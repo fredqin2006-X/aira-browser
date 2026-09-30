@@ -30,7 +30,18 @@ export class ThirdPartyNoticesMarkdownService {
       const rawFile = context.resourceManager.getRawFileContentSync(THIRD_PARTY_NOTICES_RAW_FILE_NAME);
       return buffer.from(rawFile.buffer).toString('utf8');
     } catch (_error) {
-      return '# 第三方开源许可\n\n第三方许可声明暂时无法加载。';
+      const title = this.readLocalizedName(context, 'settings_about_third_party', '第三方开源许可');
+      const message = this.readLocalizedName(context, 'settings_about_notices_unavailable', '第三方许可声明暂时无法加载。');
+      return `# ${title}\n\n${message}`;
+    }
+  }
+
+  private readLocalizedName(context: common.Context, name: string, fallback: string): string {
+    try {
+      const value = context.resourceManager.getStringByNameSync(name);
+      return value.length > 0 ? value : fallback;
+    } catch (_error) {
+      return fallback;
     }
   }
 }

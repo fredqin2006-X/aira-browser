@@ -12,7 +12,7 @@ export interface ManualElementHideSiteRowViewState {
 }
 
 export interface ManualElementHideSettingsViewState {
-  summaryText: string;
+  summaryText: ResourceStr;
   rows: ManualElementHideSiteRowViewState[];
   hasRows: boolean;
 }
@@ -26,7 +26,7 @@ export interface ManualElementHideSiteRulesViewState {
   host: string;
   enabled: boolean;
   rules: ManualElementHideRuleRowViewState[];
-  ruleCountText: string;
+  ruleCountText: ResourceStr;
   hasRules: boolean;
 }
 
@@ -52,7 +52,9 @@ export class ManualElementHideSettingsViewModel {
       return sum + site.rules.length;
     }, 0);
     return {
-      summaryText: sites.length > 0 ? `${sites.length} 个网站 · ${totalRuleCount} 条规则` : '还没有清理过页面元素',
+      summaryText: sites.length > 0
+        ? $r('app.string.element_hide_settings_summary', sites.length, totalRuleCount)
+        : $r('app.string.element_hide_settings_summary_none'),
       rows: rows,
       hasRows: rows.length > 0
     };
@@ -82,7 +84,7 @@ export class ManualElementHideSettingsViewModel {
       host: site.host,
       enabled: site.enabled,
       rules: rules,
-      ruleCountText: `${rules.length} 条清理规则`,
+      ruleCountText: $r('app.string.element_hide_settings_rules_count', rules.length),
       hasRules: rules.length > 0
     };
   }
@@ -92,7 +94,7 @@ export class ManualElementHideSettingsViewModel {
       host: host,
       enabled: false,
       rules: [],
-      ruleCountText: '没有清理规则',
+      ruleCountText: $r('app.string.element_hide_settings_no_rules'),
       hasRules: false
     };
   }

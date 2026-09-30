@@ -14,6 +14,8 @@ import {
   SearchEngineRecord
 } from '../../../common/models/BrowserModels';
 import { AppChromeIconTone } from '../../../core/resources/AppIconResources';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
+import { resourceStrKey, resourceStrPresent } from '../../../core/browser/BrowserBottomPanelText';
 import {
   BROWSER_BOTTOM_CHROME_CENTER_PRESSED_HORIZONTAL_INSET,
   BROWSER_BOTTOM_CHROME_CENTER_PRESSED_MIN_HORIZONTAL_SCALE,
@@ -91,8 +93,8 @@ export struct BrowserBottomChromeRenderer {
    * gesture-driven collapse.
    */
   @State private animatedScrollCompactProgress: number = 0;
-  @State private outgoingDisplayText: string = DEFAULT_BROWSER_BOTTOM_CHROME_PRESENTATION.centerContent.displayText;
-  @State private incomingDisplayText: string = DEFAULT_BROWSER_BOTTOM_CHROME_PRESENTATION.centerContent.displayText;
+  @State private outgoingDisplayText: ResourceStr = DEFAULT_BROWSER_BOTTOM_CHROME_PRESENTATION.centerContent.displayText;
+  @State private incomingDisplayText: ResourceStr = DEFAULT_BROWSER_BOTTOM_CHROME_PRESENTATION.centerContent.displayText;
   @State private outgoingDisplayUsesSecondaryTone: boolean =
     DEFAULT_BROWSER_BOTTOM_CHROME_PRESENTATION.centerContent.displayUsesSecondaryTone;
   @State private incomingDisplayUsesSecondaryTone: boolean =
@@ -100,7 +102,7 @@ export struct BrowserBottomChromeRenderer {
   @State private outgoingDisplayViewportWidth: number = DEFAULT_BROWSER_BOTTOM_CHROME_PRESENTATION.frame.centerViewportWidth;
   @State private incomingDisplayViewportWidth: number = DEFAULT_BROWSER_BOTTOM_CHROME_PRESENTATION.frame.centerViewportWidth;
   @State private displaySwapProgress: number = 1;
-  @State private promptText: string = DEFAULT_BROWSER_BOTTOM_CHROME_PRESENTATION.centerContent.promptText;
+  @State private promptText: ResourceStr = DEFAULT_BROWSER_BOTTOM_CHROME_PRESENTATION.centerContent.promptText;
   @State private webProtectionFeedbackVisible: boolean = false;
   @State private webProtectionFeedbackDisplayText: string = '';
   @State private webProtectionFeedbackAccessibilityLabel: string = '';
@@ -353,7 +355,7 @@ export struct BrowserBottomChromeRenderer {
       .focusable(false)
       .focusOnTouch(false)
       .enabled(this.isPhysicalTargetInteractive('compact-body'))
-      .accessibilityText(this.resolveLiveTapTarget('compact-body').accessibilityText)
+      .accessibilityText(resolveAppResourceText(this.resolveLiveTapTarget('compact-body').accessibilityText))
       // Collapsed, the capsule is the only chrome and the header host no longer blocks the page, so
       // the blocking lives here instead: confined to the capsule's own box.
       .hitTestBehavior(this.isPhysicalTargetInteractive('compact-body') ?
@@ -627,7 +629,7 @@ export struct BrowserBottomChromeRenderer {
       .focusable(false)
       .focusOnTouch(false)
       .enabled(this.isTargetEnabled(this.resolveLiveTapTarget('center-leading')))
-      .accessibilityText(this.resolveLiveTapTarget('center-leading').accessibilityText)
+      .accessibilityText(resolveAppResourceText(this.resolveLiveTapTarget('center-leading').accessibilityText))
       .hitTestBehavior(this.isTargetEnabled(this.resolveLiveTapTarget('center-leading')) ?
         HitTestMode.Default : HitTestMode.None)
       // The popup's own height is derived from this, so it must reflect the anchor's real
@@ -742,7 +744,7 @@ export struct BrowserBottomChromeRenderer {
     .stateEffect(true)
     .focusable(false)
     .focusOnTouch(false)
-    .accessibilityText(`切换到${engine.name}`)
+    .accessibilityText($r('app.string.bottom_panel_switch_search_engine', engine.name))
     .onClick(() => {
       this.searchEnginePopupVisible = false;
       this.onSelectSearchEngine(engine.id);
@@ -941,7 +943,7 @@ export struct BrowserBottomChromeRenderer {
       .focusable(false)
       .focusOnTouch(false)
       .enabled(this.isPhysicalTargetInteractive('center-body'))
-      .accessibilityText(this.resolveLiveTapTarget('center-body').accessibilityText)
+      .accessibilityText(resolveAppResourceText(this.resolveLiveTapTarget('center-body').accessibilityText))
       .hitTestBehavior(this.isPhysicalTargetInteractive('center-body') ? HitTestMode.Default : HitTestMode.None)
       .onTouch((event: TouchEvent) => {
         if (event.type === TouchType.Down) {
@@ -989,7 +991,7 @@ export struct BrowserBottomChromeRenderer {
   @Builder
   private buildAddressContextMenu() {
     Menu() {
-      MenuItem({ content: '复制链接' })
+      MenuItem({ content: $r('app.string.bottom_panel_action_copy_link') })
         .enabled(this.isAddressContextCopyLinkEnabled())
         .onClick(() => {
           if (!this.isAddressContextCopyLinkEnabled()) {
@@ -1049,7 +1051,7 @@ export struct BrowserBottomChromeRenderer {
       .focusable(false)
       .focusOnTouch(false)
       .enabled(this.isPhysicalTargetInteractive(targetKey))
-      .accessibilityText(this.resolveLiveTapTarget(targetKey).accessibilityText)
+      .accessibilityText(resolveAppResourceText(this.resolveLiveTapTarget(targetKey).accessibilityText))
       .hitTestBehavior(this.isPhysicalTargetInteractive(targetKey) ?
         HitTestMode.Default : HitTestMode.None)
       .onTouch((event: TouchEvent) => {
@@ -1086,7 +1088,7 @@ export struct BrowserBottomChromeRenderer {
       .focusable(false)
       .focusOnTouch(false)
       .enabled(this.isPhysicalTargetInteractive(targetKey))
-      .accessibilityText(this.resolveLiveTapTarget(targetKey).accessibilityText)
+      .accessibilityText(resolveAppResourceText(this.resolveLiveTapTarget(targetKey).accessibilityText))
       .hitTestBehavior(this.isPhysicalTargetInteractive(targetKey) ?
         HitTestMode.Default : HitTestMode.None)
       .onTouch((event: TouchEvent) => {
@@ -1119,7 +1121,7 @@ export struct BrowserBottomChromeRenderer {
   }
 
   @Builder
-  private buildTabSwipeTextLine(text: string, width: number, displayScale: number, offsetX: number) {
+  private buildTabSwipeTextLine(text: ResourceStr, width: number, displayScale: number, offsetX: number) {
     Text(text)
       .width(width)
       .height(BROWSER_BOTTOM_CHROME_TEXT_LINE_HEIGHT)
@@ -1624,12 +1626,12 @@ export struct BrowserBottomChromeRenderer {
       (this.currentPresentation.mode === 'resting-three-block' ||
         this.currentPresentation.mode === 'center-active-tools') &&
       this.currentPresentation.centerContent.activeLayer === 'display' &&
-      this.currentPresentation.centerContent.displayText.trim().length > 0;
+      resourceStrPresent(this.currentPresentation.centerContent.displayText);
   }
 
   private isAddressContextCopyLinkEnabled(): boolean {
     return this.currentPresentation.scene === 'web' &&
-      this.currentPresentation.centerContent.displayText.trim().length > 0;
+      resourceStrPresent(this.currentPresentation.centerContent.displayText);
   }
 
   private isPhysicalTargetInteractive(targetKey: string): boolean {

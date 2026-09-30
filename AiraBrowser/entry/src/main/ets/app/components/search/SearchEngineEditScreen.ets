@@ -19,6 +19,7 @@ import {
   SettingsSection
 } from '../settings/SettingsLayout';
 import { SettingsNavigationCoordinator } from '../../router/SettingsNavigationCoordinator';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 @Component
 export struct SearchEngineEditScreen {
@@ -29,7 +30,7 @@ export struct SearchEngineEditScreen {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY) private storedPrimaryTextColor: string = '#111318';
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string = '#5F6875';
   state: SearchEngineEditorState = {
-    title: '添加搜索引擎',
+    title: $r('app.string.settings_search_engine_add'),
     name: '',
     searchUrlTemplate: '',
     errorMessage: '',
@@ -67,7 +68,7 @@ export struct SearchEngineEditScreen {
       useTopSafeInset: this.useTopSafeInset,
       desktopPresentation: this.desktopPresentation,
       contentKind: 'readable',
-      menuActionLabel: '保存',
+      menuActionLabel: resolveAppResourceText($r('app.string.settings_search_engine_save')),
       menuActionIcon: $r('sys.symbol.checkmark'),
       menuActionEnabled: true,
       onBack: () => {
@@ -97,7 +98,7 @@ export struct SearchEngineEditScreen {
 
   @Builder
   private buildFormCard() {
-    SettingsSection({ title: '搜索引擎' }) {
+    SettingsSection({ title: $r('app.string.settings_search_engine_section') }) {
       SettingsGroupCard({
         surfaceColor: this.resolveSurfaceBackground(),
         desktopPresentation: this.desktopPresentation
@@ -105,9 +106,9 @@ export struct SearchEngineEditScreen {
         Column({ space: 16 }) {
           SettingsTextField({
             desktopPresentation: this.desktopPresentation,
-            label: '名称（可选）',
+            label: $r('app.string.settings_search_engine_name_optional'),
             text: this.state.name,
-            placeholder: '留空时自动使用搜索站点域名',
+            placeholder: $r('app.string.settings_search_engine_name_placeholder'),
             controlBackgroundColor: this.resolveControlBackground(),
             primaryTextColor: this.resolvePrimaryTextColor(),
             secondaryTextColor: this.resolveSecondaryTextColor(),
@@ -117,12 +118,12 @@ export struct SearchEngineEditScreen {
           })
           SettingsTextField({
             desktopPresentation: this.desktopPresentation,
-            label: '搜索 URL',
+            label: $r('app.string.settings_search_engine_search_url'),
             text: this.state.searchUrlTemplate,
             placeholder: 'https://example.com/search?q={searchTerms}',
             helperText: this.state.errorMessage.length > 0
               ? ''
-              : '使用 {searchTerms} 作为搜索词占位符；导入的 %s 会自动兼容。',
+              : $r('app.string.settings_search_engine_url_hint'),
             errorText: this.state.errorMessage,
             controlBackgroundColor: this.resolveControlBackground(),
             primaryTextColor: this.resolvePrimaryTextColor(),
@@ -140,13 +141,13 @@ export struct SearchEngineEditScreen {
 
   @Builder
   private buildDeleteButton() {
-    SettingsSection({ title: '管理' }) {
+    SettingsSection({ title: $r('app.string.settings_search_engine_manage_section') }) {
       SettingsGroupCard({
         surfaceColor: this.resolveSurfaceBackground(),
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsActionButton({
-          title: '删除搜索引擎',
+          title: $r('app.string.settings_search_engine_delete'),
           emphasis: 'danger',
           pressedBackgroundColor: this.resolveControlBackground(),
           onAction: () => {

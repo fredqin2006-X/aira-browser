@@ -11,6 +11,13 @@ import {
 } from './BrowserBottomPanelActionEnablement';
 import { HomeSearchPanelDetent } from './HomeSearchPanelDetentViewModel';
 import { BROWSER_BOTTOM_PANEL_MOTION_DURATION_MS } from './BrowserBottomPanelMotionTokens';
+import {
+  bottomPanelExit,
+  bottomPanelExitFullScreen,
+  bottomPanelExitPrivate,
+  bottomPanelFindUnavailable,
+  sameResourceStr
+} from './BrowserBottomPanelText';
 
 export type BrowserBottomAddressPanelActionId = BrowserBottomPanelActionId;
 
@@ -54,25 +61,25 @@ export const DEFAULT_BROWSER_BOTTOM_PANEL_MOTION_STATE: BrowserBottomPanelMotion
 
 export interface BrowserBottomAddressPanelAction {
   id: BrowserBottomAddressPanelActionId;
-  title: string;
-  trailingText?: string;
+  title: ResourceStr;
+  trailingText?: ResourceStr;
   icon: Resource;
   imageIcon?: Resource;
   airaIconId?: AiraRenderableIconId;
   enabled: boolean;
-  disabledMessage: string;
+  disabledMessage: ResourceStr;
   selected?: boolean;
   renderVersion?: number;
 }
 
 export interface BrowserBottomAddressPanelHeaderAction {
   id: string;
-  title: string;
+  title: ResourceStr;
   icon: Resource;
   imageIcon?: Resource;
   airaIconId?: AiraRenderableIconId;
   enabled: boolean;
-  disabledMessage: string;
+  disabledMessage: ResourceStr;
   triggerPolicy: BrowserBottomAddressPanelHeaderActionTriggerPolicy;
   renderVersion?: number;
 }
@@ -87,37 +94,38 @@ export interface BrowserBottomAddressPanelBuildInput {
   readerModeEnabled: boolean;
   webpageTranslationEnabled: boolean;
   offlinePageSaveEnabled: boolean;
-  offlinePageSaveDisabledMessage: string;
+  offlinePageSaveDisabledMessage: ResourceStr;
   bookmarksEnabled: boolean;
-  bookmarksActionLabel: string;
+  bookmarksActionLabel: ResourceStr;
   bookmarksActionIcon: Resource;
-  bookmarksActionDisabledMessage: string;
+  bookmarksActionDisabledMessage: ResourceStr;
   bookmarksActionSelected?: boolean;
   bookmarksActionVersion?: number;
-  userAgentActionLabel: string;
-  userAgentActionTrailingText: string;
+  userAgentActionLabel: ResourceStr;
+  userAgentActionTrailingText: ResourceStr;
   userAgentActionIcon: Resource;
   userAgentActionVersion?: number;
-  textZoomActionLabel: string;
-  textZoomActionTrailingText: string;
+  textZoomActionLabel: ResourceStr;
+  textZoomActionTrailingText: ResourceStr;
   textZoomActionIcon: Resource;
   textZoomActionVersion?: number;
-  userAgentPresetActionLabel: string;
-  userAgentPresetActionTrailingText: string;
+  userAgentPresetActionLabel: ResourceStr;
+  userAgentPresetActionTrailingText: ResourceStr;
   userAgentPresetActionIcon: Resource;
   userAgentPresetActionVersion?: number;
-  screenOrientationActionLabel: string;
-  screenOrientationActionTrailingText: string;
+  screenOrientationActionLabel: ResourceStr;
+  screenOrientationActionTrailingText: ResourceStr;
   screenOrientationActionIcon: Resource;
   screenOrientationActionVersion?: number;
-  themeModeActionLabel: string;
-  themeModeActionTrailingText: string;
+  themeModeActionLabel: ResourceStr;
+  themeModeActionTrailingText: ResourceStr;
   themeModeActionIcon: Resource;
   themeModeActionVersion?: number;
-  fullScreenModeActionLabel: string;
-  fullScreenModeActionTrailingText: string;
+  fullScreenModeActionLabel: ResourceStr;
+  fullScreenModeActionTrailingText: ResourceStr;
   fullScreenModeActionIcon: Resource;
   fullScreenModeActionVersion?: number;
+  fullScreenModeEnabled?: boolean;
   appProxyActive?: boolean;
 }
 
@@ -146,16 +154,16 @@ export function resolveBrowserBottomAddressPanelActionAiraIconId(
   return BrowserBottomPanelActionCatalog.iconId(actionId);
 }
 
-function resolveBrowserBottomAddressPanelActionTitle(actionId: BrowserBottomAddressPanelActionId): string {
+function resolveBrowserBottomAddressPanelActionTitle(actionId: BrowserBottomAddressPanelActionId): ResourceStr {
   return BrowserBottomPanelActionCatalog.title(actionId);
 }
 
-function resolveBrowserBottomAddressPanelActionTrailingText(actionId: BrowserBottomAddressPanelActionId): string {
+function resolveBrowserBottomAddressPanelActionTrailingText(actionId: BrowserBottomAddressPanelActionId): ResourceStr {
   return BrowserBottomPanelActionCatalog.subtitle(actionId);
 }
 
-function resolveBookmarkActionTrailingText(bookmarkActionLabel: string): string {
-  return bookmarkActionLabel === resolveBrowserBottomAddressPanelActionTitle('bookmark')
+function resolveBookmarkActionTrailingText(bookmarkActionLabel: ResourceStr): ResourceStr {
+  return sameResourceStr(bookmarkActionLabel, resolveBrowserBottomAddressPanelActionTitle('bookmark'))
     ? resolveBrowserBottomAddressPanelActionTrailingText('bookmark')
     : '';
 }
@@ -296,8 +304,8 @@ export class BrowserBottomAddressPanelViewModel {
       },
       {
         id: 'newPrivateTab',
-        title: privateModeActive ? '退出隐私模式' : resolveBrowserBottomAddressPanelActionTitle('newPrivateTab'),
-        trailingText: privateModeActive ? '退出' : resolveBrowserBottomAddressPanelActionTrailingText('newPrivateTab'),
+        title: privateModeActive ? bottomPanelExitPrivate() : resolveBrowserBottomAddressPanelActionTitle('newPrivateTab'),
+        trailingText: privateModeActive ? bottomPanelExit() : resolveBrowserBottomAddressPanelActionTrailingText('newPrivateTab'),
         icon: $r('sys.symbol.lock_fill'),
         airaIconId: resolveBrowserBottomAddressPanelActionAiraIconId('newPrivateTab'),
         enabled: true,
@@ -343,7 +351,7 @@ export class BrowserBottomAddressPanelViewModel {
       },
       {
         id: 'userAgent',
-        title: input.userAgentActionLabel,
+        title: resolveBrowserBottomAddressPanelActionTitle('userAgent'),
         trailingText: input.userAgentActionTrailingText,
         icon: input.userAgentActionIcon,
         airaIconId: resolveBrowserBottomAddressPanelActionAiraIconId('userAgent'),
@@ -368,14 +376,14 @@ export class BrowserBottomAddressPanelViewModel {
         icon: $r('sys.symbol.magnifyingglass'),
         airaIconId: resolveBrowserBottomAddressPanelActionAiraIconId('find'),
         enabled: input.pageFindEnabled,
-        disabledMessage: input.pageFindEnabled ? '' : '当前页面暂不可查找'
+        disabledMessage: input.pageFindEnabled ? '' : bottomPanelFindUnavailable()
       },
       {
         id: 'fullScreenMode',
         title: resolveBrowserBottomAddressPanelActionTitle('fullScreenMode'),
-        trailingText: input.fullScreenModeActionLabel === resolveBrowserBottomAddressPanelActionTitle('fullScreenMode')
-          ? input.fullScreenModeActionTrailingText
-          : input.fullScreenModeActionLabel,
+        trailingText: input.fullScreenModeEnabled === true
+          ? bottomPanelExitFullScreen()
+          : input.fullScreenModeActionTrailingText,
         icon: input.fullScreenModeActionIcon,
         airaIconId: resolveBrowserBottomAddressPanelActionAiraIconId('fullScreenMode'),
         enabled: true,
@@ -448,7 +456,7 @@ export class BrowserBottomAddressPanelViewModel {
       },
       {
         id: 'userAgentPreset',
-        title: input.userAgentPresetActionLabel,
+        title: resolveBrowserBottomAddressPanelActionTitle('userAgentPreset'),
         trailingText: input.userAgentPresetActionTrailingText,
         icon: input.userAgentPresetActionIcon,
         airaIconId: resolveBrowserBottomAddressPanelActionAiraIconId('userAgentPreset'),

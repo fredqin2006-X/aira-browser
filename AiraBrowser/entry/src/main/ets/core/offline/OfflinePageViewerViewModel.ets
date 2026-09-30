@@ -15,6 +15,7 @@ import { BrowserBottomAddressPanelHeaderAction } from '../browser/BrowserBottomA
 import { BrowserBottomChromeScrollPresentation } from '../browser/BrowserBottomChromeScrollCoordinator';
 import { BrowserBottomPanelResponsiveState } from '../browser/BrowserBottomPanelResponsiveViewModel';
 import { HomeSearchPanelDetent } from '../browser/HomeSearchPanelDetentViewModel';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export type OfflinePageViewerBackAction =
   'dismiss_reader_image_preview' |
@@ -212,21 +213,51 @@ export class OfflinePageViewerViewModel {
 
   buildInfoRows(state: OfflinePageViewerState): OfflinePageViewerInfoRow[] {
     return [
-      { label: '标题', value: this.resolveTitle(state) },
-      { label: '站点', value: this.resolveSite(state) },
-      { label: '原网页', value: state.originalUrl },
-      { label: '保存时间', value: this.formatDateTime(state.savedAt) },
-      { label: '更新时间', value: this.formatDateTime(state.updatedAt) },
-      { label: '大小', value: this.formatBytes(state.totalBytes) },
-      { label: '资源', value: this.formatResourceSummary(state.resourceCount, state.failedResourceCount) },
-      { label: '保存状态', value: this.resolveSaveStatusText(state.saveStatus) },
-      { label: '打开状态', value: this.resolveOpenStatusText(state.openStatus) }
+      { id: 'title', label: $r('app.string.offline_details_label_title'), value: this.resolveTitle(state), multiline: false },
+      { id: 'site', label: $r('app.string.offline_details_label_site'), value: this.resolveSite(state), multiline: false },
+      {
+        id: 'original',
+        label: $r('app.string.offline_details_label_original'),
+        value: state.originalUrl,
+        multiline: true
+      },
+      {
+        id: 'saved_at',
+        label: $r('app.string.offline_details_label_saved_at'),
+        value: this.formatDateTime(state.savedAt),
+        multiline: false
+      },
+      {
+        id: 'updated_at',
+        label: $r('app.string.offline_details_label_updated_at'),
+        value: this.formatDateTime(state.updatedAt),
+        multiline: false
+      },
+      { id: 'size', label: $r('app.string.offline_details_label_size'), value: this.formatBytes(state.totalBytes), multiline: false },
+      {
+        id: 'resources',
+        label: $r('app.string.offline_details_label_resources'),
+        value: this.formatResourceSummary(state.resourceCount, state.failedResourceCount),
+        multiline: false
+      },
+      {
+        id: 'save_status',
+        label: $r('app.string.offline_details_label_save_status'),
+        value: this.resolveSaveStatusText(state.saveStatus),
+        multiline: false
+      },
+      {
+        id: 'open_status',
+        label: $r('app.string.offline_details_label_open_status'),
+        value: this.resolveOpenStatusText(state.openStatus),
+        multiline: false
+      }
     ];
   }
 
   private resolveTitle(state: OfflinePageViewerState): string {
     const title = state.title.trim();
-    return title.length > 0 ? title : '未命名离线页面';
+    return title.length > 0 ? title : resolveAppResourceText($r('app.string.offline_unnamed_page'));
   }
 
   private resolveSite(state: OfflinePageViewerState): string {
@@ -235,47 +266,47 @@ export class OfflinePageViewerViewModel {
       return siteName;
     }
     const host = state.host.trim();
-    return host.length > 0 ? host : '未知来源';
+    return host.length > 0 ? host : resolveAppResourceText($r('app.string.offline_unknown_source'));
   }
 
-  private formatResourceSummary(resourceCount: number, failedResourceCount: number): string {
+  private formatResourceSummary(resourceCount: number, failedResourceCount: number): ResourceStr {
     const savedCount = Math.max(0, Math.floor(resourceCount));
     const failedCount = Math.max(0, Math.floor(failedResourceCount));
     if (failedCount > 0) {
-      return `${savedCount} 个资源 · ${failedCount} 个失败`;
+      return $r('app.string.offline_resource_summary_failed', savedCount, failedCount);
     }
-    return `${savedCount} 个资源`;
+    return $r('app.string.offline_resource_summary', savedCount);
   }
 
-  private resolveSaveStatusText(status: OfflinePageSaveStatus): string {
+  private resolveSaveStatusText(status: OfflinePageSaveStatus): ResourceStr {
     if (status === 'saved') {
-      return '已完整保存';
+      return $r('app.string.offline_save_status_saved');
     }
     if (status === 'partial_saved') {
-      return '已部分保存';
+      return $r('app.string.offline_save_status_partial');
     }
     if (status === 'saving') {
-      return '保存中';
+      return $r('app.string.offline_save_status_saving');
     }
-    return '保存失败';
+    return $r('app.string.offline_save_status_failed');
   }
 
-  private resolveOpenStatusText(status: OfflinePageOpenStatus): string {
+  private resolveOpenStatusText(status: OfflinePageOpenStatus): ResourceStr {
     if (status === 'available') {
-      return '可正常打开';
+      return $r('app.string.offline_open_status_available');
     }
     if (status === 'missing_snapshot') {
-      return '正文文件缺失';
+      return $r('app.string.offline_open_status_missing_snapshot');
     }
     if (status === 'missing_assets') {
-      return '部分资源缺失';
+      return $r('app.string.offline_open_status_missing_assets');
     }
-    return '离线副本异常';
+    return $r('app.string.offline_open_status_corrupted');
   }
 
-  private formatDateTime(value: number): string {
+  private formatDateTime(value: number): ResourceStr {
     if (value <= 0) {
-      return '暂无';
+      return $r('app.string.offline_value_unavailable');
     }
     const date = new Date(value);
     return `${date.getFullYear()}-${this.pad2(date.getMonth() + 1)}-${this.pad2(date.getDate())} ` +

@@ -20,6 +20,7 @@ import {
   SitePermissionRule
 } from '../../common/models/BrowserModels';
 import { SettingsCenterDestination } from './SettingsCenterViewModel';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { BrowserThemePaletteService } from '../../services/theme/BrowserThemePaletteService';
 import {
   APP_ICP_FILING_NUMBER,
@@ -133,7 +134,7 @@ export type SettingsDetailActionButtonEmphasis = 'primary' | 'danger';
 
 export interface SettingsDetailOption {
   id: string;
-  label: string;
+  label: ResourceStr;
   helperText: string;
   isSelected: boolean;
   isEnabled: boolean;
@@ -213,7 +214,7 @@ export interface SettingsAboutDisplayState {
 
 export interface SettingsDetailGroupState {
   id: string;
-  title: string;
+  title: ResourceStr;
   rows: SettingsDetailRowState[];
   actionButtons?: SettingsDetailActionButtonState[];
   footerText?: string;
@@ -229,7 +230,7 @@ export interface SettingsDetailActionButtonState {
 
 export interface SettingsDetailState {
   id: SettingsCenterDestination;
-  title: string;
+  title: ResourceStr;
   groups: SettingsDetailGroupState[];
   actionButtons: SettingsDetailActionButtonState[];
 }
@@ -599,12 +600,12 @@ export class SettingsDetailViewModel {
     }
     return {
       id: 'app_service_mode',
-      title: '应用服务模式',
+      title: $r('app.string.settings_advanced_service_mode_title'),
       actionButtons: [],
       groups: [
         {
           id: 'mode',
-          title: '服务模式',
+          title: $r('app.string.settings_advanced_service_mode_section'),
           rows: [
             this.optionRow(
               'app_service_mode_full',
@@ -636,12 +637,12 @@ export class SettingsDetailViewModel {
   ): SettingsDetailState {
     return {
       id: 'advanced_settings',
-      title: '高级设置',
+      title: $r('app.string.settings_advanced_title'),
       actionButtons: [],
       groups: [
         {
           id: 'tab_runtime_retention',
-          title: '标签页运行策略',
+          title: $r('app.string.settings_advanced_tab_runtime_section'),
           rows: [
             this.navigationRow(
               'retention_runtime_policy',
@@ -658,7 +659,7 @@ export class SettingsDetailViewModel {
         },
         {
           id: 'local_data',
-          title: '本地数据',
+          title: $r('app.string.settings_advanced_local_data_section'),
           rows: [
             this.navigationRow(
               'local_backup',
@@ -672,7 +673,7 @@ export class SettingsDetailViewModel {
         },
         {
           id: 'service_mode',
-          title: '服务模式',
+          title: $r('app.string.settings_advanced_service_mode_section'),
           rows: [
             this.navigationRow(
               'app_service_mode',
@@ -699,7 +700,7 @@ export class SettingsDetailViewModel {
   ): SettingsDetailState {
     return {
       id: 'privacy_security',
-      title: '隐私防护',
+      title: $r('app.string.settings_privacy_protection_title'),
       actionButtons: [
         this.actionButton(
           'clear_data',
@@ -711,7 +712,7 @@ export class SettingsDetailViewModel {
       groups: [
         {
           id: 'web_protection',
-          title: '网页防护',
+          title: $r('app.string.settings_privacy_protection_web_protection'),
           rows: [
             this.navigationRow(
               'ad_blocker',
@@ -749,7 +750,7 @@ export class SettingsDetailViewModel {
         },
         {
           id: 'site_privacy_data',
-          title: '权限与隐私数据',
+          title: $r('app.string.settings_privacy_protection_site_data'),
           rows: [
             this.navigationRow(
               'site_settings',
@@ -763,7 +764,7 @@ export class SettingsDetailViewModel {
         },
         {
           id: 'network_privacy',
-          title: '网络保护',
+          title: $r('app.string.settings_privacy_protection_network'),
           rows: [
             this.navigationRow(
               'secure_dns_settings',
@@ -778,7 +779,7 @@ export class SettingsDetailViewModel {
         },
         {
           id: 'passwords',
-          title: '密码',
+          title: $r('app.string.settings_privacy_protection_passwords'),
           rows: [
             this.navigationRow(
               'passwords',
@@ -800,12 +801,12 @@ export class SettingsDetailViewModel {
   ): SettingsDetailState {
     return {
       id: 'private_mode',
-      title: '隐私模式',
+      title: $r('app.string.settings_privacy_mode'),
       actionButtons: [],
       groups: [
         {
           id: 'private_entry',
-          title: '进入方式',
+          title: $r('app.string.settings_privacy_entry'),
           rows: [
             this.switchRow(
               'private_authentication',
@@ -828,7 +829,7 @@ export class SettingsDetailViewModel {
         },
         {
           id: 'private_data',
-          title: '数据与预览',
+          title: $r('app.string.settings_privacy_data'),
           rows: [
             this.switchRow(
               'private_preserve_cookies',
@@ -859,7 +860,7 @@ export class SettingsDetailViewModel {
         },
         {
           id: 'private_scripts',
-          title: '脚本',
+          title: $r('app.string.user_script_nav_scripts'),
           rows: [
             this.switchRow(
               'allow_user_scripts_in_private_mode',
@@ -876,7 +877,7 @@ export class SettingsDetailViewModel {
         },
         {
           id: 'private_restore',
-          title: '恢复',
+          title: $r('app.string.settings_privacy_restore'),
           rows: [
             this.navigationRow(
               'private_restore_policy',
@@ -990,12 +991,12 @@ export class SettingsDetailViewModel {
   private buildCommonState(general: SettingsGeneralDisplayState): SettingsDetailState {
     return {
       id: 'general',
-      title: '通用',
+      title: $r('app.string.settings_general'),
       actionButtons: [],
       groups: [
         {
           id: 'system',
-          title: '系统',
+          title: $r('app.string.settings_general_system'),
           rows: [
             this.navigationRow(
               'default_browser',
@@ -1008,7 +1009,7 @@ export class SettingsDetailViewModel {
         },
         {
           id: 'startup_tabs',
-          title: '启动与标签页',
+          title: $r('app.string.settings_general_startup_tabs'),
           rows: [
             this.navigationRow(
               'startup_behavior',
@@ -1028,7 +1029,7 @@ export class SettingsDetailViewModel {
         },
         {
           id: 'browsing_data',
-          title: '浏览资料',
+          title: $r('app.string.settings_general_browsing_data'),
           rows: [
             this.navigationRow(
               'history_retention',
@@ -1041,7 +1042,7 @@ export class SettingsDetailViewModel {
         },
         {
           id: 'keyboard',
-          title: '键盘',
+          title: $r('app.string.settings_general_keyboard'),
           rows: [
             this.navigationRow(
               'keyboard_shortcuts',
@@ -1081,7 +1082,7 @@ export class SettingsDetailViewModel {
     const groups: SettingsDetailGroupState[] = [
       {
         id: 'identity',
-        title: '应用',
+        title: $r('app.string.settings_about_app'),
         rows: [
           this.staticRow('name', '应用名称', about.appName, ''),
           this.staticRow('version', '版本', `${about.versionName} (${about.versionCode})`, ''),
@@ -1090,14 +1091,14 @@ export class SettingsDetailViewModel {
       },
       {
         id: 'support',
-        title: '应用支持',
+        title: $r('app.string.settings_about_support'),
         rows: supportRows
       }
     ];
     if (AIRA_DISTRIBUTION_CAPABILITY_OWNER.isCommunity()) {
       groups.push({
         id: 'open_source',
-        title: '开源项目',
+        title: $r('app.string.settings_about_open_source'),
         rows: [
           this.navigationRow(
             'source_repository',
@@ -1191,14 +1192,14 @@ export class SettingsDetailViewModel {
       ];
       groups.push({
         id: 'legal_compliance',
-        title: '协议与合规',
+        title: $r('app.string.settings_about_legal'),
         rows: legalRows,
         footerText: '相关协议和清单由 Aira 官方公开网页提供。'
       });
     }
     return {
       id: 'about',
-      title: '关于Aira',
+      title: $r('app.string.settings_about'),
       actionButtons: [],
       groups: groups
     };
@@ -1216,7 +1217,7 @@ export class SettingsDetailViewModel {
     const groups: SettingsDetailGroupState[] = [
         {
           id: 'theme_mode',
-          title: '主题模式',
+          title: $r('app.string.settings_appearance_theme_mode'),
           rows: [
             this.optionRow(
               'theme_mode_light',
@@ -1246,7 +1247,7 @@ export class SettingsDetailViewModel {
         },
         {
           id: 'theme',
-          title: '主题',
+          title: $r('app.string.settings_appearance_theme'),
           rows: [
             this.navigationRow(
               'theme_palette',
@@ -1261,7 +1262,7 @@ export class SettingsDetailViewModel {
         },
         {
           id: 'icons_web',
-          title: '应用与网页外观',
+          title: $r('app.string.settings_appearance_app_web'),
           rows: [
             this.navigationRow(
               'app_icon',
@@ -1283,7 +1284,7 @@ export class SettingsDetailViewModel {
         },
         {
           id: 'tabs_overview',
-          title: '标签页',
+          title: $r('app.string.settings_shortcuts_tabs'),
           rows: [
             isLargeScreen ?
               this.navigationRow(
@@ -1311,7 +1312,7 @@ export class SettingsDetailViewModel {
     if (tabletInterfaceModeVisible) {
       groups.unshift({
         id: 'interface_mode',
-        title: '界面',
+        title: $r('app.string.settings_appearance_interface'),
         rows: [
           this.navigationRow(
             'tablet_interface_mode',
@@ -1327,7 +1328,7 @@ export class SettingsDetailViewModel {
     if (isLargeScreen) {
       groups.push({
         id: 'desktop_bookmark_bar',
-        title: '大屏浏览器栏',
+        title: $r('app.string.settings_appearance_browser_bar'),
         rows: [
           this.desktopBookmarkBarVisibilityRow(appearance, canEditDevicePreferences)
         ],
@@ -1336,7 +1337,7 @@ export class SettingsDetailViewModel {
     }
     return {
       id: 'appearance_toolbar',
-      title: '外观设置',
+      title: $r('app.string.settings_appearance'),
       actionButtons: [],
       groups: groups
     };
@@ -1348,7 +1349,7 @@ export class SettingsDetailViewModel {
   ): SettingsDetailState {
     return {
       id: 'experiments',
-      title: '实验室',
+      title: $r('app.string.settings_experiments_title'),
       actionButtons: [],
       groups: [
         {
@@ -1499,18 +1500,20 @@ export class SettingsDetailViewModel {
     const isFullServiceMode = appServiceMode !== 'basic';
     return {
       id: 'web_features',
-      title: '网页功能',
+      title: $r('app.string.settings_web_features'),
       actionButtons: [],
       groups: [
         {
           id: 'translation',
-          title: '网页翻译',
+          title: $r('app.string.settings_web_translation'),
           rows: [
             this.navigationRow(
               'webpage_translation',
-              '网页翻译',
-              this.getFullModeRequiredValue(isFullServiceMode),
-              isFullServiceMode ? '选择翻译服务、编辑服务配置和目标语言' : '全量模式下可用',
+              resolveAppResourceText($r('app.string.settings_web_translation')),
+              isFullServiceMode ? '' : resolveAppResourceText($r('app.string.settings_web_full_mode_required')),
+              resolveAppResourceText(isFullServiceMode
+                ? $r('app.string.settings_web_translation_summary')
+                : $r('app.string.settings_web_full_mode_only')),
               'open_webpage_translation_settings',
               isFullServiceMode
             )
@@ -1518,13 +1521,13 @@ export class SettingsDetailViewModel {
         },
         {
           id: 'downloads',
-          title: '下载',
+          title: $r('app.string.settings_web_downloads'),
           rows: [
             this.navigationRow(
               'downloads',
-              '下载设置',
+              resolveAppResourceText($r('app.string.settings_web_download_settings')),
               '',
-              '保存位置、自动清理和私密下载策略',
+              resolveAppResourceText($r('app.string.settings_web_download_summary')),
               'open_download_settings'
             )
           ]
@@ -1660,7 +1663,7 @@ export class SettingsDetailViewModel {
     return this.dropdownRow(
       'desktop_bookmark_bar',
       '显示书签栏',
-      selectedOption !== undefined ? selectedOption.label : '',
+      selectedOption !== undefined ? resolveAppResourceText(selectedOption.label) : '',
       isEnabled ? '' : '当前会话不可修改全局设置',
       'set_desktop_bookmark_bar_visibility',
       options,
@@ -1925,7 +1928,7 @@ export class SettingsDetailViewModel {
       kind: 'dropdown',
       action: row.action,
       title: row.title,
-      value: selectedOption !== undefined ? selectedOption.label : row.value,
+      value: selectedOption !== undefined ? resolveAppResourceText(selectedOption.label) : row.value,
       valueSwatchColor: row.valueSwatchColor,
       helperText: row.helperText,
       isEnabled: row.isEnabled,

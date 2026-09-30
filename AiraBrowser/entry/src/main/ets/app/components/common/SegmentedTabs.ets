@@ -8,7 +8,7 @@ import {
 
 export interface SegmentedTabOption {
   id: string;
-  title: string;
+  title: ResourceStr;
 }
 
 @Component
@@ -55,8 +55,7 @@ export struct SegmentedTabs {
           }
         }
           .tabBar(this.buildTabBar(option))
-      }, (option: SegmentedTabOption) =>
-        `${option.id}:${option.title}:${this.optionsRevision}`)
+      }, (option: SegmentedTabOption) => `${option.id}:${this.optionsRevision}`)
     }
     .vertical(false)
     .scrollable(false)
@@ -166,7 +165,15 @@ export struct SegmentedTabs {
   }
 
   private buildOptionTitlesSignature(): string {
-    return this.options.map((option: SegmentedTabOption) => `${option.id}:${option.title}`).join('|');
+    return this.options.map((option: SegmentedTabOption) =>
+      `${option.id}:${this.resourceStrKey(option.title)}`).join('|');
+  }
+
+  private resourceStrKey(value: ResourceStr): string {
+    if (typeof value === 'string') {
+      return value;
+    }
+    return `resource:${value.id}`;
   }
 
   private isMaterialAvailable(): boolean {

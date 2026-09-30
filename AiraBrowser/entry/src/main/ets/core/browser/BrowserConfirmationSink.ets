@@ -1,8 +1,8 @@
 export interface BrowserConfirmationRequest {
-  title: string;
-  message: string;
-  cancelLabel: string;
-  confirmLabel: string;
+  title: ResourceStr;
+  message: ResourceStr;
+  cancelLabel: ResourceStr;
+  confirmLabel: ResourceStr;
   confirmTone?: 'warning' | 'alert';
   onCancel?: () => void;
   onConfirm: () => void;

@@ -90,12 +90,12 @@ export struct HomeLogoSettingsContent {
   @Builder
   private buildScaleSection() {
     SettingsSection({
-      title: 'Logo 大小',
+      title: $r('app.string.settings_home_logo_size'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       Column({ space: 8 }) {
         Row() {
-          Text('小')
+          Text($r('app.string.settings_logo_scale_small'))
             .fontSize(12)
             .fontColor(this.storedSecondaryTextColor)
           Blank()
@@ -143,12 +143,12 @@ export struct HomeLogoSettingsContent {
   @Builder
   private buildOpacitySection() {
     SettingsSection({
-      title: 'Logo 透明度',
+      title: $r('app.string.settings_home_logo_opacity'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       Column({ space: 8 }) {
         Row() {
-          Text('透明')
+          Text($r('app.string.settings_logo_opacity_clear'))
             .fontSize(12)
             .fontColor(this.storedSecondaryTextColor)
           Blank()
@@ -195,7 +195,7 @@ export struct HomeLogoSettingsContent {
   @Builder
   private buildGridSection() {
     SettingsSection({
-      title: '选择 Logo',
+      title: $r('app.string.settings_home_logo_choose'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       Column({ space: this.viewState().columnGap }) {
@@ -333,10 +333,10 @@ export struct HomeLogoSettingsContent {
     }
     try {
       this.getUIContext().getPromptAction().showActionMenu({
-        title: '选择图片来源',
+        title: $r('app.string.settings_home_logo_source'),
         buttons: [
-          { text: '从相册选择', color: this.storedPrimaryTextColor },
-          { text: '从文件选择（SVG / GIF）', color: this.storedPrimaryTextColor }
+          { text: $r('app.string.settings_home_logo_from_photos'), color: this.storedPrimaryTextColor },
+          { text: $r('app.string.settings_home_logo_from_files'), color: this.storedPrimaryTextColor }
         ]
       })
         .then((result: promptAction.ActionMenuSuccessResponse) => {

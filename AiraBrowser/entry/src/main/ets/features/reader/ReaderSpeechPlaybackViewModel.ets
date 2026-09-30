@@ -42,7 +42,7 @@ export class ReaderSpeechPlaybackViewModel {
     status: ReaderSpeechPlaybackStatus,
     currentChunkIndex: number,
     totalChunks: number,
-    message: string
+    message: ResourceStr
   ): ReaderSpeechState {
     return {
       status: status,
@@ -52,7 +52,7 @@ export class ReaderSpeechPlaybackViewModel {
     };
   }
 
-  buildErrorState(message: string): ReaderSpeechState {
+  buildErrorState(message: ResourceStr): ReaderSpeechState {
     return {
       status: 'error',
       currentChunkIndex: 0,
@@ -122,8 +122,8 @@ export class ReaderSpeechPlaybackViewModel {
     return voice?.id ?? '';
   }
 
-  resolveVoiceLabel(voice?: ReaderSpeechVoiceOption): string {
-    return voice?.title ?? '系统默认音色';
+  resolveVoiceLabel(voice?: ReaderSpeechVoiceOption): ResourceStr {
+    return voice?.title ?? $r('app.string.reader_voice_default');
   }
 
   private resolveSafeTotalChunks(state: ReaderSpeechState, totalChunks: number): number {

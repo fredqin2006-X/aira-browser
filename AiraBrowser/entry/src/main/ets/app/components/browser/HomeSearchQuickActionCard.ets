@@ -30,7 +30,7 @@ export struct HomeSearchQuickActionCard {
   @StorageProp(BROWSER_THEME_STORAGE_RESOLVED_MODE_KEY) private storedResolvedThemeMode: string = 'light';
   @Prop imageIcon: Resource | undefined = undefined;
   @Prop airaIconId: AiraRenderableIconId | undefined = undefined;
-  @Prop label: string = '';
+  @Prop label: ResourceStr = '';
   @Prop cardEnabled: boolean = true;
   @Prop cardImageFillColor: ResourceColor | undefined = undefined;
   @Prop cardLabelColor: ResourceColor | undefined = undefined;

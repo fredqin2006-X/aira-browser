@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   CustomHomepageItem,
   CustomHomepageRepositorySnapshot,
@@ -733,7 +734,7 @@ export class CustomHomepageSettingsViewModel {
 
   private formatByteSize(byteSize: number): string {
     if (byteSize <= 0) {
-      return '大小未知';
+      return resolveAppResourceText($r('app.string.settings_custom_home_size_unknown'));
     }
     if (byteSize < 1024) {
       return `${byteSize} B`;
@@ -762,12 +763,12 @@ export class CustomHomepageSettingsViewModel {
 
   private resolveItemSubtitle(item: CustomHomepageItem): string {
     if (item.kind === 'remote_url') {
-      return item.remoteUrl.trim().length > 0 ? `网址 · ${item.remoteUrl.trim()}` : '网址';
+      return item.remoteUrl.trim().length > 0 ? resolveAppResourceText($r('app.string.settings_custom_home_subtitle_url'), item.remoteUrl.trim()) : resolveAppResourceText($r('app.string.settings_custom_home_subtitle_url_only'));
     }
     const size = item.kind === 'zip_package' && item.packageSize > 0 ? item.packageSize : item.byteSize;
-    const prefix = item.kind === 'zip_package' ? '主页包' : 'HTML';
+    const prefix = item.kind === 'zip_package' ? resolveAppResourceText($r('app.string.settings_custom_home_kind_package')) : resolveAppResourceText($r('app.string.settings_custom_home_kind_html'));
     const author = item.author.trim();
-    return author.length > 0 ? `${prefix} · ${author} · ${this.formatByteSize(size)}` : `${prefix} · ${this.formatByteSize(size)}`;
+    return author.length > 0 ? resolveAppResourceText($r('app.string.settings_custom_home_subtitle_meta'), prefix, author, this.formatByteSize(size)) : resolveAppResourceText($r('app.string.settings_custom_home_subtitle_short'), prefix, this.formatByteSize(size));
   }
 
 }

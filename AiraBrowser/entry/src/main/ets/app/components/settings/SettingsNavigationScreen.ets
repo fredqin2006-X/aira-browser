@@ -21,6 +21,7 @@ import {
   SettingsSection
 } from './SettingsLayout';
 import { SettingsAccountCardRow, SettingsNavigationRow } from './SettingsRows';
+import { resourceStrKey } from '../../../core/browser/BrowserBottomPanelText';
 import { SettingsEmbeddedDetailPanel } from './SettingsEmbeddedDetailPanel';
 import {
   BROWSER_THEME_STORAGE_DIVIDER_KEY,
@@ -366,13 +367,13 @@ export struct SettingsNavigationScreen {
         .fontWeight(FontWeight.Medium)
         .fontColor([this.resolveSecondaryTextColor()])
 
-      Text('未找到匹配的设置项')
+      Text($r('app.string.settings_search_no_match'))
         .fontSize(15)
         .fontWeight(FontWeight.Medium)
         .fontColor(this.resolvePrimaryTextColor())
         .textAlign(TextAlign.Center)
 
-      Text('换个关键词试试')
+      Text($r('app.string.settings_search_try_another'))
         .fontSize(13)
         .fontColor(this.resolveSecondaryTextColor())
         .textAlign(TextAlign.Center)
@@ -464,7 +465,7 @@ export struct SettingsNavigationScreen {
   }
 
   private resolveSearchGroupRenderKey(group: SettingsCenterSearchGroupState): string {
-    return `${this.resolveThemeRenderKey()}:${group.id}:${group.title}`;
+    return `${this.resolveThemeRenderKey()}:${group.id}:${resourceStrKey(group.title)}`;
   }
 
   private resolveRowRenderKey(row: SettingsCenterRowState): string {

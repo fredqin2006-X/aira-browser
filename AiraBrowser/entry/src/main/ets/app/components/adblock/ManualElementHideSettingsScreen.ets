@@ -48,7 +48,7 @@ export struct ManualElementHideSettingsScreen {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string = '#5F6875';
   @Watch('syncSiteIcons')
   @Prop state: ManualElementHideSettingsViewState = {
-    summaryText: '还没有清理过页面元素',
+    summaryText: $r('app.string.element_hide_settings_summary_none'),
     rows: [],
     hasRows: false
   };
@@ -80,7 +80,7 @@ export struct ManualElementHideSettingsScreen {
 
   build() {
     SettingsHdsScaffold({
-      title: '已清理页面元素',
+      title: $r('app.string.element_hide_settings_title'),
       backIconKind: 'back',
       pageBackground: this.resolvePageBackground(),
       headerButtonBackground: this.resolvePressedBackground(),
@@ -122,7 +122,7 @@ export struct ManualElementHideSettingsScreen {
   @Builder
   private buildSummarySection() {
     SettingsSection({
-      title: '概览',
+      title: $r('app.string.element_hide_settings_overview'),
       secondaryTextColor: this.resolveSecondaryTextColor()
     }) {
       SettingsGroupCard({
@@ -139,7 +139,7 @@ export struct ManualElementHideSettingsScreen {
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-            Text('关闭某个网站后，刷新或再次打开时不再自动隐藏')
+            Text($r('app.string.element_hide_settings_footnote'))
               .width('100%')
               .fontSize(13)
               .lineHeight(18)
@@ -161,7 +161,7 @@ export struct ManualElementHideSettingsScreen {
   private buildSiteSection() {
     if (this.state.hasRows) {
       SettingsSection({
-        title: '网站',
+        title: $r('app.string.element_hide_settings_sites_title'),
         secondaryTextColor: this.resolveSecondaryTextColor()
       }) {
         Column({ space: 10 }) {
@@ -179,8 +179,8 @@ export struct ManualElementHideSettingsScreen {
     } else {
       AppEmptyState({
         airaIconId: 'browser.toolbar.manualElementHide',
-        title: '还没有清理过页面元素',
-        message: '在网页里使用“标记广告”后，站点会出现在这里',
+        title: $r('app.string.element_hide_settings_empty_title'),
+        message: $r('app.string.element_hide_settings_empty_message'),
         topPadding: 72,
         bottomPadding: 72,
         fillHeight: false,
@@ -195,7 +195,7 @@ export struct ManualElementHideSettingsScreen {
     SettingsNavigationRow({
       title: item.title,
       desktopPresentation: this.desktopPresentation,
-      value: `${item.ruleCount} 项`,
+      value: $r('app.string.element_hide_settings_rule_items', item.ruleCount),
       rowPosition: 'single',
       useCustomLeading: true,
       primaryTextColor: this.resolvePrimaryTextColor(),

@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { CustomHomepageChoiceViewState } from '../../../core/customhome/CustomHomepageSettingsViewModel';
 import {
   BROWSER_THEME_STORAGE_ACCENT_KEY,
@@ -313,7 +314,7 @@ export struct CustomHomepageFullscreenPreview {
         .height('100%')
         .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
         .enabled(!this.busy)
-        .accessibilityText('关闭预览')
+        .accessibilityText(resolveAppResourceText($r('app.string.settings_custom_home_close_preview')))
         .hitTestBehavior(HitTestMode.Block)
         .onClick(() => {
           this.onClose();
@@ -339,7 +340,7 @@ export struct CustomHomepageFullscreenPreview {
             SymbolGlyph($r('sys.symbol.checkmark_circle_fill'))
               .fontSize(16)
               .fontColor([this.storedAccentColor])
-            Text('当前主页')
+            Text($r('app.string.settings_custom_home_current'))
               .fontSize(16)
               .fontWeight(FontWeight.Medium)
               .fontColor(this.storedPrimaryTextColor)
@@ -371,7 +372,7 @@ export struct CustomHomepageFullscreenPreview {
           overlayColor: this.storedAccentColor,
           overlayOpacity: 1
         }) {
-          Text('使用该主页')
+          Text($r('app.string.settings_custom_home_use_title'))
             .fontSize(16)
             .fontWeight(FontWeight.Medium)
             .fontColor('#FFFFFF')
@@ -383,7 +384,7 @@ export struct CustomHomepageFullscreenPreview {
           .height('100%')
           .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
           .enabled(!this.busy)
-          .accessibilityText('使用该主页')
+          .accessibilityText($r('app.string.settings_custom_home_use_title'))
           .hitTestBehavior(HitTestMode.Block)
           .onClick(() => {
             this.handleUseCurrentHomepage();

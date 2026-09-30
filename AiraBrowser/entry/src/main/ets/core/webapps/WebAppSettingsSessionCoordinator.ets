@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { BrowserDesktopSiteMode } from '../../services/web/BrowserUserAgentService';
 import {
   DEFAULT_BROWSER_PROFILE_ID,
@@ -120,11 +121,11 @@ export class WebAppSettingsSessionActionResult {
 export class WebAppSettingsSessionSnapshot {
   entryKind: WebAppSettingsSessionEntryKind;
   status: WebAppSettingsSessionStatus;
-  errorMessage: string;
+  errorMessage: ResourceStr;
   listState: WebAppSettingsListState;
   detailState: WebAppSettingsDetailState;
   siteState: SiteCustomizationDetailViewState;
-  permissionTitle: string;
+  permissionTitle: ResourceStr;
   permissionGroup: SiteCustomizationPermissionGroupState;
   desktopSiteMode: BrowserDesktopSiteMode;
   operationBusy: boolean;
@@ -133,11 +134,11 @@ export class WebAppSettingsSessionSnapshot {
   constructor(
     entryKind: WebAppSettingsSessionEntryKind,
     status: WebAppSettingsSessionStatus,
-    errorMessage: string,
+    errorMessage: ResourceStr,
     listState: WebAppSettingsListState,
     detailState: WebAppSettingsDetailState,
     siteState: SiteCustomizationDetailViewState,
-    permissionTitle: string,
+    permissionTitle: ResourceStr,
     permissionGroup: SiteCustomizationPermissionGroupState,
     desktopSiteMode: BrowserDesktopSiteMode,
     operationBusy: boolean,
@@ -181,11 +182,11 @@ export class WebAppSettingsSessionCoordinator {
   private capabilityCatalog: SiteCapabilityCatalogService = new SiteCapabilityCatalogService();
   private activeEntry: WebAppSettingsSessionEntry = new WebAppSettingsSessionEntry('invalid');
   private currentStatus: WebAppSettingsSessionStatus = 'ready';
-  private errorMessage: string = '';
+  private errorMessage: ResourceStr = '';
   private listState: WebAppSettingsListState;
   private detailState: WebAppSettingsDetailState;
   private siteState: SiteCustomizationDetailViewState;
-  private permissionTitle: string = '网站权限';
+  private permissionTitle: ResourceStr = $r('app.string.settings_web_apps_permission_fallback');
   private permissionGroup: SiteCustomizationPermissionGroupState;
   private desktopSiteMode: BrowserDesktopSiteMode = 'default';
   private operationBusy: boolean = false;
@@ -252,7 +253,7 @@ export class WebAppSettingsSessionCoordinator {
     this.errorMessage = '';
     if (!this.isValidEntry(entry)) {
       this.currentStatus = 'error';
-      this.errorMessage = '这个设置页面暂时无法打开';
+      this.errorMessage = $r('app.string.settings_web_apps_open_failed');
       this.publish();
       return;
     }
@@ -280,7 +281,7 @@ export class WebAppSettingsSessionCoordinator {
       this.publish();
     } catch (_error) {
       this.currentStatus = 'error';
-      this.errorMessage = '读取网页应用设置失败';
+      this.errorMessage = $r('app.string.settings_web_apps_read_failed');
       this.publish();
     }
   }
@@ -604,7 +605,7 @@ export class WebAppSettingsSessionCoordinator {
     const group = matchedGroup === undefined
       ? this.buildFallbackPermissionGroup(entry.permissionKind)
       : matchedGroup;
-    return new WebAppSettingsPermissionSnapshot(`${group.title}权限`, group);
+    return new WebAppSettingsPermissionSnapshot($r('app.string.settings_web_apps_permission_title', group.title), group);
   }
 
   private resolveDesktopSiteMode(host: string, origin: string): BrowserDesktopSiteMode {
@@ -644,7 +645,7 @@ export class WebAppSettingsSessionCoordinator {
       summary: '',
       externalNavigationPolicy: 'ask',
       hasExternalNavigationRule: false,
-      desktopSiteSummary: '跟随全局',
+      desktopSiteSummary: resolveAppResourceText($r('app.string.settings_site_customization_follow_global')),
       hasDesktopSiteRule: false,
       privateSiteEnabled: false,
       preserveCookiesOnClose: false,
@@ -682,7 +683,7 @@ export class WebAppSettingsSessionCoordinator {
     }
     this.operationBusy = false;
     this.currentStatus = 'error';
-    this.errorMessage = '保存网页应用设置失败，请重试';
+    this.errorMessage = $r('app.string.settings_web_apps_save_failed');
     this.publish();
   }
 
@@ -724,10 +725,10 @@ class WebAppSettingsSessionDetailSnapshot {
 }
 
 class WebAppSettingsPermissionSnapshot {
-  title: string;
+  title: ResourceStr;
   group: SiteCustomizationPermissionGroupState;
 
-  constructor(title: string, group: SiteCustomizationPermissionGroupState) {
+  constructor(title: ResourceStr, group: SiteCustomizationPermissionGroupState) {
     this.title = title;
     this.group = group;
   }

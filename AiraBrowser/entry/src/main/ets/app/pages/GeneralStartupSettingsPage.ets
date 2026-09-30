@@ -60,7 +60,7 @@ struct GeneralStartupSettingsPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '启动行为',
+        title: $r('app.string.settings_general_startup'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -83,7 +83,7 @@ struct GeneralStartupSettingsPage {
   @Builder
   private buildStartupSection() {
     SettingsSection({
-      title: '启动时',
+      title: $r('app.string.settings_general_startup_when'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {

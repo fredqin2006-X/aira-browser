@@ -281,7 +281,7 @@ export struct ReadingSurface {
       if (this.options.documentHeaderVisible) {
         ListItem() {
           Column({ space: 8 }) {
-            Text(this.document.title.length > 0 ? this.document.title : '未命名文章')
+            Text(this.document.title.length > 0 ? this.document.title : $r('app.string.reader_untitled_article'))
               .fontSize(this.appearance.fontSize + 8)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.resolveTextColor())
@@ -538,7 +538,7 @@ export struct ReadingSurface {
           })
       } else if (this.shouldShowImageFallback(block)) {
         Row() {
-          Text('图片未加载')
+          Text($r('app.string.reader_image_not_loaded'))
             .fontSize(12)
             .fontColor(this.resolveSecondaryTextColor())
             .textAlign(TextAlign.Center)
@@ -690,12 +690,17 @@ export struct ReadingSurface {
     return this.documentFlow.buildAnchorSignature(anchor);
   }
 
+  private resolveContinuationLabelSignature(): string {
+    const label: ResourceStr = this.options.continuationLabel;
+    return typeof label === 'string' ? label : `${(label as Resource).id}`;
+  }
+
   private buildPresentationSignature(): string {
     return `${this.mode}|${this.appearance.fontSize}|${this.resolveEffectiveTheme()}|` +
       `${this.appearance.lineHeight}|${this.appearance.pageWidth}|` +
       `${this.options.documentHeaderVisible}|${this.options.pageHeaderVisible}|` +
       `${this.options.pageNumberVisible}|${this.options.paragraphIndentVisible}|` +
-      `${this.options.continuationAvailable}|${this.options.continuationLabel}|` +
+      `${this.options.continuationAvailable}|${this.resolveContinuationLabelSignature()}|` +
       `${this.options.contentTopInset}|${this.options.contentBottomInset}|` +
       `${this.resolvePagedColumnCount()}|${this.resolvePagedColumnGap()}|${this.resolvePagedSpreadWidth()}|` +
       `${this.contentWidth}|` +

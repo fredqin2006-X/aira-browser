@@ -29,6 +29,7 @@ import {
   RECORD_LIST_ROW_TITLE_SIZE
 } from './RecordListTokens';
 import { normalizeHomeWallpaperTransitionDuration } from '../../../core/wallpaper/HomeWallpaperPresentationTokens';
+import { hasAppResourceText } from '../../../core/resources/AppResourceText';
 
 @Component
 export struct WebsiteRecordRow {
@@ -38,9 +39,9 @@ export struct WebsiteRecordRow {
   @StorageProp(BROWSER_THEME_STORAGE_SURFACE_BACKGROUND_KEY) private storedSurfaceBackgroundColor: string = '#FFFFFF';
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY) private storedPrimaryTextColor: string = '#111318';
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string = '#5F6875';
-  @Prop title: string = '';
-  @Prop titleMeta: string = '';
-  @Prop subtitle: string = '';
+  @Prop title: ResourceStr = '';
+  @Prop titleMeta: ResourceStr = '';
+  @Prop subtitle: ResourceStr = '';
   @Prop fallbackLabel: string = '#';
   @Prop iconUri: string = '';
   @Prop iconPixelMap: image.PixelMap | undefined = undefined;
@@ -266,7 +267,7 @@ export struct WebsiteRecordRow {
         .layoutWeight(1)
         .constraintSize({ minWidth: 0 })
 
-      if (this.titleMeta.length > 0) {
+      if (hasAppResourceText(this.titleMeta)) {
         Text(this.titleMeta)
           .fontSize(RECORD_LIST_ROW_SUBTITLE_SIZE)
           .fontColor(this.resolveSecondaryTextColor())
@@ -292,7 +293,7 @@ export struct WebsiteRecordRow {
         .layoutWeight(1)
         .constraintSize({ minWidth: 0 })
 
-      if (this.titleMeta.length > 0) {
+      if (hasAppResourceText(this.titleMeta)) {
         Text(this.titleMeta)
           .fontSize(RECORD_LIST_ROW_SUBTITLE_SIZE)
           .fontColor(this.resolvePreviewSecondaryTextColor())
@@ -326,6 +327,9 @@ export struct WebsiteRecordRow {
   }
 
   private hasSubtitle(): boolean {
+    if (typeof this.subtitle !== 'string') {
+      return true;
+    }
     return this.subtitle.trim().length > 0;
   }
 

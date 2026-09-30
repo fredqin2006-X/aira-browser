@@ -130,16 +130,16 @@ struct UserScriptDetailPage {
 
   private showDeleteScriptDialog(scriptId: string, scriptName: string): void {
     showCenteredAlertDialog({
-      title: '删除用户脚本',
-      message: `确定删除“${scriptName}”吗？`,
+      title: $r('app.string.user_script_delete_dialog_title'),
+      message: $r('app.string.user_script_delete_dialog_message', scriptName),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.user_script_action_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.user_script_action_delete'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.deleteScript(scriptId);

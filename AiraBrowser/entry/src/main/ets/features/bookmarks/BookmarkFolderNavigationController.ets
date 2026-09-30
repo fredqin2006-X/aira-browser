@@ -1,17 +1,17 @@
 import { BookmarkNode } from '../../common/models/BrowserModels';
 
-const BOOKMARK_MANAGER_ROOT_TITLE: string = '书签管理';
+const BOOKMARK_MANAGER_ROOT_TITLE: ResourceStr = $r('app.string.bookmark_manager');
 
 export interface BookmarkFolderLocation {
   folderId: string;
-  folderTitle: string;
+  folderTitle: ResourceStr;
 }
 
 export class BookmarkFolderNavigationController {
   private currentFolderId: string = '';
-  private currentFolderTitle: string = BOOKMARK_MANAGER_ROOT_TITLE;
+  private currentFolderTitle: ResourceStr = BOOKMARK_MANAGER_ROOT_TITLE;
   private folderIdStack: string[] = [];
-  private folderTitleStack: string[] = [];
+  private folderTitleStack: ResourceStr[] = [];
 
   reset(): void {
     this.currentFolderId = '';

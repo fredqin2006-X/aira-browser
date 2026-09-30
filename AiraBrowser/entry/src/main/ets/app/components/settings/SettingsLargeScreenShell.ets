@@ -14,6 +14,7 @@ import {
   SettingsCenterPresentationSnapshot
 } from './SettingsCenterPresentationContract';
 import { AiraRenderableIconId } from '../../../core/resources/GeneratedAiraIconCatalog';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { SitePermissionKind } from '../../../common/models/BrowserModels';
 import { SettingsEmbeddedDetailPanel } from './SettingsEmbeddedDetailPanel';
 import { SettingsWebAppsDetailPanel } from './SettingsWebAppsDetailPanel';
@@ -50,6 +51,7 @@ import {
 } from '../browser/BrowserDownloadSettingsScreen';
 import { LocalBackupScreen } from '../backup/LocalBackupScreen';
 import { BrowserToolbarCustomizationScreen } from './BrowserToolbarCustomizationScreen';
+import { resourceStrPresent } from '../../../core/browser/BrowserBottomPanelText';
 
 const LARGE_SCREEN_SETTINGS_HEADER_HEIGHT: number = 64;
 const LARGE_SCREEN_SETTINGS_HEADER_TITLE_HORIZONTAL_PADDING: number = 24;
@@ -65,8 +67,8 @@ const LARGE_SCREEN_SETTINGS_WORKSPACE_MAX_WIDTH: number = 1024;
 
 @Component
 struct SettingsLargeScreenMenuRow {
-  @Prop title: string = '';
-  @Prop value: string = '';
+  @Prop title: ResourceStr = '';
+  @Prop value: ResourceStr = '';
   @Prop icon: Resource | undefined = undefined;
   @Prop imageIcon: Resource | undefined = undefined;
   @Prop airaIconId: AiraRenderableIconId | undefined = undefined;
@@ -97,7 +99,7 @@ struct SettingsLargeScreenMenuRow {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .textAlign(TextAlign.Start)
 
-        if (this.value.trim().length > 0) {
+        if (resourceStrPresent(this.value)) {
           Text(this.value)
             .fontSize(12)
             .fontColor(this.secondaryTextColor)
@@ -124,7 +126,7 @@ struct SettingsLargeScreenMenuRow {
     .clip(true)
     .enabled(this.isEnabled)
     .opacity(this.isEnabled ? 1 : 0.48)
-    .accessibilityText(this.title)
+    .accessibilityText(resolveAppResourceText(this.title))
     .onHover((isHover: boolean) => {
       this.hovered = isHover && this.isEnabled;
     })
@@ -253,7 +255,7 @@ export struct SettingsLargeScreenShell {
   private buildWindowHeader() {
     Row() {
       Row({ space: 8 }) {
-        Text('设置')
+        Text($r('app.string.app_shortcut_settings'))
           .layoutWeight(1)
           .fontSize(22)
           .fontWeight(FontWeight.Bold)
@@ -261,7 +263,7 @@ export struct SettingsLargeScreenShell {
           .maxLines(1)
 
         if (this.isPrivateContext()) {
-          Text('私密')
+          Text($r('app.string.settings_private_badge'))
             .fontSize(12)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.snapshot.theme.headerIconColor)
@@ -284,7 +286,7 @@ export struct SettingsLargeScreenShell {
           .buttonStyle(ButtonStyleMode.TEXTUAL)
           .backgroundColor(this.snapshot.theme.headerButtonBackground)
           .stateEffect(true)
-          .accessibilityText('关闭设置')
+          .accessibilityText($r('app.string.settings_close'))
           .onClick(() => {
             this.onIntent(SettingsCenterPresentationIntent.close());
           })
@@ -396,7 +398,7 @@ export struct SettingsLargeScreenShell {
         iconSize: 24,
         iconColor: this.snapshot.theme.secondaryTextColor
       })
-      Text('未找到匹配的设置项')
+      Text($r('app.string.settings_search_no_match'))
         .fontSize(14)
         .fontColor(this.snapshot.theme.secondaryTextColor)
         .textAlign(TextAlign.Center)
@@ -412,7 +414,7 @@ export struct SettingsLargeScreenShell {
   private buildSearchWorkspace() {
     Column() {
       Row({ space: 12 }) {
-        Text('搜索结果')
+        Text($r('app.string.settings_search_results'))
           .layoutWeight(1)
           .fontSize(24)
           .fontWeight(FontWeight.Bold)
@@ -565,10 +567,67 @@ export struct SettingsLargeScreenShell {
     .clip(true)
   }
 
+  private resolveWorkspaceTitle(): ResourceStr {
+    const destination = this.snapshot.navigationSnapshot.activeDestination;
+    if (destination === 'sync') {
+      return $r('app.string.settings_sync');
+    }
+    if (destination === 'cross_device_link') {
+      return $r('app.string.settings_sync_cross_device');
+    }
+    if (destination === 'general' && this.snapshot.navigationSnapshot.workspaceTitle === '通用') {
+      return $r('app.string.settings_general');
+    }
+    if (this.snapshot.navigationSnapshot.workspaceTitle === '外观设置') {
+      return $r('app.string.settings_appearance');
+    }
+    if (this.snapshot.navigationSnapshot.workspaceTitle === '隐私模式') {
+      return $r('app.string.settings_privacy_mode');
+    }
+    if (this.snapshot.navigationSnapshot.workspaceTitle === '隐私防护') {
+      return $r('app.string.settings_privacy_protection_title');
+    }
+    if (this.snapshot.navigationSnapshot.workspaceTitle === '站点设置') {
+      return $r('app.string.settings_site_info_site_settings');
+    }
+    if (this.snapshot.navigationSnapshot.workspaceTitle === '密码管理') {
+      return $r('app.string.settings_privacy_protection_password_management');
+    }
+    if (this.snapshot.navigationSnapshot.workspaceTitle === '安全 DNS') {
+      return $r('app.string.settings_privacy_protection_secure_dns');
+    }
+    if (this.snapshot.navigationSnapshot.workspaceTitle === 'Cookie 管理') {
+      return $r('app.string.settings_privacy_protection_cookie_management');
+    }
+    if (this.snapshot.navigationSnapshot.workspaceTitle === '防跟踪防护') {
+      return $r('app.string.settings_site_info_tracking_protection');
+    }
+    if (this.snapshot.navigationSnapshot.workspaceTitle === '网页内容过滤') {
+      return $r('app.string.settings_site_info_content_filter');
+    }
+    if (this.snapshot.navigationSnapshot.workspaceTitle === '过滤规则') {
+      return $r('app.string.settings_privacy_protection_adblock_rules');
+    }
+    if (this.snapshot.navigationSnapshot.workspaceTitle === '已清理页面元素') {
+      return $r('app.string.element_hide_settings_title');
+    }
+    if (this.snapshot.navigationSnapshot.workspaceTitle === '关于Aira') {
+      return $r('app.string.settings_about');
+    }
+    if (this.snapshot.navigationSnapshot.activeDestination === 'experiments' ||
+      this.snapshot.navigationSnapshot.workspaceTitle === '实验室') {
+      return $r('app.string.settings_experiments_title');
+    }
+    if (this.snapshot.navigationSnapshot.activePanelKind === 'keyboard_shortcuts') {
+      return $r('app.string.settings_general_keyboard_shortcuts');
+    }
+    return this.snapshot.navigationSnapshot.workspaceTitle;
+  }
+
   @Builder
   private buildWorkspaceHeader() {
     SettingsDesktopWorkspaceHeader({
-      title: this.snapshot.navigationSnapshot.workspaceTitle,
+      title: this.resolveWorkspaceTitle(),
       showBackButton: this.snapshot.navigationSnapshot.detailDepth > 1,
       primaryTextColor: this.snapshot.theme.primaryTextColor,
       iconColor: this.snapshot.theme.headerIconColor,
@@ -576,7 +635,7 @@ export struct SettingsLargeScreenShell {
       primaryActionIconId: this.snapshot.navigationSnapshot.activePanelKind === 'secure_dns'
         ? 'browser.tabs.add'
         : undefined,
-      primaryActionLabel: '添加自定义 DNS',
+      primaryActionLabel: resolveAppResourceText($r('app.string.settings_add_custom_dns')),
       onBack: () => {
         this.onIntent(SettingsCenterPresentationIntent.backDetail());
       },

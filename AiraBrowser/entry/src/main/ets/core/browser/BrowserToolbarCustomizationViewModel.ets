@@ -11,6 +11,26 @@ import {
 } from './BrowserBottomAddressPanelViewModel';
 import { BrowserBottomPanelActionCatalog } from './BrowserBottomPanelActionCatalog';
 import { AiraRenderableIconId } from '../resources/GeneratedAiraIconCatalog';
+import {
+  bottomPanelBack,
+  bottomPanelCoreBackSubtitle,
+  bottomPanelCoreForwardSubtitle,
+  bottomPanelCoreMenuSubtitle,
+  bottomPanelCoreNewTabSubtitle,
+  bottomPanelCoreReloadSubtitle,
+  bottomPanelCoreTabsSubtitle,
+  bottomPanelForward,
+  bottomPanelMenu,
+  bottomPanelNewTabPage,
+  bottomPanelInteractionTitle,
+  bottomPanelNone,
+  bottomPanelNoneSubtitle,
+  bottomPanelOpenTabsPage,
+  bottomPanelOpenTools,
+  bottomPanelReload,
+  bottomPanelSlotTitle,
+  bottomPanelTabs
+} from './BrowserBottomPanelText';
 
 export interface BrowserToolbarCustomizationState {
   slotActions: BrowserToolbarSlotActionState[];
@@ -27,8 +47,8 @@ export type BrowserToolbarSlotDispatchKind = 'header' | 'panel' | 'none';
 
 export interface BrowserToolbarInteractionActionState {
   id: BrowserToolbarInteractionActionId;
-  title: string;
-  subtitle: string;
+  title: ResourceStr;
+  subtitle: ResourceStr;
   airaIconId: AiraRenderableIconId;
   dispatchKind: BrowserToolbarSlotDispatchKind;
   isNone: boolean;
@@ -36,18 +56,18 @@ export interface BrowserToolbarInteractionActionState {
 
 export interface BrowserToolbarSlotInteractionState {
   kind: BrowserToolbarInteractionKind;
-  title: string;
+  title: ResourceStr;
   action: BrowserToolbarInteractionActionState;
   allowsNone: boolean;
 }
 
 export interface BrowserToolbarSlotActionState {
   id: BrowserToolbarSlotId;
-  slotTitle: string;
-  defaultActionTitle: string;
+  slotTitle: ResourceStr;
+  defaultActionTitle: ResourceStr;
   actionId: string;
   customActionId: string;
-  title: string;
+  title: ResourceStr;
   airaIconId: AiraRenderableIconId;
   dispatchKind: BrowserToolbarSlotDispatchKind;
   isDefault: boolean;
@@ -61,7 +81,7 @@ export type BrowserToolbarCenterCapsuleSwipeUpActionId = 'tools' | 'tabs';
 
 export interface BrowserToolbarCenterCapsuleSwipeUpOptionState {
   actionId: BrowserToolbarCenterCapsuleSwipeUpActionId;
-  title: string;
+  title: ResourceStr;
   isSelected: boolean;
 }
 
@@ -79,8 +99,8 @@ const TOOLBAR_CORE_ACTION_IDS: BrowserToolbarCoreActionId[] = [
  * no slot and no action catalog of its own, so its two choices are declared here and nowhere else.
  */
 const BROWSER_TOOLBAR_CENTER_CAPSULE_SWIPE_UP_OPTIONS: BrowserToolbarCenterCapsuleSwipeUpOptionState[] = [
-  { actionId: 'tools', title: '打开工具面板', isSelected: false },
-  { actionId: 'tabs', title: '打开标签管理页', isSelected: false }
+  { actionId: 'tools', title: bottomPanelOpenTools(), isSelected: false },
+  { actionId: 'tabs', title: bottomPanelOpenTabsPage(), isSelected: false }
 ];
 
 export class BrowserToolbarCustomizationViewModel {
@@ -358,8 +378,8 @@ export class BrowserToolbarCustomizationViewModel {
     if (actionId === 'none') {
       return {
         id: actionId,
-        title: '无动作',
-        subtitle: '不响应此操作',
+        title: bottomPanelNone(),
+        subtitle: bottomPanelNoneSubtitle(),
         airaIconId: 'browser.toolbar.emptySlot',
         dispatchKind: 'none',
         isNone: true
@@ -551,23 +571,12 @@ export class BrowserToolbarCustomizationViewModel {
     return kind === 'longPress' ? 'none' : 'home';
   }
 
-  private resolveSlotTitle(slotId: BrowserToolbarSlotId): string {
-    switch (slotId) {
-      case 'leading':
-        return '最左侧按钮';
-      case 'menu':
-        return '输入框左侧按钮';
-      case 'refresh':
-        return '输入框右侧按钮';
-      case 'tabs':
-        return '最右侧按钮';
-    }
+  private resolveSlotTitle(slotId: BrowserToolbarSlotId): ResourceStr {
+    return bottomPanelSlotTitle(slotId);
   }
 
-  private resolveInteractionTitle(kind: BrowserToolbarInteractionKind): string {
-    if (kind === 'tap') return '单击';
-    if (kind === 'longPress') return '长按';
-    return '上滑';
+  private resolveInteractionTitle(kind: BrowserToolbarInteractionKind): ResourceStr {
+    return bottomPanelInteractionTitle(kind);
   }
 
   private resolveDefaultSlotActionId(slotId: BrowserToolbarSlotId): BrowserToolbarCoreActionId {
@@ -583,22 +592,22 @@ export class BrowserToolbarCustomizationViewModel {
     }
   }
 
-  private resolveCoreActionTitle(actionId: BrowserToolbarCoreActionId): string {
-    if (actionId === 'webBack') return '返回';
-    if (actionId === 'webForward') return '前进';
-    if (actionId === 'bottomChromeMenu') return '菜单';
-    if (actionId === 'webReload') return '刷新';
-    if (actionId === 'openTabs') return '标签页';
-    return '新建标签页';
+  private resolveCoreActionTitle(actionId: BrowserToolbarCoreActionId): ResourceStr {
+    if (actionId === 'webBack') return bottomPanelBack();
+    if (actionId === 'webForward') return bottomPanelForward();
+    if (actionId === 'bottomChromeMenu') return bottomPanelMenu();
+    if (actionId === 'webReload') return bottomPanelReload();
+    if (actionId === 'openTabs') return bottomPanelTabs();
+    return bottomPanelNewTabPage();
   }
 
-  private resolveCoreActionSubtitle(actionId: BrowserToolbarCoreActionId): string {
-    if (actionId === 'webBack') return '返回上一页';
-    if (actionId === 'webForward') return '前往下一页';
-    if (actionId === 'bottomChromeMenu') return '展开或收起工具栏';
-    if (actionId === 'webReload') return '重新载入当前页面';
-    if (actionId === 'openTabs') return '查看打开的标签页';
-    return '打开新的标签页';
+  private resolveCoreActionSubtitle(actionId: BrowserToolbarCoreActionId): ResourceStr {
+    if (actionId === 'webBack') return bottomPanelCoreBackSubtitle();
+    if (actionId === 'webForward') return bottomPanelCoreForwardSubtitle();
+    if (actionId === 'bottomChromeMenu') return bottomPanelCoreMenuSubtitle();
+    if (actionId === 'webReload') return bottomPanelCoreReloadSubtitle();
+    if (actionId === 'openTabs') return bottomPanelCoreTabsSubtitle();
+    return bottomPanelCoreNewTabSubtitle();
   }
 
   private resolveCoreActionIconId(actionId: BrowserToolbarCoreActionId): AiraRenderableIconId {

@@ -10,11 +10,12 @@ import {
   ARKWEB_ORIGINAL_USER_AGENT_PRESET_ID,
   SYSTEM_DEFAULT_USER_AGENT_PRESET_ID
 } from '../../services/web/BrowserUserAgentService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface BrowserUserAgentOptionView {
   id: BrowserUserAgentPresetId;
-  title: string;
-  subtitle: string;
+  title: ResourceStr;
+  subtitle: ResourceStr;
   mode: BrowserUserAgentMode;
   icon: Resource;
 }
@@ -22,13 +23,13 @@ export interface BrowserUserAgentOptionView {
 export interface BrowserCustomUserAgentOptionView {
   id: string;
   title: string;
-  subtitle: string;
+  subtitle: ResourceStr;
   mode: BrowserUserAgentMode;
   userAgent: string;
 }
 
 export interface BrowserUserAgentSettingsViewState {
-  summary: string;
+  summary: ResourceStr;
   customUserAgent: string;
   selectedCustomUserAgentId: string;
   customUserAgents: BrowserCustomUserAgentOptionView[];
@@ -42,13 +43,32 @@ export class BrowserUserAgentSettingsViewModel {
   buildState(settings: BrowserUserAgentSettings): BrowserUserAgentSettingsViewState {
     const normalized = this.service.normalizeSettings(settings);
     return {
-      summary: this.service.resolveSettingsSummary(normalized),
+      summary: this.resolveSettingsSummary(normalized),
       customUserAgent: normalized.customUserAgent,
       selectedCustomUserAgentId: normalized.selectedCustomUserAgentId,
       customUserAgents: this.buildCustomUserAgentOptions(normalized.customUserAgents),
       mobileOptions: this.buildOptions(normalized, 'mobile'),
       desktopOptions: this.buildOptions(normalized, 'desktop')
     };
+  }
+
+  /**
+   * Same decision as BrowserUserAgentService.resolveSettingsSummary, but resolved to a resource so the
+   * identity catalog's own titles swap with the app language instead of staying in the source language.
+   */
+  resolveSettingsSummary(settings: BrowserUserAgentSettings): ResourceStr {
+    const normalized = this.service.normalizeSettings(settings);
+    if (normalized.defaultMode === 'custom') {
+      const selectedCustomUserAgent = normalized.customUserAgents
+        .find((record: BrowserCustomUserAgentRecord) => record.id === normalized.selectedCustomUserAgentId);
+      if (selectedCustomUserAgent !== undefined) {
+        return selectedCustomUserAgent.name;
+      }
+      return normalized.customUserAgent.length > 0
+        ? $r('app.string.settings_custom_ua')
+        : $r('app.string.web_ua_custom_ua_empty');
+    }
+    return this.resolvePresetTitle(normalized.selectedPresetId);
   }
 
   private buildOptions(
@@ -60,7 +80,7 @@ export class BrowserUserAgentSettingsViewModel {
       .map((preset: BrowserUserAgentPreset) => {
         const option: BrowserUserAgentOptionView = {
           id: preset.id,
-          title: preset.title,
+          title: this.resolvePresetTitle(preset.id),
           subtitle: this.resolveOptionSubtitle(preset),
           mode: preset.mode,
           icon: this.resolveOptionIcon(preset)
@@ -69,14 +89,70 @@ export class BrowserUserAgentSettingsViewModel {
       });
   }
 
-  private resolveOptionSubtitle(preset: BrowserUserAgentPreset): string {
+  private resolvePresetTitle(presetId: BrowserUserAgentPresetId): ResourceStr {
+    switch (presetId) {
+      case SYSTEM_DEFAULT_USER_AGENT_PRESET_ID:
+        return $r('app.string.web_ua_preset_aira_default');
+      case ARKWEB_ORIGINAL_USER_AGENT_PRESET_ID:
+        return $r('app.string.web_ua_preset_arkweb_original');
+      case 'mobile_huawei_browser':
+        return $r('app.string.web_ua_preset_huawei_browser');
+      case 'mobile_chrome_android':
+        return $r('app.string.web_ua_preset_chrome_android');
+      case 'mobile_safari_iphone':
+        return $r('app.string.web_ua_preset_safari_iphone');
+      case 'desktop_chrome_windows':
+        return $r('app.string.web_ua_preset_chrome_windows');
+      case 'desktop_edge_windows':
+        return $r('app.string.web_ua_preset_edge_windows');
+      case 'desktop_safari_mac':
+        return $r('app.string.web_ua_preset_safari_mac');
+      case 'desktop_firefox_windows':
+        return $r('app.string.web_ua_preset_firefox_windows');
+      default:
+        return this.service.findPreset(presetId).title;
+    }
+  }
+
+  private resolvePresetSubtitle(presetId: BrowserUserAgentPresetId): ResourceStr {
+    switch (presetId) {
+      case SYSTEM_DEFAULT_USER_AGENT_PRESET_ID:
+        return $r('app.string.web_ua_preset_aira_default_desc');
+      case ARKWEB_ORIGINAL_USER_AGENT_PRESET_ID:
+        return $r('app.string.web_ua_preset_arkweb_original_desc');
+      case 'mobile_huawei_browser':
+        return $r('app.string.web_ua_preset_huawei_browser_desc');
+      case 'mobile_chrome_android':
+        return $r('app.string.web_ua_preset_chrome_android_desc');
+      case 'mobile_safari_iphone':
+        return $r('app.string.web_ua_preset_safari_iphone_desc');
+      case 'desktop_chrome_windows':
+        return $r('app.string.web_ua_preset_chrome_windows_desc');
+      case 'desktop_edge_windows':
+        return $r('app.string.web_ua_preset_edge_windows_desc');
+      case 'desktop_safari_mac':
+        return $r('app.string.web_ua_preset_safari_mac_desc');
+      case 'desktop_firefox_windows':
+        return $r('app.string.web_ua_preset_firefox_windows_desc');
+      default:
+        return this.service.findPreset(presetId).subtitle;
+    }
+  }
+
+  private resolveOptionSubtitle(preset: BrowserUserAgentPreset): ResourceStr {
+    const presetSubtitle = this.resolvePresetSubtitle(preset.id);
     if (preset.id === SYSTEM_DEFAULT_USER_AGENT_PRESET_ID) {
-      return preset.subtitle;
+      return presetSubtitle;
     }
+    const presetSubtitleText = this.resolveResourceText(presetSubtitle);
     if (preset.mode === 'desktop') {
-      return `${preset.subtitle}，可能影响部分网站验证`;
+      return $r('app.string.web_ua_option_desktop_note', presetSubtitleText);
     }
-    return `${preset.subtitle}，验证异常时建议改回 Aira 默认`;
+    return $r('app.string.web_ua_option_mobile_note', presetSubtitleText);
+  }
+
+  private resolveResourceText(value: ResourceStr): string {
+    return typeof value === 'string' ? value : resolveAppResourceText(value);
   }
 
   private resolveOptionIcon(preset: BrowserUserAgentPreset): Resource {
@@ -102,10 +178,10 @@ export class BrowserUserAgentSettingsViewModel {
     });
   }
 
-  private resolveCustomUserAgentSubtitle(userAgent: string): string {
+  private resolveCustomUserAgentSubtitle(userAgent: string): ResourceStr {
     const trimmedUserAgent = userAgent.trim();
     if (trimmedUserAgent.length <= 0) {
-      return '未填写 UA';
+      return $r('app.string.web_ua_custom_ua_subtitle_empty');
     }
     return trimmedUserAgent.length > 72 ? `${trimmedUserAgent.slice(0, 72)}...` : trimmedUserAgent;
   }

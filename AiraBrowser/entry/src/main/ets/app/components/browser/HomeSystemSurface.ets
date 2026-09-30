@@ -21,6 +21,8 @@ export struct HomeSystemSurface {
   @Prop searchFocused: boolean = false;
   @Prop contentPresentation: BrowserHomeSurfaceContentPresentationState;
   @Prop playbackEnabled: boolean = false;
+  @Prop pageForeground: boolean = true;
+  @Prop resumeEpoch: number = 0;
   @BuilderParam content: () => void = this.emptyBuilder;
   onDismissSearchFocus: () => void = () => {};
 
@@ -36,7 +38,9 @@ export struct HomeSystemSurface {
         blurEdgeScale: this.backdropEffectState.blurEdgeScale,
         tintColor: this.backdropEffectState.tintColor,
         tintOpacity: this.backdropEffectState.tintOpacity,
-        playbackEnabled: this.playbackEnabled
+        playbackEnabled: this.playbackEnabled,
+        pageForeground: this.pageForeground,
+        resumeEpoch: this.resumeEpoch
       })
       this.buildContentLayer()
     }

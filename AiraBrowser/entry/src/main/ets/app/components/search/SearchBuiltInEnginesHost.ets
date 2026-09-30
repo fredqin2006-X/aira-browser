@@ -60,7 +60,7 @@ export struct SearchBuiltInEnginesHost {
     Column() {
       if (this.desktopPresentation && this.showDesktopHeader) {
         SettingsDesktopWorkspaceHeader({
-          title: '更多搜索引擎',
+          title: $r('app.string.settings_search_engine_more'),
           showBackButton: true,
           primaryTextColor: this.theme.textPrimary,
           iconColor: this.theme.accent,

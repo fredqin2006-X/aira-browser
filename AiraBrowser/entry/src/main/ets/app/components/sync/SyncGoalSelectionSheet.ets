@@ -16,7 +16,7 @@ import {
   SyncSetupStepScaffold
 } from './SyncSetupStepScaffold';
 
-const AIRA_CLOUD_TUTORIAL_LABEL: string = '查看多端同步教程';
+const AIRA_CLOUD_TUTORIAL_LABEL: ResourceStr = $r('app.string.settings_sync_tutorial');
 
 @Component
 export struct SyncGoalSelectionSheet {
@@ -46,8 +46,8 @@ export struct SyncGoalSelectionSheet {
 
   build() {
     SyncSetupStepScaffold({
-      title: '同步方式',
-      summary: '选择用于同步所选内容的服务。',
+      title: $r('app.string.settings_sync_method'),
+      summary: $r('app.string.settings_sync_method_summary'),
       showBackButton: this.showBackButton,
       layoutMode: this.layoutMode,
       maxHeightVp: this.maxHeightVp,
@@ -113,7 +113,7 @@ export struct SyncGoalSelectionSheet {
             if (option.id === 'webdav') {
               BrowserSheetActionButton({
                 stacked: true,
-                label: '编辑 WebDAV 配置',
+                label: $r('app.string.settings_sync_edit_webdav'),
                 actionEnabled: !this.isPrivateSession && !this.isBusy,
                 fillAvailableWidth: false,
                 buttonWidth: '100%',
@@ -128,7 +128,9 @@ export struct SyncGoalSelectionSheet {
             if (option.id === 'self_hosted') {
               BrowserSheetActionButton({
                 stacked: true,
-                label: option.isSelected ? '管理私有化部署' : '连接私有化部署',
+                label: option.isSelected
+                  ? $r('app.string.settings_sync_manage_self_host')
+                  : $r('app.string.settings_sync_connect_self_host'),
                 actionEnabled: !this.isPrivateSession && !this.isBusy,
                 fillAvailableWidth: false,
                 buttonWidth: '100%',

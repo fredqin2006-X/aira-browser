@@ -14,7 +14,7 @@ import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundary
 
 export interface AppServiceModeApplyResult {
   mode: BrowserAppServiceMode;
-  message: string;
+  message: ResourceStr;
 }
 
 export class AppServiceModeCoordinator {
@@ -61,14 +61,14 @@ export class AppServiceModeCoordinator {
       await this.applyBasicMode();
       return {
         mode: 'basic',
-        message: '已切换为基本模式，已关闭可选联网和增强功能。'
+        message: $r('app.string.settings_advanced_service_mode_applied_basic')
       };
     }
 
     await this.preferencesRepository.updateAppServiceMode('full');
     return {
       mode: 'full',
-      message: '已切换为全量模式。'
+      message: $r('app.string.settings_advanced_service_mode_applied_full')
     };
   }
 

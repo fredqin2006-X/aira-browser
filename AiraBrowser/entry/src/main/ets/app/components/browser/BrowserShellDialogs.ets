@@ -380,14 +380,16 @@ export struct DesktopShortcutNameDialog {
         .backgroundColor(this.storedFloatingSurfaceColor)
         .borderRadius(18)
         .enabled(!this.snapshot.iconProcessing)
-        .accessibilityText('更换应用图标')
+        .accessibilityText($r('app.string.settings_web_app_install_change_icon'))
         .onClick(() => {
           this.onAction({ type: 'select_icon' });
         })
 
         Text(this.snapshot.iconProcessing
-          ? '正在处理图标...'
-          : (this.snapshot.iconCustomized ? '点击可重新选择' : '点击图标可从相册更换'))
+          ? $r('app.string.settings_web_app_install_icon_processing')
+          : (this.snapshot.iconCustomized
+            ? $r('app.string.settings_web_app_install_icon_hint_custom')
+            : $r('app.string.settings_web_app_install_icon_hint_default')))
           .fontSize(12)
           .fontColor(this.storedSecondaryTextColor)
           .textAlign(TextAlign.Center)
@@ -396,7 +398,7 @@ export struct DesktopShortcutNameDialog {
         if (this.snapshot.iconCustomized && !this.snapshot.iconProcessing) {
           BrowserSheetActionButton({
             stacked: true,
-            label: '恢复网站图标',
+            label: $r('app.string.settings_web_app_install_icon_restore'),
             fillAvailableWidth: false,
             buttonWidth: 136,
             buttonHeight: 44,
@@ -411,14 +413,14 @@ export struct DesktopShortcutNameDialog {
       .justifyContent(FlexAlign.Center)
       .alignItems(HorizontalAlign.Center)
 
-      Text('安装网页')
+      Text($r('app.string.settings_web_app_install_title'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.storedPrimaryTextColor)
         .textAlign(TextAlign.Center)
 
-      TextInput({ text: this.snapshot.title, placeholder: '网页名称' })
+      TextInput({ text: this.snapshot.title, placeholder: $r('app.string.settings_web_app_install_name_placeholder') })
         .width('100%')
         .height(44)
         .fontSize(15)
@@ -444,7 +446,7 @@ export struct DesktopShortcutNameDialog {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '安装',
+          label: $r('app.string.settings_web_app_install_confirm'),
           emphasis: 'primary',
           stacked: true,
           actionEnabled: !this.snapshot.iconProcessing,
@@ -457,7 +459,7 @@ export struct DesktopShortcutNameDialog {
         })
 
         BrowserSheetActionButton({
-          label: '取消',
+          label: $r('app.string.settings_web_app_install_cancel'),
           emphasis: 'ghost',
           stacked: true,
           buttonHeight: 44,

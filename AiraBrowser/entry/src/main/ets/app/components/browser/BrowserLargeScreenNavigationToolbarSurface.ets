@@ -1,5 +1,6 @@
 import { inputMethod } from '@kit.IMEKit';
 import { KeyCode } from '@kit.InputKit';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   ExternalAppSearchTargetId,
   SearchEngineId,
@@ -27,6 +28,7 @@ import {
 import {
   BROWSER_LARGE_SCREEN_TITLE_BAR_MIN_DRAG_WIDTH_VP
 } from '../../../core/browser/BrowserLargeScreenTitleBarTokens';
+import { resourceStrKey, resourceStrPresent } from '../../../core/browser/BrowserBottomPanelText';
 import {
   sharedBrowserLargeScreenWindowChromeService
 } from '../../../services/browser/BrowserLargeScreenWindowChromeService';
@@ -768,7 +770,7 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
     .height(LARGE_SCREEN_NAVIGATION_BUTTON_SIZE_VP)
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
     .stateEffect(true)
-    .accessibilityText('当前页用户脚本')
+    .accessibilityText($r('app.string.bottom_panel_current_scripts'))
     .onClick(() => {
       this.onUserScriptAction({ type: 'open_page_actions' });
     })
@@ -829,7 +831,7 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
     .height(LARGE_SCREEN_NAVIGATION_BUTTON_SIZE_VP)
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
     .stateEffect(true)
-    .accessibilityText('更多浏览器工具')
+    .accessibilityText($r('app.string.bottom_panel_more_tools'))
     .bindMenu(this.buildOverflowMenu(), {
       placement: Placement.BottomRight,
       offset: { x: 0, y: BROWSER_DESKTOP_MENU_HORIZONTAL_INSET_VP },
@@ -858,7 +860,7 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
     .height(LARGE_SCREEN_NAVIGATION_BUTTON_SIZE_VP)
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
     .stateEffect(true)
-    .accessibilityText('更多浏览器工具')
+    .accessibilityText($r('app.string.bottom_panel_more_tools'))
     .onClick((): void => {
       this.overflowMenuVisible = true;
     })
@@ -900,7 +902,7 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
         iconSize: 18,
         iconColor: this.storedPrimaryTextColor
       })
-      Text('扫一扫')
+      Text($r('app.string.bottom_panel_action_scan_qr'))
         .layoutWeight(1)
         .fontSize(BROWSER_DESKTOP_MENU_TEXT_SIZE_FP)
         .fontColor(this.storedPrimaryTextColor)
@@ -913,7 +915,7 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
     .padding({ left: 16, right: 16 })
     .alignItems(VerticalAlign.Center)
     .hoverEffect(HoverEffect.Highlight)
-    .accessibilityText('扫一扫')
+    .accessibilityText($r('app.string.bottom_panel_action_scan_qr'))
     .onClick((): void => {
       this.crossDeviceTabsPopupVisible = false;
       this.onIntent({ kind: 'open_browser_action', text: '', actionId: 'scanQr' });
@@ -1067,7 +1069,7 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
   @Builder
   private buildPointerOverflowToolGroup(group: BrowserLargeScreenToolbarMenuPageToolGroup) {
     Column() {
-      if (group.title.length > 0) {
+      if (resourceStrPresent(group.title)) {
         Row() {
           Text(group.title)
             .fontSize(12)
@@ -1138,16 +1140,16 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
         iconSize: 18,
         iconColor: this.storedPrimaryTextColor
       })
-      Text('缩放')
+      Text($r('app.string.bottom_panel_zoom'))
         .fontSize(BROWSER_DESKTOP_MENU_TEXT_SIZE_FP)
         .fontColor(this.storedPrimaryTextColor)
         .maxLines(1)
       Blank()
         .layoutWeight(1)
       if (this.webZoomSnapshot.canDecrease) {
-        this.buildOverflowZoomButton('browser.toolbar.zoomOut', '缩小网页', 'decrease', true)
+        this.buildOverflowZoomButton('browser.toolbar.zoomOut', $r('app.string.bottom_panel_zoom_out'), 'decrease', true)
       } else {
-        this.buildOverflowZoomButton('browser.toolbar.zoomOut', '缩小网页', 'decrease', false)
+        this.buildOverflowZoomButton('browser.toolbar.zoomOut', $r('app.string.bottom_panel_zoom_out'), 'decrease', false)
       }
       Text(this.webZoomSnapshot.percentLabel)
         .width(48)
@@ -1160,9 +1162,9 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
           this.applyOverflowZoom('reset');
         })
       if (this.webZoomSnapshot.canIncrease) {
-        this.buildOverflowZoomButton('browser.toolbar.zoomIn', '放大网页', 'increase', true)
+        this.buildOverflowZoomButton('browser.toolbar.zoomIn', $r('app.string.bottom_panel_zoom_in'), 'increase', true)
       } else {
-        this.buildOverflowZoomButton('browser.toolbar.zoomIn', '放大网页', 'increase', false)
+        this.buildOverflowZoomButton('browser.toolbar.zoomIn', $r('app.string.bottom_panel_zoom_in'), 'increase', false)
       }
       Divider()
         .vertical(true)
@@ -1188,7 +1190,7 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
   @Builder
   private buildOverflowZoomButton(
     iconId: AiraRenderableIconId,
-    label: string,
+    label: ResourceStr,
     action: BrowserLargeScreenWebZoomAction,
     enabled: boolean
   ) {
@@ -1207,7 +1209,7 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
     .borderRadius(LARGE_SCREEN_OVERFLOW_ZOOM_BUTTON_SIZE_VP / 2)
     .enabled(enabled && this.webZoomSnapshot.available)
     .opacity(enabled && this.webZoomSnapshot.available ? 1 : 0.38)
-    .accessibilityText(label)
+    .accessibilityText(resolveAppResourceText(label))
     .onClick((): void => {
       if (action === 'decrease' && !this.webZoomSnapshot.canDecrease) {
         return;
@@ -1235,7 +1237,7 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
     .backgroundColor(this.storedControlBackgroundColor)
     .borderRadius(LARGE_SCREEN_OVERFLOW_ZOOM_BUTTON_SIZE_VP / 2)
     .opacity(this.activeTabChrome.scene === 'web' ? 1 : 0.38)
-    .accessibilityText('全屏模式')
+    .accessibilityText($r('app.string.bottom_panel_action_full_screen_mode'))
     .onClick((): void => {
       this.toggleOverflowFullscreen();
     })
@@ -1323,7 +1325,7 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
     .stateEffect(this.isNavigationButtonEnabled(kind))
     .enabled(this.isNavigationButtonEnabled(kind))
     .opacity(this.isNavigationButtonEnabled(kind) ? 1 : 0.38)
-    .accessibilityText(this.resolveNavigationButtonAccessibilityText(kind))
+    .accessibilityText(resolveAppResourceText(this.resolveNavigationButtonAccessibilityText(kind)))
     .onClick(() => {
       this.onIntent({ kind: kind, text: '' });
     })
@@ -1346,14 +1348,15 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
     return kind === 'forward' ? 'browser.toolbar.forward' : 'browser.toolbar.back';
   }
 
-  private resolveNavigationButtonAccessibilityText(kind: BrowserLargeScreenNavigationControlKind): string {
+  private resolveNavigationButtonAccessibilityText(kind: BrowserLargeScreenNavigationControlKind): ResourceStr {
     if (kind === 'back') {
-      return '后退';
+      return $r('app.string.bottom_panel_nav_back');
     }
     if (kind === 'forward') {
-      return '前进';
+      return $r('app.string.bottom_panel_forward');
     }
-    return this.activeTabChrome.loading ? '停止加载' : '刷新';
+    return this.activeTabChrome.loading ?
+      $r('app.string.bottom_panel_stop_loading') : $r('app.string.bottom_panel_reload');
   }
 
   private resolveOverflowActions(): BrowserBottomAddressPanelAction[] {
@@ -1397,7 +1400,7 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
     .stateEffect(this.isWebpageTranslateEnabled())
     .opacity(this.isWebpageTranslateEnabled() ? 1 : 0.38)
-    .accessibilityText('翻译网页')
+    .accessibilityText($r('app.string.bottom_panel_action_translate'))
     .onClick(() => {
       this.dispatchWebpageTranslateAction();
     })
@@ -1423,7 +1426,7 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
   }
 
   private buildPointerOverflowMenuItemKey(entry: BrowserLargeScreenToolbarMenuEntry): string {
-    return `${entry.activation}:${entry.showsSelection ? 1 : 0}:${this.buildOverflowMenuItemKey(entry.action)}:${entry.action.title}`;
+    return `${entry.activation}:${entry.showsSelection ? 1 : 0}:${this.buildOverflowMenuItemKey(entry.action)}:${resourceStrKey(entry.action.title)}`;
   }
 
   private resolveOverflowMenuItemBackground(item: BrowserBottomAddressPanelAction): ResourceColor {
@@ -1537,9 +1540,8 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
 
   private dispatchOverflowAction(item: BrowserBottomAddressPanelAction): void {
     if (!item.enabled) {
-      const message = item.disabledMessage.trim();
-      if (message.length > 0) {
-        this.getUIContext().getPromptAction().showToast({ message: message, duration: 1500 });
+      if (resourceStrPresent(item.disabledMessage)) {
+        this.getUIContext().getPromptAction().showToast({ message: item.disabledMessage, duration: 1500 });
       }
       return;
     }
@@ -1553,9 +1555,8 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
   private dispatchOverflowEntry(entry: BrowserLargeScreenToolbarMenuEntry): void {
     const item = entry.action;
     if (!item.enabled) {
-      const message = item.disabledMessage.trim();
-      if (message.length > 0) {
-        this.getUIContext().getPromptAction().showToast({ message: message, duration: 1500 });
+      if (resourceStrPresent(item.disabledMessage)) {
+        this.getUIContext().getPromptAction().showToast({ message: item.disabledMessage, duration: 1500 });
       }
       return;
     }

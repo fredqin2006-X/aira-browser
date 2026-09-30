@@ -23,6 +23,7 @@ import {
   CenteredDialogWidthViewModel
 } from '../../../core/browser/CenteredDialogWidthViewModel';
 import { DesktopDialogWidthViewModel } from '../../../core/browser/DesktopDialogWidthViewModel';
+import { isAppString } from '../../../core/resources/AppResourceText';
 
 export { CENTERED_DIALOG_MAX_WIDTH_VP };
 export const CENTERED_DIALOG_HORIZONTAL_MARGIN_VP: number = 12;
@@ -94,7 +95,8 @@ function resolveAlertDialogTier(params: CenteredAlertDialogParams): DesktopDialo
 
 function isDestructiveAlertLabel(value: ResourceStr): boolean {
   if (typeof value !== 'string') {
-    return false;
+    return isAppString(value, $r('app.string.settings_delete')) ||
+      isAppString(value, $r('app.string.ui_clear'));
   }
   return value.includes('删除') || value.includes('清除') ||
     value.includes('移除') || value.includes('移出') ||
@@ -120,11 +122,16 @@ function styleDestructiveAlertButton(button: AlertDialogButtonBaseOptions): void
   button.fontColor = DESKTOP_DIALOG_DESTRUCTIVE_TEXT;
 }
 
-function alertButtonLabel(button: AlertDialogButtonBaseOptions): string {
-  return typeof button.value === 'string' ? button.value : '';
+function alertButtonLabel(button: AlertDialogButtonBaseOptions): ResourceStr {
+  return button.value === undefined ? '' : button.value;
 }
 
-function isDismissAlertLabel(label: string): boolean {
+function isDismissAlertLabel(label: ResourceStr): boolean {
+  if (typeof label !== 'string') {
+    return isAppString(label, $r('app.string.settings_account_cancel')) ||
+      isAppString(label, $r('app.string.settings_sync_later')) ||
+      isAppString(label, $r('app.string.settings_pro_got_it'));
+  }
   return label === '取消' || label === '稍后' || label === '稍后处理' || label === '知道了';
 }
 

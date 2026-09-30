@@ -24,7 +24,7 @@ struct SettingsPrivacyStatementPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '隐私声明',
+        title: $r('app.string.settings_about_privacy'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,

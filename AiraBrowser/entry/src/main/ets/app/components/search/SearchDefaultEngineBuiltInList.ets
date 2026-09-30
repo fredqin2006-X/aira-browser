@@ -162,7 +162,7 @@ export struct SearchDefaultEngineBuiltInList {
     .buttonStyle(ButtonStyleMode.NORMAL)
     .backgroundColor(this.theme.controlBackground)
     .enabled(this.isEnabled)
-    .accessibilityText('拖动调整搜索引擎顺序')
+    .accessibilityText($r('app.string.settings_search_engine_drag_order'))
     .gesture(
       PanGesture({ direction: PanDirection.Vertical, distance: 1 })
         .onActionStart(() => {

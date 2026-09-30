@@ -72,7 +72,7 @@ export struct SearchFallbackEngineHost {
     Column() {
       if (this.desktopPresentation) {
         SettingsDesktopWorkspaceHeader({
-          title: '备用搜索引擎',
+          title: $r('app.string.settings_search_engine_fallback'),
           showBackButton: true,
           primaryTextColor: this.theme.textPrimary,
           iconColor: this.theme.accent,
@@ -84,7 +84,7 @@ export struct SearchFallbackEngineHost {
       }
 
       SettingsHdsScaffold({
-        title: '备用搜索引擎',
+        title: $r('app.string.settings_search_engine_fallback'),
         backIconKind: 'back',
         pageBackground: this.theme.pageBackground,
         headerButtonBackground: this.theme.controlBackground,
@@ -118,7 +118,7 @@ export struct SearchFallbackEngineHost {
   @Builder
   private buildEngineSection() {
     SettingsSection({
-      title: '主搜索引擎不可用时使用',
+      title: $r('app.string.settings_search_engine_fallback_use_when'),
       secondaryTextColor: this.theme.textSecondary
     }) {
       SettingsGroupCard({
@@ -133,7 +133,7 @@ export struct SearchFallbackEngineHost {
         }, (engine: SearchEngineRowView) => this.resolveEngineRenderKey(engine))
       }
       SettingsFooterText({
-        text: '这里不会改变默认搜索引擎，只决定自动回退时使用哪个搜索引擎。',
+        text: $r('app.string.settings_search_engine_fallback_note'),
         secondaryTextColor: this.theme.textSecondary
       })
     }

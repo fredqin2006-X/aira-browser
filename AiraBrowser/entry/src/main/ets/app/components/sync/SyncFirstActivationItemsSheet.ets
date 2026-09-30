@@ -39,7 +39,7 @@ export struct SyncFirstActivationItemsSheet {
   @Prop isBusy: boolean = false;
   @Prop canSubmit: boolean = true;
   @Prop layoutMode: SyncSetupStepLayoutMode = 'phone';
-  @Prop submitLabel: string = '立即同步';
+  @Prop submitLabel: ResourceStr = $r('app.string.settings_sync_now');
   @Prop maxHeightVp: number = 0;
   @Prop settingsIconBackgrounds: BrowserSettingsIconBackgroundTokenSet =
     DEFAULT_BROWSER_SETTINGS_ICON_BACKGROUND_TOKENS;

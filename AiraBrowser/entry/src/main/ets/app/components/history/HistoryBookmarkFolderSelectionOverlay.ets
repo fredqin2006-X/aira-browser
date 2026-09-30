@@ -18,7 +18,7 @@ export struct HistoryBookmarkFolderSelectionOverlay {
   @Prop sheetVisible: boolean = false;
   @Prop options: BookmarkFolderOptionView[] = [];
   @Prop isPreparing: boolean = false;
-  @Prop rootTitle: string = '添加到书签';
+  @Prop rootTitle: ResourceStr = $r('app.string.history_add_bookmark_sheet');
   @Prop message: string = '';
   onDismiss: () => void = () => {};
   onFolderOpened: (folderId: string) => void = (_folderId: string) => {};
@@ -41,10 +41,10 @@ export struct HistoryBookmarkFolderSelectionOverlay {
           options: this.options,
           isPreparing: this.isPreparing,
           rootTitle: this.rootTitle,
-          preparingTitle: '正在准备文件夹',
-          rootEmptyTitle: '没有可保存书签的文件夹',
-          leafEmptyTitle: '没有下级文件夹',
-          confirmLabel: '添加到这里',
+          preparingTitle: $r('app.string.bookmark_preparing_folders'),
+          rootEmptyTitle: $r('app.string.bookmark_no_save_folder'),
+          leafEmptyTitle: $r('app.string.bookmark_no_child_folder'),
+          confirmLabel: $r('app.string.bookmark_add_here'),
           message: this.message,
           onDismiss: () => {
             this.onDismiss();

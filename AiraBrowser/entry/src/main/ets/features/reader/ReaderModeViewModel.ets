@@ -89,7 +89,7 @@ export class ReaderModeViewModel {
     };
   }
 
-  buildErrorState(current: ReaderModeViewState, message: string): ReaderModeViewState {
+  buildErrorState(current: ReaderModeViewState, message: ResourceStr): ReaderModeViewState {
     return {
       visible: true,
       loading: false,

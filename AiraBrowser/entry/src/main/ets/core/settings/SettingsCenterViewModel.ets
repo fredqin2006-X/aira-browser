@@ -5,6 +5,7 @@ import {
 } from '../../services/privacy/BrowserPrivacyEffectPolicyService';
 import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundaryService';
 import { AiraRenderableIconId } from '../resources/GeneratedAiraIconCatalog';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../common/config/AiraDistributionCapabilityOwner';
 
 export type SettingsCenterDestination =
@@ -57,7 +58,7 @@ export interface SettingsCenterState {
 
 export interface SettingsCenterAppProxyNoticeState {
   shouldShow: boolean;
-  message: string;
+  message: ResourceStr;
 }
 
 export class SettingsCenterViewModel {
@@ -88,7 +89,7 @@ export class SettingsCenterViewModel {
     ));
     accountRows.push(this.buildRow(
       'cross_device_link',
-      '跨设备互联',
+      '与电脑互联',
       '',
       canReadDevicePreferences && isFullServiceMode
     ));
@@ -128,9 +129,9 @@ export class SettingsCenterViewModel {
         },
         {
           id: 'experience',
-          title: '网页功能',
+          title: resolveAppResourceText($r('app.string.settings_web_features')),
           rows: [
-            this.buildRow('web_features', '网页功能'),
+            this.buildRow('web_features', resolveAppResourceText($r('app.string.settings_web_features'))),
             this.buildRow(
               'user_scripts',
               '用户脚本',
@@ -144,10 +145,10 @@ export class SettingsCenterViewModel {
           id: 'advanced',
           title: '高级',
           rows: [
-            this.buildRow('user_agent', '网页标识'),
+            this.buildRow('user_agent', resolveAppResourceText($r('app.string.site_version_preset_title'))),
             this.buildRow(
               'experiments',
-              '实验室',
+              resolveAppResourceText($r('app.string.settings_experiments_title')),
               isFullServiceMode ? '' : this.getFullModeRequiredValue(isFullServiceMode),
               canReadDevicePreferences && isFullServiceMode
             ),
@@ -162,7 +163,7 @@ export class SettingsCenterViewModel {
   private buildAppProxyNotice(appProxyEnabled: boolean): SettingsCenterAppProxyNoticeState {
     return {
       shouldShow: appProxyEnabled,
-      message: '应用内代理已开启'
+      message: $r('app.string.settings_experiments_toast_proxy_on')
     };
   }
 

@@ -11,6 +11,7 @@ import {
   UserScriptRuntimeCompatibilityService
 } from '../../services/userscripts/UserScriptRuntimeCompatibilityService';
 import { normalizeUserScriptJavaScriptResult } from '../../services/userscripts/UserScriptJavaScriptResultCodec';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 interface RawUserScriptPageMenuCommand {
   scriptId?: string;
@@ -25,7 +26,7 @@ export class UserScriptPageActionsViewModel {
   createInitialState(): UserScriptPageActionsState {
     return {
       url: '',
-      message: '打开网页后会显示当前页脚本菜单。',
+      message: resolveAppResourceText($r('app.string.user_script_page_actions_initial')),
       hasPage: false,
       hasMatchingScripts: false,
       hasMenuCommands: false,
@@ -50,7 +51,7 @@ export class UserScriptPageActionsViewModel {
       return this.buildNoCommandsState(
         normalizedUrl,
         matchingScripts.length,
-        '当前私密会话不运行常规用户脚本。',
+        resolveAppResourceText($r('app.string.user_script_page_actions_private_mode')),
         scriptStatuses
       );
     }
@@ -58,7 +59,7 @@ export class UserScriptPageActionsViewModel {
       return this.buildNoCommandsState(
         normalizedUrl,
         matchingScripts.length,
-        '当前网站已停用用户脚本。',
+        resolveAppResourceText($r('app.string.user_script_page_actions_site_disabled')),
         scriptStatuses
       );
     }
@@ -66,12 +67,17 @@ export class UserScriptPageActionsViewModel {
       return this.buildNoCommandsState(
         normalizedUrl,
         matchingScripts.length,
-        '当前网页还没有可用的 Web 控制器。',
+        resolveAppResourceText($r('app.string.user_script_page_actions_no_controller')),
         scriptStatuses
       );
     }
     if (matchingScripts.length === 0) {
-      return this.buildNoCommandsState(normalizedUrl, 0, '当前页没有匹配脚本。', []);
+      return this.buildNoCommandsState(
+        normalizedUrl,
+        0,
+        resolveAppResourceText($r('app.string.user_script_page_actions_no_match')),
+        []
+      );
     }
 
     const rawResult = await controller.runJavaScript(this.buildReadMenuCommandsScript());
@@ -82,13 +88,17 @@ export class UserScriptPageActionsViewModel {
       return this.buildNoCommandsState(
         normalizedUrl,
         matchingScripts.length,
-        `本页匹配 ${matchingScripts.length} 个脚本，暂无脚本菜单命令；自动运行脚本可在下方查看状态。`,
+        resolveAppResourceText($r('app.string.user_script_page_actions_no_commands'), matchingScripts.length),
         scriptStatuses
       );
     }
     return {
       url: normalizedUrl,
-      message: `${matchingScripts.length} 个脚本匹配本页，${commands.length} 个菜单命令可执行。`,
+      message: resolveAppResourceText(
+        $r('app.string.user_script_page_actions_commands_available'),
+        matchingScripts.length,
+        commands.length
+      ),
       hasPage: true,
       hasMatchingScripts: true,
       hasMenuCommands: true,
@@ -174,7 +184,9 @@ export class UserScriptPageActionsViewModel {
         scriptId: scriptId,
         commandId: commandId,
         scriptName: script.name,
-        commandName: commandName.length > 0 ? this.normalizeCommandDisplayName(script, commandName) : '脚本命令'
+        commandName: commandName.length > 0
+          ? this.normalizeCommandDisplayName(script, commandName)
+          : resolveAppResourceText($r('app.string.user_script_page_actions_default_command'))
       });
     });
     return results;
@@ -186,10 +198,10 @@ export class UserScriptPageActionsViewModel {
       .replace(/[✅✔☑️❌✖✕]\s*$/u, '')
       .trim();
     if (trimmedName.indexOf('已启用') >= 0 && trimmedName.indexOf('禁用') >= 0) {
-      return '暂停本网站脚本';
+      return resolveAppResourceText($r('app.string.user_script_page_actions_pause_site'));
     }
     if (trimmedName.indexOf('已禁用') >= 0 && trimmedName.indexOf('启用') >= 0) {
-      return '允许本网站脚本';
+      return resolveAppResourceText($r('app.string.user_script_page_actions_allow_site'));
     }
     return this.compatibilityService.normalizeRegisteredMenuCommandDisplayName(script, trimmedName);
   }
@@ -223,7 +235,9 @@ export class UserScriptPageActionsViewModel {
         scriptId: script.id,
         commandId: '__aira_run_script__',
         scriptName: script.name,
-        commandName: script.runAt === 'context-menu' ? script.name : `运行：${script.name}`
+        commandName: script.runAt === 'context-menu'
+          ? script.name
+          : resolveAppResourceText($r('app.string.user_script_page_actions_run_command'), script.name)
       });
     });
     return results;

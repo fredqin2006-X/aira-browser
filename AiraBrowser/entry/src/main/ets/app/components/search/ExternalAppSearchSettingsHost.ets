@@ -68,7 +68,7 @@ export struct ExternalAppSearchSettingsHost {
     Column() {
       if (this.desktopPresentation) {
         SettingsDesktopWorkspaceHeader({
-          title: '跨应用搜索',
+          title: $r('app.string.settings_search_engine_external_app'),
           showBackButton: true,
           primaryTextColor: this.theme.textPrimary,
           iconColor: this.theme.accent,

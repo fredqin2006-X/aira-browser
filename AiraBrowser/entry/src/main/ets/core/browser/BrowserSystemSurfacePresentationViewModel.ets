@@ -1,6 +1,7 @@
 import { BrowserSystemSheetSnapshot } from './BrowserTransientSurfaceCoordinator';
 import { BrowserSystemSheetType } from './BrowserShellRuntimeContracts';
 import { isDedicatedLargeScreenSystemSheet } from './DesktopDialogSheetPolicy';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export function isNovelReaderSystemSurfaceType(type: BrowserSystemSheetType): boolean {
   return type === 'novelCatalog' || type === 'novelReaderText' ||
@@ -9,16 +10,16 @@ export function isNovelReaderSystemSurfaceType(type: BrowserSystemSheetType): bo
 
 export function resolveNovelReaderSystemSurfaceTitle(type: BrowserSystemSheetType): string {
   if (type === 'novelCatalog') {
-    return '目录';
+    return resolveAppResourceText($r('app.string.novel_action_catalog'));
   }
   if (type === 'novelReaderAppearance') {
-    return '亮度与主题';
+    return resolveAppResourceText($r('app.string.reader_panel_appearance'));
   }
   if (type === 'novelReaderSettings') {
-    return '阅读设置';
+    return resolveAppResourceText($r('app.string.reader_panel_settings'));
   }
   if (type === 'novelReaderText') {
-    return '文字';
+    return resolveAppResourceText($r('app.string.reader_panel_text'));
   }
   return '';
 }

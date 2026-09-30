@@ -48,7 +48,7 @@ struct KeyboardShortcutsSettingsPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '键盘快捷键',
+        title: $r('app.string.settings_general_keyboard_shortcuts'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -65,7 +65,7 @@ struct KeyboardShortcutsSettingsPage {
             }, (group: KeyboardShortcutGroupState) => group.id)
 
             SettingsFooterText({
-              text: '快捷键在外接键盘或桌面/平板键盘环境下使用。',
+              text: $r('app.string.settings_shortcuts_footer'),
               secondaryTextColor: this.storedSecondaryTextColor
             })
           }

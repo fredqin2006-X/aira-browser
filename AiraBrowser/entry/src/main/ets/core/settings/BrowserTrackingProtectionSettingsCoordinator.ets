@@ -13,14 +13,14 @@ import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundary
 
 export interface BrowserTrackingProtectionOptionState {
   mode: BrowserTrackingProtectionMode;
-  title: string;
+  title: ResourceStr;
 }
 
 export interface BrowserTrackingProtectionSettingsState extends BrowserFingerprintPrivacyPolicyState {
-  selectedLabel: string;
+  selectedLabel: ResourceStr;
   options: BrowserTrackingProtectionOptionState[];
-  footerText: string;
-  limitationText: string;
+  footerText: ResourceStr;
+  limitationText: ResourceStr;
 }
 
 export class BrowserTrackingProtectionSettingsCoordinator {
@@ -85,18 +85,30 @@ export class BrowserTrackingProtectionSettingsCoordinator {
       cookiePolicyRuntimeApplied: policy.cookiePolicyRuntimeApplied,
       runtimeApplied: policy.runtimeApplied,
       message: policy.message,
-      selectedLabel: policy.enhanced ? '增强' : '标准',
+      selectedLabel: policy.enhanced ?
+        $r('app.string.settings_privacy_protection_tracking_enhanced') :
+        $r('app.string.settings_site_info_fingerprint_standard'),
       options: [
-        { mode: 'standard', title: '标准' },
-        { mode: 'enhanced', title: '增强反跟踪' }
+        { mode: 'standard', title: $r('app.string.settings_site_info_fingerprint_standard') },
+        { mode: 'enhanced', title: $r('app.string.settings_privacy_protection_tracking_enhanced_option') }
       ],
       footerText: policy.enhanced
-        ? '减少跨网站关联：收紧网页客户端提示、拦截第三方 Cookie，并保持网页标识一致。现有网页重新加载后完整生效。'
-        : '使用当前网页兼容性策略，第三方 Cookie 和网页客户端提示由各自设置控制。',
+        ? $r('app.string.settings_privacy_protection_tracking_footer_enhanced')
+        : $r('app.string.settings_privacy_protection_tracking_footer_standard'),
       limitationText: policy.runtimeApplied
-        ? '增强反跟踪不会伪装 Canvas、WebGL、字体、时区或屏幕渲染，也不是匿名度评分。'
-        : `${policy.message}增强反跟踪不会伪装 Canvas、WebGL、字体、时区或屏幕渲染。`
+        ? $r('app.string.settings_privacy_protection_tracking_limit_applied')
+        : $r('app.string.settings_privacy_protection_tracking_limit_partial', this.resolvePolicyMessage(policy.message))
     };
+  }
+
+  private resolvePolicyMessage(message: string): ResourceStr {
+    if (message === '部分防跟踪策略未能应用，请重启 Aira 后重试。') {
+      return $r('app.string.settings_privacy_protection_tracking_partial');
+    }
+    if (message === '防跟踪策略已应用。') {
+      return $r('app.string.settings_privacy_protection_tracking_applied');
+    }
+    return message;
   }
 
   private canWriteDevicePreference(boundaryInput: BrowserDataBoundaryInput): boolean {

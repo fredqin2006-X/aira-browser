@@ -47,6 +47,7 @@ import {
 import { AppServiceModeGateService } from '../../services/settings/AppServiceModeGateService';
 import { SiteCustomizationRefreshSignal } from '../../core/sitecustomization/SiteCustomizationRefreshSignal';
 import { SiteCapabilityCatalogService } from '../../services/web/SiteCapabilityCatalogService';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 interface SiteCustomizationPermissionPageParams {
   host?: string;
@@ -129,7 +130,7 @@ struct SiteCustomizationPermissionPage {
   @Builder
   private buildOptionSection() {
     SettingsSection({
-      title: '站点权限',
+      title: $r('app.string.settings_site_customization_site_permissions'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
@@ -229,8 +230,11 @@ struct SiteCustomizationPermissionPage {
     };
   }
 
-  private resolveTitle(): string {
-    return `${this.resolveSelectedGroup().title}权限`;
+  private resolveTitle(): ResourceStr {
+    return resolveAppResourceText(
+      $r('app.string.settings_site_customization_permission_page_title'),
+      this.resolveSelectedGroup().title
+    );
   }
 
   private resolveKind(value: string): SitePermissionKind {

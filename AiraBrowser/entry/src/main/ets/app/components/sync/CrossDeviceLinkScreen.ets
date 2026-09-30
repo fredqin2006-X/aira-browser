@@ -1,6 +1,7 @@
 import {
   BROWSER_THEME_STORAGE_DIVIDER_KEY,
   BROWSER_THEME_STORAGE_PAGE_BACKGROUND_KEY,
+  BROWSER_THEME_STORAGE_RESOLVED_MODE_KEY,
   BROWSER_THEME_STORAGE_PRESSED_BACKGROUND_KEY,
   BROWSER_THEME_STORAGE_SETTINGS_ICON_FOREGROUND_KEY,
   BROWSER_THEME_STORAGE_SURFACE_BACKGROUND_KEY,
@@ -10,10 +11,21 @@ import {
 import {
   CrossDeviceLinkActionId,
   CrossDeviceLinkDeviceRowState,
-  CrossDeviceLinkViewState
+  CrossDeviceLinkViewState,
+  localizeCrossDeviceLinkCopy
 } from '../../../core/sync/CrossDeviceLinkViewModel';
 import { CrossDeviceBrowserIconKind } from '../../../core/sync/CrossDeviceBrowserIcon';
 import { CrossDeviceBrowserIconResources } from '../../../core/resources/CrossDeviceBrowserIconResources';
+import {
+  buildCrossDeviceLinkOrbitLayout,
+  capCrossDeviceLinkOrbitStageWidth,
+  crossDeviceLinkOrbitPageFadeColor,
+  crossDeviceLinkOrbitSpinPeriodMs,
+  resolveCrossDeviceLinkOrbitCoverHeight,
+  resolveCrossDeviceLinkOrbitScrollOpacity,
+  CrossDeviceLinkOrbitLayout,
+  CrossDeviceLinkOrbitMarkPlacement
+} from '../../../core/sync/CrossDeviceLinkOrbitLayout';
 import { AiraRenderableIconId } from '../../../core/resources/GeneratedAiraIconCatalog';
 import { AiraIcon } from '../common/AiraIcon';
 import { SettingsContentKind } from '../../../core/settings/SettingsContentLayoutPolicy';
@@ -43,23 +55,17 @@ const ADD_DEVICE_GLYPH: AiraRenderableIconId = 'browser.toolbar.scanQr';
 const EXTENSION_GLYPH: AiraRenderableIconId = 'site.setting.externalActions';
 const SELF_HOSTED_GLYPH: AiraRenderableIconId = 'settings.webdav';
 const LOCAL_DEVICE_GLYPH: AiraRenderableIconId = 'crossDeviceLink.localDevice';
-const PEER_COMPUTER_GLYPH: AiraRenderableIconId = 'crossDeviceLink.peerComputer';
 
-const STATUS_PANEL_HORIZONTAL_PADDING: number = 16;
-const STATUS_PANEL_VERTICAL_PADDING: number = 18;
-
-/** The header is phone → account → computer, so the avatar is the anchor in the middle. */
-const HEADER_PEER_GLYPH_SIZE: number = 30;
 /** Same 34 slot as the phone row and the add-device row, so the brand mark is not smaller than those badges. */
 const DEVICE_BROWSER_ICON_SLOT: number = 34;
 const DEVICE_BROWSER_ICON_SIZE: number = 34;
-const HEADER_GLYPH_STAGE_SIZE: number = 56;
-const HEADER_AVATAR_SIZE: number = 62;
-const HEADER_AVATAR_BORDER_WIDTH: number = 2;
-const HEADER_AVATAR_ICON_SIZE: number = 32;
-const HEADER_CONNECTOR_DOT_SIZE: number = 5;
-const HEADER_CONNECTOR_DOT_SPACE: number = 6;
-const CONNECTOR_DOT_INDICES: number[] = [0, 1, 2];
+/** Neutral, low-contrast lines. No hue in either mode. */
+const ORBIT_RING_COLOR_LIGHT: string = '#1A000000';
+const ORBIT_RING_COLOR_DARK: string = '#1FFFFFFF';
+const ORBIT_SHADOW_COLOR_LIGHT: string = '#14303A60';
+const ORBIT_SHADOW_COLOR_DARK: string = '#99000000';
+const ORBIT_CENTER_SHADOW_COLOR_LIGHT: string = '#1C303A60';
+const ORBIT_RING_WIDTH: number = 1;
 
 @Component
 export struct CrossDeviceLinkScreen {
@@ -76,6 +82,7 @@ export struct CrossDeviceLinkScreen {
     DEFAULT_THEME_PALETTE.light.textPrimary;
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string =
     DEFAULT_THEME_PALETTE.light.textSecondary;
+  @StorageProp(BROWSER_THEME_STORAGE_RESOLVED_MODE_KEY) private storedResolvedThemeMode: string = 'light';
   @Prop state: CrossDeviceLinkViewState;
   @Prop isBusy: boolean = false;
   /**
@@ -100,11 +107,18 @@ export struct CrossDeviceLinkScreen {
   onToggleLink: (enabled: boolean) => void = (_enabled: boolean): void => {};
   onAction: (action: CrossDeviceLinkActionId) => void = (_action: CrossDeviceLinkActionId) => {};
   private contentScroller: Scroller = new Scroller();
+  @State private orbitStageWidth: number = 0;
+  @State private orbitSpin0: number = 0;
+  @State private orbitSpin1: number = 0;
+  @State private orbitSpin2: number = 0;
+  @State private orbitScrollOffset: number = 0;
+  private orbitSpinStarted: boolean = false;
+  private orbitSpinAlive: boolean = true;
 
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '跨设备互联',
+        title: $r('app.string.settings_sync_cross_device'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -120,19 +134,31 @@ export struct CrossDeviceLinkScreen {
           this.onBack();
         }
       }) {
-        SettingsPresentationScrollBody({
-          desktopPresentation: this.desktopPresentation,
-          contentSpace: 16,
-          topPadding: 8,
-          bottomPadding: 28,
-          scroller: this.contentScroller
-        }) {
-          this.buildStatusSection()
-          this.buildDeviceSection()
-          this.buildSyncSection()
-          this.buildSetupSection()
-          this.buildSelfHostedSection()
+        Stack({ alignContent: Alignment.TopStart }) {
+          this.buildOrbitHeader()
+
+          Column() {
+            SettingsPresentationScrollBody({
+              desktopPresentation: this.desktopPresentation,
+              expandToParent: true,
+              contentSpace: 0,
+              topPadding: 0,
+              bottomPadding: 28,
+              scroller: this.contentScroller,
+              onScrollOffset: (offset: number): void => {
+                this.noteOrbitScrollOffset(offset);
+              }
+            }) {
+              this.buildOrbitCoverSpacer()
+              this.buildScrollingCover()
+            }
+          }
+          .width('100%')
+          .height('100%')
+          .zIndex(1)
         }
+        .width('100%')
+        .height('100%')
       }
     }
     .width('100%')
@@ -140,149 +166,306 @@ export struct CrossDeviceLinkScreen {
     .backgroundColor(this.storedPageBackgroundColor)
   }
 
+  /**
+   * The rings stay put as a background. The list starts over the logo's lower edge
+   * and scrolls over the rings. It has no sheet of its own. This spacer stays in
+   * the scroll hit test: None would let the drag fall through to the rings.
+   */
   @Builder
-  private buildStatusSection() {
-    SettingsGroupCard({
-      surfaceColor: this.storedSurfaceBackgroundColor,
-      desktopPresentation: this.desktopPresentation
-    }) {
-      Column({ space: 14 }) {
-        this.buildAccountHeader()
-
-        if (this.state.providerNotice.length > 0) {
-          Text(this.state.providerNotice)
-            .width('100%')
-            .fontSize(13)
-            .lineHeight(19)
-            .fontColor(this.storedSecondaryTextColor)
-            .textAlign(TextAlign.Center)
-        }
-      }
+  private buildOrbitCoverSpacer() {
+    Column()
       .width('100%')
-      .padding({
-        left: STATUS_PANEL_HORIZONTAL_PADDING,
-        right: STATUS_PANEL_HORIZONTAL_PADDING,
-        top: STATUS_PANEL_VERTICAL_PADDING,
-        bottom: STATUS_PANEL_VERTICAL_PADDING
-      })
-      .alignItems(HorizontalAlign.Center)
+      .height(this.resolveOrbitCoverHeight())
+  }
+
+  @Builder
+  private buildScrollingCover() {
+    Column({ space: 16 }) {
+      if (this.state.providerNotice.length > 0) {
+        Text(localizeCrossDeviceLinkCopy(this.state.providerNotice))
+          .width('100%')
+          .fontSize(13)
+          .lineHeight(19)
+          .fontColor(this.storedSecondaryTextColor)
+          .textAlign(TextAlign.Center)
+      }
+      this.buildDeviceSection()
+      this.buildSyncSection()
+      this.buildSetupSection()
+      this.buildSelfHostedSection()
     }
+    .width('100%')
+    .alignItems(HorizontalAlign.Start)
+    .padding({ top: 8 })
   }
 
   /**
-   * The header is the account itself: this phone on the left, the account in the middle,
-   * the computers on the right. The connectors light up only when a desktop is really
-   * online, so the row answers "am I connected" before any row below is read.
+   * Three full rings share the Aira logo's center. The top dissolves into the page
+   * background — light and dark each use their own — and the lower half fades out
+   * instead of being clipped.
    */
   @Builder
-  private buildAccountHeader() {
-    Column({ space: 0 }) {
-      Row() {
-        this.buildPeerGlyph(LOCAL_DEVICE_GLYPH, true)
-        this.buildConnector(true)
-        this.buildAccountAvatar()
-        this.buildConnector(this.isComputerOnline())
-        this.buildPeerGlyph(PEER_COMPUTER_GLYPH, this.isComputerOnline())
+  private buildOrbitHeader() {
+    Column() {
+      if (this.orbitStageWidth > 0) {
+        this.buildOrbitStage(buildCrossDeviceLinkOrbitLayout(this.orbitStageWidth))
       }
-      .width('100%')
-      .alignItems(VerticalAlign.Center)
-      .justifyContent(FlexAlign.Center)
-
-      Text(this.state.accountTitle)
-        .width('100%')
-        .margin({ top: 16 })
-        .fontSize(20)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(this.storedPrimaryTextColor)
-        .textAlign(TextAlign.Center)
-        .maxLines(1)
-        .textOverflow({ overflow: TextOverflow.Ellipsis })
-
-      Text(this.state.accountSubtitle)
-        .width('100%')
-        .margin({ top: 6 })
-        .fontSize(13.5)
-        .lineHeight(19)
-        .fontColor(this.storedSecondaryTextColor)
-        .textAlign(TextAlign.Center)
-        .maxLines(1)
-        .textOverflow({ overflow: TextOverflow.Ellipsis })
     }
     .width('100%')
     .alignItems(HorizontalAlign.Center)
+    .opacity(this.resolveOrbitScrollOpacity())
+    .zIndex(0)
+    // None still lets the rings take the touch. Block the whole decoration so a
+    // drag on the illustration scrolls the page instead of dying here.
+    .hitTestBehavior(HitTestMode.BLOCK_DESCENDANTS)
+    .onAreaChange((_oldArea: Area, newArea: Area) => {
+      const stageWidth = capCrossDeviceLinkOrbitStageWidth(this.parseStageWidth(newArea.width));
+      if (stageWidth > 0 && Math.abs(stageWidth - this.orbitStageWidth) > 0.5) {
+        this.orbitStageWidth = stageWidth;
+      }
+      this.startOrbitSpin();
+    })
   }
 
   @Builder
-  private buildPeerGlyph(icon: AiraRenderableIconId, isOnline: boolean) {
-    Stack({ alignContent: Alignment.Center }) {
-      AiraIcon({
-        airaIconId: icon,
-        iconSize: HEADER_PEER_GLYPH_SIZE,
-        iconColor: isOnline ? this.storedPrimaryTextColor : this.storedDividerColor
-      })
+  private buildOrbitStage(layout: CrossDeviceLinkOrbitLayout) {
+    Stack({ alignContent: Alignment.TopStart }) {
+      this.buildOrbitRings(layout)
+
+      ForEach(layout.marks, (mark: CrossDeviceLinkOrbitMarkPlacement) => {
+        this.buildOrbitMark(mark, layout)
+      }, (mark: CrossDeviceLinkOrbitMarkPlacement): string => `${mark.kind}:${layout.stageWidth}`)
+
+      this.buildOrbitCenter(layout)
+      this.buildOrbitTopFade(layout)
     }
-    .width(HEADER_GLYPH_STAGE_SIZE)
-    .height(HEADER_GLYPH_STAGE_SIZE)
+    .width(layout.stageWidth)
+    .height(layout.stageHeight)
+    .hitTestBehavior(HitTestMode.BLOCK_DESCENDANTS)
   }
 
   /**
-   * The connector is the visual claim that the two sides are talking; the dots and the
-   * computer glyph share one state so the header never says "connected" twice differently.
+   * Painted with the live page background, not a fixed wash, so a dark page does
+   * not keep a light seam and a light page does not keep a dark one.
    */
   @Builder
-  private buildConnector(isLit: boolean) {
-    Row({ space: HEADER_CONNECTOR_DOT_SPACE }) {
-      ForEach(CONNECTOR_DOT_INDICES, (_index: number) => {
-        Circle()
-          .width(HEADER_CONNECTOR_DOT_SIZE)
-          .height(HEADER_CONNECTOR_DOT_SIZE)
-          .fill(isLit ? this.storedSecondaryTextColor : this.storedDividerColor)
-      }, (index: number): string => `${index}`)
-    }
-    .padding({ left: 8, right: 8 })
-    .alignItems(VerticalAlign.Center)
+  private buildOrbitTopFade(layout: CrossDeviceLinkOrbitLayout) {
+    Column()
+      .width(layout.stageWidth)
+      .height(layout.stageHeight)
+      .hitTestBehavior(HitTestMode.None)
+      .linearGradient({
+        direction: GradientDirection.Bottom,
+        colors: [
+          [crossDeviceLinkOrbitPageFadeColor(this.storedPageBackgroundColor, 'FF'), 0],
+          [crossDeviceLinkOrbitPageFadeColor(this.storedPageBackgroundColor, 'FF'), layout.topFadeHold],
+          [crossDeviceLinkOrbitPageFadeColor(this.storedPageBackgroundColor, '00'), layout.topFadeEnd],
+          [crossDeviceLinkOrbitPageFadeColor(this.storedPageBackgroundColor, '00'), 1]
+        ]
+      })
   }
 
   @Builder
-  private buildAccountAvatar() {
-    Stack({ alignContent: Alignment.Center }) {
-      if (this.state.accountAvatarUri.length > 0) {
-        Image(this.state.accountAvatarUri)
-          .width(HEADER_AVATAR_SIZE)
-          .height(HEADER_AVATAR_SIZE)
-          .borderRadius(HEADER_AVATAR_SIZE / 2)
-          .objectFit(ImageFit.Cover)
-          .clip(true)
-      } else {
-        SymbolGlyph($r('sys.symbol.person_fill'))
-          .fontSize(HEADER_AVATAR_ICON_SIZE)
-          .fontColor([
-            this.state.accountSignedIn ? this.storedPrimaryTextColor : this.storedSecondaryTextColor
-          ])
-      }
+  private buildOrbitRings(layout: CrossDeviceLinkOrbitLayout) {
+    Stack({ alignContent: Alignment.TopStart }) {
+      ForEach(layout.orbits, (radius: number) => {
+        Circle()
+          .width(radius * 2)
+          .height(radius * 2)
+          .fill(Color.Transparent)
+          .stroke(this.resolveOrbitRingColor())
+          .strokeWidth(ORBIT_RING_WIDTH)
+          .position({ x: layout.centerX - radius, y: layout.centerY - radius })
+      }, (radius: number): string => `${radius}`)
+
+      Column()
+        .width('100%')
+        .height('100%')
+        .hitTestBehavior(HitTestMode.None)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            [Color.Black, 0],
+            [Color.Black, layout.fadeHold],
+            [Color.Transparent, layout.fadeEnd],
+            [Color.Transparent, 1]
+          ]
+        })
+        .blendMode(BlendMode.DST_IN, BlendApplyType.OFFSCREEN)
     }
-    .width(HEADER_AVATAR_SIZE)
-    .height(HEADER_AVATAR_SIZE)
-    .borderRadius(HEADER_AVATAR_SIZE / 2)
-    .backgroundColor(this.storedPageBackgroundColor)
-    .borderWidth(HEADER_AVATAR_BORDER_WIDTH)
-    .borderColor(this.storedDividerColor)
-    .clip(true)
+    .width(layout.stageWidth)
+    .height(layout.stageHeight)
+    .blendMode(BlendMode.SRC_OVER, BlendApplyType.OFFSCREEN)
   }
 
-  private isComputerOnline(): boolean {
-    return this.state.onlineComputerCount > 0;
+  @Builder
+  private buildOrbitMark(mark: CrossDeviceLinkOrbitMarkPlacement, layout: CrossDeviceLinkOrbitLayout) {
+    Stack() {
+      Stack({ alignContent: Alignment.Center }) {
+        Image(CrossDeviceBrowserIconResources.icon(mark.kind))
+          .width(mark.size * 0.62)
+          .height(mark.size * 0.62)
+          .objectFit(ImageFit.Contain)
+      }
+      .width(mark.size)
+      .height(mark.size)
+      .borderRadius(mark.size / 2)
+      .backgroundColor(this.storedSurfaceBackgroundColor)
+      .borderWidth(this.isDarkOrbit() ? 1 : 0)
+      .borderColor(this.storedDividerColor)
+      .clip(true)
+      .shadow({ radius: 16, color: this.resolveOrbitShadowColor(), offsetX: 0, offsetY: 6 })
+      .position({ x: mark.x - mark.size / 2, y: mark.y - mark.size / 2 })
+      .rotate({
+        angle: -this.resolveOrbitSpinAngle(mark.orbitIndex),
+        centerX: '50%',
+        centerY: '50%'
+      })
+    }
+    .width(layout.stageWidth)
+    .height(layout.stageHeight)
+    .hitTestBehavior(HitTestMode.None)
+    .rotate({
+      angle: this.resolveOrbitSpinAngle(mark.orbitIndex),
+      centerX: layout.centerX,
+      centerY: layout.centerY
+    })
+  }
+
+  @Builder
+  private buildOrbitCenter(layout: CrossDeviceLinkOrbitLayout) {
+    Stack({ alignContent: Alignment.Center }) {
+      if (this.isDarkOrbit()) {
+        Image($r('app.media.aira_logo_brand'))
+          .width(layout.logoSize * 0.64)
+          .height(layout.logoSize * 0.64)
+          .objectFit(ImageFit.Contain)
+          .fillColor(this.storedPrimaryTextColor)
+      } else {
+        Image($r('app.media.aira_logo_brand'))
+          .width(layout.logoSize * 0.64)
+          .height(layout.logoSize * 0.64)
+          .objectFit(ImageFit.Contain)
+      }
+    }
+    .width(layout.logoSize)
+    .height(layout.logoSize)
+    .borderRadius(layout.logoSize / 2)
+    .backgroundColor(this.storedSurfaceBackgroundColor)
+    .borderWidth(this.isDarkOrbit() ? 1 : 0)
+    .borderColor(this.storedDividerColor)
+    .clip(true)
+    .shadow({
+      radius: 22,
+      color: this.isDarkOrbit() ? ORBIT_SHADOW_COLOR_DARK : ORBIT_CENTER_SHADOW_COLOR_LIGHT,
+      offsetX: 0,
+      offsetY: 8
+    })
+    .position({ x: layout.centerX - layout.logoSize / 2, y: layout.centerY - layout.logoSize / 2 })
+  }
+
+  private parseStageWidth(value: Length): number {
+    const parsed = Number.parseFloat(`${value}`);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  private isDarkOrbit(): boolean {
+    return this.storedResolvedThemeMode === 'dark';
+  }
+
+  private resolveOrbitRingColor(): string {
+    return this.isDarkOrbit() ? ORBIT_RING_COLOR_DARK : ORBIT_RING_COLOR_LIGHT;
+  }
+
+  private resolveOrbitShadowColor(): string {
+    return this.isDarkOrbit() ? ORBIT_SHADOW_COLOR_DARK : ORBIT_SHADOW_COLOR_LIGHT;
+  }
+
+  aboutToDisappear(): void {
+    this.orbitSpinAlive = false;
+  }
+
+  private resolveOrbitSpinAngle(orbitIndex: number): number {
+    if (orbitIndex === 0) {
+      return this.orbitSpin0;
+    }
+    if (orbitIndex === 1) {
+      return this.orbitSpin1;
+    }
+    return this.orbitSpin2;
+  }
+
+  private startOrbitSpin(): void {
+    if (this.orbitSpinStarted || this.orbitStageWidth <= 0) {
+      return;
+    }
+    this.orbitSpinStarted = true;
+    this.advanceOrbitSpin(0);
+    this.advanceOrbitSpin(1);
+    this.advanceOrbitSpin(2);
   }
 
   /**
-   * Two different things, deliberately kept apart: 跨设备互联 is this page's own switch (tab
+   * Each ring keeps turning while the page is open. A full turn lands on the same
+   * pose, so restarting at 0 does not jump.
+   */
+  private advanceOrbitSpin(orbitIndex: number): void {
+    if (!this.orbitSpinAlive) {
+      return;
+    }
+    animateTo({
+      duration: crossDeviceLinkOrbitSpinPeriodMs(orbitIndex),
+      curve: Curve.Linear,
+      onFinish: (): void => {
+        this.setOrbitSpin(orbitIndex, 0);
+        this.advanceOrbitSpin(orbitIndex);
+      }
+    }, (): void => {
+      this.setOrbitSpin(orbitIndex, 360);
+    });
+  }
+
+  private setOrbitSpin(orbitIndex: number, degrees: number): void {
+    if (orbitIndex === 0) {
+      this.orbitSpin0 = degrees;
+    } else if (orbitIndex === 1) {
+      this.orbitSpin1 = degrees;
+    } else {
+      this.orbitSpin2 = degrees;
+    }
+  }
+
+  private resolveOrbitCoverHeight(): number {
+    if (this.orbitStageWidth <= 0) {
+      return 0;
+    }
+    return resolveCrossDeviceLinkOrbitCoverHeight(buildCrossDeviceLinkOrbitLayout(this.orbitStageWidth));
+  }
+
+  private noteOrbitScrollOffset(offset: number): void {
+    const next = offset > 0 ? offset : 0;
+    if (Math.abs(next - this.orbitScrollOffset) < 0.5) {
+      return;
+    }
+    this.orbitScrollOffset = next;
+  }
+
+  private resolveOrbitScrollOpacity(): number {
+    return resolveCrossDeviceLinkOrbitScrollOpacity(this.orbitScrollOffset, this.resolveOrbitCoverHeight());
+  }
+
+  /**
+   * Two different things, deliberately kept apart: 与电脑互联 is this page's own switch (tab
    * handoff and page push), while 同步设置 only hands the user to the sync owner for data
    * sync. Pausing bookmarks and history must not break tab handoff, so this page never carries
    * a second data-sync master switch of its own.
    */
   @Builder
   private buildSyncSection() {
-    SettingsSection({ title: this.state.linkSwitchTitle, secondaryTextColor: this.storedSecondaryTextColor }) {
+    SettingsSection({
+      title: localizeCrossDeviceLinkCopy(this.state.linkSwitchTitle),
+      secondaryTextColor: this.storedSecondaryTextColor
+    }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
@@ -291,7 +474,7 @@ export struct CrossDeviceLinkScreen {
         // change cannot move the boolean and ArkUI would not re-apply `isOn` on its own.
         ForEach([`${this.state.linkEnabled}:${this.switchSettledRevision}`], (_key: string) => {
           SettingsSwitchRow({
-            title: this.state.linkSwitchTitle,
+            title: localizeCrossDeviceLinkCopy(this.state.linkSwitchTitle),
             checked: this.state.linkEnabled,
             rowPosition: 'first',
             isEnabled: this.state.linkSwitchEnabled && !this.isBusy,
@@ -307,8 +490,8 @@ export struct CrossDeviceLinkScreen {
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
 
         SettingsNavigationRow({
-          title: '同步设置',
-          value: this.state.syncSettingsValue,
+          title: $r('app.string.settings_sync_settings'),
+          value: localizeCrossDeviceLinkCopy(this.state.syncSettingsValue),
           rowPosition: 'last',
           isEnabled: !this.isBusy,
           primaryTextColor: this.storedPrimaryTextColor,
@@ -321,7 +504,7 @@ export struct CrossDeviceLinkScreen {
         })
       }
 
-      Text(this.state.linkSwitchDescription)
+      Text(localizeCrossDeviceLinkCopy(this.state.linkSwitchDescription))
         .width('100%')
         .fontSize(13)
         .lineHeight(19)
@@ -332,15 +515,18 @@ export struct CrossDeviceLinkScreen {
 
   @Builder
   private buildDeviceSection() {
-    SettingsSection({ title: '在线设备', secondaryTextColor: this.storedSecondaryTextColor }) {
+    SettingsSection({
+      title: $r('app.string.settings_link_online_devices'),
+      secondaryTextColor: this.storedSecondaryTextColor
+    }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
       }) {
         // This phone is always here, because the user is holding it while reading the row.
         SettingsStaticValueRow({
-          title: this.state.localDeviceRow.title,
-          value: this.state.localDeviceRow.subtitle,
+          title: localizeCrossDeviceLinkCopy(this.state.localDeviceRow.title),
+          value: localizeCrossDeviceLinkCopy(this.state.localDeviceRow.subtitle),
           airaIconId: LOCAL_DEVICE_GLYPH,
           iconColor: this.storedSettingsIconForegroundColor,
           // Same round badge the computer rows use, so the whole list reads as one list.
@@ -361,8 +547,8 @@ export struct CrossDeviceLinkScreen {
               SettingsGroupDivider({ dividerColor: this.storedDividerColor })
             }
             SettingsNavigationRow({
-              title: row.title,
-              description: row.subtitle,
+              title: localizeCrossDeviceLinkCopy(row.title),
+              description: localizeCrossDeviceLinkCopy(row.subtitle),
               useCustomLeading: true,
               rowPosition: this.resolveRowPosition(index + 1, this.state.devices.length + 2),
               isEnabled: !this.isBusy,
@@ -385,8 +571,8 @@ export struct CrossDeviceLinkScreen {
         // The list always ends with the way to grow it, so pairing is never hidden behind
         // an empty state that the user cannot act on.
         SettingsNavigationRow({
-          title: this.state.addDeviceTitle,
-          description: this.state.addDeviceDetail,
+          title: localizeCrossDeviceLinkCopy(this.state.addDeviceTitle),
+          description: localizeCrossDeviceLinkCopy(this.state.addDeviceDetail),
           airaIconId: ADD_DEVICE_GLYPH,
           iconBackgroundColor: this.settingsIconBackgrounds.addDevice,
           iconColor: this.storedSettingsIconForegroundColor,
@@ -411,8 +597,8 @@ export struct CrossDeviceLinkScreen {
   @Builder
   private buildPlaceholderDeviceRow() {
     SettingsNavigationRow({
-      title: this.state.devicesPlaceholderTitle,
-      description: this.state.devicesPlaceholderDetail,
+      title: localizeCrossDeviceLinkCopy(this.state.devicesPlaceholderTitle),
+      description: localizeCrossDeviceLinkCopy(this.state.devicesPlaceholderDetail),
       airaIconId: DEVICE_GLYPH,
       iconBackgroundColor: this.settingsIconBackgrounds.userAgent,
       iconColor: this.storedSettingsIconForegroundColor,
@@ -433,14 +619,17 @@ export struct CrossDeviceLinkScreen {
    */
   @Builder
   private buildSetupSection() {
-    SettingsSection({ title: '安装与连接', secondaryTextColor: this.storedSecondaryTextColor }) {
+    SettingsSection({
+      title: $r('app.string.settings_link_setup_section'),
+      secondaryTextColor: this.storedSecondaryTextColor
+    }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsNavigationRow({
-          title: '互联教程',
-          value: '查看步骤',
+          title: $r('app.string.settings_link_tutorial'),
+          value: $r('app.string.settings_link_view_steps'),
           airaIconId: EXTENSION_GLYPH,
           iconBackgroundColor: this.settingsIconBackgrounds.siteCustomization,
           iconColor: this.storedSettingsIconForegroundColor,
@@ -460,13 +649,16 @@ export struct CrossDeviceLinkScreen {
 
   @Builder
   private buildSelfHostedSection() {
-    SettingsSection({ title: this.state.selfHostedSectionTitle, secondaryTextColor: this.storedSecondaryTextColor }) {
+    SettingsSection({
+      title: localizeCrossDeviceLinkCopy(this.state.selfHostedSectionTitle),
+      secondaryTextColor: this.storedSecondaryTextColor
+    }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsNavigationRow({
-          title: this.state.selfHostedTitle,
+          title: localizeCrossDeviceLinkCopy(this.state.selfHostedTitle),
           airaIconId: SELF_HOSTED_GLYPH,
           iconBackgroundColor: this.syncProviderIconBackgrounds.webdav,
           iconColor: this.storedSettingsIconForegroundColor,
@@ -482,12 +674,12 @@ export struct CrossDeviceLinkScreen {
         })
       }
 
-      this.buildSectionFooter(this.state.selfHostedFooter)
+      this.buildSectionFooter(localizeCrossDeviceLinkCopy(this.state.selfHostedFooter))
     }
   }
 
   @Builder
-  private buildSectionFooter(text: string) {
+  private buildSectionFooter(text: ResourceStr) {
     Text(text)
       .width('100%')
       .fontSize(13)

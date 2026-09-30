@@ -25,12 +25,12 @@ export struct SyncResultDialog {
   @StorageProp(BROWSER_THEME_STORAGE_DIVIDER_KEY) private storedDividerColor: string = '#E3E8EF';
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY) private storedPrimaryTextColor: string = '#111318';
   controller?: CustomDialogController;
-  @Link title: string;
-  @Link message: string;
+  @Link title: ResourceStr;
+  @Link message: ResourceStr;
 
   build() {
     Column({ space: 0 }) {
-      Text(this.title.length > 0 ? this.title : '操作结果')
+      Text(this.resolveTitle())
         .width('100%')
         .fontSize(19)
         .fontWeight(FontWeight.Bold)
@@ -42,13 +42,17 @@ export struct SyncResultDialog {
 
       Scroll() {
         Column({ space: 0 }) {
-          ForEach(this.buildRows(this.message), (row: SyncResultDialogRow) => {
+          if (typeof this.message !== 'string') {
+            this.buildResourceMessage()
+          } else {
+            ForEach(this.buildRows(this.message), (row: SyncResultDialogRow) => {
             if (row.kind === 'status') {
               this.buildStatusRow(row)
             } else {
               this.buildParagraphRow(row)
             }
           }, (row: SyncResultDialogRow) => row.key)
+          }
         }
         .width('100%')
       }
@@ -59,7 +63,7 @@ export struct SyncResultDialog {
 
       BrowserSheetActionButton({
         stacked: true,
-        label: '知道了',
+        label: $r('app.string.settings_pro_got_it'),
         emphasis: 'primary',
         accentColor: this.storedAccentColor,
         fillAvailableWidth: false,
@@ -73,6 +77,29 @@ export struct SyncResultDialog {
       .margin({ top: 20 })
     }
     .attributeModifier(CENTERED_DIALOG_SYSTEM_SURFACE_MODIFIER)
+  }
+
+  private resolveTitle(): ResourceStr {
+    if (typeof this.title === 'string' && this.title.length === 0) {
+      return $r('app.string.settings_sync_result_fallback');
+    }
+    return this.title;
+  }
+
+  @Builder
+  private buildResourceMessage() {
+    Text(this.message)
+      .width('100%')
+      .fontSize(14)
+      .lineHeight(21)
+      .fontColor(this.storedPrimaryTextColor)
+      .textAlign(TextAlign.Start)
+      .maxLines(5)
+      .textOverflow({ overflow: TextOverflow.Ellipsis })
+      .padding({
+        top: SYNC_RESULT_DIALOG_ROW_VERTICAL_PADDING,
+        bottom: SYNC_RESULT_DIALOG_ROW_VERTICAL_PADDING
+      })
   }
 
   /**

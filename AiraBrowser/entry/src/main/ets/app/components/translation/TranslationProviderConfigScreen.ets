@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
 import {
   TranslationProviderEditFieldView,
@@ -32,8 +33,8 @@ export struct TranslationProviderConfigScreen {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY) private storedPrimaryTextColor: string = '#111318';
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string = '#5F6875';
   @Prop state: TranslationProviderEditState = {
-    title: '配置服务商',
-    displayName: '自定义接口',
+    title: resolveAppResourceText($r('app.string.settings_web_translation_config_title')),
+    displayName: resolveAppResourceText($r('app.string.settings_web_translation_custom_name')),
     endpoint: '',
     apiKey: '',
     appId: '',
@@ -69,7 +70,7 @@ export struct TranslationProviderConfigScreen {
       showTitleBar: this.showTitleBar,
       useTopSafeInset: this.useTopSafeInset,
       desktopPresentation: this.desktopPresentation,
-      menuActionLabel: '保存',
+      menuActionLabel: resolveAppResourceText($r('app.string.settings_web_translation_save')),
       menuActionIcon: $r('sys.symbol.checkmark'),
       menuActionEnabled: this.state.saveEnabled && !this.isSaving,
       onBack: () => {
@@ -97,7 +98,7 @@ export struct TranslationProviderConfigScreen {
 
   @Builder
   private buildFormCard() {
-    SettingsSection({ title: '服务参数' }) {
+    SettingsSection({ title: $r('app.string.settings_web_translation_section_params') }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
@@ -127,7 +128,7 @@ export struct TranslationProviderConfigScreen {
 
   @Builder
   private buildSecurityCard() {
-    SettingsSection({ title: '安全' }) {
+    SettingsSection({ title: $r('app.string.settings_web_translation_section_security') }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
@@ -146,14 +147,14 @@ export struct TranslationProviderConfigScreen {
           .borderRadius(17)
 
           Column({ space: 4 }) {
-            Text('安全存储')
+            Text($r('app.string.settings_web_translation_secure_storage'))
               .width('100%')
               .fontSize(15)
               .fontWeight(this.desktopPresentation ? FontWeight.Regular : FontWeight.Medium)
               .fontColor(this.storedPrimaryTextColor)
             Text(this.securityMessage.length > 0
               ? this.securityMessage
-              : 'API 密钥将通过系统安全存储加密保存在本机。')
+              : resolveAppResourceText($r('app.string.settings_web_translation_secure_storage_hint')))
               .width('100%')
               .fontSize(13)
               .lineHeight(18)

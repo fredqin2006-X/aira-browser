@@ -29,6 +29,7 @@ import {
   SiteControlsNavigationDecision,
   SiteControlsSiteNavigationTarget
 } from '../../core/sitecontrols/SiteControlsNavigationDecision';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 interface SiteControlsCapabilityPageParams {
   kind?: string;
@@ -248,8 +249,10 @@ struct SiteControlsCapabilityPage {
       hasFilteredRows: listState.hasFilteredRows,
       summaryLine: '',
       listTitle: this.pageTitle,
-      emptyTitle: `还没有${this.pageTitle}规则`,
-      emptyMessage: `有站点改过${this.pageTitle}规则后，会出现在这里`
+      emptyTitle: resolveAppResourceText(
+        $r('app.string.settings_site_controls_empty_filter_title'), this.pageTitle),
+      emptyMessage: resolveAppResourceText(
+        $r('app.string.settings_site_controls_empty_filter_message'), this.pageTitle)
     };
   }
 }

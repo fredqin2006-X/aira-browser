@@ -22,6 +22,7 @@ import {
   BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY
 } from '../../../core/theme/BrowserThemeStorageKeys';
 import { DESKTOP_DIALOG_PADDING_VP } from '../../../core/browser/BrowserDialogPresentationTokens';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { AppEmptyState } from '../common/AppEmptyState';
 import { FloatingGlassMaterialSurface } from '../common/FloatingGlassMaterialSurface';
 import { HdsImmersiveMaterialSurface } from '../common/HdsImmersiveMaterialSurface';
@@ -83,10 +84,12 @@ const RESOURCE_TAB_BAR_HORIZONTAL_PADDING: number = 16;
 
 function describeKind(candidate: MediaResourceListItem): string {
   if (candidate.acquisition?.mode === 'paired_adaptive') {
-    return '自适应音视频';
+    return resolveAppResourceText($r('app.string.media_resource_kind_adaptive_av'));
   }
   if (candidate.acquisition?.mode === 'progressive') {
-    return candidate.acquisition.primaryTrack.role === 'audio' ? '音频' : '渐进式视频';
+    return candidate.acquisition.primaryTrack.role === 'audio'
+      ? resolveAppResourceText($r('app.string.media_resource_kind_audio'))
+      : resolveAppResourceText($r('app.string.media_resource_kind_progressive_video'));
   }
   switch (candidate.kind) {
     case 'hls': return 'HLS';
@@ -100,40 +103,50 @@ function describeKind(candidate: MediaResourceListItem): string {
     case 'mpeg': return 'MPEG';
     case 'wmv': return 'WMV';
     case 'ogv': return 'OGV';
-    case 'audio': return '音频';
-    case 'image': return '图片';
-    case 'document': return '文档';
-    case 'archive': return '压缩包';
-    case 'package': return '安装包';
-    case 'segment': return '媒体分片';
-    default: return '未知资源';
+    case 'audio': return resolveAppResourceText($r('app.string.media_resource_kind_audio'));
+    case 'image': return resolveAppResourceText($r('app.string.media_resource_kind_image'));
+    case 'document': return resolveAppResourceText($r('app.string.media_resource_kind_document'));
+    case 'archive': return resolveAppResourceText($r('app.string.media_resource_kind_archive'));
+    case 'package': return resolveAppResourceText($r('app.string.media_resource_kind_package'));
+    case 'segment': return resolveAppResourceText($r('app.string.media_resource_kind_segment'));
+    default: return resolveAppResourceText($r('app.string.media_resource_kind_unknown'));
   }
 }
 
 function describeStatus(candidate: MediaResourceListItem): string {
+  const downloadable = resolveAppResourceText($r('app.string.media_resource_status_downloadable'));
   switch (candidate.status) {
-    case 'playing_native': return '正在接管播放';
-    case 'playable': return '已验证视频';
-    case 'downloadable': return '可下载';
+    case 'playing_native': return resolveAppResourceText($r('app.string.media_resource_status_taking_over'));
+    case 'playable': return resolveAppResourceText($r('app.string.media_resource_status_verified_video'));
+    case 'downloadable': return downloadable;
     case 'needs_processing':
-      return candidate.kind === 'dash' ? '待解析视频' :
-        candidate.actions.indexOf('download') >= 0 ? '可下载' : '需要处理';
-    case 'protected': return '受保护，暂不支持';
-    case 'expired': return '地址可能已过期';
+      return candidate.kind === 'dash'
+        ? resolveAppResourceText($r('app.string.media_resource_status_parsing_pending'))
+        : candidate.actions.indexOf('download') >= 0
+          ? downloadable
+          : resolveAppResourceText($r('app.string.media_resource_status_needs_processing'));
+    case 'protected': return resolveAppResourceText($r('app.string.media_resource_status_protected'));
+    case 'expired': return resolveAppResourceText($r('app.string.media_resource_status_expired'));
     case 'unsupported': return describeFailureReason(candidate.failureReason);
-    case 'failed': return '处理失败：' + (candidate.failureReason ?? '未知原因');
-    default: return candidate.actions.indexOf('download') >= 0 ? '可下载' : '已发现';
+    case 'failed':
+      return resolveAppResourceText($r(
+        'app.string.media_resource_status_failed',
+        candidate.failureReason ?? resolveAppResourceText($r('app.string.media_resource_unknown_reason'))
+      ));
+    default: return candidate.actions.indexOf('download') >= 0
+      ? downloadable
+      : resolveAppResourceText($r('app.string.media_resource_status_detected'));
   }
 }
 
 function describeFailureReason(reason: string | undefined): string {
   if (reason === 'hls_requires_web_mse_runtime') {
-    return '需要网页 MSE，仅能由当前网页播放';
+    return resolveAppResourceText($r('app.string.media_resource_failure_needs_mse'));
   }
   if (reason === 'hls_child_headers_not_inherited') {
-    return 'HLS 分片鉴权暂不处理';
+    return resolveAppResourceText($r('app.string.media_resource_failure_hls_auth'));
   }
-  return '当前版本暂不支持';
+  return resolveAppResourceText($r('app.string.media_resource_failure_unsupported'));
 }
 
 function belongsToTab(candidate: MediaResourceListItem, tab: MediaResourceSurfaceTab): boolean {
@@ -187,10 +200,12 @@ function buildMeta(candidate: MediaResourceListItem): string {
 
 function describeFrameType(candidate: MediaResourceListItem): string {
   switch (candidate.frameType) {
-    case 'main_frame': return '主框架';
-    case 'sub_frame': return '子框架';
-    case 'dom_frame': return 'iframe 入口';
-    case 'dom_document': return candidate.source === 'dom' ? '页面扫描' : '';
+    case 'main_frame': return resolveAppResourceText($r('app.string.media_resource_frame_main'));
+    case 'sub_frame': return resolveAppResourceText($r('app.string.media_resource_frame_sub'));
+    case 'dom_frame': return resolveAppResourceText($r('app.string.media_resource_frame_iframe'));
+    case 'dom_document': return candidate.source === 'dom'
+      ? resolveAppResourceText($r('app.string.media_resource_frame_page_scan'))
+      : '';
     default: return '';
   }
 }
@@ -322,7 +337,7 @@ export struct BrowserMediaResourcesSheet {
       Stack() {
         BrowserImmersiveSheetLayout({
           closeVisible: true,
-          closeAccessibilityLabel: '关闭资源嗅探',
+          closeAccessibilityLabel: $r('app.string.media_resource_close'),
           onClose: (): void => {
             this.onClose();
           },
@@ -476,8 +491,8 @@ export struct BrowserMediaResourcesSheet {
         if (this.filteredCandidatesForTab(tab).length === 0 && this.scanning) {
           AppEmptyState({
             airaIconId: 'browser.shortcut.pageResources',
-            title: '正在扫描页面资源',
-            message: '先展示已捕获的网络资源，页面隐藏链接会在扫描完成后补充。',
+            title: $r('app.string.media_resource_scanning_title'),
+            message: $r('app.string.media_resource_scanning_message'),
             topPadding: 28,
             bottomPadding: 28,
             fillHeight: true
@@ -486,7 +501,7 @@ export struct BrowserMediaResourcesSheet {
           AppEmptyState({
             airaIconId: 'browser.shortcut.pageResources',
             title: this.buildEmptyTitle(tab),
-            message: '部分网站会加密、延迟加载或隐藏真实资源地址。',
+            message: $r('app.string.media_resource_empty_message'),
             topPadding: 28,
             bottomPadding: 28,
             fillHeight: true
@@ -529,7 +544,7 @@ export struct BrowserMediaResourcesSheet {
   private buildOtherResourceList() {
     Column({ space: 12 }) {
       if (this.imageCandidates().length > 0) {
-        Text('图片 ' + this.imageCandidates().length.toString())
+        Text($r('app.string.media_resource_images_count', this.imageCandidates().length))
           .width('100%')
           .fontSize(13)
           .fontWeight(FontWeight.Medium)
@@ -561,7 +576,7 @@ export struct BrowserMediaResourcesSheet {
                   .width(22)
                   .height(22)
                   .color(this.storedAccentColor)
-                Text('正在解析流媒体清单...')
+                Text($r('app.string.media_resource_parsing_manifest'))
                   .fontSize(14)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(this.storedPrimaryTextColor)
@@ -573,7 +588,7 @@ export struct BrowserMediaResourcesSheet {
               this.buildManifestSummary(this.manifestParseResult.summary)
             } else if (this.manifestParseResult !== undefined) {
               Text(this.manifestParseResult.errorMessage.length > 0 ?
-                this.manifestParseResult.errorMessage : '清单解析失败。')
+                this.manifestParseResult.errorMessage : $r('app.string.media_resource_manifest_parse_failed'))
                 .width('100%')
                 .fontSize(14)
                 .fontColor(this.storedSecondaryTextColor)
@@ -599,7 +614,9 @@ export struct BrowserMediaResourcesSheet {
           .layoutWeight(1)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-        Text(summary.encrypted ? '加密' : '未加密')
+        Text(summary.encrypted
+          ? $r('app.string.media_resource_manifest_encrypted')
+          : $r('app.string.media_resource_manifest_unencrypted'))
           .fontSize(11)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.storedAccentColor)
@@ -627,7 +644,7 @@ export struct BrowserMediaResourcesSheet {
       }
 
       if (summary.keyUrls.length > 0) {
-        Text('Key ' + summary.keyUrls.length.toString() + ' 个 · ' + shortenUrl(summary.keyUrls[0]))
+        Text($r('app.string.media_resource_manifest_keys', summary.keyUrls.length, shortenUrl(summary.keyUrls[0])))
           .width('100%')
           .fontSize(11)
           .fontColor(this.storedSecondaryTextColor)
@@ -636,7 +653,7 @@ export struct BrowserMediaResourcesSheet {
       }
 
       if (summary.sampleSegments.length > 0) {
-        Text('样例分片 ' + shortenUrl(summary.sampleSegments[0]))
+        Text($r('app.string.media_resource_sample_segment', shortenUrl(summary.sampleSegments[0])))
           .width('100%')
           .fontSize(11)
           .fontColor(this.storedSecondaryTextColor)
@@ -804,20 +821,20 @@ export struct BrowserMediaResourcesSheet {
   private buildActionButtons(candidate: MediaResourceListItem) {
     Row({ space: 4 }) {
       if (candidate.actions.indexOf('parse_manifest') >= 0) {
-        this.buildActionButton(candidate, 'parse_manifest', '解析', true)
+        this.buildActionButton(candidate, 'parse_manifest', $r('app.string.media_resource_action_parse'), true)
       }
       if (candidate.actions.indexOf('download') >= 0) {
-        this.buildActionButton(candidate, 'download', '下载', false)
+        this.buildActionButton(candidate, 'download', $r('app.string.media_resource_action_download'), false)
       }
       if (candidate.actions.indexOf('copy') >= 0) {
-        this.buildActionButton(candidate, 'copy', '复制', false)
+        this.buildActionButton(candidate, 'copy', $r('app.string.media_resource_action_copy'), false)
       }
     }
     .alignItems(VerticalAlign.Center)
   }
 
   @Builder
-  private buildActionButton(candidate: MediaResourceListItem, action: MediaResourceAction, label: string, primary: boolean) {
+  private buildActionButton(candidate: MediaResourceListItem, action: MediaResourceAction, label: ResourceStr, primary: boolean) {
     BrowserSheetActionButton({
       label: label,
       emphasis: primary ? 'primary' : 'secondary',
@@ -845,7 +862,9 @@ export struct BrowserMediaResourcesSheet {
   }
 
   private resolveTabLabel(tab: MediaResourceSurfaceTab): string {
-    return tab === 'video' ? '视频' : '其他资源';
+    return tab === 'video'
+      ? resolveAppResourceText($r('app.string.media_resource_tab_video'))
+      : resolveAppResourceText($r('app.string.media_resource_tab_other'));
   }
 
   private resolveResourceIcon(candidate: MediaResourceListItem): Resource {
@@ -976,22 +995,26 @@ export struct BrowserMediaResourcesSheet {
     this.syncSwiperToActiveTab(false);
   }
 
-  private buildTitle(): string {
-    return '资源嗅探';
+  private buildTitle(): ResourceStr {
+    return $r('app.string.media_resource_title');
   }
 
-  private buildEmptyTitle(tab: MediaResourceSurfaceTab): string {
-    return tab === 'video' ? '当前页面未检测到视频' : '当前页面没有其他资源';
+  private buildEmptyTitle(tab: MediaResourceSurfaceTab): ResourceStr {
+    return tab === 'video'
+      ? $r('app.string.media_resource_empty_video')
+      : $r('app.string.media_resource_empty_other');
   }
 
-  private buildManifestTitle(summary: MediaManifestSummary): string {
+  private buildManifestTitle(summary: MediaManifestSummary): ResourceStr {
     if (summary.kind === 'hls') {
-      return summary.role === 'master' ? 'HLS Master 清单' : 'HLS Media 清单';
+      return summary.role === 'master'
+        ? $r('app.string.media_resource_manifest_hls_master')
+        : $r('app.string.media_resource_manifest_hls_media');
     }
     if (summary.kind === 'dash') {
-      return 'DASH MPD 清单';
+      return $r('app.string.media_resource_manifest_dash');
     }
-    return '流媒体清单';
+    return $r('app.string.media_resource_manifest_stream');
   }
 
   private buildManifestMetrics(summary: MediaManifestSummary): string {
@@ -1000,16 +1023,16 @@ export struct BrowserMediaResourcesSheet {
       parts.push(summary.sourceHost);
     }
     if (summary.variantCount > 0) {
-      parts.push(summary.variantCount.toString() + ' 个清晰度');
+      parts.push(resolveAppResourceText($r('app.string.media_resource_manifest_quality_count', summary.variantCount)));
     }
     if (summary.segmentCount > 0) {
-      parts.push(summary.segmentCount.toString() + ' 个分片');
+      parts.push(resolveAppResourceText($r('app.string.media_resource_manifest_segment_count', summary.segmentCount)));
     }
     if (summary.durationSeconds > 0) {
       parts.push(formatDuration(summary.durationSeconds * 1000));
     }
     if (summary.keyCount > 0) {
-      parts.push(summary.keyCount.toString() + ' 个 Key');
+      parts.push(resolveAppResourceText($r('app.string.media_resource_manifest_key_count', summary.keyCount)));
     }
     return parts.length > 0 ? parts.join(' · ') : shortenUrl(summary.url);
   }
@@ -1024,7 +1047,7 @@ export struct BrowserMediaResourcesSheet {
     if (variant.bandwidth > 0) {
       return Math.round(variant.bandwidth / 1000).toString() + ' kbps';
     }
-    return '清晰度 ' + (variant.index + 1).toString();
+    return resolveAppResourceText($r('app.string.media_resource_variant_quality', variant.index + 1));
   }
 
   private buildVariantMeta(variant: MediaManifestVariant): string {
@@ -1033,13 +1056,13 @@ export struct BrowserMediaResourcesSheet {
       parts.push(Math.round(variant.bandwidth / 1000).toString() + ' kbps');
     }
     if (variant.segmentCount > 0) {
-      parts.push(variant.segmentCount.toString() + ' 分片');
+      parts.push(resolveAppResourceText($r('app.string.media_resource_variant_segments', variant.segmentCount)));
     }
     if (variant.targetDuration > 0) {
       parts.push(variant.targetDuration.toString() + 's');
     }
     if (variant.encrypted) {
-      parts.push('加密');
+      parts.push(resolveAppResourceText($r('app.string.media_resource_manifest_encrypted')));
     }
     return parts.length > 0 ? parts.join(' · ') : shortenUrl(variant.url);
   }
@@ -1183,14 +1206,14 @@ struct BrowserResourceVideoCard {
   @Builder
   private buildPrimaryAction() {
     if (this.candidate.actions.indexOf('download') >= 0) {
-      this.buildPrimaryActionButton('download', '下载', true)
+      this.buildPrimaryActionButton('download', $r('app.string.media_resource_action_download'), true)
     } else if (this.candidate.actions.indexOf('parse_manifest') >= 0) {
-      this.buildPrimaryActionButton('parse_manifest', '解析', true)
+      this.buildPrimaryActionButton('parse_manifest', $r('app.string.media_resource_action_parse'), true)
     }
   }
 
   @Builder
-  private buildPrimaryActionButton(action: MediaResourceAction, label: string, primary: boolean) {
+  private buildPrimaryActionButton(action: MediaResourceAction, label: ResourceStr, primary: boolean) {
     BrowserSheetActionButton({
       label: label,
       emphasis: primary ? 'primary' : 'secondary',
@@ -1211,7 +1234,7 @@ struct BrowserResourceVideoCard {
       if (this.candidate.actions.indexOf('parse_manifest') >= 0) {
         MenuItem({
           startIcon: $r('sys.symbol.doc_text_fill'),
-          content: '解析流媒体清单'
+          content: $r('app.string.media_resource_menu_parse_manifest')
         })
           .onClick(() => {
             this.runAction('parse_manifest');
@@ -1220,7 +1243,7 @@ struct BrowserResourceVideoCard {
       if (this.candidate.actions.indexOf('download') >= 0) {
         MenuItem({
           startIcon: $r('sys.symbol.arrow_down'),
-          content: '下载视频'
+          content: $r('app.string.media_resource_menu_download_video')
         })
           .onClick(() => {
             this.runAction('download');
@@ -1229,7 +1252,7 @@ struct BrowserResourceVideoCard {
       if (this.candidate.actions.indexOf('copy') >= 0) {
         MenuItem({
           startIcon: $r('sys.symbol.link'),
-          content: '复制资源链接'
+          content: $r('app.string.media_resource_menu_copy_link')
         })
           .onClick(() => {
             this.runAction('copy');
@@ -1291,7 +1314,7 @@ struct BrowserResourceVideoCard {
       parts.push(formatDuration(this.candidate.durationMs));
     }
     if (this.candidate.estimatedTotalBytes !== undefined && this.candidate.estimatedTotalBytes > 0) {
-      parts.push('约 ' + formatEstimatedBytes(this.candidate.estimatedTotalBytes));
+      parts.push(resolveAppResourceText($r('app.string.media_resource_estimated_size', formatEstimatedBytes(this.candidate.estimatedTotalBytes))));
     } else if (this.candidate.kind !== 'hls' &&
       this.candidate.totalBytes !== undefined && this.candidate.totalBytes > 0) {
       parts.push(formatBytes(this.candidate.totalBytes));
@@ -1394,7 +1417,7 @@ struct BrowserResourceImageGridCard {
       if (this.candidate.actions.indexOf('copy') >= 0) {
         MenuItem({
           startIcon: $r('sys.symbol.link'),
-          content: '复制图片链接'
+          content: $r('app.string.media_resource_menu_copy_image_link')
         })
           .onClick(() => {
             this.runAction('copy');
@@ -1403,7 +1426,7 @@ struct BrowserResourceImageGridCard {
       if (this.candidate.actions.indexOf('download') >= 0) {
         MenuItem({
           startIcon: $r('sys.symbol.arrow_down'),
-          content: '下载图片'
+          content: $r('app.string.media_resource_menu_download_image')
         })
           .onClick(() => {
             this.runAction('download');
@@ -1455,7 +1478,7 @@ struct BrowserResourceImageGridCard {
           iconSize: 20,
           iconColor: RESOURCE_IMAGE_PREVIEW_FOREGROUND_COLOR,
           buttonSize: RESOURCE_IMAGE_PREVIEW_CLOSE_SIZE,
-          accessibilityLabel: '关闭图片预览',
+          accessibilityLabel: $r('app.string.media_resource_close_image_preview'),
           onAction: () => {
             this.closePreview();
           }

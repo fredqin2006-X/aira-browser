@@ -50,6 +50,7 @@ import {
   BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY
 } from '../../../core/theme/BrowserThemeStorageKeys';
 import { applyDesktopDialogSheetChrome } from '../common/DesktopDialogSheetChrome';
+import { resourceStrPresent } from '../../../core/browser/BrowserBottomPanelText';
 
 @Component
 export struct LocalBackupScreen {
@@ -186,7 +187,7 @@ export struct LocalBackupScreen {
         this.buildContent(16)
       } else {
         SettingsHdsScaffold({
-          title: '本地备份',
+          title: $r('app.string.settings_advanced_backup_title'),
           backIconKind: 'back',
           pageBackground: this.storedPageBackgroundColor,
           headerButtonBackground: this.storedPressedBackgroundColor,
@@ -213,7 +214,7 @@ export struct LocalBackupScreen {
       preferType: SheetType.BOTTOM,
       height: SheetSize.FIT_CONTENT,
       title: {
-        title: '选择导入内容'
+        title: $r('app.string.settings_advanced_backup_import_sheet_title')
       },
       dragBar: true,
       showClose: true,
@@ -238,13 +239,13 @@ export struct LocalBackupScreen {
 
   @Builder
   private buildExportSection() {
-    SettingsSection({ title: '导出到文件', secondaryTextColor: this.storedSecondaryTextColor }) {
+    SettingsSection({ title: $r('app.string.settings_advanced_backup_export_section'), secondaryTextColor: this.storedSecondaryTextColor }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsSwitchRow({
-          title: '书签',
+          title: $r('app.string.settings_advanced_backup_export_bookmarks'),
           desktopPresentation: this.desktopPresentation,
           checked: this.exportBookmarks,
           rowPosition: 'first',
@@ -255,7 +256,7 @@ export struct LocalBackupScreen {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: '历史记录',
+          title: $r('app.string.settings_advanced_backup_export_history'),
           desktopPresentation: this.desktopPresentation,
           checked: this.exportHistory,
           rowPosition: 'middle',
@@ -266,7 +267,7 @@ export struct LocalBackupScreen {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: '常用设置',
+          title: $r('app.string.settings_advanced_backup_export_personalization'),
           desktopPresentation: this.desktopPresentation,
           checked: this.exportPersonalization,
           rowPosition: 'middle',
@@ -277,7 +278,7 @@ export struct LocalBackupScreen {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: '用户脚本',
+          title: $r('app.string.settings_advanced_backup_export_user_scripts'),
           desktopPresentation: this.desktopPresentation,
           checked: this.exportUserScripts,
           rowPosition: 'middle',
@@ -291,7 +292,7 @@ export struct LocalBackupScreen {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: '脚本数据',
+          title: $r('app.string.settings_advanced_backup_export_user_script_values'),
           desktopPresentation: this.desktopPresentation,
           checked: this.exportUserScriptValues,
           rowPosition: 'last',
@@ -302,7 +303,9 @@ export struct LocalBackupScreen {
         })
       }
       SettingsActionButton({
-        title: this.isBusy ? '正在处理' : '导出备份',
+        title: this.isBusy
+          ? $r('app.string.settings_advanced_backup_exporting')
+          : $r('app.string.settings_advanced_backup_export_action'),
         variant: 'filled',
         isEnabled: this.canOperate() && this.hasAnyExportSelection(),
         accentColor: this.storedAccentColor,
@@ -316,9 +319,13 @@ export struct LocalBackupScreen {
 
   @Builder
   private buildImportSection() {
-    SettingsSection({ title: '从文件导入', secondaryTextColor: this.storedSecondaryTextColor }) {
+    SettingsSection({ title: $r('app.string.settings_advanced_backup_import_section'), secondaryTextColor: this.storedSecondaryTextColor }) {
       SettingsActionButton({
-        title: this.isBusy ? '正在读取' : (this.hasImportPreview ? '继续导入' : '选择备份文件'),
+        title: this.isBusy
+          ? $r('app.string.settings_advanced_backup_import_reading')
+          : (this.hasImportPreview
+            ? $r('app.string.settings_advanced_backup_import_continue')
+            : $r('app.string.settings_advanced_backup_import_choose_file')),
         isEnabled: this.canOperate(),
         accentColor: this.storedAccentColor,
         pressedBackgroundColor: this.storedPressedBackgroundColor,
@@ -538,14 +545,14 @@ export struct LocalBackupScreen {
   }
 
   private presentOutcome(outcome: LocalBackupActionOutcome): void {
-    if (outcome.status === 'cancelled' || outcome.title.length <= 0) {
+    if (outcome.status === 'cancelled' || !resourceStrPresent(outcome.title)) {
       return;
     }
     showCenteredAlertDialog({
       title: outcome.title,
       message: outcome.message,
       autoCancel: true,
-      confirm: { value: '知道了', action: () => {} }
+      confirm: { value: $r('app.string.settings_advanced_backup_confirm'), action: () => {} }
     });
   }
 

@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BrowserDataScope,
   BrowserSessionPrivacyMode,
@@ -118,15 +119,15 @@ export struct BrowserDownloadSettingsDialog {
   private resolveTitle(): string {
     switch (this.activeSubpage) {
       case 'hls_concurrency':
-        return 'HLS 分片并发数';
+        return resolveAppResourceText($r('app.string.settings_web_download_hls'));
       case 'auto_clear':
-        return '自动清理';
+        return resolveAppResourceText($r('app.string.settings_web_download_auto_clear'));
       case 'private_file':
-        return '私密下载文件';
+        return resolveAppResourceText($r('app.string.settings_web_download_private_file'));
       case 'private_record':
-        return '私密下载记录';
+        return resolveAppResourceText($r('app.string.settings_web_download_private_record'));
       default:
-        return '下载设置';
+        return resolveAppResourceText($r('app.string.settings_web_download_settings'));
     }
   }
 }

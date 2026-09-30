@@ -8,7 +8,10 @@ import {
   HuaweiAccountInfoViewModel,
   HuaweiAccountInfoViewState
 } from '../settings/HuaweiAccountInfoViewModel';
-import { HuaweiAccountMutationCoordinator } from '../account/HuaweiAccountMutationCoordinator';
+import {
+  HuaweiAccountMutationCoordinator,
+  preferSignOutMessage
+} from '../account/HuaweiAccountMutationCoordinator';
 
 const HUAWEI_LOGIN_CANCEL_ERROR_CODE: number = 1001502012;
 const HUAWEI_PROFILE_REFRESH_COOLDOWN_MS: number = 6 * 60 * 60 * 1000;
@@ -29,7 +32,7 @@ export interface BrowserLargeScreenAccountPopoverSnapshot {
 
 export interface BrowserLargeScreenAccountPopoverHost {
   publishSnapshot(snapshot: BrowserLargeScreenAccountPopoverSnapshot): void;
-  showMessage(message: string): void;
+  showMessage(message: ResourceStr): void;
   copyText(text: string): Promise<void>;
   closeSurface(): void;
   notifyAccountChanged(): void;
@@ -116,15 +119,15 @@ export class BrowserLargeScreenAccountPopoverCoordinator {
     const settings = this.syncConfigStore.getSettings();
     const uid = resolveAiraHuaweiAccountIdentity(settings.huaweiCloud, settings.huaweiSpace).uid;
     if (uid.length <= 0) {
-      this.host.showMessage('当前没有可复制的账号 ID');
+      this.host.showMessage($r('app.string.settings_account_copy_empty'));
       return;
     }
     this.host.copyText(uid)
       .then(() => {
-        this.host.showMessage('账号 ID 已复制');
+        this.host.showMessage($r('app.string.settings_account_copied'));
       })
       .catch((_error: Error) => {
-        this.host.showMessage('复制失败，请稍后重试');
+        this.host.showMessage($r('app.string.settings_account_copy_failed'));
       });
   }
 
@@ -136,7 +139,7 @@ export class BrowserLargeScreenAccountPopoverCoordinator {
     this.accountMutationCoordinator.signOut(boundaryInput)
       .then((result) => {
         if (!result.ok) {
-          this.host.showMessage(result.message.length > 0 ? result.message : result.title);
+          this.host.showMessage(preferSignOutMessage(result));
           return;
         }
         this.host.notifyAccountChanged();
@@ -144,7 +147,7 @@ export class BrowserLargeScreenAccountPopoverCoordinator {
         this.host.closeSurface();
       })
       .catch((error: Error) => {
-        this.host.showMessage(error.message.length > 0 ? error.message : '退出失败');
+        this.host.showMessage(error.message.length > 0 ? error.message : $r('app.string.settings_account_sign_out_failed'));
       })
       .finally(() => {
         this.setBusy(false);

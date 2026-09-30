@@ -7,6 +7,7 @@ import { AiraRenderableIconId } from '../../../core/resources/GeneratedAiraIconC
 import { AiraIcon } from './AiraIcon';
 import { FloatingGlassMaterialSurface } from './FloatingGlassMaterialSurface';
 import { resolveFloatingGlassMaterialTintForMode } from './FloatingGlassMaterialTokens';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 const FLOATING_SELECTION_TOOLBAR_HEIGHT: number = 60;
 const FLOATING_SELECTION_TOOLBAR_RADIUS: number = FLOATING_SELECTION_TOOLBAR_HEIGHT / 2;
@@ -22,14 +23,14 @@ const FLOATING_SELECTION_TOOLBAR_ICON_SIZE: number = 21;
 const FLOATING_SELECTION_TOOLBAR_TEXT_SIZE: number = 11;
 
 export interface FloatingSelectionToolbarMenuItem {
-  value: string;
+  value: ResourceStr;
   action: () => void;
 }
 
 export interface FloatingSelectionToolbarAction {
   icon?: Resource;
   airaIconId?: AiraRenderableIconId;
-  title: string;
+  title: ResourceStr;
   action?: () => void;
   menu?: FloatingSelectionToolbarMenuItem[];
 }
@@ -60,7 +61,7 @@ export struct FloatingSelectionToolbar {
             } else {
               this.buildSelectionClickAction(item)
             }
-          }, (item: FloatingSelectionToolbarAction, index: number) => `${item.title}-${index}`)
+          }, (_item: FloatingSelectionToolbarAction, index: number) => `selection-${index}`)
         }
         .width('100%')
         .height('100%')
@@ -114,7 +115,7 @@ export struct FloatingSelectionToolbar {
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
     .borderRadius(FLOATING_SELECTION_TOOLBAR_BUTTON_RADIUS)
     .stateEffect(true)
-    .accessibilityText(item.title)
+    .accessibilityText(resolveAppResourceText(item.title))
     .onClick(() => {
       if (item.action !== undefined) {
         item.action();
@@ -134,7 +135,7 @@ export struct FloatingSelectionToolbar {
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
     .borderRadius(FLOATING_SELECTION_TOOLBAR_BUTTON_RADIUS)
     .stateEffect(true)
-    .accessibilityText(item.title)
+    .accessibilityText(resolveAppResourceText(item.title))
     .bindMenu(item.menu !== undefined ? item.menu : [], {
       placement: Placement.Top
     })
@@ -153,11 +154,12 @@ export struct FloatingSelectionToolbar {
     return Math.max(FLOATING_SELECTION_TOOLBAR_MIN_WIDTH, width);
   }
 
-  private resolveActionWidth(title: string): number {
-    if (title.length >= 6) {
+  private resolveActionWidth(title: ResourceStr): number {
+    const label = resolveAppResourceText(title);
+    if (label.length >= 6) {
       return FLOATING_SELECTION_TOOLBAR_ACTION_WIDE_WIDTH;
     }
-    if (title.length >= 4) {
+    if (label.length >= 4) {
       return FLOATING_SELECTION_TOOLBAR_ACTION_MEDIUM_WIDTH;
     }
     return FLOATING_SELECTION_TOOLBAR_ACTION_MIN_WIDTH;

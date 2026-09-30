@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
 import router from '@ohos.router';
 import { hilog } from '@kit.PerformanceAnalysisKit';
@@ -256,15 +257,15 @@ export struct BrowserDownloadSettingsScreen {
   private resolveHeaderTitle(subpage: BrowserDownloadSettingsSubpage): string {
     switch (subpage) {
       case 'hls_concurrency':
-        return 'HLS 分片并发数';
+        return resolveAppResourceText($r('app.string.settings_web_download_hls'));
       case 'auto_clear':
-        return '自动清理';
+        return resolveAppResourceText($r('app.string.settings_web_download_auto_clear'));
       case 'private_file':
-        return '私密下载文件';
+        return resolveAppResourceText($r('app.string.settings_web_download_private_file'));
       case 'private_record':
-        return '私密下载记录';
+        return resolveAppResourceText($r('app.string.settings_web_download_private_record'));
       default:
-        return '下载设置';
+        return resolveAppResourceText($r('app.string.settings_web_download_settings'));
     }
   }
 
@@ -292,7 +293,7 @@ export struct BrowserDownloadSettingsScreen {
    */
   private onRequestFolderChange(): void {
     if (!new DownloadLocationDirectoryService().isFolderSelectionSupported()) {
-      this.showToast('当前设备不支持选择文件夹。');
+      this.showToast(resolveAppResourceText($r('app.string.settings_web_download_folder_unsupported')));
       return;
     }
     if (this.delegateFolderPicker && this.onFolderChangeRequested !== undefined) {
@@ -318,7 +319,7 @@ export struct BrowserDownloadSettingsScreen {
       customLocationUri: '',
       customLocationLabel: ''
     });
-    this.saveDownloadSettings(nextSettings, '下载位置保存失败');
+    this.saveDownloadSettings(nextSettings, resolveAppResourceText($r('app.string.settings_web_download_save_location_failed')));
     if (previousUri.length > 0) {
       void new DownloadLocationDirectoryService().releaseDirectory(previousUri);
     }
@@ -338,7 +339,7 @@ export struct BrowserDownloadSettingsScreen {
       readDownloadSettings(this.settingsBoundary),
       { askBeforeDownload: enabled }
     );
-    this.saveDownloadSettings(nextSettings, '下载前询问设置保存失败');
+    this.saveDownloadSettings(nextSettings, resolveAppResourceText($r('app.string.settings_web_download_save_ask_failed')));
   }
 
   private updateAutoResumeAfterRestart(enabled: boolean): void {
@@ -347,7 +348,7 @@ export struct BrowserDownloadSettingsScreen {
       readDownloadSettings(this.settingsBoundary),
       { autoResumeAfterRestart: enabled }
     );
-    this.saveDownloadSettings(nextSettings, '启动后恢复设置保存失败');
+    this.saveDownloadSettings(nextSettings, resolveAppResourceText($r('app.string.settings_web_download_save_resume_failed')));
   }
 
   private updateAllowCellularDownloads(enabled: boolean): void {
@@ -356,7 +357,7 @@ export struct BrowserDownloadSettingsScreen {
       readDownloadSettings(this.settingsBoundary),
       { allowCellularDownloads: enabled }
     );
-    this.saveDownloadSettings(nextSettings, '移动数据下载设置保存失败');
+    this.saveDownloadSettings(nextSettings, resolveAppResourceText($r('app.string.settings_web_download_save_cellular_failed')));
   }
 
 
@@ -379,7 +380,7 @@ export struct BrowserDownloadSettingsScreen {
       settings
     ).then(() => {
       if (!silentOnSuccess) {
-        this.showToast('已保存');
+        this.showToast(resolveAppResourceText($r('app.string.settings_web_download_saved')));
       }
     }).catch((error: Error) => {
       this.viewState = this.downloadSettingsViewModel.buildState(previousSettings);
@@ -420,14 +421,14 @@ export struct BrowserDownloadSettingsScreen {
     const directoryService = new DownloadLocationDirectoryService();
     try {
       if (!directoryService.isFolderSelectionSupported()) {
-        this.showToast('当前设备不支持选择文件夹，将使用系统下载目录。');
+        this.showToast(resolveAppResourceText($r('app.string.settings_web_download_folder_unsupported_fallback')));
         return;
       }
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
       const result = await directoryService.selectDirectory(context);
       if (result.status !== 'selected' || result.selection === undefined) {
         if (result.status === 'unusable_folder') {
-          this.showToast('这个文件夹不可用，请换一个再试。');
+          this.showToast(resolveAppResourceText($r('app.string.settings_web_download_folder_unavailable')));
         }
         return;
       }
@@ -443,17 +444,17 @@ export struct BrowserDownloadSettingsScreen {
         customLocationUri: selection.uri,
         customLocationLabel: selection.label
       });
-      this.saveDownloadSettings(nextSettings, '下载位置保存失败', true);
+      this.saveDownloadSettings(nextSettings, resolveAppResourceText($r('app.string.settings_web_download_save_location_failed')), true);
       if (previousUri.length > 0 && previousUri !== selection.uri) {
         void directoryService.releaseDirectory(previousUri);
       }
       if (!isWritable) {
-        this.showToast('已选择该文件夹。若下载时无法写入，将回退到系统下载目录。');
+        this.showToast(resolveAppResourceText($r('app.string.settings_web_download_folder_selected_fallback')));
       } else if (!result.isPersisted) {
-        this.showToast('已选择该文件夹。重启应用后需要重新授权。');
+        this.showToast(resolveAppResourceText($r('app.string.settings_web_download_folder_selected_reauth')));
       }
     } catch (error) {
-      this.showToast('选择下载位置失败');
+      this.showToast(resolveAppResourceText($r('app.string.settings_web_download_folder_failed')));
       hilog.error(
         DOWNLOAD_SETTINGS_DOMAIN,
         DOWNLOAD_SETTINGS_TAG,
@@ -554,7 +555,7 @@ export struct BrowserDownloadSettingsContent {
 
   @Builder
   private buildDownloadLocationSection() {
-    SettingsSection({ title: '保存位置' }) {
+    SettingsSection({ title: $r('app.string.settings_web_download_location_section') }) {
       SettingsGroupCard({
         surfaceColor: this.resolveSurfaceBackground(),
         desktopPresentation: this.desktopPresentation
@@ -567,8 +568,8 @@ export struct BrowserDownloadSettingsContent {
       }
       SettingsFooterText({
         text: this.isUsingCustomDownloadLocation()
-          ? '下载完成后保存到选定的文件夹。私密下载仍按私密设置处理。'
-          : '下载完成后保存到这里。私密下载仍按私密设置处理。',
+          ? $r('app.string.settings_web_download_location_custom')
+          : $r('app.string.settings_web_download_location_default'),
         secondaryTextColor: this.resolveSecondaryTextColor()
       })
     }
@@ -581,7 +582,7 @@ export struct BrowserDownloadSettingsContent {
 
   @Builder
   private buildDownloadConfirmationSection() {
-    SettingsSection({ title: '下载确认' }) {
+    SettingsSection({ title: $r('app.string.settings_web_download_confirm_section') }) {
       SettingsGroupCard({
         surfaceColor: this.resolveSurfaceBackground(),
         desktopPresentation: this.desktopPresentation
@@ -589,7 +590,7 @@ export struct BrowserDownloadSettingsContent {
         this.buildAskBeforeDownloadRow()
       }
       SettingsFooterText({
-        text: '关闭后，网页触发的下载会直接开始。',
+        text: $r('app.string.settings_web_download_ask_off'),
         secondaryTextColor: this.resolveSecondaryTextColor()
       })
     }
@@ -597,7 +598,7 @@ export struct BrowserDownloadSettingsContent {
 
   @Builder
   private buildDownloadNetworkSection() {
-    SettingsSection({ title: '网络' }) {
+    SettingsSection({ title: $r('app.string.settings_web_download_network') }) {
       SettingsGroupCard({
         surfaceColor: this.resolveSurfaceBackground(),
         desktopPresentation: this.desktopPresentation
@@ -606,8 +607,8 @@ export struct BrowserDownloadSettingsContent {
       }
       SettingsFooterText({
         text: this.allowCellularDownloads
-          ? '当前允许使用 WLAN 或移动数据下载。'
-          : '关闭后，移动数据网络下的任务会等待 WLAN。',
+          ? $r('app.string.settings_web_download_cellular_on')
+          : $r('app.string.settings_web_download_cellular_off'),
         secondaryTextColor: this.resolveSecondaryTextColor()
       })
     }
@@ -615,7 +616,7 @@ export struct BrowserDownloadSettingsContent {
 
   @Builder
   private buildDownloadResumeSection() {
-    SettingsSection({ title: '下载恢复' }) {
+    SettingsSection({ title: $r('app.string.settings_web_download_resume_section') }) {
       SettingsGroupCard({
         surfaceColor: this.resolveSurfaceBackground(),
         desktopPresentation: this.desktopPresentation
@@ -623,7 +624,7 @@ export struct BrowserDownloadSettingsContent {
         this.buildAutoResumeAfterRestartRow()
       }
       SettingsFooterText({
-        text: '关闭后，重启 Aira 不会自动继续未完成下载。',
+        text: $r('app.string.settings_web_download_resume_off'),
         secondaryTextColor: this.resolveSecondaryTextColor()
       })
     }
@@ -631,7 +632,7 @@ export struct BrowserDownloadSettingsContent {
 
   @Builder
   private buildVideoDownloadSection() {
-    SettingsSection({ title: '分片下载' }) {
+    SettingsSection({ title: $r('app.string.settings_web_download_segments') }) {
       SettingsGroupCard({
         surfaceColor: this.resolveSurfaceBackground(),
         desktopPresentation: this.desktopPresentation
@@ -639,7 +640,7 @@ export struct BrowserDownloadSettingsContent {
         this.buildHlsSegmentConcurrencyRow()
       }
       SettingsFooterText({
-        text: '仅用于新开始或重试的 M3U8/HLS 分片资源。普通文件下载不受影响。并发越高，资源占用越高。',
+        text: $r('app.string.settings_web_download_hls_hint'),
         secondaryTextColor: this.resolveSecondaryTextColor()
       })
     }
@@ -647,7 +648,7 @@ export struct BrowserDownloadSettingsContent {
 
   @Builder
   private buildDownloadCleanupSection() {
-    SettingsSection({ title: '记录清理' }) {
+    SettingsSection({ title: $r('app.string.settings_web_download_clear_section') }) {
       SettingsGroupCard({
         surfaceColor: this.resolveSurfaceBackground(),
         desktopPresentation: this.desktopPresentation
@@ -659,7 +660,7 @@ export struct BrowserDownloadSettingsContent {
 
   @Builder
   private buildPrivateDownloadSettingsSection() {
-    SettingsSection({ title: '私密下载' }) {
+    SettingsSection({ title: $r('app.string.settings_web_download_private_section') }) {
       SettingsGroupCard({
         surfaceColor: this.resolveSurfaceBackground(),
         desktopPresentation: this.desktopPresentation
@@ -682,7 +683,7 @@ export struct BrowserDownloadSettingsContent {
       }
     }) {
       SettingsNavigationRow({
-        title: '下载位置',
+        title: $r('app.string.settings_web_download_location'),
         desktopPresentation: this.desktopPresentation,
         value: this.viewState.defaultLocationLabel,
         rowPosition: this.isUsingCustomDownloadLocation() ? 'first' : 'single',        // One tap straight into the system folder picker. The intermediate
@@ -702,7 +703,7 @@ export struct BrowserDownloadSettingsContent {
   @Builder
   private buildRestoreSystemLocationRow() {
     SettingsNavigationRow({
-      title: '恢复系统下载目录',
+      title: $r('app.string.settings_web_download_restore_system'),
       desktopPresentation: this.desktopPresentation,
       value: '',
       rowPosition: 'last',
@@ -723,7 +724,7 @@ export struct BrowserDownloadSettingsContent {
       }
     }) {
       SettingsSwitchRow({
-        title: '下载前询问',
+        title: $r('app.string.settings_web_download_ask'),
         desktopPresentation: this.desktopPresentation,
         checked: this.askBeforeDownload,
         rowPosition: 'single',
@@ -745,7 +746,7 @@ export struct BrowserDownloadSettingsContent {
       }
     }) {
       SettingsSwitchRow({
-        title: '允许使用移动数据',
+        title: $r('app.string.settings_web_download_cellular'),
         desktopPresentation: this.desktopPresentation,
         checked: this.allowCellularDownloads,
         rowPosition: 'single',
@@ -767,7 +768,7 @@ export struct BrowserDownloadSettingsContent {
       }
     }) {
       SettingsSwitchRow({
-        title: '启动后自动恢复',
+        title: $r('app.string.settings_web_download_resume'),
         desktopPresentation: this.desktopPresentation,
         checked: this.autoResumeAfterRestart,
         rowPosition: 'single',
@@ -789,7 +790,7 @@ export struct BrowserDownloadSettingsContent {
       }
     }) {
       SettingsNavigationRow({
-        title: 'HLS 分片并发数',
+        title: $r('app.string.settings_web_download_hls'),
         desktopPresentation: this.desktopPresentation,
         value: this.resolveSelectedOptionLabel(
           this.viewState.hlsSegmentConcurrencyOptions,
@@ -814,7 +815,7 @@ export struct BrowserDownloadSettingsContent {
       }
     }) {
       SettingsNavigationRow({
-        title: '自动清理',
+        title: $r('app.string.settings_web_download_auto_clear'),
         desktopPresentation: this.desktopPresentation,
         value: this.resolveSelectedOptionLabel(this.viewState.autoClearOptions, this.autoClearPolicy),
         rowPosition: 'single',
@@ -836,7 +837,7 @@ export struct BrowserDownloadSettingsContent {
       }
     }) {
       SettingsNavigationRow({
-        title: '私密下载文件',
+        title: $r('app.string.settings_web_download_private_file'),
         desktopPresentation: this.desktopPresentation,
         value: this.resolveSelectedOptionLabel(this.viewState.privateFileOptions, this.privateFilePolicy),
         rowPosition: this.resolveMainRowPosition(0, 2),
@@ -858,7 +859,7 @@ export struct BrowserDownloadSettingsContent {
       }
     }) {
       SettingsNavigationRow({
-        title: '私密下载记录',
+        title: $r('app.string.settings_web_download_private_record'),
         desktopPresentation: this.desktopPresentation,
         value: this.resolveSelectedOptionLabel(this.viewState.privateRecordOptions, this.privateRecordPolicy),
         rowPosition: this.resolveMainRowPosition(1, 2),
@@ -1022,15 +1023,15 @@ export struct BrowserDownloadSettingsOptionScreen {
   private resolveHeaderTitle(): string {
     switch (this.subpage) {
       case 'hls_concurrency':
-        return 'HLS 分片并发数';
+        return resolveAppResourceText($r('app.string.settings_web_download_hls'));
       case 'auto_clear':
-        return '自动清理';
+        return resolveAppResourceText($r('app.string.settings_web_download_auto_clear'));
       case 'private_file':
-        return '私密下载文件';
+        return resolveAppResourceText($r('app.string.settings_web_download_private_file'));
       case 'private_record':
-        return '私密下载记录';
+        return resolveAppResourceText($r('app.string.settings_web_download_private_record'));
       default:
-        return '下载设置';
+        return resolveAppResourceText($r('app.string.settings_web_download_settings'));
     }
   }
 
@@ -1118,7 +1119,7 @@ export struct BrowserDownloadSettingsOptionScreen {
       readDownloadSettings(this.settingsBoundary),
       { autoClearPolicy: policy }
     );
-    this.saveDownloadSettings(nextSettings, '下载自动清理策略保存失败');
+    this.saveDownloadSettings(nextSettings, resolveAppResourceText($r('app.string.settings_web_download_save_clear_failed')));
   }
 
   private updateHlsSegmentConcurrency(concurrency: BrowserHlsSegmentConcurrency): void {
@@ -1130,7 +1131,7 @@ export struct BrowserDownloadSettingsOptionScreen {
       readDownloadSettings(this.settingsBoundary),
       { hlsSegmentConcurrency: concurrency }
     );
-    this.saveDownloadSettings(nextSettings, 'HLS 分片并发数保存失败');
+    this.saveDownloadSettings(nextSettings, resolveAppResourceText($r('app.string.settings_web_download_save_hls_failed')));
   }
 
 
@@ -1144,7 +1145,7 @@ export struct BrowserDownloadSettingsOptionScreen {
       readDownloadSettings(this.settingsBoundary),
       { privateFilePolicy: policy }
     );
-    this.saveDownloadSettings(nextSettings, '私密下载文件设置保存失败');
+    this.saveDownloadSettings(nextSettings, resolveAppResourceText($r('app.string.settings_web_download_save_private_file_failed')));
   }
 
   private updatePrivateRecordPolicy(policy: BrowserPrivateDownloadRecordPolicy): void {
@@ -1156,7 +1157,7 @@ export struct BrowserDownloadSettingsOptionScreen {
       readDownloadSettings(this.settingsBoundary),
       { privateRecordPolicy: policy }
     );
-    this.saveDownloadSettings(nextSettings, '私密下载记录设置保存失败');
+    this.saveDownloadSettings(nextSettings, resolveAppResourceText($r('app.string.settings_web_download_save_private_record_failed')));
   }
 
   private saveDownloadSettings(settings: BrowserDownloadSettings, failurePrefix: string): void {
@@ -1170,7 +1171,7 @@ export struct BrowserDownloadSettingsOptionScreen {
       // user could not tell whether the choice took effect. The refreshed
       // selection mark plus a toast is the confirmation now.
       this.isSelectingOption = false;
-      this.showToast('已保存');
+      this.showToast(resolveAppResourceText($r('app.string.settings_web_download_saved')));
     }).catch((error: Error) => {
       this.isSelectingOption = false;
       hilog.error(

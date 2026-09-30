@@ -33,9 +33,6 @@ import { SettingsHdsScaffold } from '../settings/SettingsHdsScaffold';
 import { SettingsNavigationCoordinator } from '../../router/SettingsNavigationCoordinator';
 import { HuaweiLoginSheetContent } from '../account/HuaweiLoginSheetContent';
 import { SyncDesktopBookmarkGuideContent } from '../sync/SyncDesktopBookmarkGuideContent';
-import {
-  SYNC_DESKTOP_BOOKMARK_GUIDE_TITLE
-} from '../../../services/sync/SyncDesktopBookmarkGuideMarkdownService';
 import { BrowserAdaptiveModalOverlay } from '../browser/BrowserAdaptiveModalOverlay';
 import { AiraLegalWebDocumentContent } from '../legal/AiraLegalWebDocumentContent';
 import {
@@ -97,7 +94,7 @@ export struct AiraProScreen {
     () => {
       this.ensureHuaweiAccountSignedIn();
     },
-    (message: string) => {
+    (message: ResourceStr) => {
       this.showToast(message);
     }
   );
@@ -333,11 +330,11 @@ export struct AiraProScreen {
    * findable, so it sits opposite the close action instead of in a footer link
    * the user has to scroll to. It is hidden when there is nothing to restore.
    */
-  private resolveRestorePurchaseActionLabel(): string {
+  private resolveRestorePurchaseActionLabel(): ResourceStr {
     if (!this.state.proActionsEnabled) {
       return '';
     }
-    return this.state.plans.length > 0 ? '恢复购买' : '';
+    return this.state.plans.length > 0 ? $r('app.string.settings_pro_restore') : '';
   }
 
   private restorePurchase(): void {
@@ -380,7 +377,7 @@ export struct AiraProScreen {
       return;
     }
     if (!isValidMembershipRedeemCode(code)) {
-      this.showToast('兑换码格式不正确');
+      this.showToast($r('app.string.settings_pro_redeem_invalid'));
       return;
     }
     this.membershipRedeemInFlight = true;
@@ -388,12 +385,12 @@ export struct AiraProScreen {
       .then((result: AiraMembershipRedeemResult) => {
         this.membershipRedeemInFlight = false;
         if (!result.ok) {
-          this.showToast(result.message.length > 0 ? result.message : '兑换失败，请稍后再试。');
+          this.showToast(this.preferMessage(result.message, $r('app.string.settings_pro_redeem_failed')));
           return;
         }
         const kind = this.resolveRedeemGrantKind(result.kind);
         if (kind === undefined) {
-          this.showToast(result.message.length > 0 ? result.message : '兑换失败，请稍后再试。');
+          this.showToast(this.preferMessage(result.message, $r('app.string.settings_pro_redeem_failed')));
           return;
         }
         this.presentMembershipRedeemResult(kind);
@@ -408,7 +405,7 @@ export struct AiraProScreen {
       })
       .catch((_error: Error) => {
         this.membershipRedeemInFlight = false;
-        this.showToast('兑换失败，请稍后再试。');
+        this.showToast($r('app.string.settings_pro_redeem_failed'));
       });
   }
 
@@ -456,7 +453,7 @@ export struct AiraProScreen {
           this.complimentaryClaimDialogController.close();
         }
         this.applyAiraProState();
-        this.showToast(result.message.length > 0 ? result.message : '会员领取失败，请稍后再试。');
+        this.showToast(this.preferMessage(result.message, $r('app.string.settings_pro_claim_failed')));
         if (result.ok) {
           sharedMembershipFeature.refreshStateForBoundary(this.buildAiraProDataBoundaryInput(), { force: true })
             .then(() => {
@@ -469,7 +466,7 @@ export struct AiraProScreen {
       })
       .catch((_error: Error) => {
         this.complimentaryClaimInFlight = false;
-        this.showToast('会员领取失败，请稍后再试。');
+        this.showToast($r('app.string.settings_pro_claim_failed'));
       });
   }
 
@@ -704,10 +701,10 @@ export struct AiraProScreen {
       return true;
     }
     if (!sharedHuaweiAccountMutationCoordinator.canSignIn(this.buildAiraProDataBoundaryInput())) {
-      this.showToast('请回到普通会话后登录华为账号。');
+      this.showToast($r('app.string.settings_pro_sign_in_private'));
       return false;
     }
-    this.showToast('请先使用华为账号登录后再开通 Aira Pro 权益。');
+    this.showToast($r('app.string.settings_pro_sign_in_required'));
     this.openActiveSheet('login');
     return false;
   }
@@ -718,12 +715,12 @@ export struct AiraProScreen {
   ): void {
     if (error !== undefined) {
       if (error.code !== 1001502012) {
-        this.showToast(error.message.length > 0 ? error.message : '华为账号登录失败');
+        this.showToast(this.preferMessage(error.message, $r('app.string.settings_pro_sign_in_failed')));
       }
       return;
     }
     if (response.authorizationCode.trim().length <= 0 && response.openID.trim().length <= 0) {
-      this.showToast('华为账号登录未完成');
+      this.showToast($r('app.string.settings_pro_sign_in_incomplete'));
       return;
     }
     this.closeActiveSheet();
@@ -756,17 +753,33 @@ export struct AiraProScreen {
     return this.storedFloatingSurfaceColor;
   }
 
-  private resolveDesktopDialogTitle(): string {
+  private resolveDesktopDialogTitle(): ResourceStr {
     if (this.activeSheetKind === 'login') {
-      return '登录华为账号';
+      return $r('app.string.settings_pro_sign_in_title');
     }
     if (this.activeSheetKind === 'selfHostingGuide') {
-      return SYNC_DESKTOP_BOOKMARK_GUIDE_TITLE;
+      return $r('app.string.settings_pro_self_hosting_guide');
     }
     if (this.activeSheetKind === 'legalDocument') {
-      return this.legalDocument.title;
+      return this.resolveLegalDocumentTitle(this.legalDocument.id);
     }
-    return '进入 Aira Pro';
+    return $r('app.string.settings_pro_enter');
+  }
+
+  private resolveLegalDocumentTitle(documentId: AiraLegalDocumentId): ResourceStr {
+    if (documentId === 'user_service_agreement') {
+      return $r('app.string.settings_pro_legal_user');
+    }
+    if (documentId === 'privacy_statement') {
+      return $r('app.string.settings_pro_legal_privacy');
+    }
+    if (documentId === 'pro_membership_service_agreement') {
+      return $r('app.string.settings_pro_legal_membership_full');
+    }
+    if (documentId === 'pro_auto_renewal_service_agreement') {
+      return $r('app.string.settings_pro_legal_renewal_full');
+    }
+    return this.legalDocument.title;
   }
 
   private shouldShowDesktopDialogHeader(): boolean {
@@ -779,7 +792,7 @@ export struct AiraProScreen {
     sharedHuaweiAccountMutationCoordinator.signIn(this.buildAiraProDataBoundaryInput())
       .then((result) => {
         if (result.type === 'failed') {
-          this.showToast(result.message.length > 0 ? result.message : result.title);
+          this.showToast(this.preferMessage(result.message, result.title));
           return;
         }
         this.syncSettingsRefreshSignal.bump();
@@ -787,7 +800,7 @@ export struct AiraProScreen {
         this.showToast(result.title);
       })
       .catch((_error: Error) => {
-        this.showToast('华为账号登录失败');
+        this.showToast($r('app.string.settings_pro_sign_in_failed'));
       });
   }
 
@@ -819,7 +832,11 @@ export struct AiraProScreen {
     this.themePreferencesListenerKey = '';
   }
 
-  private showToast(message: string): void {
+  private preferMessage(message: string, fallback: ResourceStr): ResourceStr {
+    return message.length > 0 ? message : fallback;
+  }
+
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

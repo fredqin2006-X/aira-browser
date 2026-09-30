@@ -45,11 +45,11 @@ export struct WebpageTranslationSettingsScreen {
     enabled: true,
     allowInPrivateTabs: false,
     preferredTargetLanguage: 'zh-CN',
-    preferredTargetLanguageLabel: '简体中文',
-    targetLanguageDescription: '手动翻译网页时默认使用此语言',
-    targetLanguageSheetHelperText: '多语言能力由当前服务商提供，实际可用语种以服务商为准。',
+    preferredTargetLanguageLabel: '',
+    targetLanguageDescription: '',
+    targetLanguageSheetHelperText: '',
     targetLanguageOptions: [],
-    providerStatusText: '未配置',
+    providerStatusText: '',
     hasActiveProvider: false,
     providers: []
   };
@@ -70,7 +70,7 @@ export struct WebpageTranslationSettingsScreen {
 
   build() {
     SettingsHdsScaffold({
-      title: '网页翻译',
+      title: $r('app.string.settings_web_translation'),
       backIconKind: 'back',
       pageBackground: this.storedPageBackgroundColor,
       headerButtonBackground: this.storedPressedBackgroundColor,
@@ -134,11 +134,11 @@ export struct WebpageTranslationSettingsContent {
     enabled: true,
     allowInPrivateTabs: false,
     preferredTargetLanguage: 'zh-CN',
-    preferredTargetLanguageLabel: '简体中文',
-    targetLanguageDescription: '手动翻译网页时默认使用此语言',
-    targetLanguageSheetHelperText: '多语言能力由当前服务商提供，实际可用语种以服务商为准。',
+    preferredTargetLanguageLabel: '',
+    targetLanguageDescription: '',
+    targetLanguageSheetHelperText: '',
     targetLanguageOptions: [],
-    providerStatusText: '未配置',
+    providerStatusText: '',
     hasActiveProvider: false,
     providers: []
   };
@@ -178,8 +178,8 @@ export struct WebpageTranslationSettingsContent {
     Column({ space: 18 }) {
       if (this.showTranslationNotice) {
         SettingsNoticeCard({
-          title: '翻译会发送页面文字',
-          message: '页面文本可能发送到翻译服务，请确认服务来源可信。',
+          title: $r('app.string.settings_web_translation_disclosure_title'),
+          message: $r('app.string.settings_web_translation_disclosure_message'),
           siblingSpace: 18,
           desktopPresentation: this.desktopPresentation,
           onClosed: () => {
@@ -210,15 +210,17 @@ export struct WebpageTranslationSettingsContent {
 
   @Builder
   private buildStatusSection() {
-    SettingsSection({ title: '功能' }) {
+    SettingsSection({ title: $r('app.string.settings_web_translation_section_feature') }) {
       SettingsGroupCard({
         surfaceColor: this.resolveSurfaceBackground(),
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsSwitchRow({
-          title: '网页翻译',
+          title: $r('app.string.settings_web_translation'),
           desktopPresentation: this.desktopPresentation,
-          description: this.state.enabled ? '可从菜单手动翻译当前网页' : '关闭后不显示网页翻译入口',
+          description: this.state.enabled
+            ? $r('app.string.settings_web_translation_enabled_on')
+            : $r('app.string.settings_web_translation_enabled_off'),
           checked: this.state.enabled,
           isEnabled: this.controlsEnabled,
           rowPosition: 'single',
@@ -232,7 +234,7 @@ export struct WebpageTranslationSettingsContent {
 
   @Builder
   private buildProviderSection() {
-    SettingsSection({ title: '服务管理' }) {
+    SettingsSection({ title: $r('app.string.settings_web_translation_section_services') }) {
       SettingsGroupCard({
         surfaceColor: this.resolveSurfaceBackground(),
         desktopPresentation: this.desktopPresentation
@@ -246,10 +248,10 @@ export struct WebpageTranslationSettingsContent {
           }
         }) {
           SettingsNavigationRow({
-            title: '选择翻译服务',
+            title: $r('app.string.settings_web_translation_choose_service'),
             desktopPresentation: this.desktopPresentation,
             value: this.state.providerStatusText,
-            description: '选择或添加 API 翻译服务',
+            description: $r('app.string.settings_web_translation_choose_service_desc'),
             rowPosition: 'first',
             isEnabled: this.controlsEnabled,
             onAction: () => {
@@ -267,9 +269,11 @@ export struct WebpageTranslationSettingsContent {
           }
         }) {
           SettingsNavigationRow({
-            title: '编辑服务配置',
+            title: $r('app.string.settings_web_translation_edit_service'),
             desktopPresentation: this.desktopPresentation,
-            description: this.state.hasActiveProvider ? '更新 API Key、Endpoint 或区域' : '请先选择翻译服务',
+            description: this.state.hasActiveProvider
+              ? $r('app.string.settings_web_translation_edit_service_on')
+              : $r('app.string.settings_web_translation_edit_service_off'),
             rowPosition: 'last',
             isEnabled: this.controlsEnabled && this.state.hasActiveProvider,
             onAction: () => {
@@ -283,7 +287,7 @@ export struct WebpageTranslationSettingsContent {
 
   @Builder
   private buildLanguageSection() {
-    SettingsSection({ title: '语言' }) {
+    SettingsSection({ title: $r('app.string.settings_web_translation_section_language') }) {
       SettingsGroupCard({
         surfaceColor: this.resolveSurfaceBackground(),
         desktopPresentation: this.desktopPresentation
@@ -297,7 +301,7 @@ export struct WebpageTranslationSettingsContent {
           }
         }) {
           SettingsNavigationRow({
-            title: '目标语言',
+            title: $r('app.string.settings_web_translation_target_language'),
             desktopPresentation: this.desktopPresentation,
             value: this.state.preferredTargetLanguageLabel,
             description: this.state.targetLanguageDescription,
@@ -314,7 +318,7 @@ export struct WebpageTranslationSettingsContent {
 
   @Builder
   private buildPromptSection() {
-    SettingsSection({ title: '隐私' }) {
+    SettingsSection({ title: $r('app.string.settings_web_translation_section_privacy') }) {
       SettingsGroupCard({
         surfaceColor: this.resolveSurfaceBackground(),
         desktopPresentation: this.desktopPresentation
@@ -328,9 +332,9 @@ export struct WebpageTranslationSettingsContent {
           }
         }) {
           SettingsSwitchRow({
-            title: '私密标签页允许翻译',
+            title: $r('app.string.settings_web_translation_private_tabs'),
             desktopPresentation: this.desktopPresentation,
-            description: '关闭时私密标签页不提供网页翻译',
+            description: $r('app.string.settings_web_translation_private_tabs_desc'),
             checked: this.state.allowInPrivateTabs,
             rowPosition: 'single',
             isEnabled: this.controlsEnabled && this.state.enabled,

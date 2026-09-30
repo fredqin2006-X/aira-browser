@@ -22,7 +22,14 @@ function compile(source, filename, requireModule) {
   });
   assert.equal((result.diagnostics || []).filter(d => d.category === ts.DiagnosticCategory.Error).length, 0);
   const module = { exports: {} };
-  vm.runInNewContext(result.outputText, { module, exports: module.exports, require: requireModule }, { filename });
+  vm.runInNewContext(result.outputText, {
+    module,
+    exports: module.exports,
+    require: requireModule,
+    // ArkTS resources resolve in the ArkUI runtime. The harness keeps the
+    // resource key plus its format arguments so diagnostics stay assertable.
+    $r: (value, ...args) => args.length > 0 ? `${value} ${args.join(' ')}` : value
+  }, { filename });
   return module.exports;
 }
 const modules = new Map();
@@ -270,7 +277,7 @@ test('zero-removal and rejected writes refresh persisted data and retain write d
     await task;
     const state = f.coordinator.getSnapshot();
     assert.equal(state.visits[0].id, 'remaining-0');
-    assert.match(state.message, fail ? /write failed/ : /没有删除/);
+    assert.match(state.message, fail ? /write failed/ : /history_none_deleted/);
     assert.equal(state.loading, false);
   }
 });

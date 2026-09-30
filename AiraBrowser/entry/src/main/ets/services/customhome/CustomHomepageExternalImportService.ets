@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { Want } from '@kit.AbilityKit';
 import { systemShare } from '@kit.ShareKit';
 import { CustomHomepagePackageImportError } from './CustomHomepageFileService';
@@ -45,16 +46,16 @@ export class CustomHomepageExternalImportService {
     const message = this.stringifyError(error);
     if (error instanceof CustomHomepagePackageImportError) {
       if (error.code === 'missing_manifest') {
-        return '这不是 Aira 主页包。Aira 不是解压缩工具，仅支持根目录包含 aira-homepage.json 的 ZIP 主页包。';
+        return resolveAppResourceText($r('app.string.settings_custom_home_import_not_package'));
       }
       if (error.code === 'invalid_zip') {
-        return '这不是有效的 Aira 主页包。请确认文件是完整的 ZIP 主页包后重试。';
+        return resolveAppResourceText($r('app.string.settings_custom_home_import_invalid_zip'));
       }
     }
     if (error instanceof CustomHomepageExternalSourceError) {
       return error.message;
     }
-    return `无法作为 Aira 主页包导入：${message} Aira 不是解压缩工具，仅支持符合主页包规范的 ZIP 文件。`;
+    return resolveAppResourceText($r('app.string.settings_custom_home_import_generic'), message);
   }
 
   private async resolveSharedSourceUri(want: Want): Promise<string> {
@@ -69,7 +70,7 @@ export class CustomHomepageExternalImportService {
     if (fileRecords.length > 1) {
       throw new CustomHomepageExternalSourceError(
         'multiple_files',
-        'Aira 主页导入只支持接收一个 ZIP 文件。'
+        resolveAppResourceText($r('app.string.settings_custom_home_import_one_file'))
       );
     }
     if (fileRecords.length === 1) {
@@ -85,14 +86,14 @@ export class CustomHomepageExternalImportService {
 
   private ensureUsableZipSource(uri: string, descriptor: string, fallbackDescriptor: string = ''): void {
     if (uri.length <= 0) {
-      throw new CustomHomepageExternalSourceError('missing_file', '未收到可读取的主页包文件。');
+      throw new CustomHomepageExternalSourceError('missing_file', resolveAppResourceText($r('app.string.settings_custom_home_import_missing_file')));
     }
     if (!this.isZipDescriptor(descriptor) &&
       !this.isZipDescriptor(fallbackDescriptor) &&
       !this.isZipUri(uri)) {
       throw new CustomHomepageExternalSourceError(
         'unsupported_type',
-        'Aira 主页导入只支持 ZIP 主页包。'
+        resolveAppResourceText($r('app.string.settings_custom_home_import_zip_only'))
       );
     }
   }
@@ -112,6 +113,6 @@ export class CustomHomepageExternalImportService {
       return error.message.trim();
     }
     const message = JSON.stringify(error);
-    return message.length > 0 ? message : '未知错误';
+    return message.length > 0 ? message : resolveAppResourceText($r('app.string.settings_custom_home_unknown_error'));
   }
 }

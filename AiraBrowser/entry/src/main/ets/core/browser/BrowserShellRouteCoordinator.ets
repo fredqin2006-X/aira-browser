@@ -1,6 +1,7 @@
 import router from '@ohos.router';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { FrameCallback, UIContext } from '@kit.ArkUI';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   BrowserDataScope,
   HomeSystemShortcutTarget,
@@ -403,10 +404,16 @@ export class BrowserShellRouteCoordinator {
         url: OFFLINE_PAGES_ROUTE,
         params: this.buildBoundaryRouteParams()
       }).catch((error: Error) => {
-        this.host.presentRouteFailure(`打开已保存页面失败：${JSON.stringify(error)}`, '已保存页面打开失败');
+        this.host.presentRouteFailure(
+          resolveAppResourceText($r('app.string.offline_route_open_failed_detail'), JSON.stringify(error)),
+          resolveAppResourceText($r('app.string.offline_route_open_failed'))
+        );
       });
     } catch (error) {
-      this.host.presentRouteFailure(`打开已保存页面失败：${JSON.stringify(error)}`, '已保存页面打开失败');
+      this.host.presentRouteFailure(
+        resolveAppResourceText($r('app.string.offline_route_open_failed_detail'), JSON.stringify(error)),
+        resolveAppResourceText($r('app.string.offline_route_open_failed'))
+      );
     }
   }
 
@@ -579,11 +586,19 @@ export class BrowserShellRouteCoordinator {
       case 'app_proxy':
         return { url: APP_PROXY_SETTINGS_ROUTE, params: boundaryParams, failurePrefix: '打开应用内代理设置失败' };
       case 'saved_pages':
-        return { url: OFFLINE_PAGES_ROUTE, params: boundaryParams, failurePrefix: '打开已保存页面失败' };
+        return {
+          url: OFFLINE_PAGES_ROUTE,
+          params: boundaryParams,
+          failurePrefix: resolveAppResourceText($r('app.string.offline_route_open_failed'))
+        };
       case 'bookshelf':
         return { url: NOVEL_BOOKSHELF_ROUTE, params: boundaryParams, failurePrefix: '打开我的书架失败' };
       default:
-        return { url: OFFLINE_PAGES_ROUTE, params: boundaryParams, failurePrefix: '打开已保存页面失败' };
+        return {
+          url: OFFLINE_PAGES_ROUTE,
+          params: boundaryParams,
+          failurePrefix: resolveAppResourceText($r('app.string.offline_route_open_failed'))
+        };
     }
   }
 

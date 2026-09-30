@@ -87,6 +87,15 @@ export struct ActivityHeatmapCard {
   }
 
   @Builder
+  private buildCellTooltip() {
+    Text(this.resolveVisibleTooltipText())
+      .fontSize(13)
+      .fontWeight(FontWeight.Medium)
+      .fontColor(this.tooltipTextColor)
+      .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+  }
+
+  @Builder
   private buildCell(cell: AiraActivityHeatmapCellState, weekIndex: number, dayIndex: number) {
     Row() {
       Blank()
@@ -115,20 +124,13 @@ export struct ActivityHeatmapCard {
         this.showHeatmapTooltip(cell, false);
       })
       .bindPopup(this.isCellTooltipVisible(cell), {
-        message: cell.tooltipText,
+        builder: this.buildCellTooltip,
         placement: Placement.Top,
         enableArrow: true,
         autoCancel: true,
         mask: false,
         targetSpace: 8,
         popupColor: this.surfaceColor,
-        messageOptions: {
-          textColor: this.tooltipTextColor,
-          font: {
-            size: 13,
-            weight: FontWeight.Medium
-          }
-        },
         radius: 14,
         width: 168,
         onStateChange: (event: PopupStateChangeParam) => {
@@ -267,6 +269,16 @@ export struct ActivityHeatmapCard {
     for (let index = 0; index < this.state.cells.length; index += 1) {
       if (this.state.cells[index].isToday) {
         return this.state.cells[index].date;
+      }
+    }
+    return '';
+  }
+
+  private resolveVisibleTooltipText(): ResourceStr {
+    for (let index = 0; index < this.state.cells.length; index += 1) {
+      const cell = this.state.cells[index];
+      if (cell.date === this.tooltipDate) {
+        return cell.tooltipText;
       }
     }
     return '';

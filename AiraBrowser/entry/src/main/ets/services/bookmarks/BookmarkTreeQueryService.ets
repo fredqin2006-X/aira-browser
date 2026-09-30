@@ -6,13 +6,13 @@ import {
   AiraBookmarkOverview
 } from '../../common/models/AiraSyncModels';
 import { BookmarkRepository } from '../../data/repositories/BrowserRepositories';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   BOOKMARK_OTHER_ROOT_ID,
   BOOKMARK_TOOLBAR_ROOT_ID,
   PRIVATE_BOOKMARK_TOOLBAR_ROOT_ID
 } from '../../data/repositories/BookmarkRepositoryCore';
 
-const DEFAULT_NEW_FOLDER_TITLE = '新建文件夹';
 const BOOKMARK_FOLDER_COUNT_BATCH_SIZE: number = 200;
 const LOCAL_BOOKMARK_OVERVIEW_ROOT_IDS: string[] = [
   BOOKMARK_TOOLBAR_ROOT_ID,
@@ -216,7 +216,10 @@ export class BookmarkTreeQueryService {
     };
   }
 
-  buildNextFolderTitle(parentId?: string, baseTitle: string = DEFAULT_NEW_FOLDER_TITLE): string {
+  buildNextFolderTitle(
+    parentId?: string,
+    baseTitle: string = resolveAppResourceText($r('app.string.bookmark_new_folder'))
+  ): string {
     const children = this.listDisplayChildren(parentId);
     let index = 1;
     let title = baseTitle;

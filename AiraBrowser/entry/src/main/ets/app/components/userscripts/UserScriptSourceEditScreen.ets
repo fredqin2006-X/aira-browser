@@ -11,6 +11,7 @@ import {
   BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY,
   BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY
 } from '../../../core/theme/BrowserThemeStorageKeys';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 @Component
 export struct UserScriptSourceEditScreen {
@@ -26,7 +27,7 @@ export struct UserScriptSourceEditScreen {
   build() {
     Column() {
       ManagementHdsScaffold({
-        title: '脚本源码',
+        title: $r('app.string.user_script_source_title'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         primaryTextColor: this.storedPrimaryTextColor,
@@ -64,7 +65,7 @@ export struct UserScriptSourceEditScreen {
   private buildHeaderMenuActions(): ManagementHdsMenuAction[] {
     const actions: ManagementHdsMenuAction[] = [
       {
-        label: '完成',
+        label: resolveAppResourceText($r('app.string.user_script_action_done')),
         icon: $r('sys.symbol.checkmark'),
         action: () => {
           this.onSave();

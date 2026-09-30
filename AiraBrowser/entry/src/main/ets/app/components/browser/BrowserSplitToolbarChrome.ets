@@ -6,6 +6,7 @@ import {
   SearchSuggestion
 } from '../../../common/models/BrowserModels';
 import { BrowserSearchEnginePresentationViewModel } from '../../../core/browser/BrowserSearchEnginePresentationViewModel';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   SPLIT_TOOLBAR_ADDRESS_BLOCK_VP,
   SPLIT_TOOLBAR_ADDRESS_HORIZONTAL_MARGIN_VP,
@@ -1101,7 +1102,7 @@ export struct BrowserSplitToolbarButtonRow {
     .clip(true)
     .stateEffect(false)
     .enabled(button.enabled)
-    .accessibilityText(button.title)
+    .accessibilityText(resolveAppResourceText(button.title))
     .onTouch((event: TouchEvent) => {
       this.updatePressed(button.slotId, event.type, button.enabled);
     })

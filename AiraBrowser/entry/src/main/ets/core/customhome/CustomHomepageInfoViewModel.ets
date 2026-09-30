@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   CustomHomepageItem,
   CustomHomepageItemKind
@@ -5,7 +6,7 @@ import {
 
 export interface CustomHomepageInfoRowViewState {
   id: string;
-  label: string;
+  label: ResourceStr;
   value: string;
   technical: boolean;
 }
@@ -31,14 +32,14 @@ export class CustomHomepageInfoViewModel {
     const rows: CustomHomepageInfoRowViewState[] = [];
     const title = this.resolveTitle(item);
     const typeLabel = this.resolveTypeLabel(item.kind, item.version);
-    this.appendRow(rows, 'author', '作者', item.author, false);
-    this.appendRow(rows, 'package_id', '主页包 ID', this.resolveDeclaredPackageId(item), true);
+    this.appendRow(rows, 'author', $r('app.string.settings_custom_home_author'), item.author, false);
+    this.appendRow(rows, 'package_id', $r('app.string.settings_custom_home_package_id'), this.resolveDeclaredPackageId(item), true);
     if (item.kind === 'remote_url') {
-      this.appendRow(rows, 'url', '主页网址', item.remoteUrl, true);
+      this.appendRow(rows, 'url', $r('app.string.settings_custom_home_url'), item.remoteUrl, true);
     } else if (item.kind === 'single_html') {
-      this.appendSizeRow(rows, 'size', '大小', item.byteSize);
+      this.appendSizeRow(rows, 'size', $r('app.string.settings_custom_home_size'), item.byteSize);
     } else {
-      this.appendSizeRow(rows, 'size', '大小', item.packageSize);
+      this.appendSizeRow(rows, 'size', $r('app.string.settings_custom_home_size'), item.packageSize);
     }
     return {
       title: title,
@@ -51,7 +52,7 @@ export class CustomHomepageInfoViewModel {
   private appendRow(
     rows: CustomHomepageInfoRowViewState[],
     id: string,
-    label: string,
+    label: ResourceStr,
     rawValue: string,
     technical: boolean
   ): void {
@@ -70,7 +71,7 @@ export class CustomHomepageInfoViewModel {
   private appendSizeRow(
     rows: CustomHomepageInfoRowViewState[],
     id: string,
-    label: string,
+    label: ResourceStr,
     byteSize: number
   ): void {
     if (byteSize <= 0) {
@@ -89,18 +90,20 @@ export class CustomHomepageInfoViewModel {
       return fileName;
     }
     const remoteUrl = item.remoteUrl.trim();
-    return remoteUrl.length > 0 ? remoteUrl : '自定义主页';
+    return remoteUrl.length > 0 ? remoteUrl : resolveAppResourceText($r('app.string.settings_custom_home_fallback_title'));
   }
 
   private resolveTypeLabel(kind: CustomHomepageItemKind, rawVersion: string): string {
-    let typeLabel = '单文件 HTML';
+    let typeLabel = resolveAppResourceText($r('app.string.settings_custom_home_type_html'));
     if (kind === 'zip_package') {
-      typeLabel = '主页包（ZIP）';
+      typeLabel = resolveAppResourceText($r('app.string.settings_custom_home_type_zip'));
     } else if (kind === 'remote_url') {
-      typeLabel = '网址主页';
+      typeLabel = resolveAppResourceText($r('app.string.settings_custom_home_type_url'));
     }
     const version = rawVersion.trim();
-    return version.length > 0 ? `${typeLabel} · v${version}` : typeLabel;
+    return version.length > 0
+      ? resolveAppResourceText($r('app.string.settings_custom_home_type_version'), typeLabel, version)
+      : typeLabel;
   }
 
   private resolveDeclaredPackageId(item: CustomHomepageItem): string {

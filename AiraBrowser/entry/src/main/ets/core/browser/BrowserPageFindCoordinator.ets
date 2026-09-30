@@ -27,8 +27,8 @@ interface BrowserPageFindTabState {
 export interface BrowserPageFindBarState {
   visible: boolean;
   query: string;
-  progressText: string;
-  statusText: string;
+  progressText: ResourceStr;
+  statusText: ResourceStr;
   canSearchPrevious: boolean;
   canSearchNext: boolean;
   inputFocused: boolean;
@@ -57,7 +57,7 @@ export interface BrowserPageFindOpenAvailabilityInput {
 }
 
 export interface BrowserPageFindMoveResult {
-  diagnosticText: string;
+  diagnosticText: ResourceStr;
 }
 
 export interface BrowserPageFindController {
@@ -71,7 +71,7 @@ export interface BrowserPageFindControllerHost {
   resolveController: (tabId: string) => BrowserPageFindController | webview.WebviewController | undefined;
   isControllerAttached: (tabId: string) => boolean;
   publishBarState: (tabId: string, state: BrowserPageFindBarState) => void;
-  showStatusMessage?: (message: string) => void;
+  showStatusMessage?: (message: ResourceStr) => void;
 }
 
 interface BrowserPageFindStatePatch {
@@ -142,8 +142,9 @@ export class BrowserPageFindCoordinator {
       return;
     }
     const result = this.move(tabId, action.type === 'next');
-    if (result.diagnosticText.length > 0) {
-      this.host.showStatusMessage?.(result.diagnosticText);
+    const diagnosticText = result.diagnosticText;
+    if (typeof diagnosticText !== 'string' || diagnosticText.length > 0) {
+      this.host.showStatusMessage?.(diagnosticText);
     }
   }
 
@@ -154,7 +155,7 @@ export class BrowserPageFindCoordinator {
       state.query.trim().length === 0 ||
       !state.isSearchStable) {
       return {
-        diagnosticText: '查找结果还在稳定中'
+        diagnosticText: $r('app.string.page_find_status_stabilizing')
       };
     }
     if (state.isNavigating || state.status === 'navigating') {
@@ -166,7 +167,7 @@ export class BrowserPageFindCoordinator {
       this.statesByTabId[tabId] = this.copyState(state, 'controller_unavailable', Date.now());
       this.publishBarState(tabId);
       return {
-        diagnosticText: 'Web 控制器暂不可用'
+        diagnosticText: $r('app.string.page_find_controller_unavailable')
       };
     }
     try {
@@ -179,7 +180,7 @@ export class BrowserPageFindCoordinator {
       this.statesByTabId[tabId] = this.copyState(state, 'controller_unavailable', Date.now());
       this.publishBarState(tabId);
       return {
-        diagnosticText: '调用 ArkWeb 查找跳转失败'
+        diagnosticText: $r('app.string.page_find_navigate_failed')
       };
     }
     const nextState = this.copyStateWithNavigation(state, Date.now());
@@ -332,12 +333,12 @@ export class BrowserPageFindCoordinator {
     };
   }
 
-  private buildProgressText(state: BrowserPageFindTabState): string {
+  private buildProgressText(state: BrowserPageFindTabState): ResourceStr {
     if (state.query.trim().length === 0 || state.status === 'controller_unavailable') {
       return '';
     }
     if (!state.isDoneCounting && state.numberOfMatches <= 0) {
-      return '统计中';
+      return $r('app.string.page_find_counting');
     }
     if (state.numberOfMatches <= 0) {
       return '0 / 0';
@@ -346,21 +347,21 @@ export class BrowserPageFindCoordinator {
     return `${current} / ${state.numberOfMatches}`;
   }
 
-  private buildStatusText(state: BrowserPageFindTabState): string {
+  private buildStatusText(state: BrowserPageFindTabState): ResourceStr {
     if (state.status === 'controller_unavailable') {
-      return '页面暂不可查找';
+      return $r('app.string.page_find_unavailable');
     }
     if (state.query.trim().length === 0 || state.status === 'empty') {
       return '';
     }
     if (state.status === 'no_match') {
-      return '无结果';
+      return $r('app.string.page_find_no_result');
     }
     if (state.status === 'counting') {
-      return '统计中';
+      return $r('app.string.page_find_counting');
     }
     if (state.status === 'navigating') {
-      return '定位中';
+      return $r('app.string.page_find_locating');
     }
     return '';
   }

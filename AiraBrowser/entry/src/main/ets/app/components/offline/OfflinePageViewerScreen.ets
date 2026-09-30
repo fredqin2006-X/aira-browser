@@ -108,6 +108,7 @@ import { ReaderModeOverlay } from '../browser/ReaderModeOverlay';
 import { ReaderSpeechVoiceDialog } from '../browser/ReaderSpeechVoiceDialog';
 import { BrowserWindowRuntime } from '../../runtime/BrowserWindowRuntime';
 import { applyDesktopDialogSheetChrome } from '../common/DesktopDialogSheetChrome';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 const OFFLINE_PAGE_FIND_TAB_ID: string = 'offline-page-viewer';
 const OFFLINE_PAGE_FIND_BAR_TOP_MARGIN: number = 74;
@@ -440,7 +441,7 @@ export struct OfflinePageViewerScreen {
   }
 
   @Builder
-  private buildStatus(message: string) {
+  private buildStatus(message: ResourceStr) {
     Column({ space: 12 }) {
       SymbolGlyph($r('sys.symbol.doc_text_fill'))
         .fontSize(38)
@@ -476,7 +477,7 @@ export struct OfflinePageViewerScreen {
     BrowserBottomSheetSurface({ surfaceColor: this.themedPanelBackground }) {
       Column({ space: 16 }) {
         Column({ space: 4 }) {
-          Text('离线网页详情')
+          Text($r('app.string.offline_details_sheet_title'))
             .width('100%')
             .fontSize(21)
             .fontWeight(FontWeight.Bold)
@@ -497,13 +498,13 @@ export struct OfflinePageViewerScreen {
         Column({ space: 8 }) {
           ForEach(this.viewerViewModel.buildInfoRows(this.viewerState), (row: OfflinePageViewerInfoRow) => {
             this.buildDetailsInfoRow(row)
-          }, (row: OfflinePageViewerInfoRow) => row.label)
+          }, (row: OfflinePageViewerInfoRow) => row.id)
         }
         .width('100%')
 
         Column({ space: 8 }) {
           BrowserSheetActionButton({
-            label: '打开原网页',
+            label: $r('app.string.offline_action_open_original'),
             emphasis: 'primary',
             stacked: true,
             actionEnabled: this.resolveOriginalPageUrl().length > 0,
@@ -515,7 +516,7 @@ export struct OfflinePageViewerScreen {
           })
 
           BrowserSheetActionButton({
-            label: '复制链接',
+            label: $r('app.string.offline_action_copy_link'),
             emphasis: 'ghost',
             stacked: true,
             actionEnabled: this.resolveOriginalPageUrl().length > 0,
@@ -542,11 +543,11 @@ export struct OfflinePageViewerScreen {
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-      Text(row.value.length > 0 ? row.value : '暂无')
+      Text(row.value)
         .layoutWeight(1)
         .fontSize(15)
         .fontColor(this.themedTextPrimaryColor)
-        .maxLines(row.label === '原网页' ? 2 : 1)
+        .maxLines(row.multiline ? 2 : 1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
     }
     .width('100%')
@@ -619,7 +620,7 @@ export struct OfflinePageViewerScreen {
         this.shareOriginalUrl(effect.title, effect.url);
         return;
       case 'bookmark':
-        this.showToast('离线阅读模式暂不支持加入书签');
+        this.showToast($r('app.string.offline_reader_bookmark_unsupported'));
         return;
       case 'open_bookmarks':
         this.openBookmarkManager();
@@ -715,9 +716,9 @@ export struct OfflinePageViewerScreen {
     }
     const siteName = this.viewerState.siteName.trim();
     if (siteName.length > 0) {
-      return `${siteName} · 离线副本`;
+      return `${siteName} · ${resolveAppResourceText($r('app.string.offline_page_site'))}`;
     }
-    return '离线副本';
+    return resolveAppResourceText($r('app.string.offline_page_site'));
   }
 
   private buildOfflineBottomChromePresentation(): BrowserBottomChromePresentation {
@@ -730,7 +731,7 @@ export struct OfflinePageViewerScreen {
       panelExpansionEnabled: this.buildOfflineBottomPanelMotionState().panelExpansionEnabled,
       addressInput: this.resolveOriginalPageUrl(),
       addressDisplayText: this.resolveOfflinePanelTitle(),
-      placeholder: '离线副本',
+      placeholder: resolveAppResourceText($r('app.string.offline_page_site')),
       leadingHeaderActions: this.buildOfflineLeadingHeaderActions(),
       trailingHeaderActions: this.buildOfflineTrailingHeaderActions()
     });
@@ -738,26 +739,26 @@ export struct OfflinePageViewerScreen {
 
   private buildOfflineLeadingHeaderActions(): BrowserBottomAddressPanelHeaderAction[] {
     return [
-      this.buildOfflineHeaderAction('offlineBack', '返回列表', $r('sys.symbol.chevron_left'), true, '',
-        'browser.toolbar.back')
+      this.buildOfflineHeaderAction('offlineBack', $r('app.string.offline_action_back_to_list'),
+        $r('sys.symbol.chevron_left'), true, '', 'browser.toolbar.back')
     ];
   }
 
   private buildOfflineTrailingHeaderActions(): BrowserBottomAddressPanelHeaderAction[] {
     return [
-      this.buildOfflineHeaderAction('offlineReload', '刷新', $r('sys.symbol.arrow_clockwise'), true, '',
-        'browser.toolbar.refresh'),
-      this.buildOfflineHeaderAction('offlineTabs', '标签页', $r('sys.symbol.rectangle_on_rectangle_fill'), true, '',
-        'browser.toolbar.tabs')
+      this.buildOfflineHeaderAction('offlineReload', $r('app.string.offline_action_refresh'),
+        $r('sys.symbol.arrow_clockwise'), true, '', 'browser.toolbar.refresh'),
+      this.buildOfflineHeaderAction('offlineTabs', $r('app.string.offline_action_tabs'),
+        $r('sys.symbol.rectangle_on_rectangle_fill'), true, '', 'browser.toolbar.tabs')
     ];
   }
 
   private buildOfflineHeaderAction(
     id: string,
-    title: string,
+    title: ResourceStr,
     icon: Resource,
     enabled: boolean,
-    disabledMessage: string,
+    disabledMessage: ResourceStr,
     airaIconId: AiraRenderableIconId
   ): BrowserBottomAddressPanelHeaderAction {
     return {
@@ -813,8 +814,8 @@ export struct OfflinePageViewerScreen {
     return [
       {
         id: 'openOriginal',
-        title: '打开原网页',
-        trailingText: '在线',
+        title: $r('app.string.offline_action_open_original'),
+        trailingText: $r('app.string.offline_action_open_original_trailing'),
         icon: $r('sys.symbol.link'),
         airaIconId: 'offline.openOriginal',
         enabled: true,
@@ -822,35 +823,35 @@ export struct OfflinePageViewerScreen {
       },
       {
         id: 'find',
-        title: '查找网页',
-        trailingText: '搜索',
+        title: $r('app.string.offline_action_find'),
+        trailingText: $r('app.string.offline_action_find_trailing'),
         icon: $r('sys.symbol.magnifyingglass'),
         airaIconId: 'settings.search',
         enabled: true,
-        disabledMessage: '页面暂不可查找'
+        disabledMessage: $r('app.string.offline_find_unavailable')
       },
       {
         id: 'reader',
-        title: '阅读模式',
-        trailingText: '阅读视图',
+        title: $r('app.string.offline_action_reader'),
+        trailingText: $r('app.string.offline_action_reader_trailing'),
         icon: $r('sys.symbol.doc_text_fill'),
         airaIconId: 'browser.toolbar.reader',
         enabled: true,
-        disabledMessage: '离线页面暂不可阅读'
+        disabledMessage: $r('app.string.offline_reader_unavailable')
       },
       {
         id: 'details',
-        title: '页面详情',
-        trailingText: '信息',
+        title: $r('app.string.offline_action_details'),
+        trailingText: $r('app.string.offline_action_details_trailing'),
         icon: $r('sys.symbol.doc_text_fill'),
         airaIconId: 'browser.toolbar.siteInfo',
         enabled: true,
-        disabledMessage: '离线页面详情不可用'
+        disabledMessage: $r('app.string.offline_details_unavailable')
       },
       {
         id: 'copyLink',
-        title: '复制链接',
-        trailingText: '链接',
+        title: $r('app.string.offline_action_copy_link'),
+        trailingText: $r('app.string.offline_action_copy_link_trailing'),
         icon: $r('sys.symbol.link'),
         airaIconId: 'browser.toolbar.copyLink',
         enabled: true,
@@ -863,8 +864,8 @@ export struct OfflinePageViewerScreen {
     return [
       {
         id: 'home',
-        title: '返回列表',
-        trailingText: '离线页',
+        title: $r('app.string.offline_action_back_to_list'),
+        trailingText: $r('app.string.offline_action_home_trailing'),
         icon: $r('sys.symbol.chevron_left'),
         airaIconId: 'browser.toolbar.back',
         enabled: true,
@@ -872,8 +873,8 @@ export struct OfflinePageViewerScreen {
       },
       {
         id: 'share',
-        title: '分享原网页链接',
-        trailingText: '发送',
+        title: $r('app.string.offline_action_share'),
+        trailingText: $r('app.string.offline_action_share_trailing'),
         icon: $r('sys.symbol.arrow_up'),
         airaIconId: 'browser.toolbar.sharePage',
         enabled: true,
@@ -881,26 +882,26 @@ export struct OfflinePageViewerScreen {
       },
       {
         id: 'exportPage',
-        title: '导出网页',
+        title: $r('app.string.offline_action_export'),
         trailingText: 'HTML',
         icon: $r('sys.symbol.download_fill'),
         airaIconId: 'settings.downloads',
         enabled: this.viewerState.canOpen,
-        disabledMessage: '当前离线页面不可导出'
+        disabledMessage: $r('app.string.offline_export_disabled')
       },
       {
         id: 'deletePage',
-        title: '删除离线页面',
-        trailingText: '删除',
+        title: $r('app.string.offline_action_delete'),
+        trailingText: $r('app.string.offline_action_delete_trailing'),
         icon: $r('sys.symbol.trash_fill'),
         airaIconId: 'browser.tabs.delete',
         enabled: true,
-        disabledMessage: '当前离线页面不可删除'
+        disabledMessage: $r('app.string.offline_delete_disabled')
       },
       {
         id: 'openBookmarks',
-        title: '进入书签',
-        trailingText: '收藏',
+        title: $r('app.string.offline_action_bookmarks'),
+        trailingText: $r('app.string.offline_action_bookmarks_trailing'),
         icon: $r('sys.symbol.bookmark'),
         airaIconId: 'browser.shortcut.bookmarks',
         enabled: true,
@@ -1184,7 +1185,7 @@ export struct OfflinePageViewerScreen {
       .catch((_error: Error) => {
         this.offlineHtmlLoadRequested = false;
         this.loadedIntoWeb = false;
-        this.viewerState = this.openCoordinator.buildFailureState(this.pageId, '离线页面打开失败');
+        this.viewerState = this.openCoordinator.buildFailureState(this.pageId, $r('app.string.offline_open_failed'));
       });
   }
 
@@ -1256,7 +1257,7 @@ export struct OfflinePageViewerScreen {
     } catch (_error) {
       this.offlineHtmlLoadRequested = false;
       this.loadedIntoWeb = false;
-      this.viewerState = this.openCoordinator.buildFailureState(this.pageId, '离线页面打开失败');
+      this.viewerState = this.openCoordinator.buildFailureState(this.pageId, $r('app.string.offline_open_failed'));
     }
   }
 
@@ -1284,16 +1285,16 @@ export struct OfflinePageViewerScreen {
     }
   }
 
-  private buildWebLoadErrorMessage(event: OnErrorReceiveEvent): string {
+  private buildWebLoadErrorMessage(event: OnErrorReceiveEvent): ResourceStr {
     try {
       const errorInfo = event.error;
       const message = errorInfo?.getErrorInfo() ?? '';
       if (message.length > 0) {
-        return `离线页面加载失败：${message}`;
+        return $r('app.string.offline_load_failed_detail', message);
       }
     } catch (_error) {
     }
-    return '离线页面加载失败';
+    return $r('app.string.offline_load_failed');
   }
 
   private getOfflineWebViewportLayoutTopInsetPx(): number {
@@ -1313,7 +1314,7 @@ export struct OfflinePageViewerScreen {
 
   private openPageFind(): void {
     if (!this.viewerState.canOpen || !this.webControllerAttached) {
-      this.showToast('页面暂不可查找');
+      this.showToast($r('app.string.offline_find_unavailable'));
       return;
     }
     this.pageFindCoordinator.open(OFFLINE_PAGE_FIND_TAB_ID);
@@ -1322,7 +1323,7 @@ export struct OfflinePageViewerScreen {
 
   private async openReaderMode(): Promise<void> {
     if (!this.viewerState.canOpen) {
-      this.showToast('离线页面暂不可阅读');
+      this.showToast($r('app.string.offline_reader_unavailable'));
       return;
     }
     if (this.viewerState.html.trim().length > 0) {
@@ -1335,7 +1336,7 @@ export struct OfflinePageViewerScreen {
       });
       const outcome = this.articleReadingSession.openSessionFromArticle(article, articleUrl);
       if (outcome === 'unavailable') {
-        this.showToast('没有整理出可阅读的正文');
+        this.showToast($r('app.string.offline_reader_no_article'));
       }
       return;
     }
@@ -1347,7 +1348,7 @@ export struct OfflinePageViewerScreen {
     const outcome: ReaderModeSessionOpenOutcome =
       await this.articleReadingSession.openSessionFromController(this.webController, articleUrl);
     if (outcome === 'unavailable') {
-      this.showToast('没有整理出可阅读的正文');
+      this.showToast($r('app.string.offline_reader_no_article'));
     }
   }
 
@@ -1561,7 +1562,7 @@ export struct OfflinePageViewerScreen {
 
   private openDetailsSheet(): void {
     if (!this.viewerState.canOpen) {
-      this.showToast('离线页面详情不可用');
+      this.showToast($r('app.string.offline_details_unavailable'));
       return;
     }
     this.detailsSheetVisible = true;
@@ -1570,12 +1571,12 @@ export struct OfflinePageViewerScreen {
 
   private openOriginalPage(): void {
     if (!this.listCoordinator.canNavigate(this.dataScope, this.privacyMode)) {
-      this.showToast('当前隐私策略不允许打开原网页');
+      this.showToast($r('app.string.offline_open_original_blocked'));
       return;
     }
     const originalUrl = this.resolveOriginalPageUrl();
     if (originalUrl.length === 0) {
-      this.showToast('原网页链接不可用');
+      this.showToast($r('app.string.offline_original_link_unavailable'));
       return;
     }
     router.pushUrl({
@@ -1600,7 +1601,7 @@ export struct OfflinePageViewerScreen {
           : 'regular_session'
       }
     }).catch((_error: Error) => {
-      this.showToast('打开书签管理失败');
+      this.showToast($r('app.string.offline_bookmarks_open_failed'));
     });
   }
 
@@ -1613,22 +1614,22 @@ export struct OfflinePageViewerScreen {
         }
       })
       .catch((_error: Error) => {
-        this.showToast('删除离线页面失败');
+        this.showToast($r('app.string.offline_delete_failed'));
       });
   }
 
   private confirmDeleteCurrentPage(): void {
     showCenteredAlertDialog({
-      title: '删除离线页面',
-      message: `确定删除“${this.viewerState.title}”的离线副本吗？`,
+      title: $r('app.string.offline_action_delete'),
+      message: $r('app.string.offline_delete_dialog_message', this.viewerState.title),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.offline_dialog_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.offline_dialog_delete'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.deleteCurrentPage();
@@ -1681,7 +1682,7 @@ export struct OfflinePageViewerScreen {
     return this.getUIContext().getHostContext() as common.UIAbilityContext;
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

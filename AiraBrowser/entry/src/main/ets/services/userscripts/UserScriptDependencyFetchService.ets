@@ -10,6 +10,7 @@ import {
   UserScriptSourceFetchResult,
   UserScriptSourceFetchService
 } from './UserScriptSourceFetchService';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 const MAX_REQUIRE_COUNT: number = 24;
 const MAX_RESOURCE_COUNT: number = 24;
@@ -90,18 +91,18 @@ export class UserScriptDependencyFetchService {
     for (let index = 0; index < urls.length && index < MAX_REQUIRE_COUNT; index++) {
       const url = urls[index].trim();
       if (!this.isHttpUrl(url)) {
-        warnings.push(`忽略不支持的 @require：${url}`);
+        warnings.push(resolveAppResourceText($r('app.string.user_script_dep_require_unsupported'), url));
         continue;
       }
       const result: UserScriptSourceFetchResult = await this.sourceFetchService.fetchSource(url, true);
       if (!result.ok) {
-        warnings.push(`@require 下载失败：${url}`);
+        warnings.push(resolveAppResourceText($r('app.string.user_script_dep_require_failed'), url));
         continue;
       }
       results.push(result.source);
     }
     if (urls.length > MAX_REQUIRE_COUNT) {
-      warnings.push(`@require 超过 ${MAX_REQUIRE_COUNT} 个，已忽略后续依赖。`);
+      warnings.push(resolveAppResourceText($r('app.string.user_script_dep_require_limit'), `${MAX_REQUIRE_COUNT}`));
     }
     return results;
   }
@@ -115,12 +116,12 @@ export class UserScriptDependencyFetchService {
       const resource = resources[index];
       const url = resource.url.trim();
       if (!this.isHttpUrl(url)) {
-        warnings.push(`忽略不支持的 @resource：${resource.name}`);
+        warnings.push(resolveAppResourceText($r('app.string.user_script_dep_resource_unsupported'), resource.name));
         continue;
       }
       const result: UserScriptResourceFetchResult = await this.fetchResource(url);
       if (!result.ok) {
-        warnings.push(`@resource 下载失败：${resource.name}`);
+        warnings.push(resolveAppResourceText($r('app.string.user_script_dep_resource_failed'), resource.name));
         continue;
       }
       results.push({
@@ -132,7 +133,7 @@ export class UserScriptDependencyFetchService {
       });
     }
     if (resources.length > MAX_RESOURCE_COUNT) {
-      warnings.push(`@resource 超过 ${MAX_RESOURCE_COUNT} 个，已忽略后续资源。`);
+      warnings.push(resolveAppResourceText($r('app.string.user_script_dep_resource_limit'), `${MAX_RESOURCE_COUNT}`));
     }
     return results;
   }

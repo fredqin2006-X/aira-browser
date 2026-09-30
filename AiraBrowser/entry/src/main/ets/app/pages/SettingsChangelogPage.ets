@@ -91,7 +91,7 @@ struct SettingsChangelogPage {
         payload.historyUrl
       );
     } catch (_error) {
-      this.showToast('更新日志加载失败');
+      this.showToast($r('app.string.settings_about_changelog_failed'));
     }
   }
 
@@ -109,7 +109,7 @@ struct SettingsChangelogPage {
     };
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

@@ -29,6 +29,7 @@ import { AppServiceModeGateService } from '../../../services/settings/AppService
 import {
   BROWSER_THEME_STORAGE_PAGE_BACKGROUND_KEY
 } from '../../../core/theme/BrowserThemeStorageKeys';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 export type UserScriptInstallEntryMode = 'prepared_manual_install' | 'direct_web_install';
 
@@ -92,7 +93,7 @@ export struct UserScriptInstallSheetContent {
         this.importBusy = true;
         void this.loadSourceFromInitialUrl(initialSourceUrl);
       } else {
-        this.loadErrorMessage = '没有可读取的脚本地址。';
+        this.loadErrorMessage = resolveAppResourceText($r('app.string.user_script_no_script_url'));
       }
     }
   }
@@ -233,7 +234,11 @@ export struct UserScriptInstallSheetContent {
         if (!this.pageVisible) {
           return;
         }
-        this.showSaveFailure(error.message.length > 0 ? error.message : '保存脚本失败。');
+        this.showSaveFailure(
+          error.message.length > 0
+            ? error.message
+            : resolveAppResourceText($r('app.string.user_script_save_failed'))
+        );
         this.onCommitSettled();
       });
   }

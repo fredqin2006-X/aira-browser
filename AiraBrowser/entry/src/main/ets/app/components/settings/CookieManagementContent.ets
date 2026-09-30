@@ -10,7 +10,7 @@ import { SettingsOptionRow } from './SettingsRows';
 
 interface CookieManagementOptionState {
   mode: SettingsCookiePolicyMode;
-  title: string;
+  title: ResourceStr;
 }
 
 @Component
@@ -105,9 +105,9 @@ export struct CookieManagementContent {
 
   private buildOptions(): CookieManagementOptionState[] {
     return [
-      { mode: 'allow_all', title: '不阻止' },
-      { mode: 'block_third_party', title: '仅阻止第三方 Cookie' },
-      { mode: 'block_all', title: '阻止所有 Cookie' }
+      { mode: 'allow_all', title: $r('app.string.settings_privacy_protection_cookie_allow_all') },
+      { mode: 'block_third_party', title: $r('app.string.settings_privacy_protection_cookie_block_third_option') },
+      { mode: 'block_all', title: $r('app.string.settings_privacy_protection_cookie_block_all_option') }
     ];
   }
 
@@ -118,17 +118,17 @@ export struct CookieManagementContent {
     return mode !== 'allow_all' || !this.state.thirdPartyCookiePolicyLocked;
   }
 
-  private resolveFooterText(): string {
+  private resolveFooterText(): ResourceStr {
     if (!this.state.canEditCookiePolicy) {
-      return '当前私密会话沿用全局 Cookie 策略，请在常规设置中修改。';
+      return $r('app.string.settings_privacy_protection_cookie_footer_locked');
     }
     if (this.state.thirdPartyCookiePolicyLocked) {
-      return '增强反跟踪已自动拦截第三方 Cookie。关闭增强反跟踪后，可选择“不阻止”。';
+      return $r('app.string.settings_privacy_protection_cookie_footer_enhanced');
     }
     if (this.state.cookiePolicyMode === 'block_all') {
-      return '阻止所有 Cookie 可能导致登录、购物车等网页功能无法正常使用。';
+      return $r('app.string.settings_privacy_protection_cookie_footer_block_all');
     }
-    return '阻止第三方 Cookie 可减少跨网站跟踪，同时兼顾大多数网页的正常使用。';
+    return $r('app.string.settings_privacy_protection_cookie_footer_block_third');
   }
 
   private resolveRowPosition(index: number, total: number): 'single' | 'first' | 'middle' | 'last' {

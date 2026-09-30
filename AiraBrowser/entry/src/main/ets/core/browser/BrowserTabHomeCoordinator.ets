@@ -113,6 +113,10 @@ import {
   BrowserBottomAddressTransientMessageContext
 } from './BrowserBottomAddressTransientMessageViewModel';
 import { BrowserRootBottomPanelSessionCoordinator } from './BrowserRootBottomPanelSessionCoordinator';
+import {
+  bottomPanelThemeSwitched,
+  bottomPanelThemeUpdateFailed
+} from './BrowserBottomPanelText';
 import { BrowserTabPreviewCoordinator } from './BrowserTabPreviewCoordinator';
 import { BrowserTabSessionPersistenceCoordinator } from './BrowserTabSessionPersistenceCoordinator';
 import { BrowserTabSwitchCoordinator } from './BrowserTabSwitchCoordinator';
@@ -218,7 +222,7 @@ interface BrowserTabHomeStateApplication {
   clearControllerAttachment?: boolean;
   invalidateWebSessionTransition?: boolean;
   incrementThemeModeActionVersion?: boolean;
-  themeModeToastMessage?: string;
+  themeModeToastMessage?: ResourceStr;
   endSearchInvocation?: boolean;
   resetHomeSearchPresentation?: boolean;
   forceSyncStatusBarStyle?: boolean;
@@ -778,14 +782,14 @@ export class BrowserTabHomeCoordinator {
       this.optimisticThemeModeOverride = '';
       this.shell.applyState({ incrementThemeModeActionVersion: true });
       this.refreshAppearance();
-      this.shell.applyState({ themeModeToastMessage: `已切换为${
-        this.dependencies.resolveRootBottomPanelSessionCoordinator().resolveThemeModeActionTitleForMode(result.mode)
-      }。` });
+      this.shell.applyState({
+        themeModeToastMessage: bottomPanelThemeSwitched(result.mode)
+      });
     } catch (_error) {
       this.optimisticThemeModeOverride = previousOptimisticMode;
       this.shell.applyState({ incrementThemeModeActionVersion: true });
       this.refreshAppearance();
-      this.shell.applyState({ themeModeToastMessage: '外观模式更新失败。' });
+      this.shell.applyState({ themeModeToastMessage: bottomPanelThemeUpdateFailed() });
     }
   }
 

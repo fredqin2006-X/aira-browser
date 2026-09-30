@@ -83,14 +83,14 @@ export struct AiraLegalWebDocumentContent {
   private buildPendingLinkState() {
     Column() {
       Column({ space: 10 }) {
-        Text('链接待配置')
+        Text($r('app.string.settings_about_link_pending'))
           .width('100%')
           .fontSize(20)
           .fontWeight(FontWeight.Bold)
           .fontColor(this.storedPrimaryTextColor)
           .textAlign(TextAlign.Center)
 
-        Text('该协议将以公开网页形式提供。公网地址上线后，此入口会直接打开对应页面。')
+        Text($r('app.string.settings_about_link_pending_message'))
           .width('100%')
           .fontSize(14)
           .lineHeight(22)

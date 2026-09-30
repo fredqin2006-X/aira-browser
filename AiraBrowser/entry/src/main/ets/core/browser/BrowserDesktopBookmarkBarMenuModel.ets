@@ -27,7 +27,7 @@ export type BrowserDesktopBookmarkBarMenuItemId =
 
 export interface BrowserDesktopBookmarkBarMenuItem {
   id: BrowserDesktopBookmarkBarMenuItemId;
-  label: string;
+  label: ResourceStr;
   enabled: boolean;
   checked: boolean;
 }
@@ -53,17 +53,17 @@ interface BrowserDesktopBookmarkBarVisibilityEntry {
   choice: DesktopBookmarkBarVisibilityChoice;
 }
 
-const OPEN_NEW_TAB_LABEL: string = '在新标签页中打开';
-const OPEN_NEW_WINDOW_LABEL: string = '在新窗口中打开';
-const OPEN_PRIVATE_WINDOW_LABEL: string = '在隐私窗口中打开';
-const RENAME_LABEL: string = '重命名...';
-const CUT_LABEL: string = '剪切';
-const COPY_LABEL: string = '复制';
-const PASTE_LABEL: string = '粘贴';
-const DELETE_LABEL: string = '删除';
-const ADD_BOOKMARK_LABEL: string = '添加网页...';
-const ADD_FOLDER_LABEL: string = '添加文件夹...';
-const OPEN_MANAGER_LABEL: string = '打开书签管理器';
+const OPEN_NEW_TAB_LABEL: ResourceStr = $r('app.string.history_open_new_tab');
+const OPEN_NEW_WINDOW_LABEL: ResourceStr = $r('app.string.bookmark_bar_open_new_window');
+const OPEN_PRIVATE_WINDOW_LABEL: ResourceStr = $r('app.string.bookmark_bar_open_private');
+const RENAME_LABEL: ResourceStr = $r('app.string.bookmark_bar_rename');
+const CUT_LABEL: ResourceStr = $r('app.string.ui_cut');
+const COPY_LABEL: ResourceStr = $r('app.string.ui_copy');
+const PASTE_LABEL: ResourceStr = $r('app.string.ui_paste');
+const DELETE_LABEL: ResourceStr = $r('app.string.settings_delete');
+const ADD_BOOKMARK_LABEL: ResourceStr = $r('app.string.bookmark_bar_add_page');
+const ADD_FOLDER_LABEL: ResourceStr = $r('app.string.bookmark_bar_add_folder');
+const OPEN_MANAGER_LABEL: ResourceStr = $r('app.string.bookmark_bar_open_manager');
 
 function resolveVisibilityMenuItemId(
   visibility: DesktopBookmarkBarVisibility
@@ -161,7 +161,7 @@ function buildVisibilityGroup(
     (entry: BrowserDesktopBookmarkBarVisibilityEntry): BrowserDesktopBookmarkBarMenuItem => {
       return {
         id: entry.id,
-        label: entry.choice.label,
+        label: visibilityMenuLabel(entry.id),
         enabled: true,
         checked: entry.choice.visibility === barVisibility
       };
@@ -169,9 +169,19 @@ function buildVisibilityGroup(
   );
 }
 
+function visibilityMenuLabel(id: BrowserDesktopBookmarkBarMenuItemId): ResourceStr {
+  if (id === 'bar_visibility_never') {
+    return $r('app.string.bookmark_bar_visibility_never');
+  }
+  if (id === 'bar_visibility_always') {
+    return $r('app.string.bookmark_bar_visibility_always');
+  }
+  return $r('app.string.bookmark_bar_visibility_new_tab');
+}
+
 function buildItem(
   id: BrowserDesktopBookmarkBarMenuItemId,
-  label: string,
+  label: ResourceStr,
   enabled: boolean
 ): BrowserDesktopBookmarkBarMenuItem {
   return {

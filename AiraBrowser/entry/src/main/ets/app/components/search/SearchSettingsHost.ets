@@ -39,6 +39,7 @@ import {
   QUICK_SEARCH_SWITCHING_PREFERENCES_REVISION_KEY,
   SEARCH_ENGINE_SETTINGS_REVISION_KEY
 } from '../../../common/constants/SearchPreferenceKeys';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 @Component
 export struct SearchSettingsHost {
@@ -378,15 +379,15 @@ export struct SearchSettingsHost {
       return;
     }
     showCenteredAlertDialog({
-      title: '清除搜索历史',
-      message: '会清除地址栏保存的搜索词，不影响网页浏览历史。',
+      title: $r('app.string.settings_search_engine_clear_history'),
+      message: $r('app.string.settings_search_engine_clear_history_message'),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_search_engine_cancel'),
         action: () => {}
       },
       secondaryButton: {
-        value: '清除',
+        value: $r('app.string.settings_search_engine_clear'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.clearSearchHistory();
@@ -405,17 +406,19 @@ export struct SearchSettingsHost {
       privacyMode: this.boundary.privacyMode
     })
       .then((result: SearchQueryHistoryClearResult) => {
-        this.showToast(result.removedCount > 0 ? '搜索历史已清除。' : '当前没有搜索历史。');
+        this.showToast(result.removedCount > 0
+          ? $r('app.string.settings_search_engine_history_cleared')
+          : $r('app.string.settings_search_engine_history_empty'));
       })
       .catch((_error: Error) => {
-        this.showToast('清除搜索历史失败，请稍后再试。');
+        this.showToast($r('app.string.settings_search_engine_clear_failed'));
       })
       .finally(() => {
         this.clearingSearchHistory = false;
       });
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,
@@ -439,8 +442,11 @@ export struct SearchSettingsHost {
 
   private resolveExternalAppSearchSummary(): string {
     if (!this.externalAppSearchPreferences.enabled) {
-      return '已关闭';
+      return resolveAppResourceText($r('app.string.settings_search_engine_external_off'));
     }
-    return `已开启 ${this.externalAppSearchPreferences.selectedTargetIds.length} 个`;
+    return resolveAppResourceText(
+      $r('app.string.settings_search_engine_external_on_count'),
+      `${this.externalAppSearchPreferences.selectedTargetIds.length}`
+    );
   }
 }

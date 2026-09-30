@@ -85,7 +85,7 @@ export struct ReadingSurfaceSettingsPanel {
     Column({ space: 14 }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceColor }) {
         SettingsSwitchRow({
-          title: '跟随系统亮度',
+          title: $r('app.string.reader_brightness_follow_system'),
           checked: this.appearance.brightnessMode === 'system',
           rowPosition: 'first',
           onChange: (enabled: boolean): void => {
@@ -197,7 +197,7 @@ export struct ReadingSurfaceSettingsPanel {
   private buildFontSizeSlider() {
     Column({ space: 12 }) {
       Row() {
-        Text('字号')
+        Text($r('app.string.reader_font_size'))
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.resolveTextColor())
@@ -243,7 +243,7 @@ export struct ReadingSurfaceSettingsPanel {
   private buildLineHeightSlider() {
     Column({ space: 12 }) {
       Row() {
-        Text('行间距')
+        Text($r('app.string.reader_line_spacing'))
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.resolveTextColor())
@@ -289,11 +289,11 @@ export struct ReadingSurfaceSettingsPanel {
     Column({ space: 14 }) {
       if (this.showPageModeOptions) {
         SettingsGroupCard({ surfaceColor: this.storedSurfaceColor }) {
-          this.buildPageModeOption('左右翻页', 'horizontal', 'first')
+          this.buildPageModeOption($r('app.string.reader_page_mode_horizontal'), 'horizontal', 'first')
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
-          this.buildPageModeOption('左右快速', 'horizontalFast', 'middle')
+          this.buildPageModeOption($r('app.string.reader_page_mode_horizontal_fast'), 'horizontalFast', 'middle')
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
-          this.buildPageModeOption('上下滚动', 'vertical', 'last')
+          this.buildPageModeOption($r('app.string.reader_page_mode_vertical'), 'vertical', 'last')
         }
       }
 
@@ -310,7 +310,7 @@ export struct ReadingSurfaceSettingsPanel {
 
   @Builder
   private buildPageModeOption(
-    label: string,
+    label: ResourceStr,
     mode: ReadingPresentationMode,
     rowPosition: 'first' | 'middle' | 'last'
   ) {
@@ -350,14 +350,14 @@ export struct ReadingSurfaceSettingsPanel {
     return 'comfortable';
   }
 
-  private resolveLineHeightLabel(): string {
+  private resolveLineHeightLabel(): ResourceStr {
     if (this.appearance.lineHeight === 'compact') {
-      return '紧凑';
+      return $r('app.string.reader_line_height_compact');
     }
     if (this.appearance.lineHeight === 'loose') {
-      return '宽松';
+      return $r('app.string.reader_line_height_loose');
     }
-    return '舒适';
+    return $r('app.string.reader_line_height_comfortable');
   }
 
   private copyAppearance(): ReadingSurfaceAppearance {

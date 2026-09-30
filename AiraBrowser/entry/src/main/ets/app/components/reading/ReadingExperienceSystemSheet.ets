@@ -52,20 +52,20 @@ export function resolveReadingExperienceSystemSheetTitle(
   type: BrowserSystemSheetType
 ): SheetTitleOptions | undefined {
   if (type === 'crossDeviceTabs') {
-    return { title: '跨设备标签页' };
+    return { title: $r('app.string.reading_cross_device_tabs') };
   }
   const novelReaderTitle: string = resolveNovelReaderSystemSurfaceTitle(type);
   if (novelReaderTitle.length > 0) {
     return { title: novelReaderTitle };
   }
   if (type === 'readerAppearance') {
-    return { title: '亮度与主题' };
+    return { title: $r('app.string.reader_panel_appearance') };
   }
   if (type === 'readerSettings') {
-    return { title: '阅读设置' };
+    return { title: $r('app.string.reader_panel_settings') };
   }
   if (type === 'readerText') {
-    return { title: '文字' };
+    return { title: $r('app.string.reader_panel_text') };
   }
   return undefined;
 }
@@ -151,7 +151,7 @@ export struct ReadingExperienceSystemSheet {
     SettingsGroupCard({ surfaceColor: this.storedSurfaceColor }) {
       if (this.isNovelComicMode()) {
         SettingsSwitchRow({
-          title: '显示系统状态栏',
+          title: $r('app.string.novel_settings_status_bar'),
           checked: this.novelState.preferences.systemStatusBarVisible,
           rowPosition: 'first',
           onChange: (enabled: boolean): void => {
@@ -160,7 +160,7 @@ export struct ReadingExperienceSystemSheet {
         })
       } else {
         SettingsSwitchRow({
-          title: '自动阅读',
+          title: $r('app.string.novel_settings_auto_read'),
           checked: this.novelState.preferences.autoReadingEnabled,
           rowPosition: 'first',
           onChange: (enabled: boolean): void => {
@@ -169,7 +169,7 @@ export struct ReadingExperienceSystemSheet {
         })
         SettingsGroupDivider({})
         SettingsSwitchRow({
-          title: '显示系统状态栏',
+          title: $r('app.string.novel_settings_status_bar'),
           checked: this.novelState.preferences.systemStatusBarVisible,
           rowPosition: 'middle',
           onChange: (enabled: boolean): void => {
@@ -178,7 +178,7 @@ export struct ReadingExperienceSystemSheet {
         })
         SettingsGroupDivider({})
         SettingsSwitchRow({
-          title: '显示章节名称',
+          title: $r('app.string.novel_settings_chapter_name'),
           checked: this.novelState.preferences.chapterNameVisible,
           rowPosition: 'middle',
           onChange: (enabled: boolean): void => {
@@ -187,7 +187,7 @@ export struct ReadingExperienceSystemSheet {
         })
         SettingsGroupDivider({})
         SettingsSwitchRow({
-          title: '显示页码',
+          title: $r('app.string.novel_settings_page_number'),
           checked: this.novelState.preferences.pageNumberVisible,
           rowPosition: 'last',
           onChange: (enabled: boolean): void => {

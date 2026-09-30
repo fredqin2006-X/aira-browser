@@ -6,6 +6,7 @@ import {
   SearchSuggestionPreferences
 } from '../../common/models/BrowserModels';
 import { SearchEngineTemplateService } from '../../services/search/SearchEngineTemplateService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface SearchEngineRowView {
   id: SearchEngineId;
@@ -40,7 +41,7 @@ export interface BuiltInSearchEngineVisibilityRowView {
 }
 
 export interface SearchEngineEditorState {
-  title: string;
+  title: ResourceStr;
   name: string;
   searchUrlTemplate: string;
   errorMessage: string;
@@ -96,7 +97,7 @@ export class SearchEngineManagementViewModel {
     const errorMessage = validation !== undefined && !validation.valid ? validation.errorMessage : '';
     const hasUsableName = trimmedName.length > 0 || (validation?.suggestedName ?? '').length > 0;
     return {
-      title: engine === undefined ? '添加搜索引擎' : '编辑搜索引擎',
+      title: engine === undefined ? resolveAppResourceText($r('app.string.settings_search_engine_add')) : resolveAppResourceText($r('app.string.settings_search_engine_edit')),
       name: name,
       searchUrlTemplate: template,
       errorMessage: errorMessage,
@@ -108,14 +109,14 @@ export class SearchEngineManagementViewModel {
   buildEditorSubmitError(name: string, template: string): string {
     const trimmedTemplate = template.trim();
     if (trimmedTemplate.length === 0) {
-      return '请输入搜索 URL。';
+      return resolveAppResourceText($r('app.string.settings_search_engine_url_required'));
     }
     const validation = this.templateService.validateTemplate(trimmedTemplate);
     if (!validation.valid) {
       return validation.errorMessage;
     }
     if (name.trim().length === 0 && validation.suggestedName.length === 0) {
-      return '搜索引擎名称不能为空。';
+      return resolveAppResourceText($r('app.string.settings_search_engine_name_required'));
     }
     return '';
   }
@@ -126,9 +127,9 @@ export class SearchEngineManagementViewModel {
 
   buildFallbackEngineValue(state: SearchEngineManagementState): string {
     if (!state.fallbackEnabled) {
-      return '关闭';
+      return resolveAppResourceText($r('app.string.settings_search_engine_off'));
     }
-    return state.fallbackEngineName.length > 0 ? state.fallbackEngineName : '未选择';
+    return state.fallbackEngineName.length > 0 ? state.fallbackEngineName : resolveAppResourceText($r('app.string.settings_search_engine_not_selected'));
   }
 
   buildBuiltInVisibilityRows(
@@ -178,7 +179,7 @@ export class SearchEngineManagementViewModel {
   }
 
   buildDeleteConfirmationMessage(engine: SearchEngineRecord): string {
-    return `删除 ${engine.name} 后，如果它是默认搜索引擎，将自动切回 Bing。`;
+    return resolveAppResourceText($r('app.string.settings_search_engine_delete_message'), engine.name);
   }
 
   buildSearchSuggestionPreferences(
@@ -202,7 +203,7 @@ export class SearchEngineManagementViewModel {
   }
 
   private buildFallbackInfoText(): string {
-    return '默认搜索引擎不可用时，会自动使用你选择的备用搜索引擎完成本次搜索。';
+    return resolveAppResourceText($r('app.string.settings_search_engine_fallback_info_text'));
   }
 
   private buildEngineSubtitle(engine: SearchEngineRecord): string {

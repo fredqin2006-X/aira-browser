@@ -44,7 +44,7 @@ export struct AiraProMembershipRedeemDialog {
 
   build() {
     Column({ space: 16 }) {
-      Text('兑换会员')
+      Text($r('app.string.settings_pro_redeem'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -87,7 +87,7 @@ export struct AiraProMembershipRedeemDialog {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '兑换',
+          label: $r('app.string.settings_pro_redeem_action'),
           emphasis: 'primary',
           stacked: true,
           actionEnabled: this.canRedeem(),
@@ -100,7 +100,7 @@ export struct AiraProMembershipRedeemDialog {
         })
 
         BrowserSheetActionButton({
-          label: '取消',
+          label: $r('app.string.settings_account_cancel'),
           emphasis: 'ghost',
           stacked: true,
           buttonHeight: 44,

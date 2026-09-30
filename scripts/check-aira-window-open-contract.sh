@@ -384,7 +384,7 @@ require_order "${UA_RUNTIME_POLICY_COORDINATOR}" \
   'must carry the policy-owned reload reason into the native Controller transition.'
 require_order "${UA_ACTION_COORDINATOR}" \
   "result.status === 'transition_deferred'" \
-  '为保留返回与前进历史' \
+  'web_ua_runtime_deferred' \
   'must use the delayed notice only after the immediate runtime transition declines or is unavailable.'
 require_order "${UA_RUNTIME_TRANSITION_COORDINATOR}" \
   'isBrowserDataBoundarySessionEphemeralTabLike({' \
@@ -611,7 +611,7 @@ require_order "${UA_RUNTIME_POLICY_COORDINATOR}" \
   'runtimeTransitionCoordinator.transitionToNative(' \
   'must skip reload or Controller replacement when a mandatory Host keeps the effective identity unchanged.'
 require_literal "${UA_ACTION_COORDINATOR}" \
-  '当前网站继续使用 Aira 兼容标识。' \
+  'web_ua_runtime_identity_unchanged' \
   'must explain a saved but superseded user choice without exposing a mutable mandatory-Host control.'
 require_literal "${UA_HOST_POLICY_CATALOG}" \
   'GOOGLE_SEARCH_COMPATIBILITY_HOST_CHUNKS' \

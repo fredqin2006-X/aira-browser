@@ -76,18 +76,18 @@ export struct AiraProOverviewScreen {
       actionEnabled: false,
       availability: 'available'
     },
-    proValue: '查看',
-    proActivatedActionText: '已开通 Aira Pro',
-    proLegalPromptText: '我已阅读并同意',
-    proLegalAgreementTitle: '会员服务协议',
-    proLegalRenewalTitle: '自动续费服务协议',
+    proValue: $r('app.string.settings_pro_value_view'),
+    proActivatedActionText: $r('app.string.settings_pro_activated'),
+    proLegalPromptText: $r('app.string.settings_pro_legal_prompt'),
+    proLegalAgreementTitle: $r('app.string.settings_pro_legal_membership'),
+    proLegalRenewalTitle: $r('app.string.settings_pro_legal_renewal'),
     proActionsEnabled: true,
     proSubscribeEnabled: true,
     lifetimeUpgradePrompt: {
-      title: '升级长期会员',
+      title: $r('app.string.settings_pro_upgrade_title'),
       message: '',
-      cancelLabel: '暂不升级',
-      manageLabel: '前往关闭自动续费'
+      cancelLabel: $r('app.string.settings_pro_upgrade_cancel'),
+      manageLabel: $r('app.string.settings_pro_manage_renewal')
     }
   };
   @Prop surfaceBackground: ResourceColor = '#FFFFFF';
@@ -162,7 +162,7 @@ export struct AiraProOverviewScreen {
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-      if (this.state.subtitle.length > 0) {
+      if (this.hasVisibleText(this.state.subtitle)) {
         Text(this.state.subtitle)
           .width('100%')
           .fontSize(AIRA_PRO_HERO_SUBTITLE_FONT_SIZE)
@@ -352,7 +352,7 @@ export struct AiraProOverviewScreen {
           .height(AIRA_PRO_PLAN_TITLE_ROW_HEIGHT)
           .alignItems(VerticalAlign.Center)
 
-          if (plan.discountBadgeText.length > 0) {
+          if (this.hasVisibleText(plan.discountBadgeText)) {
             Text(plan.discountBadgeText)
               .fontSize(11)
               .fontWeight(FontWeight.Bold)
@@ -377,8 +377,8 @@ export struct AiraProOverviewScreen {
             .fontWeight(FontWeight.Bold)
             .fontColor(this.primaryTextColor)
 
-          if (plan.periodText.length > 0) {
-            Span(plan.periodText.startsWith('/') ? plan.periodText : ` ${plan.periodText}`)
+          if (this.hasVisibleText(plan.periodText)) {
+            Span(plan.periodText)
               .fontSize(AIRA_PRO_PLAN_PERIOD_FONT_SIZE)
               .fontWeight(FontWeight.Medium)
               .fontColor(this.secondaryTextColor)
@@ -403,7 +403,7 @@ export struct AiraProOverviewScreen {
       .alignItems(HorizontalAlign.Start)
       .justifyContent(FlexAlign.Start)
 
-      if (plan.originalPriceText.length > 0) {
+      if (this.hasVisibleText(plan.originalPriceText)) {
         this.buildOriginalPriceCapsule(plan.originalPriceText)
       }
     }
@@ -428,7 +428,7 @@ export struct AiraProOverviewScreen {
    * the pill stays inside the rounded corner so the clip does not cut it.
    */
   @Builder
-  private buildOriginalPriceCapsule(text: string) {
+  private buildOriginalPriceCapsule(text: ResourceStr) {
     Text(text)
       .fontSize(11)
       .fontWeight(FontWeight.Medium)
@@ -452,8 +452,8 @@ export struct AiraProOverviewScreen {
   @Builder
   private buildMembershipRedeemRow() {
     this.buildFooterEntryRow(
-      '兑换会员',
-      '输入兑换码开通会员',
+      $r('app.string.settings_pro_redeem'),
+      $r('app.string.settings_pro_redeem_hint'),
       'settings.membership',
       this.settingsIconBackgrounds.syncMethod,
       () => {
@@ -469,8 +469,8 @@ export struct AiraProOverviewScreen {
   @Builder
   private buildSelfHostingRow() {
     this.buildFooterEntryRow(
-      '私有化部署',
-      '免费使用，查看部署教程',
+      $r('app.string.settings_pro_self_hosting'),
+      $r('app.string.settings_pro_self_hosting_hint'),
       'settings.webdav',
       this.syncProviderIconBackgrounds.webdav,
       () => {
@@ -481,8 +481,8 @@ export struct AiraProOverviewScreen {
 
   @Builder
   private buildFooterEntryRow(
-    title: string,
-    subtitle: string,
+    title: ResourceStr,
+    subtitle: ResourceStr,
     airaIconId: AiraRenderableIconId,
     iconBackground: ResourceColor,
     onAction: () => void
@@ -558,7 +558,7 @@ export struct AiraProOverviewScreen {
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-        if (this.state.membershipStatusDetail.length > 0) {
+        if (this.hasVisibleText(this.state.membershipStatusDetail)) {
           Text(this.state.membershipStatusDetail)
             .width('100%')
             .fontSize(13)
@@ -609,7 +609,7 @@ export struct AiraProOverviewScreen {
             this.onOpenMembershipTerms?.();
           })
           if (this.shouldShowAutoRenewalNotice()) {
-            Text('、')
+            Text($r('app.string.settings_pro_legal_join'))
               .fontSize(12)
               .lineHeight(20)
               .fontColor(this.secondaryTextColor)
@@ -636,7 +636,7 @@ export struct AiraProOverviewScreen {
   }
 
   @Builder
-  private buildLegalTextLink(label: string, action: () => void) {
+  private buildLegalTextLink(label: ResourceStr, action: () => void) {
     Button({ type: ButtonType.Normal }) {
       Text(label)
         .fontSize(12)
@@ -725,10 +725,10 @@ export struct AiraProOverviewScreen {
    * by a pixel on every tap.
    */
   private resolvePlanTitleRightPadding(plan: AiraProOverviewPlanState): number {
-    if (plan.originalPriceText.length > 0) {
+    if (this.hasVisibleText(plan.originalPriceText)) {
       return AIRA_PRO_PLAN_ORIGINAL_PRICE_RIGHT_PADDING;
     }
-    if (plan.discountBadgeText.length > 0) {
+    if (this.hasVisibleText(plan.discountBadgeText)) {
       return AIRA_PRO_PLAN_BADGE_RIGHT_PADDING;
     }
     return 0;
@@ -780,28 +780,32 @@ export struct AiraProOverviewScreen {
     this.proTermsAccepted = !this.proTermsAccepted;
   }
 
-  private resolveSubscribeButtonLabel(): string {
+  private resolveSubscribeButtonLabel(): ResourceStr {
     if (!this.state.proActionsEnabled) {
-      return '当前会话不可订阅';
+      return $r('app.string.settings_pro_subscribe_blocked');
     }
     if (!this.state.proSubscribeEnabled) {
       return this.state.proActivatedActionText;
     }
     const selectedPlan = this.resolveSelectedPlan();
     if (selectedPlan?.action === 'purchase' && !this.proTermsAccepted) {
-      return selectedPlan?.consentActionText ?? '同意协议后继续';
+      return selectedPlan?.consentActionText ?? $r('app.string.settings_pro_consent_continue');
     }
-    return selectedPlan?.actionText ?? '继续';
+    return selectedPlan?.actionText ?? $r('app.string.settings_pro_continue');
   }
 
-  private resolveSubscriptionFooterText(): string {
+  private resolveSubscriptionFooterText(): ResourceStr {
     if (!this.state.proActionsEnabled) {
-      return '当前为私密会话，请在普通会话中订阅或恢复购买。';
+      return $r('app.string.settings_pro_private_note');
     }
     if (!this.state.proSubscribeEnabled) {
       return this.state.proValue;
     }
     return this.resolveSelectedPlan()?.footerText ?? '';
+  }
+
+  private hasVisibleText(value: ResourceStr): boolean {
+    return typeof value !== 'string' || value.length > 0;
   }
 
   private shouldShowAutoRenewalNotice(): boolean {

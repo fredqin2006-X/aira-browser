@@ -3,6 +3,7 @@ import { fileIo, picker } from '@kit.CoreFileKit';
 import { UserScriptExportPayload } from '../../features/userscripts/UserScriptMetadataModels';
 import { BrowserPrivacyEffectPolicyService } from '../privacy/BrowserPrivacyEffectPolicyService';
 import { BrowserProfileBoundaryService } from '../../core/browser/BrowserProfileBoundaryService';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export type UserScriptExportStatus = 'exported' | 'canceled' | 'failed';
 
@@ -39,7 +40,7 @@ export class UserScriptExportService {
       if (targetUri === undefined) {
         return {
           status: 'canceled',
-          message: '已取消导出脚本。'
+          message: resolveAppResourceText($r('app.string.user_script_export_cancelled'))
         };
       }
       const decision = this.privacyEffectPolicy.decide({
@@ -54,19 +55,19 @@ export class UserScriptExportService {
       if (decision.outcome !== 'allow') {
         return {
           status: 'failed',
-          message: '当前会话不可导出用户脚本。'
+          message: resolveAppResourceText($r('app.string.user_script_export_not_allowed'))
         };
       }
       await this.writeSource(targetUri, this.normalizeSource(script.source));
       return {
         status: 'exported',
-        message: `已导出“${script.name}”。`,
+        message: resolveAppResourceText($r('app.string.user_script_export_done'), script.name),
         targetUri: targetUri
       };
     } catch (_error) {
       return {
         status: 'failed',
-        message: '导出脚本失败，请稍后重试。'
+        message: resolveAppResourceText($r('app.string.user_script_export_failed'))
       };
     }
   }
@@ -75,7 +76,7 @@ export class UserScriptExportService {
     const documentPicker = new picker.DocumentViewPicker(context);
     const uris = await documentPicker.save({
       newFileNames: [fileName],
-      fileSuffixChoices: ['用户脚本|.user.js']
+      fileSuffixChoices: [resolveAppResourceText($r('app.string.user_script_export_picker_label'))]
     });
     return uris.length > 0 && uris[0].length > 0 ? uris[0] : undefined;
   }

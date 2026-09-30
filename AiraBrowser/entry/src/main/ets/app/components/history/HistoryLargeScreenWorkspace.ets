@@ -1,3 +1,5 @@
+import { hasAppResourceText, resolveAppResourceText } from '../../../core/resources/AppResourceText';
+import { localizeHistoryHost } from '../../../core/resources/HistoryBookmarkDisplayText';
 import { pasteboard } from '@kit.BasicServicesKit';
 import { showCenteredAlertDialog } from '../common/CenteredDialogSurface';
 import { KeyCode } from '@kit.InputKit';
@@ -103,7 +105,7 @@ export struct HistoryLargeScreenWorkspace {
     ManagementLargeScreenShell({
       title: this.resolveWorkspaceTitle(),
       badge: this.resolveWorkspaceBadge(),
-      searchPlaceholder: '搜索历史记录',
+      searchPlaceholder: $r('app.string.history_search'),
       searchQuery: this.snapshot.query,
       searchFocusKey: HISTORY_LARGE_SCREEN_SEARCH_FOCUS_KEY,
       onSearchChange: (query: string): void => {
@@ -133,9 +135,9 @@ export struct HistoryLargeScreenWorkspace {
 
   @Builder
   private buildSidebar() {
-    ManagementLargeScreenNavSection({ title: '视图' })
+    ManagementLargeScreenNavSection({ title: $r('app.string.history_view_menu') })
     ManagementLargeScreenNavItem({
-      title: '时间线',
+      title: $r('app.string.history_timeline'),
       selected: this.snapshot.viewMode === 'timeline' && this.snapshot.site.length === 0,
       iconId: 'browser.shortcut.history',
       onSelect: (): void => {
@@ -143,7 +145,7 @@ export struct HistoryLargeScreenWorkspace {
       }
     })
     ManagementLargeScreenNavItem({
-      title: '按站点',
+      title: $r('app.string.history_by_site'),
       selected: this.snapshot.viewMode === 'sites',
       iconId: 'browser.toolbar.siteInfo',
       onSelect: (): void => {
@@ -151,7 +153,7 @@ export struct HistoryLargeScreenWorkspace {
       }
     })
     if (this.snapshot.site.length > 0) {
-      ManagementLargeScreenNavSection({ title: '当前站点' })
+      ManagementLargeScreenNavSection({ title: $r('app.string.history_current_site') })
       ManagementLargeScreenNavItem({
         title: this.snapshot.site,
         selected: true,
@@ -166,21 +168,21 @@ export struct HistoryLargeScreenWorkspace {
   private buildToolbarActions() {
     if (this.snapshot.selectedVisitIds.length > 0) {
       ManagementLargeScreenTextButton({
-        label: '打开',
+        label: $r('app.string.ui_open'),
         isEnabled: !this.snapshot.busy,
         onAction: (): void => {
           this.confirmOpenSelection();
         }
       })
       ManagementLargeScreenTextButton({
-        label: '删除',
+        label: $r('app.string.settings_delete'),
         isEnabled: !this.snapshot.busy,
         onAction: (): void => {
           this.confirmDeleteSelection();
         }
       })
       ManagementLargeScreenTextButton({
-        label: '完成',
+        label: $r('app.string.ui_done'),
         onAction: (): void => {
           this.applySnapshot(this.coordinator.clearSelection());
         }
@@ -188,7 +190,7 @@ export struct HistoryLargeScreenWorkspace {
     } else {
       if (this.snapshot.site.length > 0) {
         ManagementLargeScreenTextButton({
-          label: '返回站点',
+          label: $r('app.string.history_back_to_sites'),
           onAction: (): void => {
             void this.updateViewMode('sites');
           }
@@ -196,7 +198,7 @@ export struct HistoryLargeScreenWorkspace {
       }
       ManagementLargeScreenIconButton({
         iconId: 'browser.tabs.delete',
-        label: '清除历史记录',
+        label: $r('app.string.history_clear_all'),
         isEnabled: !this.snapshot.busy && this.resolveVisibleItemCount() > 0,
         onAction: (): void => {
           this.confirmClearAll();
@@ -288,7 +290,7 @@ export struct HistoryLargeScreenWorkspace {
         })
       }
 
-      if (this.snapshot.message.length > 0 && this.resolveVisibleItemCount() > 0) {
+      if (hasAppResourceText(this.snapshot.message) && this.resolveVisibleItemCount() > 0) {
         Text(this.snapshot.message)
           .width('100%')
           .fontSize(12)
@@ -307,7 +309,7 @@ export struct HistoryLargeScreenWorkspace {
       LoadingProgress()
         .width(28)
         .height(28)
-      Text('正在加载历史记录')
+      Text($r('app.string.history_loading'))
         .fontSize(13)
         .fontColor(this.storedSecondaryTextColor)
     }
@@ -325,11 +327,11 @@ export struct HistoryLargeScreenWorkspace {
         iconSize: 34,
         iconColor: this.storedSecondaryTextColor
       })
-      Text(this.snapshot.query.length > 0 ? '没有匹配的历史记录' : '还没有历史记录')
+      Text(this.snapshot.query.length > 0 ? $r('app.string.history_no_match') : $r('app.string.history_empty'))
         .fontSize(15)
         .fontWeight(FontWeight.Medium)
         .fontColor(this.storedPrimaryTextColor)
-      if (this.snapshot.message.length > 0) {
+      if (hasAppResourceText(this.snapshot.message)) {
         Text(this.snapshot.message)
           .constraintSize({ maxWidth: 480 })
           .fontSize(13)
@@ -492,15 +494,15 @@ export struct HistoryLargeScreenWorkspace {
 
   private confirmDeleteVisit(visit: HistoryDisplayVisit): void {
     showCenteredAlertDialog({
-      title: '删除历史记录',
-      message: `确定删除“${visit.title}”吗？`,
+      title: $r('app.string.history_delete_title'),
+      message: $r('app.string.history_delete_one', visit.title),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: (): void => {}
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.settings_delete'),
         fontColor: this.storedPrimaryTextColor,
         action: (): void => {
           void this.deleteVisit(visit.id);
@@ -515,15 +517,15 @@ export struct HistoryLargeScreenWorkspace {
       return;
     }
     showCenteredAlertDialog({
-      title: '删除历史记录',
-      message: `确定删除选中的 ${selectedCount} 项历史记录吗？`,
+      title: $r('app.string.history_delete_title'),
+      message: $r('app.string.history_delete_many', selectedCount),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: (): void => {}
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.settings_delete'),
         fontColor: this.storedPrimaryTextColor,
         action: (): void => {
           void this.deleteSelection();
@@ -534,15 +536,15 @@ export struct HistoryLargeScreenWorkspace {
 
   private confirmClearAll(): void {
     showCenteredAlertDialog({
-      title: '清除历史记录',
-      message: '确定清除全部历史记录吗？此操作无法撤销。',
+      title: $r('app.string.history_clear_all'),
+      message: $r('app.string.history_clear_confirm'),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: (): void => {}
       },
       secondaryButton: {
-        value: '清除',
+        value: $r('app.string.ui_clear'),
         fontColor: this.storedPrimaryTextColor,
         action: (): void => {
           void this.clearAll();
@@ -553,12 +555,12 @@ export struct HistoryLargeScreenWorkspace {
 
   private confirmDeleteSite(site: HistorySiteGroup): void {
     showCenteredAlertDialog({
-      title: '删除站点历史记录',
-      message: `确定删除 ${site.host} 的全部历史记录吗？`,
+      title: $r('app.string.history_delete_site_title'),
+      message: $r('app.string.history_delete_site_confirm', resolveAppResourceText(localizeHistoryHost(site.host))),
       autoCancel: true,
-      primaryButton: { value: '取消', action: (): void => {} },
+      primaryButton: { value: $r('app.string.settings_account_cancel'), action: (): void => {} },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.settings_delete'),
         fontColor: this.storedPrimaryTextColor,
         action: (): void => {
           void this.deleteSite(site.host);
@@ -577,12 +579,12 @@ export struct HistoryLargeScreenWorkspace {
       return;
     }
     showCenteredAlertDialog({
-      title: '打开多个标签页',
-      message: `即将在新标签页中打开 ${visits.length} 项历史记录，是否继续？`,
+      title: $r('app.string.history_open_many_title'),
+      message: $r('app.string.history_open_many_confirm', visits.length),
       autoCancel: true,
-      primaryButton: { value: '取消', action: (): void => {} },
+      primaryButton: { value: $r('app.string.settings_account_cancel'), action: (): void => {} },
       secondaryButton: {
-        value: '打开',
+        value: $r('app.string.ui_open'),
         action: (): void => this.openSelectionInNewTabs(visits)
       }
     });
@@ -648,17 +650,17 @@ export struct HistoryLargeScreenWorkspace {
       const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, url);
       pasteboard.getSystemPasteboard().setData(data)
         .then((): void => {
-          this.showToast('已复制链接');
+          this.showToast($r('app.string.history_link_copied'));
         })
         .catch((_error: Error): void => {
-          this.showToast('复制失败，请稍后重试。');
+          this.showToast($r('app.string.ui_copy_failed'));
         });
     } catch (_error) {
-      this.showToast('复制失败，请稍后重试。');
+      this.showToast($r('app.string.ui_copy_failed'));
     }
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,
@@ -712,24 +714,24 @@ export struct HistoryLargeScreenWorkspace {
     return false;
   }
 
-  private resolveWorkspaceTitle(): string {
+  private resolveWorkspaceTitle(): ResourceStr {
     if (this.snapshot.selectedVisitIds.length > 0) {
-      return `已选择 ${this.snapshot.selectedVisitIds.length} 项`;
+      return $r('app.string.history_selected', this.snapshot.selectedVisitIds.length);
     }
     if (this.snapshot.site.length > 0) {
-      return this.snapshot.site;
+      return localizeHistoryHost(this.snapshot.site);
     }
-    return '历史记录';
+    return $r('app.string.app_shortcut_history');
   }
 
-  private resolveWorkspaceBadge(): string {
+  private resolveWorkspaceBadge(): ResourceStr {
     if (this.snapshot.selectedVisitIds.length > 0 || this.snapshot.loading) {
       return '';
     }
     if (this.privateMode) {
-      return '常规历史';
+      return $r('app.string.history_regular');
     }
-    return `${this.resolveVisibleItemCount()} 项`;
+    return $r('app.string.history_item_count', this.resolveVisibleItemCount());
   }
 
   private scheduleRoutePublish(): void {

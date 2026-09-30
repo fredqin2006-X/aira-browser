@@ -8,7 +8,7 @@ import { SettingsSection } from '../settings/SettingsLayout';
 
 @Component
 export struct SyncAdvancedOperationsSection {
-  @Prop mergeActionLabel: string = '立即合并同步';
+  @Prop mergeActionLabel: ResourceStr = '';
   @Prop actionState: SyncAdvancedProviderActionState = {
     showHuaweiCloud: false,
     showHuaweiSpace: false,
@@ -27,7 +27,7 @@ export struct SyncAdvancedOperationsSection {
 
   build() {
     Column({ space: 16 }) {
-      SettingsSection({ title: '合并同步' }) {
+      SettingsSection({ title: $r('app.string.settings_sync_advanced_merge_section') }) {
         this.buildActionButton(this.mergeActionLabel, () => {
           this.onMerge?.();
         }, false, this.actionState.mergeRequiresPro)
@@ -47,14 +47,14 @@ export struct SyncAdvancedOperationsSection {
 
   @Builder
   private buildProviderOperationSection(remoteKind: AiraSyncRemoteKind) {
-    SettingsSection({ title: this.resolveProviderSectionTitle(remoteKind) }) {
+    SettingsSection({ title: this.viewModel.resolveProviderSectionTitle(remoteKind) }) {
       this.buildActionButton(this.viewModel.resolveProviderCheckActionLabel(remoteKind), () => {
         this.onCheckProvider?.(remoteKind);
       })
-      this.buildActionButton(`本机覆盖${this.viewModel.resolveProviderShortLabel(remoteKind)}`, () => {
+      this.buildActionButton(this.viewModel.resolvePushActionLabel(remoteKind), () => {
         this.onPushProvider?.(remoteKind);
       })
-      this.buildActionButton(`${this.viewModel.resolveProviderShortLabel(remoteKind)}覆盖本机`, () => {
+      this.buildActionButton(this.viewModel.resolvePullActionLabel(remoteKind), () => {
         this.onPullProvider?.(remoteKind);
       }, true)
     }
@@ -62,7 +62,7 @@ export struct SyncAdvancedOperationsSection {
 
   @Builder
   private buildActionButton(
-    label: string,
+    label: ResourceStr,
     action: () => void,
     isDestructive: boolean = false,
     requiresPro: boolean = false
@@ -78,11 +78,6 @@ export struct SyncAdvancedOperationsSection {
     })
   }
 
-  private resolveProviderSectionTitle(remoteKind: AiraSyncRemoteKind): string {
-    return remoteKind === 'aira_cloud'
-      ? 'Aira 云同步'
-      : this.viewModel.resolveProviderServiceName(remoteKind);
-  }
 }
 
 @Component
@@ -98,12 +93,13 @@ export struct SyncAdvancedProviderSelectionSection {
   @Prop isPrivateSession: boolean = false;
   @Prop accentColor: ResourceColor = '';
   @Prop pressedBackgroundColor: ResourceColor = '';
+  private viewModel: SyncAdvancedSettingsViewModel = new SyncAdvancedSettingsViewModel();
   onSelectProvider?: (remoteKind: AiraSyncRemoteKind) => void;
 
   build() {
     Column() {
       if (this.countConfiguredProviders() > 1) {
-        SettingsSection({ title: '当前同步方式' }) {
+        SettingsSection({ title: $r('app.string.settings_sync_advanced_current_method') }) {
           if (this.actionState.showHuaweiSpace) {
             this.buildProviderSwitchButtons('huawei_space')
           }
@@ -121,11 +117,13 @@ export struct SyncAdvancedProviderSelectionSection {
 
   @Builder
   private buildActionButton(
-    label: string,
+    label: ResourceStr,
     remoteKind: AiraSyncRemoteKind
   ) {
     SettingsActionButton({
-      title: this.activeRemoteKind === remoteKind ? `${label}（当前）` : label,
+      title: this.activeRemoteKind === remoteKind
+        ? this.viewModel.resolveCurrentSwitchActionLabel(remoteKind)
+        : label,
       emphasis: 'primary',
       isEnabled: !this.isBusy && !this.isPrivateSession && this.activeRemoteKind !== remoteKind,
       accentColor: this.accentColor,
@@ -138,7 +136,7 @@ export struct SyncAdvancedProviderSelectionSection {
 
   @Builder
   private buildProviderSwitchButtons(remoteKind: AiraSyncRemoteKind) {
-    this.buildActionButton(`改用${this.resolveProviderLabel(remoteKind)}`, remoteKind)
+    this.buildActionButton(this.viewModel.resolveSwitchActionLabel(remoteKind), remoteKind)
   }
 
   private countConfiguredProviders(): number {
@@ -153,15 +151,5 @@ export struct SyncAdvancedProviderSelectionSection {
       count++;
     }
     return count;
-  }
-
-  private resolveProviderLabel(remoteKind: AiraSyncRemoteKind): string {
-    if (remoteKind === 'aira_cloud') {
-      return 'Aira 云同步';
-    }
-    if (remoteKind === 'huawei_space') {
-      return '华为云空间';
-    }
-    return 'WebDAV';
   }
 }

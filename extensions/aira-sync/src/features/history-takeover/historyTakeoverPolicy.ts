@@ -39,10 +39,13 @@ export function resolveHistoryBrowserKind(signals: HistoryBrowserSignals = {}): 
   if (/Floorp\//i.test(ua)) return 'floorp';
   if (/Firefox\//i.test(ua)) return 'firefox';
   if (/OPR\/|Opera\//i.test(ua) || hasBrand('opera')) return 'opera';
-  if (signals.isVivaldi === true || /Vivaldi\//i.test(ua) || hasBrand('vivaldi')) return 'vivaldi';
-  if (/Edg\//i.test(ua) || hasBrand('microsoft edge')) return 'edge';
+  // Chrome and Edge are the common case. An inferred Vivaldi flag must not
+  // override either of them; only an explicit Vivaldi token can.
+  if (/Edg\/|Edge\//i.test(ua) || hasBrand('microsoft edge') || brands.some((brand) => brand === 'edge')) return 'edge';
   if (hasBrand('google chrome')) return 'chrome';
-  if (/Chrome\//i.test(ua) && signals.isBrave === false) return 'chrome';
+  if (/Vivaldi\//i.test(ua) || hasBrand('vivaldi')) return 'vivaldi';
+  if (/Chrome\//i.test(ua) && signals.isBrave !== true) return 'chrome';
+  if (signals.isVivaldi === true) return 'vivaldi';
   return 'chromium';
 }
 
@@ -110,13 +113,18 @@ export async function readInstalledHistoryBrowser(
 
 async function rememberSpecificBrowser(detected: HistoryBrowserKind): Promise<HistoryBrowserKind> {
   const remembered = await readRememberedBrowserKind();
-  const resolved = detected === 'chrome' || detected === 'chromium'
-    ? remembered ?? detected
-    : detected;
-  if (resolved !== 'chrome' && resolved !== 'chromium' && resolved !== remembered) {
-    await writeExtensionStorageRecord({ [INSTALLED_BROWSER_STORAGE_KEY]: resolved }).catch(() => undefined);
+  // Chrome and Edge must not inherit a name stored by another browser, or by an
+  // earlier uncertain read. A remembered Edge must not appear on Chrome, or the reverse.
+  if (detected === 'chrome' || detected === 'edge' || detected === 'chromium') {
+    if (remembered && remembered !== detected) {
+      await writeExtensionStorageRecord({ [INSTALLED_BROWSER_STORAGE_KEY]: '' }).catch(() => undefined);
+    }
+    return detected;
   }
-  return resolved;
+  if (detected !== remembered) {
+    await writeExtensionStorageRecord({ [INSTALLED_BROWSER_STORAGE_KEY]: detected }).catch(() => undefined);
+  }
+  return detected;
 }
 
 async function readRememberedBrowserKind(): Promise<HistoryBrowserKind | null> {
@@ -153,8 +161,9 @@ export function tabHasVivaldiMetadata(tab: object | null | undefined): boolean {
 
 export function vivaldiProbeRejectionMeansInstalled(message: string): boolean {
   const text = message.trim();
-  if (!text) return false;
-  return !/unexpected property|unknown property|invalid property|not allowed/i.test(text);
+  // Only a rejected tab id means the browser accepted vivExtData. Any other
+  // message, including an empty or localized one, is not evidence of Vivaldi.
+  return /no tab with id|no such tab|invalid tab/i.test(text);
 }
 
 export function vivaldiFromExtensionClientHints(options: {
@@ -163,13 +172,11 @@ export function vivaldiFromExtensionClientHints(options: {
   brands?: readonly string[];
   platform?: string;
 }): boolean {
-  if (options.protocol !== 'chrome-extension:') return false;
   const userAgent = options.userAgent || '';
   const brands = options.brands || [];
-  if (/Vivaldi/i.test(userAgent) || brands.some((brand) => /vivaldi/i.test(brand))) return true;
-  if (/Edg\/|OPR\/|Firefox\//i.test(userAgent)) return false;
-  if (brands.some((brand) => /brave|edge|opera/i.test(brand))) return false;
-  return brands.length === 0 && !String(options.platform || '').trim() && /Chrome\//.test(userAgent);
+  // Missing client hints are not a Vivaldi signal. Chrome extension pages can
+  // omit them too, and an uncertain read must stay Chrome.
+  return /Vivaldi/i.test(userAgent) || brands.some((brand) => /vivaldi/i.test(brand));
 }
 
 async function detectInstalledVivaldi(
@@ -178,58 +185,23 @@ async function detectInstalledVivaldi(
   isBrave: boolean,
 ): Promise<boolean> {
   const userAgent = navigatorObject?.userAgent || '';
-  if (/Vivaldi/i.test(userAgent) || brands.some((brand) => /vivaldi/i.test(brand))) return true;
-  if (isBrave || /Edg\/|OPR\/|Firefox\//i.test(userAgent)) return false;
-  if (brands.some((brand) => /brave|edge|opera/i.test(brand))) return false;
+  const normalizedBrands = brands.map((brand) => brand.toLowerCase());
+  if (/Edg\/|Edge\//i.test(userAgent) || normalizedBrands.some((brand) => brand.includes('microsoft edge') || brand === 'edge')) {
+    return false;
+  }
+  if (normalizedBrands.some((brand) => brand.includes('google chrome'))) return false;
+  if (/Vivaldi/i.test(userAgent) || normalizedBrands.some((brand) => brand.includes('vivaldi'))) return true;
+  if (isBrave || /OPR\/|Firefox\//i.test(userAgent)) return false;
+  if (normalizedBrands.some((brand) => /brave|opera/.test(brand))) return false;
+  // A Chrome user agent is Chrome. Do not probe vivExtData: Chrome can reject
+  // that call with the same "no tab" message Vivaldi uses.
+  if (/Chrome\//i.test(userAgent)) return false;
   if (await queryHasVivaldiTab()) return true;
-  const clientHints = navigatorObject?.userAgentData;
-  if (vivaldiFromExtensionClientHints({
+  return vivaldiFromExtensionClientHints({
     protocol: globalThis.location?.protocol,
     userAgent,
-    brands: clientHints?.brands?.map((item) => String(item?.brand || '')) || brands,
-    platform: clientHints?.platform,
-  })) return true;
-  if (!/Chrome\//.test(userAgent)) return false;
-  return probeVivaldiExtensionApi();
-}
-
-let vivaldiProbeResult: boolean | null = null;
-
-async function probeVivaldiExtensionApi(): Promise<boolean> {
-  if (vivaldiProbeResult !== null) return vivaldiProbeResult;
-  const tabs = (globalThis.chrome as unknown as {
-    tabs?: {
-      update?: (
-        tabId: number,
-        info: { vivExtData: string },
-        callback?: () => void,
-      ) => Promise<unknown> | void;
-    };
-  } | undefined)?.tabs;
-  if (typeof tabs?.update !== 'function') return false;
-  const update = tabs.update.bind(tabs);
-  try {
-    const result = update(-1, { vivExtData: '' });
-    if (result && typeof (result as Promise<unknown>).then === 'function') {
-      await result;
-      vivaldiProbeResult = true;
-      return true;
-    }
-  } catch (error) {
-    vivaldiProbeResult = vivaldiProbeRejectionMeansInstalled(String((error as Error)?.message || ''));
-    return vivaldiProbeResult;
-  }
-  return await new Promise((resolve) => {
-    try {
-      update(-1, { vivExtData: '' }, () => {
-        const message = String(globalThis.chrome?.runtime?.lastError?.message || '');
-        vivaldiProbeResult = vivaldiProbeRejectionMeansInstalled(message);
-        resolve(vivaldiProbeResult);
-      });
-    } catch (error) {
-      vivaldiProbeResult = vivaldiProbeRejectionMeansInstalled(String((error as Error)?.message || ''));
-      resolve(vivaldiProbeResult);
-    }
+    brands,
+    platform: navigatorObject?.userAgentData?.platform,
   });
 }
 

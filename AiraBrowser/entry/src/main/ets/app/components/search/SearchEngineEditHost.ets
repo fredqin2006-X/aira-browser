@@ -15,6 +15,7 @@ import {
   BrowserThemeViewStateFactory
 } from '../../../core/theme/BrowserThemeViewState';
 import { SearchSettingsBoundary } from '../../../core/search/SearchEngineSettingsCoordinator';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { SettingsDesktopWorkspaceHeader } from '../settings/SettingsDesktopWorkspaceHeader';
 
 /**
@@ -62,8 +63,8 @@ export struct SearchEngineEditHost {
           primaryTextColor: this.theme.textPrimary,
           iconColor: this.theme.accent,
           buttonBackgroundColor: this.theme.controlBackground,
-          primaryActionText: '保存',
-          primaryActionLabel: '保存搜索引擎',
+          primaryActionText: resolveAppResourceText($r('app.string.settings_search_engine_save')),
+          primaryActionLabel: resolveAppResourceText($r('app.string.settings_search_engine_save_label')),
           onBack: () => {
             this.onBack?.();
           },
@@ -207,16 +208,16 @@ export struct SearchEngineEditHost {
       return;
     }
     showCenteredAlertDialog({
-      title: '删除搜索引擎',
+      title: $r('app.string.settings_search_engine_delete'),
       message: this.viewModel.buildDeleteConfirmationMessage(this.editingEngine),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_search_engine_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.settings_search_engine_delete_confirm'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.deleteEngine();

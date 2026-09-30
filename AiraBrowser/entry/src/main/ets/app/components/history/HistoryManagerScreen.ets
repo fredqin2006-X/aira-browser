@@ -1,3 +1,4 @@
+import { localizeHistoryHost } from '../../../core/resources/HistoryBookmarkDisplayText';
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
 import { showCenteredAlertDialog } from '../common/CenteredDialogSurface';
 import { common } from '@kit.AbilityKit';
@@ -35,6 +36,8 @@ import {
   HistorySelectionMoreMenuItem,
   planHistorySelectionMoreMenu
 } from '../../../features/history/HistorySelectionMoreMenu';
+import { HistoryVisitContextActionId } from '../../../features/history/HistoryVisitContextAction';
+import { hasAppResourceText, resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   HistoryManagerScreenController,
   HistoryTimelineDeletionCompletion,
@@ -144,14 +147,14 @@ interface HistoryIconStateTarget {
 
 interface HistorySelectionMoreAction {
   airaIconId: AiraRenderableIconId;
-  title: string;
+  title: ResourceStr;
   action: () => void;
   enabled: boolean;
 }
 
 interface HistoryOverlayMenuState {
-  title: string;
-  message: string;
+  title: ResourceStr;
+  message: ResourceStr;
   actions: HistorySelectionMoreAction[];
   alignToTop: boolean;
   anchorRight: number;
@@ -199,8 +202,8 @@ export struct HistoryManagerScreen {
   @State viewMode: HistoryViewMode = 'timeline';
   @State isTimelineLoading: boolean = false;
   @State isSiteLoading: boolean = false;
-  @State timelineLoadError: string = '';
-  @State siteLoadError: string = '';
+  @State timelineLoadError: ResourceStr = '';
+  @State siteLoadError: ResourceStr = '';
   @State drilldownReturnQuery: string = '';
   @State drilldownReturnMode: HistoryViewMode = 'timeline';
   @State drilldownHost: string = '';
@@ -253,7 +256,7 @@ export struct HistoryManagerScreen {
       this.isSiteLoading = status.loading;
       this.siteLoadError = status.error;
     });
-    this.controller.setTimelineErrorListener((message: string): void => {
+    this.controller.setTimelineErrorListener((message: ResourceStr): void => {
       this.timelineLoadError = message;
     });
     this.controller.setTimelineLoadingListener((loading: boolean): void => {
@@ -388,7 +391,7 @@ export struct HistoryManagerScreen {
     HistoryVisitDetailsSheet({
       rows: this.visitDetailRows,
       copyLink: () => {
-        this.copyTextToClipboard(this.visitDetailUrl, '当前没有可复制的链接。', '链接已复制。');
+        this.copyTextToClipboard(this.visitDetailUrl, $r('app.string.history_copy_empty'), $r('app.string.history_link_copied_period'));
       },
       onClose: () => {
         this.visitDetailsSheetVisible = false;
@@ -431,14 +434,14 @@ export struct HistoryManagerScreen {
       this.pendingHistoryMutations === 0;
     const actions: ManagementHdsMenuAction[] = [
       {
-        label: '搜索',
+        label: $r('app.string.settings_sync_search'),
         icon: $r('sys.symbol.magnifyingglass'),
         action: () => {
           this.enterSearchMode();
         }
       },
       {
-        label: '编辑',
+        label: $r('app.string.ui_edit'),
         icon: $r('sys.symbol.checkmark_circle_fill'),
         enabled: canEdit,
         action: () => {
@@ -446,7 +449,7 @@ export struct HistoryManagerScreen {
         }
       },
       {
-        label: '按站点清理',
+        label: $r('app.string.history_cleanup_by_site'),
         icon: $r('sys.symbol.trash_fill'),
         enabled: hasHistory && !this.isTransferBusy,
         action: () => {
@@ -454,7 +457,7 @@ export struct HistoryManagerScreen {
         }
       },
       {
-        label: '导入历史',
+        label: $r('app.string.history_import'),
         icon: $r('sys.symbol.arrow_down'),
         enabled: !this.isTransferBusy,
         action: () => {
@@ -462,7 +465,7 @@ export struct HistoryManagerScreen {
         }
       },
       {
-        label: '导出历史',
+        label: $r('app.string.history_export'),
         icon: $r('sys.symbol.arrow_up'),
         enabled: hasHistory && !this.isTransferBusy,
         action: () => {
@@ -492,14 +495,14 @@ export struct HistoryManagerScreen {
 
         Column() {
           Column({ space: 0 }) {
-            if (this.overlayMenuState.title.length > 0) {
+            if (hasAppResourceText(this.overlayMenuState.title)) {
               Column({ space: 4 }) {
                 Text(this.overlayMenuState.title)
                   .width('100%')
                   .fontSize(16)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(this.storedPrimaryTextColor)
-                if (this.overlayMenuState.message.length > 0) {
+                if (hasAppResourceText(this.overlayMenuState.message)) {
                   Text(this.overlayMenuState.message)
                     .width('100%')
                     .fontSize(12)
@@ -517,7 +520,7 @@ export struct HistoryManagerScreen {
 
             ForEach(this.overlayMenuState.actions, (item: HistorySelectionMoreAction, index: number) => {
               this.buildOverlayMenuItem(item, index)
-            }, (item: HistorySelectionMoreAction) => item.title)
+            }, (item: HistorySelectionMoreAction, index: number) => `overlay-${index}-${item.airaIconId}`)
           }
           .width('100%')
           .padding({ top: HISTORY_SELECTION_MENU_VERTICAL_PADDING, bottom: HISTORY_SELECTION_MENU_VERTICAL_PADDING })
@@ -599,12 +602,12 @@ export struct HistoryManagerScreen {
 
   @Builder
   private buildHistoryLoadStatus() {
-    if (this.resolveHistoryLoadError().length > 0) {
+    if (hasAppResourceText(this.resolveHistoryLoadError())) {
       Row({ space: 8 }) {
         Text(this.resolveHistoryLoadError())
           .fontSize(14)
           .fontColor(this.storedSecondaryTextColor)
-        Button('重试')
+        Button($r('app.string.settings_sync_retry'))
           .onClick(() => this.reloadVisits())
       }
       .width('100%')
@@ -616,7 +619,7 @@ export struct HistoryManagerScreen {
         LoadingProgress()
           .width(32)
           .height(32)
-        Text('正在加载历史记录…')
+        Text($r('app.string.history_loading_ellipsis'))
           .fontSize(14)
           .fontColor(this.storedSecondaryTextColor)
       }
@@ -631,7 +634,7 @@ export struct HistoryManagerScreen {
     return this.viewMode === 'sites' ? this.isSiteLoading : this.isTimelineLoading;
   }
 
-  private resolveHistoryLoadError(): string {
+  private resolveHistoryLoadError(): ResourceStr {
     return this.viewMode === 'sites' ? this.siteLoadError : this.timelineLoadError;
   }
 
@@ -756,8 +759,8 @@ export struct HistoryManagerScreen {
         onSetVisitSelected: (visitId: string, selected: boolean) => {
           this.setVisitSelected(visitId, selected);
         },
-        onContextAction: (visit: HistoryDisplayVisit, title: string) => {
-          this.handleContextAction(visit, title);
+        onContextAction: (visit: HistoryDisplayVisit, actionId: HistoryVisitContextActionId) => {
+          this.handleContextAction(visit, actionId);
         },
         onIconLoadError: (
           target: SiteIconListTarget,
@@ -846,21 +849,21 @@ export struct HistoryManagerScreen {
       actions: [
         {
           airaIconId: 'browser.toolbar.selectAll',
-          title: '全选',
+          title: $r('app.string.ui_select_all'),
           action: () => {
             this.selectAllVisibleVisits();
           }
         },
         {
           airaIconId: 'browser.tabs.delete',
-          title: '删除',
+          title: $r('app.string.settings_delete'),
           action: () => {
             this.confirmDeleteSelectedVisits();
           }
         },
         {
           airaIconId: 'browser.toolbar.more',
-          title: '更多',
+          title: $r('app.string.settings_sync_more'),
           menu: this.buildHistorySelectionMoreMenuItems()
         }
       ]
@@ -1039,7 +1042,7 @@ export struct HistoryManagerScreen {
   }
 
   private loadNextTimelinePage(): void {
-    if (this.viewMode !== 'timeline' || !this.isActive || this.timelineLoadError.length > 0) {
+    if (this.viewMode !== 'timeline' || !this.isActive || hasAppResourceText(this.timelineLoadError)) {
       return;
     }
     this.controller.requestNextTimelinePages(
@@ -1117,7 +1120,7 @@ export struct HistoryManagerScreen {
   }
 
   private requestMoreSiteRowsIfNeeded(): void {
-    if (this.viewMode !== 'sites' || !this.isActive || this.siteLoadError.length > 0) {
+    if (this.viewMode !== 'sites' || !this.isActive || hasAppResourceText(this.siteLoadError)) {
       return;
     }
     const remainingRows = this.sites.length - this.siteVisibleEndIndex;
@@ -1131,17 +1134,30 @@ export struct HistoryManagerScreen {
     );
   }
 
-  private resolveTitle(): string {
-    const regularProfileLabel = this.isSessionEphemeral ? '常规历史 · ' : '';
+  private resolveTitle(): ResourceStr {
+    const selectedCount = this.viewMode === 'sites' ? this.selectedSiteKeys.length : this.selectedVisitIds.length;
     if (this.isSelectionMode) {
-      const selectedCount = this.viewMode === 'sites' ? this.selectedSiteKeys.length : this.selectedVisitIds.length;
-      return `${regularProfileLabel}已选 ${selectedCount} 项`;
+      return this.isSessionEphemeral
+        ? $r('app.string.history_regular_selected_short', selectedCount)
+        : $r('app.string.history_selected_short', selectedCount);
     }
     const filtered = this.searchQuery.trim().length > 0;
     if (this.viewMode === 'sites') {
-      return `${regularProfileLabel}${filtered ? `站点 · ${this.sites.length}` : '按站点'}`;
+      if (this.isSessionEphemeral) {
+        return filtered
+          ? $r('app.string.history_regular_site_count', this.sites.length)
+          : $r('app.string.history_regular_by_site');
+      }
+      return filtered ? $r('app.string.history_site_count', this.sites.length) : $r('app.string.history_by_site');
     }
-    return `${regularProfileLabel}${filtered ? `搜索结果 · ${this.visits.length}` : '历史记录'}`;
+    if (this.isSessionEphemeral) {
+      return filtered
+        ? $r('app.string.history_regular_search_count', this.visits.length)
+        : $r('app.string.history_regular_title');
+    }
+    return filtered
+      ? $r('app.string.history_search_count', this.visits.length)
+      : $r('app.string.app_shortcut_history');
   }
 
   private handleLeadingClick(): void {
@@ -1160,8 +1176,8 @@ export struct HistoryManagerScreen {
     router.back();
   }
 
-  private handleContextAction(visit: HistoryDisplayVisit, title: string): void {
-    if (title === '多选') {
+  private handleContextAction(visit: HistoryDisplayVisit, actionId: HistoryVisitContextActionId): void {
+    if (actionId === 'multi_select') {
       if (this.isSearchMode) {
         return;
       }
@@ -1170,7 +1186,7 @@ export struct HistoryManagerScreen {
       });
       return;
     }
-    if (title === '添加书签') {
+    if (actionId === 'add_bookmark') {
       if (this.isVisitBookmarked(visit.id)) {
         return;
       }
@@ -1179,61 +1195,61 @@ export struct HistoryManagerScreen {
       });
       return;
     }
-    if (title === '取消书签') {
+    if (actionId === 'remove_bookmark') {
       this.runAfterContextMenuDismiss(() => {
         this.removeVisitFromBookmarks(visit);
       });
       return;
     }
-    if (title === '添加到主页' || title === '从主页移除') {
+    if (actionId === 'add_to_home' || actionId === 'remove_from_home') {
       this.runAfterContextMenuDismiss(() => {
         this.toggleVisitHomeShortcut(visit);
       });
       return;
     }
-    if (title === '分享') {
+    if (actionId === 'share') {
       this.runAfterContextMenuDismiss(() => {
         this.shareVisit(visit);
       });
       return;
     }
-    if (title === '复制链接') {
+    if (actionId === 'copy_link') {
       this.runAfterContextMenuDismiss(() => {
         this.copyVisitUrl(visit);
       });
       return;
     }
-    if (title === '详情') {
+    if (actionId === 'details') {
       this.runAfterContextMenuDismiss(() => {
         this.showVisitDetails(visit);
       });
       return;
     }
-    if (title === '打开') {
+    if (actionId === 'open') {
       this.runAfterContextMenuDismiss(() => {
         this.openVisit(visit);
       });
       return;
     }
-    if (title === '新标签页打开') {
+    if (actionId === 'open_new_tab') {
       this.runAfterContextMenuDismiss(() => {
         this.openVisitWithIntent(visit, 'new_tab');
       });
       return;
     }
-    if (title === '后台打开') {
+    if (actionId === 'open_background') {
       this.runAfterContextMenuDismiss(() => {
         this.openVisitWithIntent(visit, 'background_tab');
       });
       return;
     }
-    if (title === '删除该站点记录') {
+    if (actionId === 'delete_site') {
       this.runAfterContextMenuDismiss(() => {
         this.confirmDeleteSiteForVisit(visit);
       });
       return;
     }
-    if (title === '删除') {
+    if (actionId === 'delete') {
       this.runAfterContextMenuDismiss(() => {
         this.confirmDeleteVisit(visit);
       });
@@ -1253,7 +1269,7 @@ export struct HistoryManagerScreen {
     try {
       this.historyFeature.authorizeNavigationForManagement(this.buildHistoryManagementBoundary());
     } catch (error) {
-      this.showDialog('无法打开', this.stringifyError(error as Error));
+      this.showDialog($r('app.string.history_cannot_open'), this.stringifyError(error as Error));
       return;
     }
     router.back({
@@ -1296,7 +1312,7 @@ export struct HistoryManagerScreen {
       return false;
     }
     if ((mode === 'timeline' ? this.isTimelineLoading : this.isSiteLoading) ||
-      this.resolveHistoryLoadError().length > 0) {
+      hasAppResourceText(this.resolveHistoryLoadError())) {
       return false;
     }
     return this.isViewModeEmpty(mode);
@@ -1370,7 +1386,7 @@ export struct HistoryManagerScreen {
   private addVisitToBookmarks(visit: HistoryDisplayVisit): void {
     if (this.bookmarkManagementFeature.hasBookmarkForUrl(visit.url)) {
       this.refreshBookmarkMarkers(this.visits);
-      this.showDialog('已添加书签', '这条历史记录已经在书签里。');
+      this.showDialog($r('app.string.history_bookmark_added'), $r('app.string.history_already_bookmarked'));
       return;
     }
     this.openBookmarkFolderSelection([visit]);
@@ -1380,14 +1396,14 @@ export struct HistoryManagerScreen {
     try {
       this.historyFeature.authorizeShareForManagement(this.buildHistoryManagementBoundary());
     } catch (error) {
-      this.showDialog('无法分享', this.stringifyError(error as Error));
+      this.showDialog($r('app.string.history_cannot_share'), this.stringifyError(error as Error));
       return;
     }
     this.webPageShareService.shareWebPage(this.getPickerContext(), {
       title: visit.title,
       url: visit.url
     }).catch((error: Error) => {
-      this.showDialog('分享失败', `分享失败：${this.stringifyError(error)}`);
+      this.showDialog($r('app.string.history_share_failed'), $r('app.string.history_share_failed_detail', this.stringifyError(error)));
     });
   }
 
@@ -1395,10 +1411,10 @@ export struct HistoryManagerScreen {
     try {
       this.historyFeature.authorizeShareForManagement(this.buildHistoryManagementBoundary());
     } catch (error) {
-      this.showDialog('无法复制', this.stringifyError(error as Error));
+      this.showDialog($r('app.string.history_cannot_copy'), this.stringifyError(error as Error));
       return;
     }
-    this.copyTextToClipboard(visit.url, '当前没有可复制的链接。', '链接已复制。');
+    this.copyTextToClipboard(visit.url, $r('app.string.history_copy_empty'), $r('app.string.history_link_copied_period'));
   }
 
   private showVisitDetails(visit: HistoryDisplayVisit): void {
@@ -1429,16 +1445,16 @@ export struct HistoryManagerScreen {
 
   private confirmDeleteSite(site: HistorySiteGroup): void {
     showCenteredAlertDialog({
-      title: '删除站点历史',
-      message: `确定删除 ${site.host} 的 ${site.visitCount} 条历史记录吗？`,
+      title: $r('app.string.history_delete_site_menu'),
+      message: $r('app.string.history_delete_site_count_confirm', resolveAppResourceText(localizeHistoryHost(site.host)), site.visitCount),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.settings_delete'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.deleteSiteVisits(site.host);
@@ -1454,29 +1470,29 @@ export struct HistoryManagerScreen {
     const deletionTransactionId = this.removeVisitsFromLocalState(removingSourceIds);
     this.removeSitesFromLocalState([host]);
     this.exitSelectionMode();
-    this.showNativeToast('站点历史已删除。');
+    this.showNativeToast($r('app.string.history_site_deleted'));
     this.historyFeature.deleteVisitsByHostForManagement(host, this.buildHistoryManagementBoundary())
       .then((removed: number) => {
         this.finishTimelineDeletion(deletionTransactionId, removed > 0);
       })
       .catch((error: Error) => {
         this.finishTimelineDeletion(deletionTransactionId, false);
-        this.showDialog('删除失败', `删除站点历史失败：${this.stringifyError(error)}`);
+        this.showDialog($r('app.string.history_delete_failed'), $r('app.string.history_delete_site_failed_detail', this.stringifyError(error)));
       });
   }
 
   private confirmDeleteVisit(visit: HistoryDisplayVisit): void {
     showCenteredAlertDialog({
-      title: '删除历史记录',
+      title: $r('app.string.history_delete_title'),
       message: this.historyViewModel.buildDeleteVisitMessage(visit),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.settings_delete'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.deleteVisit(visit.id);
@@ -1489,19 +1505,19 @@ export struct HistoryManagerScreen {
     const removingVisit = this.visits.find((visit: HistoryDisplayVisit) => visit.id === visitId);
     const deletingIds = removingVisit === undefined ? [visitId] : this.historyViewModel.getVisitSourceIds(removingVisit);
     const deletionTransactionId = this.removeVisitsFromLocalState(deletingIds);
-    this.showNativeToast('历史记录已删除。');
+    this.showNativeToast($r('app.string.history_deleted'));
     this.historyFeature.deleteVisitsByIdsForManagement(deletingIds, this.buildHistoryManagementBoundary())
       .then((removed: number) => {
         if (removed <= 0) {
           this.finishTimelineDeletion(deletionTransactionId, false);
-          this.showDialog('删除失败', '没有找到这条历史记录，可能已经被删除。');
+          this.showDialog($r('app.string.history_delete_failed'), $r('app.string.history_missing'));
           return;
         }
         this.finishTimelineDeletion(deletionTransactionId, true);
       })
       .catch((error: Error) => {
         this.finishTimelineDeletion(deletionTransactionId, false);
-        this.showDialog('删除失败', `删除失败：${this.stringifyError(error)}`);
+        this.showDialog($r('app.string.history_delete_failed'), $r('app.string.history_delete_failed_detail', this.stringifyError(error)));
       });
   }
 
@@ -1664,10 +1680,10 @@ export struct HistoryManagerScreen {
     }, this.buildManagementBoundaryInput())
       .then((result: HomeShortcutToggleResult) => {
         this.applyHomeShortcutToggleResult(result, visit);
-        this.showNativeToast(result.added ? '已添加到主页。' : '已从主页移除。');
+        this.showNativeToast(result.added ? $r('app.string.history_home_added') : $r('app.string.history_home_removed'));
       })
       .catch((error: Error) => {
-        this.showDialog('操作失败', `更新主页快捷方式失败：${this.stringifyError(error)}`);
+        this.showDialog($r('app.string.history_action_failed'), $r('app.string.history_home_failed_detail', this.stringifyError(error)));
       });
   }
 
@@ -1776,16 +1792,16 @@ export struct HistoryManagerScreen {
       return;
     }
     showCenteredAlertDialog({
-      title: '删除历史记录',
-      message: `确定删除选中的 ${selectedCount} 项历史记录吗？`,
+      title: $r('app.string.history_delete_title'),
+      message: $r('app.string.history_delete_many', selectedCount),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.settings_delete'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.deleteSelectedVisits();
@@ -1806,14 +1822,14 @@ export struct HistoryManagerScreen {
     const uniqueDeletingIds = Array.from(new Set<string>(deletingIds));
     const deletionTransactionId = this.removeVisitsFromLocalState(uniqueDeletingIds);
     this.exitSelectionMode();
-    this.showNativeToast(`已删除 ${uniqueDeletingIds.length} 条历史记录。`);
+    this.showNativeToast($r('app.string.history_deleted_count', uniqueDeletingIds.length));
     this.historyFeature.deleteVisitsByIdsForManagement(uniqueDeletingIds, this.buildHistoryManagementBoundary())
       .then((removed: number) => {
         this.finishTimelineDeletion(deletionTransactionId, removed > 0);
       })
       .catch((error: Error) => {
         this.finishTimelineDeletion(deletionTransactionId, false);
-        this.showDialog('删除失败', `删除失败：${this.stringifyError(error)}`);
+        this.showDialog($r('app.string.history_delete_failed'), $r('app.string.history_delete_failed_detail', this.stringifyError(error)));
       });
   }
 
@@ -1832,7 +1848,7 @@ export struct HistoryManagerScreen {
     const deletionTransactionId = this.removeVisitsFromLocalState(removingSourceIds);
     this.removeSitesFromLocalState(uniqueDeletingHosts);
     this.exitSelectionMode();
-    this.showNativeToast(`已删除 ${uniqueDeletingHosts.length} 个站点历史。`);
+    this.showNativeToast($r('app.string.history_deleted_sites', uniqueDeletingHosts.length));
     let deletionErrorMessage: string = '';
     const deletionTasks: Promise<number>[] = uniqueDeletingHosts.map((host: string): Promise<number> => {
       return this.historyFeature.deleteVisitsByHostForManagement(host, this.buildHistoryManagementBoundary())
@@ -1847,7 +1863,7 @@ export struct HistoryManagerScreen {
       .then((removed: number[]) => {
         if (deletionErrorMessage.length > 0) {
           this.finishTimelineDeletion(deletionTransactionId, false);
-          this.showDialog('删除失败', `删除失败：${deletionErrorMessage}`);
+          this.showDialog($r('app.string.history_delete_failed'), $r('app.string.history_delete_failed_detail', deletionErrorMessage));
           return;
         }
         this.finishTimelineDeletion(deletionTransactionId, removed.some((count: number) => count > 0));
@@ -1909,7 +1925,7 @@ export struct HistoryManagerScreen {
     if (this.viewMode === 'timeline') {
       const copyAction: HistorySelectionMoreAction = {
         airaIconId: 'browser.toolbar.copyLink',
-        title: '批量复制链接',
+        title: $r('app.string.history_batch_copy'),
         enabled: true,
         action: () => {
           this.requestCloseOverlayMenu();
@@ -1919,7 +1935,7 @@ export struct HistoryManagerScreen {
       sheets.push(copyAction);
       const bookmarkAction: HistorySelectionMoreAction = {
         airaIconId: 'browser.toolbar.addBookmark',
-        title: '批量添加到书签',
+        title: $r('app.string.history_batch_add_bookmarks'),
         enabled: true,
         action: () => {
           this.requestCloseOverlayMenu();
@@ -1930,7 +1946,7 @@ export struct HistoryManagerScreen {
       if (this.hasSelectedBookmarkedVisits()) {
         const removeBookmarkAction: HistorySelectionMoreAction = {
           airaIconId: 'browser.toolbar.addBookmark',
-          title: '批量取消书签',
+          title: $r('app.string.history_batch_remove_bookmarks'),
           enabled: true,
           action: () => {
             this.requestCloseOverlayMenu();
@@ -1941,7 +1957,7 @@ export struct HistoryManagerScreen {
       }
       const shareAction: HistorySelectionMoreAction = {
         airaIconId: 'browser.toolbar.sharePage',
-        title: '批量分享链接',
+        title: $r('app.string.history_batch_share'),
         enabled: true,
         action: () => {
           this.requestCloseOverlayMenu();
@@ -1953,7 +1969,7 @@ export struct HistoryManagerScreen {
     if (this.viewMode === 'sites') {
       const deleteSitesAction: HistorySelectionMoreAction = {
         airaIconId: 'browser.tabs.delete',
-        title: '删除所选站点历史',
+        title: $r('app.string.history_delete_selected_sites'),
         enabled: true,
         action: () => {
           this.requestCloseOverlayMenu();
@@ -1982,7 +1998,7 @@ export struct HistoryManagerScreen {
       return;
     }
     const uniqueUrls = Array.from(new Set<string>(visits.map((visit: HistoryDisplayVisit) => visit.url).filter((url: string) => url.length > 0)));
-    this.copyTextToClipboard(uniqueUrls.join('\n'), '当前没有可复制的链接。', `已复制 ${uniqueUrls.length} 条链接。`);
+    this.copyTextToClipboard(uniqueUrls.join('\n'), $r('app.string.history_copy_empty'), $r('app.string.history_copied_many', uniqueUrls.length));
   }
 
   private hasSelectedBookmarkedVisits(): boolean {
@@ -2010,7 +2026,7 @@ export struct HistoryManagerScreen {
     }
     if (pendingVisits.length === 0) {
       this.exitSelectionMode();
-      this.showNativeToast('这些链接已经都在书签里了。');
+      this.showNativeToast($r('app.string.history_already_all_bookmarked'));
       return;
     }
     this.openBookmarkFolderSelection(pendingVisits);
@@ -2019,17 +2035,17 @@ export struct HistoryManagerScreen {
   private removeVisitFromBookmarks(visit: HistoryDisplayVisit): void {
     if (!this.bookmarkManagementFeature.hasBookmarkForUrl(visit.url)) {
       this.refreshBookmarkMarkers(this.visits);
-      this.showNativeToast('这条历史记录没有书签。');
+      this.showNativeToast($r('app.string.history_not_bookmarked'));
       return;
     }
     this.unmarkVisitsBookmarkedByUrls([visit]);
     this.bookmarkManagementFeature.deleteRegularBookmarksByUrls([visit.url])
       .then((removedCount: number) => {
-        this.showNativeToast(removedCount > 0 ? '已取消书签。' : '这条历史记录没有书签。');
+        this.showNativeToast(removedCount > 0 ? $r('app.string.history_bookmark_removed') : $r('app.string.history_not_bookmarked'));
       })
       .catch((error: Error) => {
         this.refreshBookmarkMarkers(this.visits);
-        this.showDialog('取消失败', `取消书签失败：${this.stringifyError(error)}`);
+        this.showDialog($r('app.string.history_remove_bookmark_failed'), $r('app.string.history_remove_bookmark_failed_detail', this.stringifyError(error)));
       });
   }
 
@@ -2043,7 +2059,7 @@ export struct HistoryManagerScreen {
     if (bookmarkedVisits.length === 0) {
       this.exitSelectionMode();
       this.refreshBookmarkMarkers(this.visits);
-      this.showNativeToast('选中的链接没有书签。');
+      this.showNativeToast($r('app.string.history_selected_not_bookmarked'));
       return;
     }
     this.unmarkVisitsBookmarkedByUrls(bookmarkedVisits);
@@ -2056,11 +2072,11 @@ export struct HistoryManagerScreen {
           sharedBookmarkFolderSelectionPreparationCoordinator.invalidate('regular');
           void sharedBookmarkFolderSelectionPreparationCoordinator.prepare('regular', true);
         }
-        this.showNativeToast(removedCount > 0 ? `已取消 ${removedCount} 个书签。` : '选中的链接没有书签。');
+        this.showNativeToast(removedCount > 0 ? $r('app.string.history_removed_bookmark_count', removedCount) : $r('app.string.history_selected_not_bookmarked'));
       })
       .catch((error: Error) => {
         this.refreshBookmarkMarkers(this.visits);
-        this.showDialog('取消失败', `批量取消书签失败：${this.stringifyError(error)}`);
+        this.showDialog($r('app.string.history_remove_bookmark_failed'), $r('app.string.history_batch_remove_failed_detail', this.stringifyError(error)));
       });
   }
 
@@ -2082,11 +2098,11 @@ export struct HistoryManagerScreen {
         }
         this.markVisitsBookmarked(visits);
         const addedCount = bookmarks.length;
-        this.showNativeToast(addedCount > 0 ? `已添加 ${addedCount} 个书签。` : '这些链接已经都在书签里了。');
+        this.showNativeToast(addedCount > 0 ? $r('app.string.history_added_bookmark_count', addedCount) : $r('app.string.history_already_all_bookmarked'));
       })
       .catch((error: Error) => {
         this.refreshBookmarkMarkers(this.visits);
-        this.showDialog('添加失败', `批量添加书签失败：${this.stringifyError(error)}`);
+        this.showDialog($r('app.string.history_batch_add_failed'), $r('app.string.history_batch_add_failed_detail', this.stringifyError(error)));
       });
   }
 
@@ -2157,7 +2173,7 @@ export struct HistoryManagerScreen {
         this.bookmarkFolderSelectionVisible = false;
         this.bookmarkFolderSelectionOptions = [];
         this.pendingBookmarkVisits = [];
-        this.showDialog('无法添加书签', '当前没有可保存书签的文件夹。');
+        this.showDialog($r('app.string.history_cannot_add_bookmark'), $r('app.string.history_no_bookmark_folder'));
         return;
       }
       this.bookmarkFolderSelectionOptions = options;
@@ -2168,7 +2184,7 @@ export struct HistoryManagerScreen {
         return;
       }
       this.bookmarkFolderSelectionPreparing = false;
-      this.showDialog('加载失败', `文件夹加载失败：${this.stringifyError(error as Error)}`);
+      this.showDialog($r('app.string.history_load_failed'), $r('app.string.history_folder_load_failed_detail', this.stringifyError(error as Error)));
     }
   }
 
@@ -2197,14 +2213,19 @@ export struct HistoryManagerScreen {
     try {
       this.historyFeature.authorizeShareForManagement(this.buildHistoryManagementBoundary());
     } catch (error) {
-      this.showDialog('无法分享', this.stringifyError(error as Error));
+      this.showDialog($r('app.string.history_cannot_share'), this.stringifyError(error as Error));
       return;
     }
     const uniqueVisits = this.deduplicateDisplayVisitsByUrl(visits);
-    const summaryTitle = uniqueVisits.length === 1 ? uniqueVisits[0].title : `分享 ${uniqueVisits.length} 条历史链接`;
+    const summaryTitle = uniqueVisits.length === 1
+      ? uniqueVisits[0].title
+      : resolveAppResourceText($r('app.string.history_share_many'), uniqueVisits.length);
     const summaryUrls = uniqueVisits.map((visit: HistoryDisplayVisit) => visit.url).join('\n');
     this.webPageShareService.sharePlainText(this.getPickerContext(), summaryTitle, summaryUrls).catch((error: Error) => {
-      this.showDialog('分享失败', `批量分享失败：${this.stringifyError(error)}`);
+      this.showDialog(
+        $r('app.string.history_share_failed'),
+        $r('app.string.history_batch_share_failed_detail', this.stringifyError(error))
+      );
     });
   }
 
@@ -2290,7 +2311,7 @@ export struct HistoryManagerScreen {
     // Selection can start before the first site page arrives.
     this.isSelectionMode = true;
     this.contextMenuVisitId = '';
-    this.showNativeToast('选择站点后点删除。');
+    this.showNativeToast($r('app.string.history_select_sites_then_delete'));
   }
 
   private isViewModeEmpty(mode: HistoryViewMode): boolean {
@@ -2300,18 +2321,18 @@ export struct HistoryManagerScreen {
     return this.visits.length === 0;
   }
 
-  private getEmptyTitle(mode: HistoryViewMode = this.viewMode): string {
+  private getEmptyTitle(mode: HistoryViewMode = this.viewMode): ResourceStr {
     if (this.isSearchMode) {
-      return this.searchQuery.trim().length > 0 ? '没有匹配的历史记录' : '搜索历史记录';
+      return this.searchQuery.trim().length > 0 ? $r('app.string.history_no_match') : $r('app.string.history_search');
     }
-    return this.searchQuery.trim().length > 0 ? '没有匹配的历史记录' : '还没有历史记录';
+    return this.searchQuery.trim().length > 0 ? $r('app.string.history_no_match') : $r('app.string.history_empty');
   }
 
-  private getEmptyMessage(mode: HistoryViewMode = this.viewMode): string {
+  private getEmptyMessage(mode: HistoryViewMode = this.viewMode): ResourceStr {
     if (this.isSearchMode) {
-      return this.searchQuery.trim().length > 0 ? '换个关键词试试。' : '输入标题或网址开始搜索';
+      return this.searchQuery.trim().length > 0 ? $r('app.string.history_try_another') : $r('app.string.history_search_hint');
     }
-    return this.searchQuery.trim().length > 0 ? '换个关键词试试。' : '从搜索栏打开网页后，这里会自动记录。';
+    return this.searchQuery.trim().length > 0 ? $r('app.string.history_try_another') : $r('app.string.history_empty_message');
   }
 
   private switchViewMode(mode: HistoryViewMode): void {
@@ -2421,7 +2442,7 @@ export struct HistoryManagerScreen {
         this.reloadVisits();
       })
       .catch((error: Error) => {
-        this.showDialog('生成压测历史失败', `生成 5 万条历史记录失败：${this.stringifyError(error)}`);
+        this.showDialog($r('app.string.history_stress_failed'), $r('app.string.history_stress_failed_detail', this.stringifyError(error)));
       })
       .finally(() => {
         this.isSeedingStressHistory = false;
@@ -2434,16 +2455,16 @@ export struct HistoryManagerScreen {
       return;
     }
     this.isTransferBusy = true;
-    let importStage = '打开文件选择器';
+    let importStage = $r('app.string.history_import_stage_picker');
     this.pickOpenUri()
       .then((uri: string | undefined) => {
         if (uri === undefined) {
           return Promise.resolve(undefined);
         }
-        importStage = '读取文件';
+        importStage = $r('app.string.history_import_stage_read');
         return this.readTextFromUri(uri)
           .then((payload: string) => {
-            importStage = '写入历史';
+            importStage = $r('app.string.history_import_stage_write');
             return this.historyFeature.importVisitsForManagement(payload, this.buildHistoryManagementBoundary());
           });
       })
@@ -2452,10 +2473,10 @@ export struct HistoryManagerScreen {
           return;
         }
         this.reloadVisits();
-        this.showDialog('导入成功', `已导入 ${result.importedCount} 条历史记录，跳过 ${result.skippedCount} 条重复记录。`);
+        this.showDialog($r('app.string.history_import_success'), $r('app.string.history_import_summary', result.importedCount, result.skippedCount));
       })
       .catch((error: Error) => {
-        this.showDialog('导入失败', `导入失败（${importStage}）：${this.stringifyError(error)}`);
+        this.showDialog($r('app.string.history_import_failed'), $r('app.string.history_import_failed_detail', resolveAppResourceText(importStage), this.stringifyError(error)));
       })
       .finally(() => {
         this.isTransferBusy = false;
@@ -2475,11 +2496,11 @@ export struct HistoryManagerScreen {
         }
         const payload = this.historyFeature.exportVisitsForManagement(this.buildHistoryManagementBoundary());
         return this.writeTextToUri(uri, payload).then(() => {
-          this.showDialog('导出成功', '历史记录已导出。');
+          this.showDialog($r('app.string.history_export_success'), $r('app.string.history_export_done'));
         });
       })
       .catch((error: Error) => {
-        this.showDialog('导出失败', `导出失败：${this.stringifyError(error)}`);
+        this.showDialog($r('app.string.history_export_failed'), $r('app.string.history_export_failed_detail', this.stringifyError(error)));
       })
       .finally(() => {
         this.isTransferBusy = false;
@@ -2743,7 +2764,7 @@ export struct HistoryManagerScreen {
     return normalized < 10 ? `0${normalized}` : String(normalized);
   }
 
-  private copyTextToClipboard(value: string, emptyMessage: string, successMessage: string): void {
+  private copyTextToClipboard(value: string, emptyMessage: ResourceStr, successMessage: ResourceStr): void {
     if (value.length === 0) {
       this.showNativeToast(emptyMessage);
       return;
@@ -2755,14 +2776,14 @@ export struct HistoryManagerScreen {
           this.showNativeToast(successMessage);
         })
         .catch((_error: Error) => {
-          this.showNativeToast('复制失败，请稍后重试。');
+          this.showNativeToast($r('app.string.ui_copy_failed'));
         });
     } catch (_error) {
-      this.showNativeToast('复制失败，请稍后重试。');
+      this.showNativeToast($r('app.string.ui_copy_failed'));
     }
   }
 
-  private showNativeToast(message: string): void {
+  private showNativeToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,
@@ -2772,13 +2793,13 @@ export struct HistoryManagerScreen {
     }
   }
 
-  private showDialog(title: string, message: string): void {
+  private showDialog(title: ResourceStr, message: ResourceStr): void {
     showCenteredAlertDialog({
       title: title,
       message: message,
       autoCancel: true,
       confirm: {
-        value: '知道了',
+        value: $r('app.string.settings_pro_got_it'),
         action: () => {
         }
       }
@@ -2800,6 +2821,6 @@ export struct HistoryManagerScreen {
       return error.message;
     }
     const serialized = JSON.stringify(error);
-    return serialized.length > 0 ? serialized : '未知错误';
+    return serialized.length > 0 ? serialized : resolveAppResourceText($r('app.string.ui_unknown_error'));
   }
 }

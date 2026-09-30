@@ -1,6 +1,6 @@
 export const AIRA_LOCAL_TEST_MODE: boolean = false;
-export const AIRA_LOCAL_TEST_UID: string = '';
-export const AIRA_LOCAL_TEST_AUTH_TOKEN: string = '';
+export const AIRA_LOCAL_TEST_UID: string = "";
+export const AIRA_LOCAL_TEST_AUTH_TOKEN: string = "";
 
 export interface AiraLocalTestIdentity {
   uid: string;

@@ -46,6 +46,7 @@ import {
   createLocalBookmarkId,
   DEFAULT_ACTOR,
   DEFAULT_DEVICE_ID,
+  defaultBookmarkTitle,
   InMemoryBookmarkRepository,
   isBookmarkRootNodeId,
   applyLocalBookmarkUpdate,
@@ -895,7 +896,7 @@ export class RdbBookmarkRepository implements BookmarkRepository {
     const node = buildLocalBookmarkNode(
       createLocalBookmarkId(command.type, scope),
       command.type,
-      sanitizeBookmarkTitle(command.title, command.type === 'folder' ? '新文件夹' : '新书签'),
+      sanitizeBookmarkTitle(command.title, defaultBookmarkTitle(command.type)),
       parentId,
       this.resolveNextPosition(parentId),
       now,

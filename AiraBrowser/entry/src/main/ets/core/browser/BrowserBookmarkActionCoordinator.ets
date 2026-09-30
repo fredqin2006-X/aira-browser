@@ -20,9 +20,9 @@ export type BrowserBookmarkActionSource = 'current_page' | 'reader_article' | 'c
 
 export interface BrowserBookmarkActionState {
   hasBookmark: boolean;
-  label: string;
+  label: ResourceStr;
   icon: Resource;
-  disabledMessage: string;
+  disabledMessage: ResourceStr;
   bookmarkId?: string;
 }
 
@@ -58,8 +58,8 @@ export interface BrowserBookmarkFolderSelectionAction {
 
 export interface BrowserBookmarkActionShell {
   applySnapshot: (snapshot: BrowserBookmarkActionSessionSnapshot) => void;
-  showToast: (message: string) => void;
-  presentPersistentWriteBlocked: (helperText: string, summaryLine: string) => void;
+  showToast: (message: ResourceStr) => void;
+  presentPersistentWriteBlocked: (helperText: ResourceStr, summaryLine: string) => void;
   confirmRemove: (confirmation: BrowserBookmarkRemoveConfirmation) => void;
   refreshHomeShortcuts: () => void;
 }
@@ -114,7 +114,7 @@ export class BrowserBookmarkActionCoordinator {
     }
     return {
       hasBookmark: true,
-      label: '取消书签',
+      label: $r('app.string.bottom_panel_remove_bookmark'),
       icon: $r('sys.symbol.bookmark_fill'),
       disabledMessage: disabledMessage,
       bookmarkId: bookmark.id
@@ -243,9 +243,11 @@ export class BrowserBookmarkActionCoordinator {
       if (deleted) {
         this.refreshBookmarkSurfaces(confirmation.scope);
       }
-      this.shell.showToast(deleted ? '已取消书签。' : '没有找到这个书签。');
+      this.shell.showToast(deleted ?
+        $r('app.string.bottom_panel_bookmark_removed') :
+        $r('app.string.bottom_panel_bookmark_missing'));
     } catch (_error) {
-      this.shell.showToast('取消书签失败，请稍后重试。');
+      this.shell.showToast($r('app.string.bottom_panel_bookmark_remove_failed'));
     }
   }
 
@@ -278,15 +280,18 @@ export class BrowserBookmarkActionCoordinator {
           });
           this.shell.refreshHomeShortcuts();
           this.shell.showToast(result.added ?
-            '已加入书签，并添加到主页。' : '已加入书签，主页已有这个快捷方式。');
+            $r('app.string.bottom_panel_bookmark_added_home') :
+            $r('app.string.bottom_panel_bookmark_added_home_exists'));
         } catch (_error) {
-          this.shell.showToast('已加入书签，但添加到主页失败。');
+          this.shell.showToast($r('app.string.bottom_panel_bookmark_added_home_failed'));
         }
         return;
       }
-      this.shell.showToast(scope === 'private' ? '已加入隐私书签。' : '已加入书签。');
+      this.shell.showToast(scope === 'private' ?
+        $r('app.string.bottom_panel_bookmark_added_private') :
+        $r('app.string.bottom_panel_bookmark_added'));
     } catch (_error) {
-      this.shell.showToast('加入书签失败，请稍后重试。');
+      this.shell.showToast($r('app.string.bottom_panel_bookmark_add_failed'));
     }
   }
 
@@ -303,7 +308,7 @@ export class BrowserBookmarkActionCoordinator {
       );
       if (!privateBookmarkPolicy.persistentWriteAllowed) {
         this.shell.presentPersistentWriteBlocked(
-          '当前会话不可写入隐私书签。',
+          $r('app.string.bookmark_action_private_blocked'),
           privateBookmarkPolicy.summaryLine
         );
       }
@@ -317,7 +322,7 @@ export class BrowserBookmarkActionCoordinator {
     });
     if (decision.outcome !== 'allow') {
       this.shell.presentPersistentWriteBlocked(
-        '当前私密会话不可直接写入常规书签。',
+        $r('app.string.bookmark_action_regular_blocked'),
         decision.diagnosticSummary
       );
     }
@@ -407,17 +412,21 @@ export class BrowserBookmarkActionCoordinator {
     return this.scopeService.resolveScopeForBoundary(target.dataScope, target.privacyMode);
   }
 
-  private buildDisabledMessage(target: BrowserBookmarkActionTarget, scope: BookmarkStorageScope): string {
+  private buildDisabledMessage(target: BrowserBookmarkActionTarget, scope: BookmarkStorageScope): ResourceStr {
     if (target.source === 'reader_article') {
-      return scope === 'private' ? '当前文章链接无法加入隐私书签' : '当前文章链接不可用';
+      return scope === 'private' ?
+        $r('app.string.bottom_panel_article_private_bookmark_unavailable') :
+        $r('app.string.bottom_panel_article_link_unavailable');
     }
-    return scope === 'private' ? '当前页面无法加入隐私书签' : '当前页面无法收藏';
+    return scope === 'private' ?
+      $r('app.string.bottom_panel_private_bookmark_unavailable') :
+      $r('app.string.bottom_panel_bookmark_unavailable');
   }
 
-  private buildAddState(disabledMessage: string): BrowserBookmarkActionState {
+  private buildAddState(disabledMessage: ResourceStr): BrowserBookmarkActionState {
     return {
       hasBookmark: false,
-      label: '添加书签',
+      label: $r('app.string.bottom_panel_action_bookmark'),
       icon: $r('sys.symbol.bookmark'),
       disabledMessage: disabledMessage
     };

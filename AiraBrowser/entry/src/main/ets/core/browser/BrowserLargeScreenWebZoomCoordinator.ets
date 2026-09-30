@@ -48,7 +48,7 @@ export interface BrowserLargeScreenWebZoomSnapshot {
   canIncrease: boolean;
   available: boolean;
   shortcutNotificationVisible: boolean;
-  shortcutNotificationLabel: string;
+  shortcutNotificationLabel: ResourceStr;
   revision: number;
 }
 
@@ -106,7 +106,7 @@ export class BrowserLargeScreenWebZoomCoordinator {
   private debugSequence: number = 0;
   private shortcutNotificationTabId: string = '';
   private shortcutNotificationVisible: boolean = false;
-  private shortcutNotificationLabel: string = '';
+  private shortcutNotificationLabel: ResourceStr = '';
   private shortcutNotificationDismissTimer: number = -1;
   private shortcutNotificationGeneration: number = 0;
   private scaleObservationGeneration: number = 0;
@@ -143,7 +143,7 @@ export class BrowserLargeScreenWebZoomCoordinator {
     if (result.applied) {
       this.presentShortcutNotification(
         result.snapshot.tabId,
-        this.resolveShortcutNotificationLabel(action)
+        action
       );
     }
     return {
@@ -351,17 +351,18 @@ export class BrowserLargeScreenWebZoomCoordinator {
     };
   }
 
-  private resolveShortcutNotificationLabel(action: BrowserLargeScreenWebZoomAction): string {
+  private resolveShortcutNotificationLabel(action: BrowserLargeScreenWebZoomAction): ResourceStr {
     if (action === 'increase') {
-      return '网页已放大';
+      return $r('app.string.web_text_zoom_notice_increased');
     }
     if (action === 'decrease') {
-      return '网页已缩小';
+      return $r('app.string.web_text_zoom_notice_decreased');
     }
-    return '网页已恢复默认缩放';
+    return $r('app.string.web_text_zoom_notice_reset');
   }
 
-  private presentShortcutNotification(tabId: string, label: string): void {
+  private presentShortcutNotification(tabId: string, action: BrowserLargeScreenWebZoomAction): void {
+    const label = this.resolveShortcutNotificationLabel(action);
     this.clearShortcutNotificationDismissTimer();
     this.shortcutNotificationTabId = tabId;
     this.shortcutNotificationVisible = true;
@@ -372,10 +373,10 @@ export class BrowserLargeScreenWebZoomCoordinator {
     hilog.info(
       WEB_ZOOM_DIAG_DOMAIN,
       WEB_ZOOM_DIAG_TAG,
-      '%{public}s notification-present tab=%{public}s label=%{public}s revision=%{public}d',
+      '%{public}s notification-present tab=%{public}s action=%{public}s revision=%{public}d',
       WEB_ZOOM_DIAG_PREFIX,
       tabId,
-      label,
+      action,
       this.revision
     );
     this.publishRevision();

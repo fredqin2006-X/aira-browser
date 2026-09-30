@@ -69,7 +69,7 @@ export struct SettingsAppProxyNoticeBanner {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
 
         Button() {
-          Text('设置')
+          Text($r('app.string.app_shortcut_settings'))
             .fontSize(13)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.resolveAccentColor())

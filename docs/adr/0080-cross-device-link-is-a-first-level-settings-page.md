@@ -20,8 +20,8 @@ on phone and touch two-pane where there is no pane. The page is deliberately a *
   availability is the existing `aira_cloud` distribution capability. The page never activates sync, never toggles a
   provider, and never keeps its own copy of sync state — `SyncExperienceCoordinator` remains the single state-transition
   owner (ADR 0048), and the frozen Aira-sync contract is untouched.
-- 数据同步 and 跨设备互联 are two channels with two owners, and the page keeps them apart. This page owns the
-  跨设备互联 switch (tab handoff and page push) through `CrossDeviceTabPresenceCoordinator`, whose preference is scoped
+- 数据同步 and 与电脑互联 are two channels with two owners, and the page keeps them apart. This page owns the
+  与电脑互联 switch (tab handoff and page push) through `CrossDeviceTabPresenceCoordinator`, whose preference is scoped
   to the paired account or server instance; turning it off stops publishing, stops the heartbeat and withdraws this
   phone's snapshot without touching any sync state. Data sync is only a 同步设置 row that carries the sync owner's own
   goal label and deep-links into 同步设置. The page deliberately carries no second data-sync master switch: pausing
@@ -37,13 +37,18 @@ on phone and touch two-pane where there is no pane. The page is deliberately a *
   never be wrong about (the user is holding it), so it is read from the presence owner's own installation record and
   rendered as a static row marked 当前设备; the computers follow, and 添加设备 — the QR pairing handshake — is appended
   last in every state so pairing is never hidden behind an empty list.
-- The page opens on the account itself rather than on a status block: this phone on the left, the account avatar in the
-  middle, the computers on the right, with the nickname over the account id underneath. The identity is the sync owner's
-  own `resolveAiraHuaweiAccountIdentity` (`displayName`, `uid`, `photoUrl`), falling back to the locally picked avatar
-  when the account has none, so the header reports who is signed in without keeping a second copy of account state. The
-  computer side and its connector light up only while the presence owner reports at least one online computer; a signed
-  out header says 未登录 and guides instead of printing an id, and an account that never returned a nickname falls back to
-  a plain label instead of inventing one.
+Amended 2026-09-30: the header is the orbit graphic below, not the phone-account-computer row. The graphic is a
+fixed background: the list starts beneath it, and scrolling up covers the rings. The rings are neutral and quiet in both
+themes, with no hue of their own. While the page is open the marks revolve around the logo on their own rings.
+The inner ring is fastest and the outer ring is slowest. There is no entrance sweep; they start on the reviewed pose.
+The top of the graphic fades into the live page background, so light, dark, and any other palette dissolve into their
+own page color rather than a fixed wash. The center logo is smaller than the first reviewed size, and the list start
+follows the higher center.
+- The page opens on the orbit graphic, not a status block and not the old phone-account-computer row. Three full rings
+  share the Aira logo as their center. The other browser marks sit on those rings. The lower half of each ring fades out
+  instead of being clipped. The top fades into the page background of the active theme. Account identity is still the sync owner's own `resolveAiraHuaweiAccountIdentity`
+  (`displayName`, `uid`, `photoUrl`), so the page does not keep a second copy of account state; it is no longer the
+  header. A signed-out account still resolves to 未登录 rather than an invented name.
 - The page is provider-aware, because the desktop link is not the same thing on every mode. Aira Cloud and a self-hosted
   server carry the whole link; WebDAV carries bookmarks only; Huawei Space has no desktop browser side at all. The active
   mode is read from the sync owner's own goal options, never guessed, and a mode that cannot carry everything the page
@@ -119,6 +124,12 @@ Entry is gated by the same optional-service check as 同步, so a basic service 
   bar and back button hidden and `onExit` returning to the destination list.
 - The page owns no timers and no persistence: it reloads on appear and on the existing `SyncSettingsRefreshSignal`, and
   reflects whatever the sync and presence owners report, including their own empty and error messages.
+- Amended 2026-09-30: the first time this device opens the page, a lesson plays the two computer-link clips. On a
+  phone it is the system's tallest bottom sheet, edge to edge, with the clip flush to the top. It does not turn the
+  page into a tutorial. The first step's button is 下一个. Only the second step's primary button opens the existing
+  互联教程 page. 不再提示, back, dragging the sheet down, and leaving the page close it without opening the recipe.
+  A tap on the dimmed page does not. The lesson is spent once it is shown, in its own preferences store, and is not a
+  fact of `CrossDeviceLinkViewModel`.
 - The device list stays ephemeral by construction: it shows only what the presence owner currently reports as online.
 
 ## Verification

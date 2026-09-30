@@ -16,29 +16,29 @@ import { AiraRenderableIconId } from '../resources/GeneratedAiraIconCatalog';
 
 export interface AiraProBenefitDefinition {
   id: string;
-  title: string;
+  title: ResourceStr;
   iconId: AiraRenderableIconId;
 }
 
 export const AIRA_PRO_BENEFITS: AiraProBenefitDefinition[] = [
   {
     id: 'cross_system_bookmark_sync',
-    title: 'Aira 云书签同步',
+    title: $r('app.string.settings_pro_benefit_bookmarks'),
     iconId: 'membership.benefit.sync'
   },
   {
     id: 'page_handoff',
-    title: 'Aira 云网页接力',
+    title: $r('app.string.settings_pro_benefit_handoff'),
     iconId: 'browser.toolbar.sendToDesktop'
   },
   {
     id: 'cross_device_tabs',
-    title: 'Aira 云跨设备标签页',
+    title: $r('app.string.settings_pro_benefit_tabs'),
     iconId: 'browser.toolbar.tabs'
   },
   {
     id: 'aira_cloud_history',
-    title: 'Aira 云历史同步',
+    title: $r('app.string.settings_pro_benefit_history'),
     iconId: 'membership.benefit.sync'
   }
 ];
@@ -56,14 +56,14 @@ export type AiraProReachableDeviceGlyph = 'chrome' | 'edge' | 'firefox';
 
 export interface AiraProReachableDeviceDefinition {
   id: string;
-  label: string;
+  label: ResourceStr;
   glyph: AiraProReachableDeviceGlyph;
 }
 
 export const AIRA_PRO_REACHABLE_DEVICES: AiraProReachableDeviceDefinition[] = [
   // Browser extensions, not desktop apps: Aira itself only ships for
   // HarmonyOS, and the desktop side is Aira-sync.
-  { id: 'chrome', label: 'Chrome 扩展', glyph: 'chrome' },
-  { id: 'edge', label: 'Edge 扩展', glyph: 'edge' },
-  { id: 'firefox', label: 'Firefox 扩展', glyph: 'firefox' }
+  { id: 'chrome', label: $r('app.string.settings_pro_device_chrome'), glyph: 'chrome' },
+  { id: 'edge', label: $r('app.string.settings_pro_device_edge'), glyph: 'edge' },
+  { id: 'firefox', label: $r('app.string.settings_pro_device_firefox'), glyph: 'firefox' }
 ];

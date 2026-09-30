@@ -1,4 +1,5 @@
 import { Want } from '@kit.AbilityKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 const WANT_ACTION_VIEW_DATA: string = 'ohos.want.action.viewData';
 const PARAMS_STREAM: string = 'ability.params.stream';
@@ -18,7 +19,7 @@ export class UserScriptExternalImportService {
   resolveSourceUri(want: Want): string {
     const uri = this.resolveCandidateUri(want);
     if (uri.length === 0) {
-      throw new UserScriptExternalImportSourceError('Aira 只接收 .user.js 用户脚本文件。');
+      throw new UserScriptExternalImportSourceError(resolveAppResourceText($r('app.string.user_script_import_only_user_js')));
     }
     return uri;
   }
@@ -28,9 +29,9 @@ export class UserScriptExternalImportService {
       return error.message;
     }
     if (error instanceof Error && error.message.trim().length > 0) {
-      return `无法导入用户脚本：${error.message.trim()}`;
+      return resolveAppResourceText($r('app.string.user_script_import_failed_with_reason'), error.message.trim());
     }
-    return '无法导入用户脚本，请确认文件完整且格式正确。';
+    return resolveAppResourceText($r('app.string.user_script_import_failed_generic'));
   }
 
   private resolveCandidateUri(want: Want): string {

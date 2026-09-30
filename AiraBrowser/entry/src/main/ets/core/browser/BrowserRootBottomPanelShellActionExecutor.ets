@@ -11,7 +11,7 @@ export interface BrowserRootBottomPanelShellActionHost {
   openSiteReport: () => void;
   openTabsOverview: () => void;
   requestBrowserBack: () => void;
-  showActionRejection: (message: string) => void;
+  showActionRejection: (message: ResourceStr) => void;
 }
 
 export class BrowserRootBottomPanelShellActionExecutor {

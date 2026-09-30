@@ -31,6 +31,7 @@ import {
   BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY,
   BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY
 } from '../../../core/theme/BrowserThemeStorageKeys';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 const USER_SCRIPT_PAGE_ACTIONS_FOOTER_SPACE: number = 68;
 
@@ -48,7 +49,7 @@ export struct UserScriptPageActionsSheet {
   @State private sheetScrollOffset: number = 0;
   @Prop state: UserScriptPageActionsState = {
     url: '',
-    message: '打开网页后会显示当前页脚本菜单。',
+    message: resolveAppResourceText($r('app.string.user_script_page_actions_initial')),
     hasPage: false,
     hasMatchingScripts: false,
     hasMenuCommands: false,
@@ -117,7 +118,7 @@ export struct UserScriptPageActionsSheet {
         icon: $r('sys.symbol.xmark'),
         iconSize: BROWSER_FEATURE_SHEET_HEADER_ICON_SIZE,
         buttonSize: BROWSER_FEATURE_SHEET_HEADER_BUTTON_SIZE,
-        accessibilityLabel: '关闭当前页脚本',
+        accessibilityLabel: $r('app.string.user_script_close_page_actions'),
         immersiveMaterialEnabled: true,
         onAction: (): void => {
           this.onAction({ type: 'dismiss_page_actions' });
@@ -216,7 +217,7 @@ export struct UserScriptPageActionsSheet {
   }
 
   @Builder
-  private buildSectionTitle(title: string) {
+  private buildSectionTitle(title: ResourceStr) {
     Text(title)
       .width('100%')
       .fontSize(13)
@@ -231,7 +232,7 @@ export struct UserScriptPageActionsSheet {
       title: this.resolveHeaderTitle(),
       titleColor: this.storedPrimaryTextColor,
       showLeadingButton: this.isScriptDetailVisible(),
-      leadingAccessibilityLabel: '返回当前页脚本',
+      leadingAccessibilityLabel: $r('app.string.user_script_back_page_script'),
       trailingVisible: !this.isScriptDetailVisible(),
       trailing: () => {
         this.buildPhoneHeaderTrailingAction()
@@ -248,7 +249,7 @@ export struct UserScriptPageActionsSheet {
       icon: $r('sys.symbol.arrow_clockwise'),
       iconSize: BROWSER_FEATURE_SHEET_HEADER_ICON_SIZE,
       buttonSize: BROWSER_FEATURE_SHEET_HEADER_BUTTON_SIZE,
-      accessibilityLabel: '刷新',
+      accessibilityLabel: $r('app.string.user_script_action_refresh'),
       immersiveMaterialEnabled: true,
       onAction: () => {
         this.onAction({ type: 'refresh_page_actions' });
@@ -262,7 +263,7 @@ export struct UserScriptPageActionsSheet {
       if (this.isScriptDetailVisible()) {
         BrowserSheetIconButton({
           icon: $r('sys.symbol.chevron_left'),
-          accessibilityLabel: '返回当前页脚本',
+          accessibilityLabel: $r('app.string.user_script_back_page_script'),
           onAction: () => {
             this.closeScriptDetail();
           }
@@ -289,7 +290,7 @@ export struct UserScriptPageActionsSheet {
       if (!this.isScriptDetailVisible()) {
         BrowserSheetIconButton({
           icon: $r('sys.symbol.arrow_clockwise'),
-          accessibilityLabel: '刷新',
+          accessibilityLabel: $r('app.string.user_script_action_refresh'),
           onAction: () => {
             this.onAction({ type: 'refresh_page_actions' });
           }
@@ -299,7 +300,7 @@ export struct UserScriptPageActionsSheet {
       BrowserSheetIconButton({
         icon: $r('sys.symbol.xmark'),
         iconSize: 17,
-        accessibilityLabel: '关闭',
+        accessibilityLabel: $r('app.string.user_script_action_close'),
         onAction: () => {
           this.onAction({ type: 'dismiss_page_actions' });
         }
@@ -327,7 +328,7 @@ export struct UserScriptPageActionsSheet {
   private buildSelectedScriptCommands() {
     if (this.resolveSelectedCommands().length > 0) {
       Column({ space: 8 }) {
-        this.buildSectionTitle('脚本功能')
+        this.buildSectionTitle($r('app.string.user_script_section_script_functions'))
         Column({ space: 0 }) {
           ForEach(this.resolveSelectedCommands(), (command: UserScriptPageMenuCommandView, index: number) => {
             this.buildCommandItem(command, index, this.resolveSelectedCommands().length)
@@ -343,8 +344,8 @@ export struct UserScriptPageActionsSheet {
     } else {
       AppEmptyState({
         airaIconId: 'settings.userScripts',
-        title: '暂无可用功能',
-        message: '这个脚本当前没有可执行的菜单功能。',
+        title: $r('app.string.user_script_no_functions_title'),
+        message: $r('app.string.user_script_no_functions_message'),
         fillHeight: true
       })
     }
@@ -449,7 +450,7 @@ export struct UserScriptPageActionsSheet {
   private buildFooter() {
     Row() {
       BrowserSheetActionButton({
-        label: '管理脚本',
+        label: $r('app.string.user_script_manage'),
         emphasis: 'primary',
         accentColor: this.storedAccentColor,
         textColor: this.storedOnPrimaryColor,
@@ -523,8 +524,8 @@ export struct UserScriptPageActionsSheet {
     });
   }
 
-  private resolveHeaderTitle(): string {
-    return this.resolveSelectedScript()?.scriptName ?? '当前页脚本';
+  private resolveHeaderTitle(): ResourceStr {
+    return this.resolveSelectedScript()?.scriptName ?? $r('app.string.user_script_current_page_scripts');
   }
 
   private resolveRowBorderRadius(index: number, total: number): BorderRadiuses {
@@ -540,21 +541,21 @@ export struct UserScriptPageActionsSheet {
     return { topLeft: 0, topRight: 0, bottomLeft: 0, bottomRight: 0 };
   }
 
-  private resolveSubtitle(): string {
+  private resolveSubtitle(): ResourceStr {
     if (this.state.url.length === 0) {
-      return '当前页';
+      return $r('app.string.user_script_current_page');
     }
     return this.state.url;
   }
 
-  private resolveEmptyTitle(): string {
+  private resolveEmptyTitle(): ResourceStr {
     if (!this.state.hasPage) {
-      return '当前没有网页';
+      return $r('app.string.user_script_empty_no_page');
     }
     if (!this.state.hasMatchingScripts) {
-      return '没有匹配脚本';
+      return $r('app.string.user_script_empty_no_match');
     }
-    return '没有脚本菜单';
+    return $r('app.string.user_script_empty_no_menu');
   }
 
 }

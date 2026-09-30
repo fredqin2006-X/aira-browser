@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   TranslationProviderConfig,
   TranslationProviderTemplateId
@@ -52,13 +53,13 @@ struct TranslationProviderWorkspaceValidationDialog {
         .width(34)
         .height(34)
         .color(this.storedAccentColor)
-      Text('正在测试翻译服务')
+      Text($r('app.string.settings_web_translation_testing'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.storedPrimaryTextColor)
         .textAlign(TextAlign.Center)
-      Text('正在联网校验 API 配置，请稍候。')
+      Text($r('app.string.settings_web_translation_testing_hint'))
         .fontSize(14)
         .lineHeight(20)
         .textAlign(TextAlign.Center)
@@ -122,8 +123,8 @@ export struct TranslationProviderWorkspaceHost {
         primaryTextColor: this.storedPrimaryTextColor,
         iconColor: this.storedSecondaryTextColor,
         buttonBackgroundColor: this.storedPressedBackgroundColor,
-        primaryActionText: this.activeView === 'config' ? '保存' : '',
-        primaryActionLabel: '保存翻译服务配置',
+        primaryActionText: this.activeView === 'config' ? resolveAppResourceText($r('app.string.settings_web_translation_save')) : '',
+        primaryActionLabel: resolveAppResourceText($r('app.string.settings_web_translation_save_a11y')),
         primaryActionEnabled: this.activeView === 'config' &&
           this.editViewModel.buildState(this.draft, this.errorMessage).saveEnabled &&
           !this.isSaving,
@@ -248,17 +249,17 @@ export struct TranslationProviderWorkspaceHost {
     const state = this.editViewModel.buildState(this.draft, '');
     if (!state.saveEnabled) {
       this.errorMessage = state.errorMessage;
-      this.showDialog('保存失败', state.errorMessage);
+      this.showDialog(resolveAppResourceText($r('app.string.settings_web_translation_save_failed')), state.errorMessage);
       return;
     }
     const provider = this.editViewModel.buildProvider(this.draft);
     showCenteredAlertDialog({
-      title: '启用翻译服务？',
+      title: $r('app.string.settings_web_translation_enable_title'),
       message: this.coordinator.buildSaveConfirmationMessage(provider),
       autoCancel: true,
-      primaryButton: { value: '取消', action: () => {} },
+      primaryButton: { value: $r('app.string.settings_web_translation_cancel'), action: () => {} },
       secondaryButton: {
-        value: '保存并启用',
+        value: $r('app.string.settings_web_translation_save_enable'),
         action: () => {
           this.persistProvider();
         }
@@ -278,11 +279,11 @@ export struct TranslationProviderWorkspaceHost {
         this.isSaving = false;
         this.validationDialogController.close();
         if (!result.ok) {
-          this.showToast('翻译服务验证失败。');
-          this.showDialog('连接校验失败', result.message);
+          this.showToast(resolveAppResourceText($r('app.string.settings_web_translation_verify_failed')));
+          this.showDialog(resolveAppResourceText($r('app.string.settings_web_translation_verify_failed_title')), result.message);
           return;
         }
-        this.showToast('翻译服务验证成功。');
+        this.showToast(resolveAppResourceText($r('app.string.settings_web_translation_verify_ok')));
         this.refreshSettingsState();
         this.onSettingsChanged?.();
         this.finishConfig();
@@ -290,8 +291,8 @@ export struct TranslationProviderWorkspaceHost {
       .catch((error: Error) => {
         this.isSaving = false;
         this.validationDialogController.close();
-        this.showToast('翻译服务验证失败。');
-        this.showDialog('连接校验失败', error.message);
+        this.showToast(resolveAppResourceText($r('app.string.settings_web_translation_verify_failed')));
+        this.showDialog(resolveAppResourceText($r('app.string.settings_web_translation_verify_failed_title')), error.message);
       });
   }
 
@@ -313,7 +314,7 @@ export struct TranslationProviderWorkspaceHost {
 
   private resolveHeaderTitle(): string {
     if (this.activeView === 'selection') {
-      return '选择翻译服务';
+      return resolveAppResourceText($r('app.string.settings_web_translation_choose_service'));
     }
     return this.editViewModel.buildState(this.draft, this.errorMessage).title;
   }
@@ -333,7 +334,7 @@ export struct TranslationProviderWorkspaceHost {
       title: title,
       message: message,
       autoCancel: true,
-      confirm: { value: '知道了', action: () => {} }
+      confirm: { value: $r('app.string.settings_web_translation_got_it'), action: () => {} }
     });
   }
 }

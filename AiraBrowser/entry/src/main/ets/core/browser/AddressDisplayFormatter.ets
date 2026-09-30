@@ -29,11 +29,11 @@ export function resolveCurrentSiteHost(currentUrl: string, addressInput: string)
   return extractSiteHost(resolveCurrentSiteUrl(currentUrl, addressInput));
 }
 
-export function resolveConnectionStatusTitle(currentUrl: string, addressInput: string): string {
+export function resolveConnectionStatusTitle(currentUrl: string, addressInput: string): ResourceStr {
   if (isSecureCurrentSiteUrl(currentUrl, addressInput)) {
-    return '连接安全';
+    return $r('app.string.settings_site_info_connection_secure');
   }
-  return '连接未验证';
+  return $r('app.string.settings_site_info_connection_unverified');
 }
 
 export function isSecureCurrentSiteUrl(currentUrl: string, addressInput: string): boolean {

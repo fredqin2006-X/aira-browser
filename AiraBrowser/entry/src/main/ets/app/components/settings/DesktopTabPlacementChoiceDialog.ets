@@ -26,7 +26,7 @@ export struct DesktopTabPlacementChoiceDialog {
   build() {
     Column() {
       BrowserLargeScreenModalHeader({
-        title: '标签页样式',
+        title: $r('app.string.settings_appearance_tab_style'),
         dialogMode: true,
         onClose: (): void => {
           if (!this.isSaving) {
@@ -35,8 +35,8 @@ export struct DesktopTabPlacementChoiceDialog {
         }
       })
       Row({ space: 8 }) {
-        this.buildChoice('horizontal', '水平标签页')
-        this.buildChoice('vertical', '垂直标签页')
+        this.buildChoice('horizontal', $r('app.string.settings_appearance_horizontal_tabs'))
+        this.buildChoice('vertical', $r('app.string.settings_appearance_vertical_tabs'))
       }
       .width('100%')
       .alignItems(VerticalAlign.Top)
@@ -46,7 +46,7 @@ export struct DesktopTabPlacementChoiceDialog {
   }
 
   @Builder
-  private buildChoice(placement: string, title: string) {
+  private buildChoice(placement: string, title: ResourceStr) {
     Column({ space: 10 }) {
       this.buildPreview(placement)
 

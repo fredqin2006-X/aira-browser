@@ -72,7 +72,7 @@ export struct BrowserUserAgentPresetSheet {
       if (this.layoutMode === 'phone') {
         BrowserImmersiveSheetLayout({
           closeVisible: true,
-          closeAccessibilityLabel: '关闭网页标识',
+          closeAccessibilityLabel: $r('app.string.site_version_preset_close'),
           onClose: (): void => {
             this.onBack();
           },
@@ -92,10 +92,10 @@ export struct BrowserUserAgentPresetSheet {
   @Builder
   private buildHeader() {
     BrowserFeatureSheetHeader({
-      title: '网页标识',
+      title: $r('app.string.site_version_preset_title'),
       titleColor: this.storedPrimaryTextColor,
       showLeadingButton: true,
-      leadingAccessibilityLabel: '返回网站版本',
+      leadingAccessibilityLabel: $r('app.string.site_version_preset_back'),
       onLeadingAction: () => {
         this.onBack();
       }
@@ -125,8 +125,8 @@ export struct BrowserUserAgentPresetSheet {
   private buildScrollContent(immersive: boolean) {
     Scroll(this.sheetBlurScroller) {
       Column({ space: 14 }) {
-        this.buildOptionGroup('移动端网页', this.mobileOptions)
-        this.buildOptionGroup('桌面端网页', this.desktopOptions)
+        this.buildOptionGroup($r('app.string.site_version_preset_mobile_group'), this.mobileOptions)
+        this.buildOptionGroup($r('app.string.site_version_preset_desktop_group'), this.desktopOptions)
         this.buildCustomOptionGroup()
       }
       .width('100%')
@@ -153,7 +153,7 @@ export struct BrowserUserAgentPresetSheet {
   }
 
   @Builder
-  private buildOptionGroup(title: string, options: BrowserUserAgentOptionView[]) {
+  private buildOptionGroup(title: ResourceStr, options: BrowserUserAgentOptionView[]) {
     Column({ space: 8 }) {
       SettingsSectionTitle({
         title: title,
@@ -177,7 +177,7 @@ export struct BrowserUserAgentPresetSheet {
     if (this.customOptions.length > 0) {
       Column({ space: 8 }) {
         SettingsSectionTitle({
-          title: '自定义 UA',
+          title: $r('app.string.settings_custom_ua'),
           secondaryTextColor: this.storedSecondaryTextColor
         })
 

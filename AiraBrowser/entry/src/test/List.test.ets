@@ -79,6 +79,7 @@ import browserTabsOverviewSwipeDismissPolicyTest from './BrowserTabsOverviewSwip
 import browserTabsOverviewSelectionDisplacementCoordinatorTest from './BrowserTabsOverviewSelectionDisplacementCoordinator.test';
 import browserTabsOverviewStackLayoutPolicyTest from './BrowserTabsOverviewStackLayoutPolicy.test';
 import bottomToolbarGuideCoordinatorTest from './BottomToolbarGuideCoordinator.test';
+import crossDeviceLinkGuideCoordinatorTest from './CrossDeviceLinkGuideCoordinator.test';
 import crossDeviceLinkViewModelTest from './CrossDeviceLinkViewModel.test';
 import communityUpdateCheckCoordinatorTest from './CommunityUpdateCheckCoordinator.test';
 import browserLargeScreenWebZoomPolicyTest from './BrowserLargeScreenWebZoomPolicy.test';
@@ -187,6 +188,7 @@ export default function tests(): void {
   browserTabsOverviewSelectionDisplacementCoordinatorTest();
   browserTabsOverviewStackLayoutPolicyTest();
   bottomToolbarGuideCoordinatorTest();
+  crossDeviceLinkGuideCoordinatorTest();
   crossDeviceLinkViewModelTest();
   communityUpdateCheckCoordinatorTest();
   browserLargeScreenWebZoomPolicyTest();

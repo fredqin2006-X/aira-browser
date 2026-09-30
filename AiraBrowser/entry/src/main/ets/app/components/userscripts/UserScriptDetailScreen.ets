@@ -18,6 +18,7 @@ import {
   BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY,
   BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY
 } from '../../../core/theme/BrowserThemeStorageKeys';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 @Component
 export struct UserScriptDetailScreen {
@@ -29,7 +30,7 @@ export struct UserScriptDetailScreen {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY) private storedPrimaryTextColor: string = '#111318';
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string = '#5F6875';
   @Prop state: UserScriptDetailState = {
-    title: '脚本详情',
+    title: resolveAppResourceText($r('app.string.user_script_detail_title')),
     subtitle: '',
     enabled: false,
     found: false,
@@ -60,7 +61,7 @@ export struct UserScriptDetailScreen {
     Column() {
       if (this.desktopPresentation) {
         SettingsDesktopWorkspaceHeader({
-          title: '脚本详情',
+          title: $r('app.string.user_script_detail_title'),
           showBackButton: true,
           primaryTextColor: this.storedPrimaryTextColor,
           iconColor: this.storedSecondaryTextColor,
@@ -72,7 +73,7 @@ export struct UserScriptDetailScreen {
       }
 
       ManagementHdsScaffold({
-        title: '脚本详情',
+        title: $r('app.string.user_script_detail_title'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         primaryTextColor: this.storedPrimaryTextColor,
@@ -90,9 +91,9 @@ export struct UserScriptDetailScreen {
         Scroll(this.contentScroller) {
           Column({ space: 18 }) {
             this.buildStatusCard()
-            this.buildRowsSection('元数据', this.state.metadataRows)
-            this.buildRowsSection('运行诊断', this.state.runtimeRows)
-            this.buildRowsSection('脚本存储', this.state.storageRows)
+            this.buildRowsSection($r('app.string.user_script_section_metadata'), this.state.metadataRows)
+            this.buildRowsSection($r('app.string.user_script_section_runtime'), this.state.runtimeRows)
+            this.buildRowsSection($r('app.string.user_script_section_storage'), this.state.storageRows)
             this.buildSourceSection()
             this.buildBottomDeleteAction()
           }
@@ -171,7 +172,7 @@ export struct UserScriptDetailScreen {
       .width('100%')
       .alignItems(HorizontalAlign.Start)
 
-      Button('前往扩展页面')
+      Button($r('app.string.user_script_open_extensions_page'))
         .width('100%')
         .height(40)
         .type(ButtonType.Normal)
@@ -190,7 +191,7 @@ export struct UserScriptDetailScreen {
   }
 
   @Builder
-  private buildRowsSection(title: string, rows: UserScriptDetailRowView[]) {
+  private buildRowsSection(title: ResourceStr, rows: UserScriptDetailRowView[]) {
     if (rows.length > 0) {
       Column({ space: 8 }) {
         this.buildSectionTitle(title)
@@ -211,7 +212,7 @@ export struct UserScriptDetailScreen {
   private buildSourceSection() {
     if (this.state.sourcePreview.length > 0) {
       Column({ space: 8 }) {
-        this.buildSectionTitle('源码预览')
+        this.buildSectionTitle($r('app.string.user_script_section_source_preview'))
         Text(this.state.sourcePreview)
           .width('100%')
           .fontSize(12)
@@ -228,7 +229,7 @@ export struct UserScriptDetailScreen {
 
   @Builder
   private buildBottomDeleteAction() {
-    Button('删除脚本')
+    Button($r('app.string.user_script_delete'))
       .width('100%')
       .height(44)
       .enabled(this.state.actions.deleteEnabled)
@@ -275,7 +276,7 @@ export struct UserScriptDetailScreen {
   }
 
   @Builder
-  private buildSectionTitle(title: string) {
+  private buildSectionTitle(title: ResourceStr) {
     Text(title)
       .width('100%')
       .fontSize(13)

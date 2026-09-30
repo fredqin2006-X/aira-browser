@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@ohos/hypium';
+import { isAppString } from '../main/ets/core/resources/AppResourceText';
 import {
   isSplitToolbarChromeActive,
   normalizeToolbarChromeStyle,
@@ -284,10 +285,10 @@ describe('BrowserToolbarChromeStylePolicy', () => {
     const splitState = viewModel.buildStateForBehavior('compact', 'split');
     expect(splitState.behavior).assertEqual('fixed');
     expect(splitState.options.length).assertEqual(2);
-    expect(splitState.options[0].title).assertEqual('固定');
-    expect(splitState.options[1].title).assertEqual('收起地址栏和工具栏');
-    expect(viewModel.formatBehaviorTitle('compact', 'split')).assertEqual('固定');
-    expect(viewModel.formatBehaviorTitle('hidden', 'split')).assertEqual('收起地址栏和工具栏');
+    expect(isAppString(splitState.options[0].title, $r('app.string.toolbar_settings_scroll_split_fixed'))).assertTrue();
+    expect(isAppString(splitState.options[1].title, $r('app.string.toolbar_settings_scroll_split_hidden'))).assertTrue();
+    expect(isAppString(viewModel.formatBehaviorTitle('compact', 'split'), $r('app.string.toolbar_settings_scroll_split_fixed'))).assertTrue();
+    expect(isAppString(viewModel.formatBehaviorTitle('hidden', 'split'), $r('app.string.toolbar_settings_scroll_split_hidden'))).assertTrue();
     expect(viewModel.buildStateForBehavior('compact', 'floating').options.length).assertEqual(3);
   });
 
@@ -299,8 +300,8 @@ describe('BrowserToolbarChromeStylePolicy', () => {
     expect(shouldApplyAlwaysTopImmersion(true, false)).assertTrue();
     expect(shouldApplyAlwaysTopImmersion(true, true)).assertFalse();
     expect(shouldApplyAlwaysTopImmersion(false, false)).assertFalse();
-    expect(resolveScrollTopImmersionFooter('split').indexOf('底部工具栏保持显示') >= 0).assertTrue();
-    expect(resolveScrollTopImmersionFooter('floating').indexOf('顶部安全区域') >= 0).assertTrue();
+    expect(isAppString(resolveScrollTopImmersionFooter('split'), $r('app.string.toolbar_settings_immersion_footer_split'))).assertTrue();
+    expect(isAppString(resolveScrollTopImmersionFooter('floating'), $r('app.string.toolbar_settings_immersion_footer_floating'))).assertTrue();
 
     const stored = resolveTopImmersionPreference({
       globalImmersionEnabled: false,

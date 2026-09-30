@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { common, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import {
@@ -217,7 +218,7 @@ export class CustomHomepageSettingsCoordinator {
       };
     } catch (error) {
       await this.discardExternalHomepageImportSafely(prepared, 'prepare_snapshot_failure');
-      const message = error instanceof Error ? error.message : '主页包预检未完成。';
+      const message = error instanceof Error ? error.message : resolveAppResourceText($r('app.string.settings_custom_home_precheck_incomplete'));
       throw new Error(message);
     }
   }
@@ -247,7 +248,7 @@ export class CustomHomepageSettingsCoordinator {
       } else {
         await this.discardExternalHomepageImportSafely(prepared, 'commit_failure');
       }
-      const message = error instanceof Error ? error.message : '主页包导入未完成。';
+      const message = error instanceof Error ? error.message : resolveAppResourceText($r('app.string.settings_custom_home_import_incomplete'));
       throw new Error(message);
     }
   }
@@ -305,11 +306,11 @@ export class CustomHomepageSettingsCoordinator {
       if (envelope.prepared !== undefined) {
         void this.discardExternalHomepageImportSafely(envelope.prepared, 'invalid_envelope');
       }
-      host.presentFailure('主页包预检状态不可用。');
+      host.presentFailure(resolveAppResourceText($r('app.string.settings_custom_home_precheck_unavailable')));
       return;
     }
     this.externalImportPrepared = envelope.prepared;
-    host.presentPrepared(envelope.item, envelope.updated ? '更新主页' : '导入主页');
+    host.presentPrepared(envelope.item, envelope.updated ? resolveAppResourceText($r('app.string.settings_custom_home_update_action')) : resolveAppResourceText($r('app.string.settings_custom_home_import')));
   }
 
   commitPresentedExternalHomepageImport(): void {
@@ -333,7 +334,7 @@ export class CustomHomepageSettingsCoordinator {
         this.externalImportCommitting = false;
         const host = this.externalImportPresentationHost;
         host?.dismiss();
-        host?.notifyCommitFailure(error.message.length > 0 ? error.message : '未知错误');
+        host?.notifyCommitFailure(error.message.length > 0 ? error.message : resolveAppResourceText($r('app.string.settings_custom_home_unknown_error')));
         this.consumePendingExternalImportPresentation();
       });
   }

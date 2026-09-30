@@ -232,11 +232,11 @@ export function shouldApplyAlwaysTopImmersion(enabled: boolean, splitChromeActiv
   return enabled && !splitChromeActive;
 }
 
-export function resolveScrollTopImmersionFooter(style: BrowserToolbarChromeStyle): string {
+export function resolveScrollTopImmersionFooter(style: BrowserToolbarChromeStyle): ResourceStr {
   if (style === 'split') {
-    return '向下滚动网页时只收起顶部地址栏，底部工具栏保持显示。向上滚动或停止后恢复。';
+    return $r('app.string.toolbar_settings_immersion_footer_split');
   }
-  return '向下滚动网页时收起顶部安全区域，向上滚动或停止后恢复。';
+  return $r('app.string.toolbar_settings_immersion_footer_floating');
 }
 
 /** Turning one on clears the other. Hiding a switch does not clear its stored value. */

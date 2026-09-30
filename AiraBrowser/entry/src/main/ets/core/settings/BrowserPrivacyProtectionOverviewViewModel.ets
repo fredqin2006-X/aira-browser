@@ -1,6 +1,44 @@
 import { AdBlockDailyProtectionActivity } from '../../common/models/BrowserModels';
+import { resolveAppResourceText } from '../resources/AppResourceText';
+import { i18n } from '@kit.LocalizationKit';
 
-const WEEKDAY_LABELS: string[] = ['日', '一', '二', '三', '四', '五', '六'];
+function resolveWeekdayShortLabel(weekdayIndex: number): string {
+  switch (weekdayIndex) {
+    case 0:
+      return resolveAppResourceText($r('app.string.settings_privacy_protection_weekday_short_sun'));
+    case 1:
+      return resolveAppResourceText($r('app.string.settings_privacy_protection_weekday_short_mon'));
+    case 2:
+      return resolveAppResourceText($r('app.string.settings_privacy_protection_weekday_short_tue'));
+    case 3:
+      return resolveAppResourceText($r('app.string.settings_privacy_protection_weekday_short_wed'));
+    case 4:
+      return resolveAppResourceText($r('app.string.settings_privacy_protection_weekday_short_thu'));
+    case 5:
+      return resolveAppResourceText($r('app.string.settings_privacy_protection_weekday_short_fri'));
+    default:
+      return resolveAppResourceText($r('app.string.settings_privacy_protection_weekday_short_sat'));
+  }
+}
+
+function resolveWeekdayDetailLabel(weekdayIndex: number): string {
+  switch (weekdayIndex) {
+    case 0:
+      return resolveAppResourceText($r('app.string.settings_privacy_protection_weekday_detail_sun'));
+    case 1:
+      return resolveAppResourceText($r('app.string.settings_privacy_protection_weekday_detail_mon'));
+    case 2:
+      return resolveAppResourceText($r('app.string.settings_privacy_protection_weekday_detail_tue'));
+    case 3:
+      return resolveAppResourceText($r('app.string.settings_privacy_protection_weekday_detail_wed'));
+    case 4:
+      return resolveAppResourceText($r('app.string.settings_privacy_protection_weekday_detail_thu'));
+    case 5:
+      return resolveAppResourceText($r('app.string.settings_privacy_protection_weekday_detail_fri'));
+    default:
+      return resolveAppResourceText($r('app.string.settings_privacy_protection_weekday_detail_sat'));
+  }
+}
 
 export interface BrowserPrivacyProtectionOverviewInput {
   activities: AdBlockDailyProtectionActivity[];
@@ -75,8 +113,12 @@ export class BrowserPrivacyProtectionOverviewViewModel {
       selectedDay: selectedDay,
       lastSevenDaysTotalLabel: this.formatCount(lastSevenDaysTotal),
       filterEnabled: input.filterEnabled,
-      filterStatusLabel: input.filterEnabled ? '过滤已开启' : '过滤已关闭',
-      trackingModeLabel: input.enhancedTrackingProtectionEnabled ? '增强' : '标准',
+      filterStatusLabel: input.filterEnabled ?
+        resolveAppResourceText($r('app.string.settings_privacy_protection_overview_filter_on')) :
+        resolveAppResourceText($r('app.string.settings_privacy_protection_overview_filter_off')),
+      trackingModeLabel: input.enhancedTrackingProtectionEnabled ?
+        resolveAppResourceText($r('app.string.settings_privacy_protection_tracking_enhanced')) :
+        resolveAppResourceText($r('app.string.settings_site_info_fingerprint_standard')),
       detailBreakdownLabel: this.buildBreakdownLabel(selectedDay)
     };
   }
@@ -94,11 +136,15 @@ export class BrowserPrivacyProtectionOverviewViewModel {
     const totalActionCount: number = requestBlockingCount + linkCleaningCount +
       elementHidingCount;
     const date: Date = new Date(activity.dayStartedAt);
-    const weekdayLabel: string = WEEKDAY_LABELS[date.getDay()];
+    const weekdayIndex: number = date.getDay();
     return {
       dayStartedAt: activity.dayStartedAt,
-      shortLabel: isToday ? '今' : weekdayLabel,
-      detailLabel: isToday ? '今天' : `周${weekdayLabel}`,
+      shortLabel: isToday
+        ? resolveAppResourceText($r('app.string.settings_privacy_protection_today_short'))
+        : resolveWeekdayShortLabel(weekdayIndex),
+      detailLabel: isToday
+        ? resolveAppResourceText($r('app.string.settings_privacy_protection_today'))
+        : resolveWeekdayDetailLabel(weekdayIndex),
       requestBlockingCount: requestBlockingCount,
       linkCleaningCount: linkCleaningCount,
       elementHidingCount: elementHidingCount,
@@ -108,8 +154,12 @@ export class BrowserPrivacyProtectionOverviewViewModel {
   }
 
   private buildBreakdownLabel(day: BrowserPrivacyProtectionDayState): string {
-    return `请求 ${this.formatCount(day.requestBlockingCount)}　链接 ${this.formatCount(day.linkCleaningCount)}` +
-      `　元素 ${this.formatCount(day.elementHidingCount)}`;
+    return resolveAppResourceText(
+      $r('app.string.settings_privacy_protection_overview_breakdown'),
+      this.formatCount(day.requestBlockingCount),
+      this.formatCount(day.linkCleaningCount),
+      this.formatCount(day.elementHidingCount)
+    );
   }
 
   private resolveBarHeight(value: number, maximumCount: number): number {
@@ -131,13 +181,22 @@ export class BrowserPrivacyProtectionOverviewViewModel {
 
   private formatCount(value: number): string {
     const normalized: number = Math.max(0, Math.floor(value));
+    if (!i18n.System.getSystemLanguage().toLowerCase().startsWith('zh')) {
+      return normalized.toLocaleString();
+    }
     if (normalized >= 100000000) {
-      return `${Math.floor(normalized / 100000000)}亿`;
+      return resolveAppResourceText(
+        $r('app.string.settings_privacy_protection_count_yi'),
+        Math.floor(normalized / 100000000)
+      );
     }
     if (normalized >= 10000) {
       const whole: number = Math.floor(normalized / 10000);
       const decimal: number = Math.floor((normalized % 10000) / 1000);
-      return decimal > 0 ? `${whole}.${decimal}万` : `${whole}万`;
+      if (decimal > 0) {
+        return resolveAppResourceText($r('app.string.settings_privacy_protection_count_wan_decimal'), whole, decimal);
+      }
+      return resolveAppResourceText($r('app.string.settings_privacy_protection_count_wan'), whole);
     }
     return `${normalized}`;
   }

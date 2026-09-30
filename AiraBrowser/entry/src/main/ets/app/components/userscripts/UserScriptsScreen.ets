@@ -49,6 +49,7 @@ import {
   SettingsDesktopWorkspaceHeader,
   SettingsDesktopWorkspaceHeaderAction
 } from '../settings/SettingsDesktopWorkspaceHeader';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 const USER_SCRIPTS_SECTION_CORNER_RADIUS: number = 22;
 const USER_SCRIPT_DESKTOP_CARD_RADIUS_VP: number = 16;
@@ -172,7 +173,7 @@ export struct UserScriptsScreen {
     ManagementLargeScreenShell({
       title: USER_SCRIPT_FEATURE_TITLE,
       badge: this.resolveDesktopBadge(),
-      searchPlaceholder: '搜索脚本',
+      searchPlaceholder: $r('app.string.user_script_search_placeholder'),
       searchQuery: this.desktopQuery,
       searchFocusKey: USER_SCRIPT_DESKTOP_SEARCH_FOCUS_KEY,
       limitContentWidth: false,
@@ -199,9 +200,9 @@ export struct UserScriptsScreen {
 
   @Builder
   private buildDesktopSidebar() {
-    ManagementLargeScreenNavSection({ title: '脚本' })
+    ManagementLargeScreenNavSection({ title: $r('app.string.user_script_nav_scripts') })
     ManagementLargeScreenNavItem({
-      title: '全部',
+      title: $r('app.string.user_script_filter_all'),
       count: `${this.state.rows.length}`,
       selected: this.desktopFilter === 'all',
       iconId: 'browser.toolbar.userScripts',
@@ -210,7 +211,7 @@ export struct UserScriptsScreen {
       }
     })
     ManagementLargeScreenNavItem({
-      title: '已启用',
+      title: $r('app.string.user_script_filter_enabled'),
       count: `${this.countDesktopRows(true)}`,
       selected: this.desktopFilter === 'enabled',
       iconId: 'settings.userScripts',
@@ -219,7 +220,7 @@ export struct UserScriptsScreen {
       }
     })
     ManagementLargeScreenNavItem({
-      title: '已停用',
+      title: $r('app.string.user_script_filter_disabled'),
       count: `${this.countDesktopRows(false)}`,
       selected: this.desktopFilter === 'disabled',
       iconId: 'settings.general',
@@ -227,29 +228,29 @@ export struct UserScriptsScreen {
         this.desktopFilter = 'disabled';
       }
     })
-    ManagementLargeScreenNavSection({ title: '添加' })
+    ManagementLargeScreenNavSection({ title: $r('app.string.user_script_nav_add') })
     ManagementLargeScreenNavItem({
-      title: '从 URL 添加',
+      title: $r('app.string.user_script_add_from_url'),
       iconId: 'browser.toolbar.fillAddress',
       onSelect: (): void => {
         this.onAddFromUrl();
       }
     })
     ManagementLargeScreenNavItem({
-      title: '从文件导入',
+      title: $r('app.string.user_script_import_from_file'),
       iconId: 'browser.toolbar.savedPages',
       onSelect: (): void => {
         this.onImportFromFile();
       }
     })
     ManagementLargeScreenNavItem({
-      title: '编辑或粘贴源码',
+      title: $r('app.string.user_script_edit_source'),
       iconId: 'browser.toolbar.edit',
       onSelect: (): void => {
         this.onEditSource();
       }
     })
-    ManagementLargeScreenNavSection({ title: '脚本库' })
+    ManagementLargeScreenNavSection({ title: $r('app.string.user_script_nav_gallery') })
     ManagementLargeScreenNavItem({
       title: 'Greasy Fork',
       iconId: 'browser.toolbar.siteInfo',
@@ -277,7 +278,7 @@ export struct UserScriptsScreen {
   private buildDesktopToolbarActions() {
     ManagementLargeScreenIconButton({
       iconId: 'browser.toolbar.refresh',
-      label: '检查更新',
+      label: resolveAppResourceText($r('app.string.user_script_check_updates')),
       isEnabled: this.state.hasScripts,
       onAction: (): void => {
         this.onUpdateAllScripts();
@@ -292,8 +293,8 @@ export struct UserScriptsScreen {
         if (this.showNotice) {
           SettingsNoticeCard({
             icon: $r('sys.symbol.exclamationmark_shield_fill'),
-            title: '脚本会改变网页行为',
-            message: '只安装可信脚本；它们可能读取页面或影响网页功能。',
+            title: $r('app.string.user_script_notice_title'),
+            message: $r('app.string.user_script_notice_message'),
             desktopPresentation: true,
             onClosed: (): void => {
               this.onDismissNotice();
@@ -307,14 +308,14 @@ export struct UserScriptsScreen {
         if (!this.state.hasScripts) {
           this.buildStandaloneEmptyState(
             'settings.userScripts',
-            '还没有安装用户脚本',
-            '导入脚本后，会在这里显示并可单独管理。'
+            $r('app.string.user_script_empty_title'),
+            $r('app.string.user_script_empty_message')
           )
         } else if (this.resolveDesktopVisibleRows().length === 0) {
           this.buildStandaloneEmptyState(
             'settings.userScripts',
-            '没有匹配的脚本',
-            '换个筛选或搜索词再看看。'
+            $r('app.string.user_script_no_match_title'),
+            $r('app.string.user_script_no_match_message')
           )
         } else {
           this.buildDesktopScriptGrid()
@@ -341,7 +342,7 @@ export struct UserScriptsScreen {
     Row({
       space: 12
     }) {
-      Text('自动检查脚本更新')
+      Text($r('app.string.user_script_auto_update'))
         .layoutWeight(1)
         .fontSize(14)
         .fontColor(this.storedPrimaryTextColor)
@@ -366,8 +367,8 @@ export struct UserScriptsScreen {
         if (this.showNotice) {
           SettingsNoticeCard({
             icon: $r('sys.symbol.exclamationmark_shield_fill'),
-            title: '脚本会改变网页行为',
-            message: '只安装可信脚本；它们可能读取页面或影响网页功能。',
+            title: $r('app.string.user_script_notice_title'),
+            message: $r('app.string.user_script_notice_message'),
             desktopPresentation: this.desktopPresentation,
             onClosed: () => {
               this.onDismissNotice();
@@ -398,21 +399,21 @@ export struct UserScriptsScreen {
   private buildHeaderMenuActions(): ManagementHdsMenuAction[] {
     const actions: ManagementHdsMenuAction[] = [
       {
-        label: '从 URL 添加',
+        label: resolveAppResourceText($r('app.string.user_script_add_from_url')),
         icon: $r('sys.symbol.link'),
         action: () => {
           this.onAddFromUrl();
         }
       },
       {
-        label: '从文件导入',
+        label: resolveAppResourceText($r('app.string.user_script_import_from_file')),
         icon: $r('sys.symbol.folder'),
         action: () => {
           this.onImportFromFile();
         }
       },
       {
-        label: '编辑或粘贴源码',
+        label: resolveAppResourceText($r('app.string.user_script_edit_source')),
         icon: $r('sys.symbol.doc_text'),
         action: () => {
           this.onEditSource();
@@ -440,7 +441,7 @@ export struct UserScriptsScreen {
         }
       },
       {
-        label: '检查更新',
+        label: resolveAppResourceText($r('app.string.user_script_check_updates')),
         icon: $r('sys.symbol.arrow_clockwise'),
         action: () => {
           this.onUpdateAllScripts();
@@ -452,13 +453,13 @@ export struct UserScriptsScreen {
 
   private buildDesktopHeaderMenuActions(): SettingsDesktopWorkspaceHeaderAction[] {
     return [
-      { label: '从 URL 添加', action: (): void => this.onAddFromUrl() },
-      { label: '从文件导入', action: (): void => this.onImportFromFile() },
-      { label: '编辑或粘贴源码', action: (): void => this.onEditSource() },
+      { label: resolveAppResourceText($r('app.string.user_script_add_from_url')), action: (): void => this.onAddFromUrl() },
+      { label: resolveAppResourceText($r('app.string.user_script_import_from_file')), action: (): void => this.onImportFromFile() },
+      { label: resolveAppResourceText($r('app.string.user_script_edit_source')), action: (): void => this.onEditSource() },
       { label: 'Greasy Fork', action: (): void => this.onOpenGallerySource('https://greasyfork.org/zh-CN/scripts') },
       { label: 'OpenUserJS', action: (): void => this.onOpenGallerySource('https://openuserjs.org/') },
       { label: 'Userscript.Zone', action: (): void => this.onOpenGallerySource('https://www.userscript.zone/') },
-      { label: '检查更新', action: (): void => this.onUpdateAllScripts() }
+      { label: resolveAppResourceText($r('app.string.user_script_check_updates')), action: (): void => this.onUpdateAllScripts() }
     ];
   }
 
@@ -472,7 +473,7 @@ export struct UserScriptsScreen {
       this.buildScriptAutoUpdateSection()
       if (this.state.hasScripts) {
         Column({ space: 8 }) {
-          this.buildSectionTitle('已安装脚本')
+          this.buildSectionTitle($r('app.string.user_script_installed_section'))
           if (this.useCardLayout) {
             this.buildDesktopScriptGrid()
           } else {
@@ -488,8 +489,8 @@ export struct UserScriptsScreen {
       } else {
         this.buildStandaloneEmptyState(
           'settings.userScripts',
-          '还没有安装用户脚本',
-          '导入脚本后，会在这里显示并可单独管理。'
+          $r('app.string.user_script_empty_title'),
+          $r('app.string.user_script_empty_message')
         )
       }
     }
@@ -509,7 +510,7 @@ export struct UserScriptsScreen {
   @Builder
   private buildScriptAutoUpdateSection() {
     SettingsSection({
-      title: '更新策略',
+      title: $r('app.string.user_script_update_policy'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       Column({ space: 8 }) {
@@ -518,7 +519,7 @@ export struct UserScriptsScreen {
           desktopPresentation: this.desktopPresentation
         }) {
           SettingsSwitchRow({
-            title: '自动检查脚本更新',
+            title: $r('app.string.user_script_auto_update'),
             desktopPresentation: this.desktopPresentation,
             checked: this.state.autoUpdateEnabled,
             rowPosition: 'single',
@@ -536,7 +537,7 @@ export struct UserScriptsScreen {
   }
 
   @Builder
-  private buildStandaloneEmptyState(iconId: AiraRenderableIconId, title: string, message: string) {
+  private buildStandaloneEmptyState(iconId: AiraRenderableIconId, title: ResourceStr, message: ResourceStr) {
     AppEmptyState({
       airaIconId: iconId,
       title: title,
@@ -606,7 +607,7 @@ export struct UserScriptsScreen {
           .width('100%')
           .alignItems(VerticalAlign.Center)
 
-          Text(row.description.length > 0 ? row.description : '没有说明')
+          Text(row.description.length > 0 ? row.description : $r('app.string.user_script_no_description'))
             .width('100%')
             .fontSize(13)
             .lineHeight(20)
@@ -623,14 +624,14 @@ export struct UserScriptsScreen {
       .opacity(row.enabled ? 1 : 0.62)
 
       Column({ space: 4 }) {
-        Text(`ID：${row.id}`)
+        Text($r('app.string.user_script_id_label', row.id))
           .width('100%')
           .fontSize(12)
           .fontColor(this.storedSecondaryTextColor)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-        Text(`作用范围：${row.scopeSummary}`)
+        Text($r('app.string.user_script_scope_label', row.scopeSummary))
           .width('100%')
           .fontSize(12)
           .fontColor(this.storedSecondaryTextColor)
@@ -645,8 +646,8 @@ export struct UserScriptsScreen {
         .layoutWeight(1)
 
       Row({ space: 8 }) {
-        this.buildDesktopCardAction('详情', row.id, 'detail')
-        this.buildDesktopCardAction('移除', row.id, 'remove')
+        this.buildDesktopCardAction($r('app.string.user_script_action_detail'), row.id, 'detail')
+        this.buildDesktopCardAction($r('app.string.user_script_action_remove'), row.id, 'remove')
         Blank()
           .layoutWeight(1)
         Toggle({ type: ToggleType.Switch, isOn: row.enabled })
@@ -676,7 +677,7 @@ export struct UserScriptsScreen {
   }
 
   @Builder
-  private buildDesktopCardAction(label: string, scriptId: string, action: string) {
+  private buildDesktopCardAction(label: ResourceStr, scriptId: string, action: string) {
     Button(label)
       .type(ButtonType.Normal)
       .height(32)
@@ -805,20 +806,20 @@ export struct UserScriptsScreen {
   @Builder
   private buildScriptContextMenu(row: UserScriptRowView) {
     Menu() {
-      MenuItem({ content: '查看详情' })
+      MenuItem({ content: $r('app.string.user_script_menu_view_detail') })
         .onClick(() => {
           this.onEditScript(row.id);
         })
-      MenuItem({ content: '检查更新' })
+      MenuItem({ content: $r('app.string.user_script_check_updates') })
         .enabled(row.canUpdate)
         .onClick(() => {
           this.onUpdateScript(row.id);
         })
-      MenuItem({ content: '导出脚本' })
+      MenuItem({ content: $r('app.string.user_script_export') })
         .onClick(() => {
           this.onExportScript(row.id);
         })
-      MenuItem({ content: '删除脚本' })
+      MenuItem({ content: $r('app.string.user_script_delete') })
         .onClick(() => {
           this.onDeleteScript(row.id);
         })
@@ -837,20 +838,20 @@ export struct UserScriptsScreen {
     BrowserDesktopContextMenu() {
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
-          label: '查看详情',
+          label: $r('app.string.user_script_menu_view_detail'),
           onAction: (): void => {
             this.onEditScript(row.id);
           }
         })
         BrowserDesktopContextMenuItem({
-          label: '检查更新',
+          label: $r('app.string.user_script_check_updates'),
           itemEnabled: row.canUpdate,
           onAction: (): void => {
             this.onUpdateScript(row.id);
           }
         })
         BrowserDesktopContextMenuItem({
-          label: '导出脚本',
+          label: $r('app.string.user_script_export'),
           onAction: (): void => {
             this.onExportScript(row.id);
           }
@@ -859,7 +860,7 @@ export struct UserScriptsScreen {
 
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
-          label: '删除脚本',
+          label: $r('app.string.user_script_delete'),
           onAction: (): void => {
             this.onDeleteScript(row.id);
           }
@@ -869,7 +870,7 @@ export struct UserScriptsScreen {
   }
 
   @Builder
-  private buildSectionTitle(title: string) {
+  private buildSectionTitle(title: ResourceStr) {
     Text(title)
       .width('100%')
       .fontSize(13)
@@ -932,7 +933,7 @@ export struct UserScriptsScreen {
 
   private resolveDesktopBadge(): string {
     const count = this.resolveDesktopVisibleRows().length;
-    return `${count} 个`;
+    return resolveAppResourceText($r('app.string.user_script_count_badge'), count);
   }
 
   private resolveDesktopCardWidth(): number {

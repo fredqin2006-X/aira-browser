@@ -33,7 +33,7 @@ describe('history takeover browser detection', () => {
     expect(detectHistoryBrowserKind('Mozilla/5.0 Chrome/128.0 OPR/114.0')).toBe('opera');
     expect(detectHistoryBrowserKind('Mozilla/5.0 Chrome/128.0 Vivaldi/6.8')).toBe('vivaldi');
     expect(detectHistoryBrowserKind('Mozilla/5.0 Chrome/128.0 Edg/128.0')).toBe('edge');
-    expect(detectHistoryBrowserKind('Mozilla/5.0 Chrome/128.0')).toBe('chromium');
+    expect(detectHistoryBrowserKind('Mozilla/5.0 Chrome/128.0')).toBe('chrome');
     expect(detectHistoryPlatform('MacIntel')).toBe('mac');
     expect(detectHistoryPlatform('Win32')).toBe('other');
   });
@@ -68,7 +68,20 @@ describe('history takeover browser detection', () => {
       userAgent: chromeUserAgent,
       brands: ['Chromium', 'Google Chrome'],
       isVivaldi: true,
-    })).toBe('vivaldi');
+    })).toBe('chrome');
+    expect(resolveHistoryBrowserKind({
+      userAgent: chromeUserAgent,
+      isVivaldi: true,
+    })).toBe('chrome');
+    expect(resolveHistoryBrowserKind({
+      userAgent: 'Mozilla/5.0 Chrome/128.0 Edg/128.0',
+      brands: ['Chromium', 'Microsoft Edge'],
+      isVivaldi: true,
+    })).toBe('edge');
+    expect(resolveHistoryBrowserKind({
+      userAgent: 'Mozilla/5.0 Chrome/128.0 Edge/128.0',
+      isVivaldi: true,
+    })).toBe('edge');
   });
 
   test('recognizes Vivaldi when it masks itself as Chrome', () => {
@@ -77,9 +90,16 @@ describe('history takeover browser detection', () => {
     expect(vivaldiProbeRejectionMeansInstalled('No tab with id: -1.')).toBe(true);
     expect(vivaldiProbeRejectionMeansInstalled("Unexpected property: 'vivExtData'.")).toBe(false);
     expect(vivaldiProbeRejectionMeansInstalled('')).toBe(false);
+    expect(vivaldiProbeRejectionMeansInstalled('Unexpected property')).toBe(false);
     expect(vivaldiFromExtensionClientHints({
       protocol: 'chrome-extension:',
       userAgent: 'Mozilla/5.0 Chrome/128.0 Safari/537.36',
+      brands: [],
+      platform: '',
+    })).toBe(false);
+    expect(vivaldiFromExtensionClientHints({
+      protocol: 'chrome-extension:',
+      userAgent: 'Mozilla/5.0 Chrome/128.0 Vivaldi/7.0 Safari/537.36',
       brands: [],
       platform: '',
     })).toBe(true);
@@ -107,6 +127,40 @@ describe('history takeover browser detection', () => {
       brave: { isBrave: async () => true },
     });
     expect(detected).toBe('brave');
+  });
+
+  test('does not let a Vivaldi probe or a stored name replace Chrome or Edge', async () => {
+    const storage: Record<string, unknown> = { airaInstalledBrowserKind: 'vivaldi' };
+    const previousChrome = globalThis.chrome;
+    Object.assign(globalThis, {
+      chrome: {
+        storage: {
+          local: {
+            get: async (keys: string[]) => Object.fromEntries(keys.map((key) => [key, storage[key]])),
+            set: async (values: Record<string, unknown>) => Object.assign(storage, values),
+            remove: async (keys: string[]) => keys.forEach((key) => delete storage[key]),
+          },
+        },
+        tabs: {
+          update: () => Promise.reject(new Error('No tab with id: -1.')),
+          query: async () => [{ vivExtData: '{}' }],
+        },
+      },
+    });
+    try {
+      await expect(readInstalledHistoryBrowser({
+        userAgent: 'Mozilla/5.0 Chrome/128.0 Safari/537.36',
+        userAgentData: { brands: [{ brand: 'Google Chrome' }], platform: 'macOS' },
+      })).resolves.toBe('chrome');
+      storage.airaInstalledBrowserKind = 'chrome';
+      await expect(readInstalledHistoryBrowser({
+        userAgent: 'Mozilla/5.0 Chrome/128.0 Edg/128.0 Safari/537.36',
+        userAgentData: { brands: [{ brand: 'Microsoft Edge' }], platform: 'Windows' },
+      })).resolves.toBe('edge');
+    } finally {
+      if (previousChrome === undefined) delete (globalThis as { chrome?: unknown }).chrome;
+      else Object.assign(globalThis, { chrome: previousChrome });
+    }
   });
 
   test('reads Zen from the Gecko browser name when the user agent still says Firefox', async () => {

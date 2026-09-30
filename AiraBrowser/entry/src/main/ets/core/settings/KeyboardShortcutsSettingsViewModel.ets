@@ -2,13 +2,13 @@ import { resolveBrowserDesktopMenuShortcutLabel } from '../browser/BrowserDeskto
 
 export interface KeyboardShortcutRowState {
   id: string;
-  title: string;
-  shortcut: string;
+  title: ResourceStr;
+  shortcut: ResourceStr;
 }
 
 export interface KeyboardShortcutGroupState {
   id: string;
-  title: string;
+  title: ResourceStr;
   rows: KeyboardShortcutRowState[];
 }
 
@@ -17,59 +17,59 @@ export class KeyboardShortcutsSettingsViewModel {
     return [
       {
         id: 'tabs',
-        title: '标签页',
+        title: $r('app.string.settings_shortcuts_tabs'),
         rows: [
-          this.row('new_tab', '打开新标签页', 'Ctrl+T'),
-          this.row('close_tab', '关闭当前标签页', 'Ctrl+W'),
-          this.row('restore_tab', '恢复最近关闭标签页', 'Ctrl+Shift+T'),
-          this.row('next_tab', '切到下一个标签页', 'Ctrl+Tab'),
-          this.row('previous_tab', '切到上一个标签页', 'Ctrl+Shift+Tab'),
-          this.row('numbered_tabs', '切到指定标签页', 'Ctrl+1~9'),
-          this.row('tabs_overview', '打开或关闭标签页列表', 'Ctrl+Shift+A'),
-          this.row('tabs_overview_keyboard', '在标签页列表中选择标签页', '方向键 / Enter')
+          this.row('new_tab', $r('app.string.settings_shortcuts_new_tab'), 'Ctrl+T'),
+          this.row('close_tab', $r('app.string.settings_shortcuts_close_tab'), 'Ctrl+W'),
+          this.row('restore_tab', $r('app.string.settings_shortcuts_restore_tab'), 'Ctrl+Shift+T'),
+          this.row('next_tab', $r('app.string.settings_shortcuts_next_tab'), 'Ctrl+Tab'),
+          this.row('previous_tab', $r('app.string.settings_shortcuts_previous_tab'), 'Ctrl+Shift+Tab'),
+          this.row('numbered_tabs', $r('app.string.settings_shortcuts_numbered_tabs'), 'Ctrl+1~9'),
+          this.row('tabs_overview', $r('app.string.settings_shortcuts_tabs_overview'), 'Ctrl+Shift+A'),
+          this.row('tabs_overview_keyboard', $r('app.string.settings_shortcuts_tabs_overview_keyboard'), $r('app.string.settings_shortcuts_arrow_enter'))
         ]
       },
       {
         id: 'browse',
-        title: '浏览',
+        title: $r('app.string.settings_shortcuts_browse'),
         rows: [
-          this.row('address_alt', '焦点移到地址栏', 'Alt+D'),
-          this.row('address_ctrl', '焦点移到地址栏', 'Ctrl+L'),
-          this.row('find', '查找页面内容', 'Ctrl+F'),
-          this.row('reload_ctrl', '刷新页面', 'Ctrl+R'),
-          this.row('reload_f5', '刷新页面', 'F5'),
-          this.row('fullscreen', '进入或退出全屏', 'F11'),
-          this.row('escape', '退出当前状态或停止加载', 'Esc')
+          this.row('address_alt', $r('app.string.settings_shortcuts_address'), 'Alt+D'),
+          this.row('address_ctrl', $r('app.string.settings_shortcuts_address'), 'Ctrl+L'),
+          this.row('find', $r('app.string.settings_shortcuts_find'), 'Ctrl+F'),
+          this.row('reload_ctrl', $r('app.string.settings_shortcuts_reload'), 'Ctrl+R'),
+          this.row('reload_f5', $r('app.string.settings_shortcuts_reload'), 'F5'),
+          this.row('fullscreen', $r('app.string.settings_shortcuts_fullscreen'), 'F11'),
+          this.row('escape', $r('app.string.settings_shortcuts_escape'), 'Esc')
         ]
       },
       {
         id: 'navigation',
-        title: '导航',
+        title: $r('app.string.settings_shortcuts_navigation'),
         rows: [
-          this.row('back', '后退', 'Alt+Left'),
-          this.row('forward', '前进', 'Alt+Right')
+          this.row('back', $r('app.string.settings_shortcuts_back'), 'Alt+Left'),
+          this.row('forward', $r('app.string.settings_shortcuts_forward'), 'Alt+Right')
         ]
       },
       {
         id: 'management',
-        title: '管理',
+        title: $r('app.string.settings_shortcuts_management'),
         rows: [
-          this.row('history', '打开历史记录', resolveBrowserDesktopMenuShortcutLabel('history')),
-          this.row('downloads', '打开下载管理', resolveBrowserDesktopMenuShortcutLabel('downloads')),
-          this.row('bookmarks_manager', '打开书签管理', resolveBrowserDesktopMenuShortcutLabel('openBookmarks')),
-          this.row('bookmark_bar', '显示或隐藏书签栏', resolveBrowserDesktopMenuShortcutLabel('bar')),
-          this.row('bookmark', '收藏当前页面', resolveBrowserDesktopMenuShortcutLabel('bookmark')),
-          this.row('save_offline', '保存当前网页到离线页面', resolveBrowserDesktopMenuShortcutLabel('offline')),
-          this.row('settings', '打开设置', resolveBrowserDesktopMenuShortcutLabel('settings')),
-          this.row('private_mode', '切换隐私模式', resolveBrowserDesktopMenuShortcutLabel('newPrivateTab')),
-          this.row('print', '打印网页', resolveBrowserDesktopMenuShortcutLabel('print')),
-          this.row('inspect', '审查元素', resolveBrowserDesktopMenuShortcutLabel('elementInspection'))
+          this.row('history', $r('app.string.settings_shortcuts_history'), resolveBrowserDesktopMenuShortcutLabel('history')),
+          this.row('downloads', $r('app.string.settings_shortcuts_downloads'), resolveBrowserDesktopMenuShortcutLabel('downloads')),
+          this.row('bookmarks_manager', $r('app.string.settings_shortcuts_bookmarks'), resolveBrowserDesktopMenuShortcutLabel('openBookmarks')),
+          this.row('bookmark_bar', $r('app.string.settings_shortcuts_bookmark_bar'), resolveBrowserDesktopMenuShortcutLabel('bar')),
+          this.row('bookmark', $r('app.string.settings_shortcuts_bookmark'), resolveBrowserDesktopMenuShortcutLabel('bookmark')),
+          this.row('save_offline', $r('app.string.settings_shortcuts_save_offline'), resolveBrowserDesktopMenuShortcutLabel('offline')),
+          this.row('settings', $r('app.string.settings_shortcuts_settings'), resolveBrowserDesktopMenuShortcutLabel('settings')),
+          this.row('private_mode', $r('app.string.settings_shortcuts_private'), resolveBrowserDesktopMenuShortcutLabel('newPrivateTab')),
+          this.row('print', $r('app.string.settings_shortcuts_print'), resolveBrowserDesktopMenuShortcutLabel('print')),
+          this.row('inspect', $r('app.string.settings_shortcuts_inspect'), resolveBrowserDesktopMenuShortcutLabel('elementInspection'))
         ]
       }
     ];
   }
 
-  private row(id: string, title: string, shortcut: string): KeyboardShortcutRowState {
+  private row(id: string, title: ResourceStr, shortcut: ResourceStr): KeyboardShortcutRowState {
     return {
       id: id,
       title: title,

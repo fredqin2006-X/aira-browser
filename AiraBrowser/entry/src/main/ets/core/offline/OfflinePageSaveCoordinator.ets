@@ -33,6 +33,7 @@ import { MembershipFeature } from '../../features/membership/MembershipFeature';
 import { FeatureGateCoordinator } from '../membership/FeatureGateCoordinator';
 import { BrowserPrivacyEffectPolicyService } from '../../services/privacy/BrowserPrivacyEffectPolicyService';
 import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundaryService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface OfflinePageSaveShellContext {
   targetTab?: BrowserTabState;
@@ -47,7 +48,7 @@ export interface OfflinePageSaveShellContext {
 
 export interface OfflinePageSaveSessionSnapshot {
   visible: boolean;
-  message: string;
+  message: ResourceStr;
   title: string;
   url: string;
   iconUri: string;
@@ -57,7 +58,7 @@ export interface OfflinePageSaveSessionSnapshot {
 export interface OfflinePageSaveCoordinatorShell {
   readContext: (targetTabId: string) => OfflinePageSaveShellContext;
   publishSessionSnapshot: (snapshot: OfflinePageSaveSessionSnapshot) => void;
-  showToast: (message: string) => void;
+  showToast: (message: ResourceStr) => void;
   reportError: (message: string) => void;
 }
 
@@ -86,12 +87,12 @@ export interface OfflinePageSaveCoordinatorOptions {
 
 const OFFLINE_PAGE_SNAPSHOT_FILE_NAME: string = 'snapshot.html';
 const OFFLINE_PAGE_MANIFEST_FILE_NAME: string = 'manifest.json';
-const SAVE_SUCCESS_MESSAGE: string = '已保存到离线页面';
-const SAVE_PARTIAL_SUCCESS_MESSAGE: string = '部分资源保存失败，已保存可阅读内容';
-const SAVE_CONTENT_TOO_LARGE_MESSAGE: string = '网页内容过大，保存失败';
-const SAVE_STORAGE_FULL_MESSAGE: string = '存储空间不足';
-const SAVE_UNSUPPORTED_MESSAGE: string = '当前页面暂不支持保存';
-const SAVE_FAILED_MESSAGE: string = '当前页面无法保存';
+const SAVE_SUCCESS_MESSAGE: ResourceStr = $r('app.string.offline_save_saved');
+const SAVE_PARTIAL_SUCCESS_MESSAGE: ResourceStr = $r('app.string.offline_save_partial');
+const SAVE_CONTENT_TOO_LARGE_MESSAGE: ResourceStr = $r('app.string.offline_save_too_large');
+const SAVE_STORAGE_FULL_MESSAGE: ResourceStr = $r('app.string.offline_save_storage_full');
+const SAVE_UNSUPPORTED_MESSAGE: ResourceStr = $r('app.string.offline_save_unsupported');
+const SAVE_FAILED_MESSAGE: ResourceStr = $r('app.string.offline_save_failed');
 const DEFAULT_PROMPT_HIDE_DELAY_MS: number = 5200;
 const HIDDEN_OFFLINE_PAGE_SAVE_SESSION_SNAPSHOT: OfflinePageSaveSessionSnapshot = {
   visible: false,
@@ -223,7 +224,7 @@ export class OfflinePageSaveCoordinator {
     try {
       const targetTab = context.targetTab;
       if (targetTab === undefined) {
-        this.shell.reportError('当前页面状态不可用，请稍后重试。');
+        this.shell.reportError(resolveAppResourceText($r('app.string.offline_save_unavailable')));
         return;
       }
       const currentUsage = this.repository === undefined ? 0 : (await this.repository.list()).length;
@@ -240,7 +241,7 @@ export class OfflinePageSaveCoordinator {
         return;
       }
       if (presentationVersion === this.completionPresentationVersion) {
-        this.shell.showToast('正在保存网页...');
+        this.shell.showToast($r('app.string.offline_save_in_progress'));
       }
       const result = await this.saveActivePage(context);
       if (result.ok) {
@@ -254,7 +255,7 @@ export class OfflinePageSaveCoordinator {
         this.shell.showToast(result.message);
       }
     } catch (error) {
-      this.shell.reportError(`保存离线网页失败：${JSON.stringify(error)}`);
+      this.shell.reportError(resolveAppResourceText($r('app.string.offline_save_failed_detail'), JSON.stringify(error)));
       if (presentationVersion === this.completionPresentationVersion) {
         this.shell.showToast(SAVE_FAILED_MESSAGE);
       }
@@ -310,7 +311,7 @@ export class OfflinePageSaveCoordinator {
         return this.buildFailureResult('storage_full', SAVE_STORAGE_FULL_MESSAGE);
       }
       if (!this.canPersistOfflinePage(tab)) {
-        return this.buildFailureResult('privacy_policy_blocked', '当前隐私策略不允许保存离线页面');
+        return this.buildFailureResult('privacy_policy_blocked', $r('app.string.offline_save_blocked'));
       }
 
       await this.fileStore.prepareDraft(saveJobId);
@@ -559,7 +560,7 @@ export class OfflinePageSaveCoordinator {
     }).outcome === 'allow';
   }
 
-  private buildFailureResult(reason: OfflinePageFailureReason | '', message: string): OfflinePageSaveResult {
+  private buildFailureResult(reason: OfflinePageFailureReason | '', message: ResourceStr): OfflinePageSaveResult {
     return {
       ok: false,
       status: 'failed',
@@ -568,7 +569,7 @@ export class OfflinePageSaveCoordinator {
     };
   }
 
-  private resolveFailureMessage(reason: string): string {
+  private resolveFailureMessage(reason: string): ResourceStr {
     if (reason === 'content_too_large') {
       return SAVE_CONTENT_TOO_LARGE_MESSAGE;
     }
@@ -589,7 +590,7 @@ export class OfflinePageSaveCoordinator {
         return value;
       }
     }
-    return '离线网页';
+    return resolveAppResourceText($r('app.string.offline_saved_web_title'));
   }
 
   private resolveSiteName(snapshotSiteName: string, snapshotHost: string, url: string): string {
@@ -600,7 +601,7 @@ export class OfflinePageSaveCoordinator {
         return value;
       }
     }
-    return '未知来源';
+    return resolveAppResourceText($r('app.string.offline_unknown_source'));
   }
 
   private resolveHost(url: string): string {

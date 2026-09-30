@@ -2,8 +2,8 @@ export type BrowserScreenOrientationMode = 'system' | 'portrait' | 'landscape';
 
 export interface BrowserScreenOrientationOptionState {
   mode: BrowserScreenOrientationMode;
-  title: string;
-  helperText: string;
+  title: ResourceStr;
+  helperText: ResourceStr;
   icon: Resource;
   isSelected: boolean;
 }
@@ -13,36 +13,36 @@ export class BrowserScreenOrientationViewModel {
     return [
       this.buildOption(
         'system',
-        '跟随系统',
-        '使用系统旋转锁定与方向设置',
+        $r('app.string.settings_screen_orientation_system_title'),
+        $r('app.string.settings_screen_orientation_system_helper'),
         $r('sys.symbol.gyroscope'),
         selectedMode
       ),
       this.buildOption(
         'portrait',
-        '竖屏',
-        '将浏览器固定为竖屏显示',
+        $r('app.string.settings_screen_orientation_portrait_title'),
+        $r('app.string.settings_screen_orientation_portrait_helper'),
         $r('sys.symbol.rectangle'),
         selectedMode
       ),
       this.buildOption(
         'landscape',
-        '横屏',
-        '将浏览器固定为横屏显示',
+        $r('app.string.settings_screen_orientation_landscape_title'),
+        $r('app.string.settings_screen_orientation_landscape_helper'),
         $r('sys.symbol.rectangle_on_rectangle_fill'),
         selectedMode
       )
     ];
   }
 
-  resolveLabel(mode: BrowserScreenOrientationMode): string {
+  resolveLabel(mode: BrowserScreenOrientationMode): ResourceStr {
     if (mode === 'portrait') {
-      return '竖屏';
+      return $r('app.string.settings_screen_orientation_portrait_title');
     }
     if (mode === 'landscape') {
-      return '横屏';
+      return $r('app.string.settings_screen_orientation_landscape_title');
     }
-    return '跟随系统';
+    return $r('app.string.settings_screen_orientation_system_title');
   }
 
   resolveIcon(mode: BrowserScreenOrientationMode): Resource {
@@ -57,8 +57,8 @@ export class BrowserScreenOrientationViewModel {
 
   private buildOption(
     mode: BrowserScreenOrientationMode,
-    title: string,
-    helperText: string,
+    title: ResourceStr,
+    helperText: ResourceStr,
     icon: Resource,
     selectedMode: BrowserScreenOrientationMode
   ): BrowserScreenOrientationOptionState {

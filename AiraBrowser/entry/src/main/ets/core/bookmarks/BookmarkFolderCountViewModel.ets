@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { BookmarkFolderBookmarkCountsResult } from '../../services/bookmarks/BookmarkTreeQueryService';
 import { BookmarkManagementFeature } from '../../features/bookmarks/BookmarkManagementFeature';
 import {
@@ -136,11 +137,11 @@ export class BookmarkFolderCountViewModel {
     return snapshotVersion >= currentVersion;
   }
 
-  resolveSubtitle(state: BookmarkFolderCountState, folderId: string): string {
+  resolveSubtitle(state: BookmarkFolderCountState, folderId: string): ResourceStr {
     if (!state.ready) {
-      return '正在统计';
+      return $r('app.string.bookmark_counting');
     }
-    return `${state.counts.get(folderId) ?? 0} 个书签`;
+    return resolveAppResourceText($r('app.string.bookmark_count', state.counts.get(folderId) ?? 0));
   }
 
   resolveCount(state: BookmarkFolderCountState, folderId: string): number {

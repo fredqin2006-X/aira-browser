@@ -1,14 +1,18 @@
 import { common } from '@kit.AbilityKit';
 import { pasteboard } from '@kit.BasicServicesKit';
+import { i18n } from '@kit.LocalizationKit';
 import buffer from '@ohos.buffer';
 import { BrowserWebLoadDataPayload } from '../../core/browser/BrowserWebLoadCoordinator';
 import {
   MarkdownDocumentTheme,
   MarkdownDocumentViewerService
 } from '../markdown/MarkdownDocumentViewerService';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
-const SYNC_DESKTOP_BOOKMARK_GUIDE_RAW_FILE_NAME: string = 'sync_desktop_bookmark_guide.md';
-export const SYNC_DESKTOP_BOOKMARK_GUIDE_TITLE: string = '私有化部署教程';
+const SYNC_DESKTOP_BOOKMARK_GUIDE_RAW_FILE_NAME_ZH: string = 'sync_desktop_bookmark_guide.md';
+const SYNC_DESKTOP_BOOKMARK_GUIDE_RAW_FILE_NAME_EN: string = 'sync_desktop_bookmark_guide_en.md';
+export const SYNC_DESKTOP_BOOKMARK_GUIDE_TITLE: ResourceStr =
+  $r('app.string.settings_sync_self_host_guide_title');
 const SYNC_DESKTOP_BOOKMARK_GUIDE_SOURCE_URL: string = 'https://aira.local/settings/sync-desktop-bookmark-guide.md';
 const SYNC_DESKTOP_BOOKMARK_GUIDE_BASE_URL: string = 'https://aira.local/settings/';
 const SYNC_DESKTOP_BOOKMARK_GUIDE_LOCAL_PACKAGE_URL: string = 'https://wwbgv.lanzoul.com/b00oe0qfcd';
@@ -37,7 +41,7 @@ export class SyncDesktopBookmarkGuideMarkdownService {
   async buildPayload(context: common.Context, theme?: MarkdownDocumentTheme): Promise<BrowserWebLoadDataPayload> {
     const markdown = this.applyImagePlaceholders(this.readMarkdown(context));
     return this.markdownViewerService.buildPayloadFromMarkdown({
-      title: SYNC_DESKTOP_BOOKMARK_GUIDE_TITLE,
+      title: this.resolveGuideTitle(),
       sourceUri: SYNC_DESKTOP_BOOKMARK_GUIDE_SOURCE_URL,
       markdown: markdown,
       baseUrl: SYNC_DESKTOP_BOOKMARK_GUIDE_BASE_URL,
@@ -59,7 +63,7 @@ export class SyncDesktopBookmarkGuideMarkdownService {
     if (!this.shouldCopyGuideLink(normalizedUrl)) {
       return {
         ok: false,
-        message: '扩展链接暂未配置。'
+        message: resolveAppResourceText($r('app.string.settings_sync_self_host_guide_link_unset'))
       };
     }
     try {
@@ -67,27 +71,46 @@ export class SyncDesktopBookmarkGuideMarkdownService {
       await pasteboard.getSystemPasteboard().setData(data);
       return {
         ok: true,
-        message: '链接已复制，请在电脑中打开。'
+        message: resolveAppResourceText($r('app.string.settings_sync_self_host_guide_link_copied'))
       };
     } catch (_error) {
       return {
         ok: false,
-        message: '复制失败，请稍后重试。'
+        message: resolveAppResourceText($r('app.string.settings_sync_self_host_guide_copy_failed'))
       };
     }
   }
 
   private readMarkdown(context: common.Context): string {
     try {
-      const rawFile = context.resourceManager.getRawFileContentSync(SYNC_DESKTOP_BOOKMARK_GUIDE_RAW_FILE_NAME);
+      const rawFile = context.resourceManager.getRawFileContentSync(this.resolveGuideRawFileName());
       return buffer.from(rawFile.buffer).toString('utf8');
     } catch (error) {
       return [
-        `# ${SYNC_DESKTOP_BOOKMARK_GUIDE_TITLE}`,
+        `# ${this.resolveGuideTitle()}`,
         '',
-        `同步指南加载失败：${this.stringifyError(error)}`
+        resolveAppResourceText(
+          $r('app.string.settings_sync_self_host_guide_load_failed'),
+          this.stringifyError(error)
+        )
       ].join('\n');
     }
+  }
+
+  /**
+   * rawfile 目录不参与资源限定词匹配，所以教程正文按系统语言显式挑文件：
+   * 英文走英文正文，其余语言回落到 base 对应的中文正文，与 string.json 的兜底关系一致。
+   */
+  private resolveGuideRawFileName(): string {
+    const language = i18n.System.getSystemLanguage().trim().toLowerCase();
+    return language.startsWith('en')
+      ? SYNC_DESKTOP_BOOKMARK_GUIDE_RAW_FILE_NAME_EN
+      : SYNC_DESKTOP_BOOKMARK_GUIDE_RAW_FILE_NAME_ZH;
+  }
+
+  private resolveGuideTitle(): string {
+    const title = SYNC_DESKTOP_BOOKMARK_GUIDE_TITLE;
+    return typeof title === 'string' ? title : resolveAppResourceText(title);
   }
 
   private applyImagePlaceholders(markdown: string): string {

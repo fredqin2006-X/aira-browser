@@ -8,6 +8,7 @@ import {
   UserScriptExternalImportEnvelope,
   UserScriptExternalImportRuntime
 } from './UserScriptExternalImportRuntime';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface UserScriptExternalImportLaunchHost {
   waitForContentReady: () => Promise<void>;
@@ -113,7 +114,7 @@ export class UserScriptExternalImportCoordinator {
         return {
           requestId: requestId,
           status: 'failed',
-          errorMessage: '用户脚本导入已取消。'
+          errorMessage: resolveAppResourceText($r('app.string.user_script_import_cancelled'))
         };
     }
   }

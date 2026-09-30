@@ -29,6 +29,7 @@ import {
   BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY
 } from '../../../core/theme/BrowserThemeStorageKeys';
 import { SettingsContentKind } from '../../../core/settings/SettingsContentLayoutPolicy';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 @Component
 export struct SearchSettingsScreen {
@@ -78,7 +79,7 @@ export struct SearchSettingsScreen {
       this.highlightedTargetId = targetId;
     }
   );
-  @Prop externalAppSearchSummary: string = '已开启';
+  @Prop externalAppSearchSummary: string = resolveAppResourceText($r('app.string.settings_search_engine_external_on'));
   @Prop quickSearchSwitchingEnabled: boolean = true;
   onOpenDefaultEngine: () => void = () => {};
   onQuickSearchSwitchingChange: (enabled: boolean) => void = (_enabled: boolean) => {};
@@ -104,7 +105,7 @@ export struct SearchSettingsScreen {
 
   build() {
     SettingsHdsScaffold({
-      title: '搜索',
+      title: $r('app.string.settings_search_engine_page_title'),
       backIconKind: 'back',
       pageBackground: this.resolvePageBackground(),
       headerButtonBackground: this.resolveControlBackground(),
@@ -154,7 +155,7 @@ export struct SearchSettingsScreen {
       }
     }) {
       SettingsSection({
-        title: '搜索引擎',
+        title: $r('app.string.settings_search_engine_section'),
         secondaryTextColor: this.resolveSecondaryTextColor()
       }) {
         SettingsGroupCard({
@@ -170,7 +171,7 @@ export struct SearchSettingsScreen {
           }
         }) {
           SettingsNavigationRow({
-            title: '默认搜索引擎',
+            title: $r('app.string.settings_search_engine_default'),
             desktopPresentation: this.desktopPresentation,
             value: this.state.defaultEngineName,
             primaryTextColor: this.resolvePrimaryTextColor(),
@@ -192,7 +193,7 @@ export struct SearchSettingsScreen {
           }
         }) {
           SettingsSwitchRow({
-            title: '快速切换搜索引擎',
+            title: $r('app.string.settings_search_engine_quick_switch'),
             desktopPresentation: this.desktopPresentation,
             checked: this.quickSearchSwitchingEnabled,
             primaryTextColor: this.resolvePrimaryTextColor(),
@@ -214,13 +215,13 @@ export struct SearchSettingsScreen {
           }
         }) {
           SettingsSwitchRow({
-            title: '智能搜索回退',
+            title: $r('app.string.settings_search_engine_smart_fallback'),
             desktopPresentation: this.desktopPresentation,
             checked: this.state.fallbackEnabled,
             isEnabled: this.state.fallbackEngineSelectable,
             titleActionIcon: $r('sys.symbol.info_circle'),
             titlePopupText: this.state.fallbackInfoText,
-            titleActionAccessibilityText: '查看智能搜索回退说明',
+            titleActionAccessibilityText: $r('app.string.settings_search_engine_fallback_info'),
             primaryTextColor: this.resolvePrimaryTextColor(),
             secondaryTextColor: this.resolveSecondaryTextColor(),
             pressedBackgroundColor: this.resolvePressedBackground(),
@@ -240,7 +241,7 @@ export struct SearchSettingsScreen {
           }
         }) {
           SettingsNavigationRow({
-            title: '备用搜索引擎',
+            title: $r('app.string.settings_search_engine_fallback'),
             desktopPresentation: this.desktopPresentation,
             value: this.resolveFallbackEngineName(),
             isEnabled: this.state.fallbackEnabled && this.state.fallbackEngineSelectable,
@@ -263,7 +264,7 @@ export struct SearchSettingsScreen {
           }
         }) {
           SettingsSwitchRow({
-            title: '回退提示',
+            title: $r('app.string.settings_search_engine_fallback_notice'),
             desktopPresentation: this.desktopPresentation,
             checked: this.state.fallbackNoticeEnabled,
             isEnabled: this.state.fallbackEnabled,
@@ -278,7 +279,7 @@ export struct SearchSettingsScreen {
         }
         }
         SettingsFooterText({
-          text: '主搜索引擎当前不可用时，地址栏会自动使用备用搜索引擎完成本次搜索。检测不会发送搜索词。',
+          text: $r('app.string.settings_search_engine_fallback_footer'),
           secondaryTextColor: this.resolveSecondaryTextColor()
         })
       }
@@ -296,7 +297,7 @@ export struct SearchSettingsScreen {
       }
     }) {
       SettingsSection({
-        title: '搜索建议',
+        title: $r('app.string.settings_search_engine_suggestions'),
         secondaryTextColor: this.resolveSecondaryTextColor()
       }) {
         SettingsGroupCard({
@@ -312,7 +313,7 @@ export struct SearchSettingsScreen {
           }
         }) {
           SettingsSwitchRow({
-            title: '搜索历史建议',
+            title: $r('app.string.settings_search_engine_history_suggestions'),
             desktopPresentation: this.desktopPresentation,
             checked: this.state.historySuggestionsEnabled,
             primaryTextColor: this.resolvePrimaryTextColor(),
@@ -334,7 +335,7 @@ export struct SearchSettingsScreen {
           }
         }) {
           SettingsSwitchRow({
-            title: '历史记录建议',
+            title: $r('app.string.settings_search_engine_browsing_suggestions'),
             desktopPresentation: this.desktopPresentation,
             checked: this.state.browsingHistorySuggestionsEnabled,
             primaryTextColor: this.resolvePrimaryTextColor(),
@@ -356,7 +357,7 @@ export struct SearchSettingsScreen {
           }
         }) {
           SettingsSwitchRow({
-            title: '书签建议',
+            title: $r('app.string.settings_search_engine_bookmark_suggestions'),
             desktopPresentation: this.desktopPresentation,
             checked: this.state.bookmarkSuggestionsEnabled,
             primaryTextColor: this.resolvePrimaryTextColor(),
@@ -378,7 +379,7 @@ export struct SearchSettingsScreen {
           }
         }) {
           SettingsSwitchRow({
-            title: '已打开的标签页',
+            title: $r('app.string.settings_search_engine_open_tabs'),
             desktopPresentation: this.desktopPresentation,
             checked: this.state.openTabSuggestionsEnabled,
             primaryTextColor: this.resolvePrimaryTextColor(),
@@ -400,7 +401,7 @@ export struct SearchSettingsScreen {
           }
         }) {
           SettingsSwitchRow({
-            title: '网络搜索建议',
+            title: $r('app.string.settings_search_engine_remote_suggestions'),
             desktopPresentation: this.desktopPresentation,
             checked: this.state.remoteSuggestionsEnabled,
             primaryTextColor: this.resolvePrimaryTextColor(),
@@ -414,7 +415,7 @@ export struct SearchSettingsScreen {
         }
         }
         SettingsFooterText({
-          text: '书签、已打开的标签页、搜索历史和访问记录都在本机匹配。网络搜索建议会在输入时获取联想词。',
+          text: $r('app.string.settings_search_engine_suggestions_footer'),
           secondaryTextColor: this.resolveSecondaryTextColor()
         })
       }
@@ -424,7 +425,7 @@ export struct SearchSettingsScreen {
   @Builder
   private buildExternalAppSearchEntrySection() {
     SettingsSection({
-      title: '更多搜索方式',
+      title: $r('app.string.settings_search_engine_more_ways'),
       secondaryTextColor: this.resolveSecondaryTextColor()
     }) {
       SettingsGroupCard({
@@ -440,7 +441,7 @@ export struct SearchSettingsScreen {
           }
         }) {
           SettingsNavigationRow({
-            title: '跨应用搜索',
+            title: $r('app.string.settings_search_engine_external_app'),
             desktopPresentation: this.desktopPresentation,
             value: this.externalAppSearchSummary,
             primaryTextColor: this.resolvePrimaryTextColor(),
@@ -467,7 +468,7 @@ export struct SearchSettingsScreen {
       }
     }) {
       SettingsActionButton({
-        title: '清除搜索历史',
+        title: $r('app.string.settings_search_engine_clear_history'),
         emphasis: 'danger',
         pressedBackgroundColor: this.resolvePressedBackground(),
         onAction: () => {
@@ -510,7 +511,7 @@ export struct SearchSettingsScreen {
   }
 
   private resolveFallbackEngineName(): string {
-    return this.state.fallbackEngineName.length > 0 ? this.state.fallbackEngineName : '未选择';
+    return this.state.fallbackEngineName.length > 0 ? this.state.fallbackEngineName : resolveAppResourceText($r('app.string.settings_search_engine_not_selected'));
   }
 
 }

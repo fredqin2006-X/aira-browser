@@ -35,13 +35,13 @@ export struct SyncSetupStepScaffold {
     DEFAULT_THEME_PALETTE.light.textPrimary;
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string =
     DEFAULT_THEME_PALETTE.light.textSecondary;
-  @Prop title: string = '';
-  @Prop summary: string = '';
+  @Prop title: ResourceStr = '';
+  @Prop summary: ResourceStr = '';
   @Prop showBackButton: boolean = false;
   @Prop layoutMode: SyncSetupStepLayoutMode = 'phone';
   @Prop maxHeightVp: number = 0;
   @Prop showSubmitButton: boolean = false;
-  @Prop submitLabel: string = '';
+  @Prop submitLabel: ResourceStr = '';
   @Prop isBusy: boolean = false;
   @Prop canSubmit: boolean = true;
   onBack: () => void = () => {};
@@ -187,7 +187,7 @@ export struct SyncSetupStepScaffold {
       title: this.title,
       titleColor: this.storedPrimaryTextColor,
       showLeadingButton: this.showBackButton,
-      leadingAccessibilityLabel: '返回',
+      leadingAccessibilityLabel: $r('app.string.settings_sync_back'),
       onLeadingAction: (): void => {
         if (this.showBackButton) {
           this.onBack();

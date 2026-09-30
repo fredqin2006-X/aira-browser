@@ -15,6 +15,7 @@ import {
   BrowserDataScope,
   BrowserSessionPrivacyMode
 } from '../../common/models/BrowserModels';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 const USER_SCRIPT_INSTALL_SUCCESS_PROMPT_AUTO_DISMISS_MS: number = 4000;
 
@@ -62,7 +63,7 @@ export function createBrowserUserScriptApplicationSnapshot(): BrowserUserScriptA
     pageActionsPopupVisible: false,
     pageActionsState: {
       url: '',
-      message: '打开网页后会显示当前页脚本菜单。',
+      message: resolveAppResourceText($r('app.string.user_script_page_actions_initial')),
       hasPage: false,
       hasMatchingScripts: false,
       hasMenuCommands: false,
@@ -263,7 +264,10 @@ export class BrowserUserScriptApplicationCoordinator {
       }
     }).catch((error: Error) => {
       if (this.isCurrentPageActionsRequest(facts, generation)) {
-        this.emitMessage('set_error_message', `读取脚本菜单失败：${this.stringifyError(error)}`);
+        this.emitMessage(
+          'set_error_message',
+          resolveAppResourceText($r('app.string.user_script_read_menu_failed'), this.stringifyError(error))
+        );
       }
     });
   }
@@ -304,11 +308,14 @@ export class BrowserUserScriptApplicationCoordinator {
       facts.privateMode
     ).then((success: boolean) => {
       if (generation === this.pageCommandGeneration && this.isCurrentPage(facts) && !success) {
-        this.emitMessage('set_helper_message', '脚本菜单命令执行失败');
+        this.emitMessage('set_helper_message', resolveAppResourceText($r('app.string.user_script_command_run_failed')));
       }
     }).catch((error: Error) => {
       if (generation === this.pageCommandGeneration && this.isCurrentPage(facts)) {
-        this.emitMessage('set_error_message', `执行脚本菜单失败：${this.stringifyError(error)}`);
+        this.emitMessage(
+          'set_error_message',
+          resolveAppResourceText($r('app.string.user_script_run_menu_failed'), this.stringifyError(error))
+        );
       }
     });
   }
@@ -418,9 +425,11 @@ export class BrowserUserScriptApplicationCoordinator {
     }
     try {
       const serialized = JSON.stringify(error);
-      return serialized.length > 0 ? serialized : '未知错误';
+      return serialized.length > 0
+        ? serialized
+        : resolveAppResourceText($r('app.string.user_script_unknown_error'));
     } catch (_stringifyError) {
-      return '未知错误';
+      return resolveAppResourceText($r('app.string.user_script_unknown_error'));
     }
   }
 }

@@ -5,16 +5,16 @@ export type HistorySelectionMoreActionId =
 
 export interface HistorySelectionMoreMenuItem {
   id: HistorySelectionMoreActionId;
-  title: string;
+  title: ResourceStr;
 }
 
 export interface HistorySelectionMoreMenuPlan {
-  emptySelectionMessage: string;
+  emptySelectionMessage: ResourceStr;
   selectedCount: number;
   items: HistorySelectionMoreMenuItem[];
 }
 
-export const HISTORY_SELECTION_MORE_EMPTY_MESSAGE: string = '请先选择历史记录。';
+export const HISTORY_SELECTION_MORE_EMPTY_MESSAGE: ResourceStr = $r('app.string.history_select_first');
 
 export function planHistorySelectionMoreMenu(
   viewMode: HistoryViewMode,
@@ -25,26 +25,26 @@ export function planHistorySelectionMoreMenu(
   if (viewMode === 'sites') {
     items.push({
       id: 'delete_selected_sites',
-      title: '删除所选站点历史'
+      title: $r('app.string.history_delete_selected_sites')
     });
   } else {
     items.push({
       id: 'copy_links',
-      title: '批量复制链接'
+      title: $r('app.string.history_batch_copy')
     });
     items.push({
       id: 'add_bookmarks',
-      title: '批量添加到书签'
+      title: $r('app.string.history_batch_add_bookmarks')
     });
     if (includeRemoveBookmarks) {
       items.push({
         id: 'remove_bookmarks',
-        title: '批量取消书签'
+        title: $r('app.string.history_batch_remove_bookmarks')
       });
     }
     items.push({
       id: 'share_links',
-      title: '批量分享链接'
+      title: $r('app.string.history_batch_share')
     });
   }
   return {

@@ -1,0 +1,30 @@
+{
+  "plural": [
+    {
+      "name": "bottom_panel_hide_rule_count",
+      "value": [
+        {
+          "quantity": "one",
+          "value": "%d rule"
+        },
+        {
+          "quantity": "other",
+          "value": "%d rules"
+        }
+      ]
+    },
+    {
+      "name": "bookshelf_book_count",
+      "value": [
+        {
+          "quantity": "one",
+          "value": "%d book"
+        },
+        {
+          "quantity": "other",
+          "value": "%d books"
+        }
+      ]
+    }
+  ]
+}

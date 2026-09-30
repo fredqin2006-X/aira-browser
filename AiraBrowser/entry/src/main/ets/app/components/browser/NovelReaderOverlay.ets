@@ -18,6 +18,7 @@ import {
   buildNovelChapterRenderKey,
   NovelSessionCommittedChapter
 } from '../../../features/novel/NovelReadingSessionState';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { NovelReadingDocumentAdapter } from '../../../features/novel/NovelReadingDocumentAdapter';
 import {
   ReadingAnchor,
@@ -200,7 +201,7 @@ export struct NovelReaderOverlay {
           if (this.resolveContentKind() !== 'comic' &&
             this.readingSurfaceDocument.blocks.length === 0) {
             Text(this.resolveChapterTransitionMessage().length > 0
-              ? this.resolveChapterTransitionMessage() : '正在整理正文…')
+              ? this.resolveChapterTransitionMessage() : $r('app.string.novel_reading_preparing'))
               .fontSize(15)
               .fontColor(this.resolveTextColor(this.effectiveTheme()))
               .textAlign(TextAlign.Center)
@@ -232,7 +233,9 @@ export struct NovelReaderOverlay {
       if (this.chromeVisible) {
         ReadingExperienceChrome({
           title: this.state.bookTitle.length > 0 ? this.state.bookTitle : this.resolveReadingModeLabel(),
-          closeAccessibilityLabel: `退出${this.resolveReadingModeAccessibilityLabel()}`,
+          closeAccessibilityLabel: resolveAppResourceText(
+            $r('app.string.novel_action_exit_mode', this.resolveReadingModeAccessibilityLabel())
+          ),
           visible: this.chromeVisible,
           appearance: this.resolveReadingSurfaceAppearance(),
           textActionVisible: this.resolveContentKind() !== 'comic',
@@ -241,10 +244,10 @@ export struct NovelReaderOverlay {
           controlContentWidth: this.resolveReadingChromeControlWidth(),
           contextRowVisible: true,
           primaryActionIcon: 'novelReader.catalog',
-          primaryActionLabel: '目录',
+          primaryActionLabel: resolveAppResourceText($r('app.string.novel_action_catalog')),
           trailingActionVisible: true,
           trailingActionIcon: 'browser.shortcut.home',
-          trailingActionLabel: '主页',
+          trailingActionLabel: resolveAppResourceText($r('app.string.novel_action_home')),
           onClose: (): void => {
             this.closeReader();
           },
@@ -302,7 +305,9 @@ export struct NovelReaderOverlay {
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
     .borderRadius(16)
     .stateEffect(true)
-    .accessibilityText(`更多${this.resolveReadingModeLabel()}操作`)
+    .accessibilityText(resolveAppResourceText(
+      $r('app.string.novel_action_more_mode', this.resolveReadingModeLabel())
+    ))
     .bindMenu(this.buildBookOverflowMenu())
   }
 
@@ -316,7 +321,7 @@ export struct NovelReaderOverlay {
         .maxLines(2)
       Row({ space: 8 }) {
         if (this.canRetryChapterTransition()) {
-          Button('重试')
+          Button($r('app.string.novel_action_retry'))
             .buttonStyle(ButtonStyleMode.TEXTUAL)
             .fontColor(this.resolveTextColor(this.effectiveTheme()))
             .onClick(() => {
@@ -385,7 +390,7 @@ export struct NovelReaderOverlay {
             .color(this.resolveSecondaryTextColor(this.effectiveTheme()))
             .opacity(0.18)
 
-          Button('退出自动阅读')
+          Button($r('app.string.novel_action_exit_auto_read'))
             .width('100%')
             .height(47)
             .buttonStyle(ButtonStyleMode.TEXTUAL)
@@ -440,7 +445,9 @@ export struct NovelReaderOverlay {
       }, (url: string, index: number): string => `${this.resolveActiveChapterRenderKey()}:${index}:${url}`)
       ListItem() {
         Column() {
-          Text(this.state.canNavigateNext ? '继续下一话' : '已经是最后一话')
+          Text(this.state.canNavigateNext
+            ? $r('app.string.novel_action_continue_episode')
+            : $r('app.string.novel_last_episode'))
             .fontSize(15)
             .fontColor('#FFFFFFFF')
         }
@@ -463,7 +470,7 @@ export struct NovelReaderOverlay {
   @Builder
   buildChapterNavRow() {
     Row() {
-      Text('上一章')
+      Text($r('app.string.novel_action_previous_chapter'))
         .fontSize(15)
         .fontColor(this.state.canNavigatePrevious
           ? this.resolveTextColor(this.effectiveTheme())
@@ -483,7 +490,7 @@ export struct NovelReaderOverlay {
         .layoutWeight(1)
         .textAlign(TextAlign.Center)
         .margin({ left: 12, right: 12 })
-      Text('下一章')
+      Text($r('app.string.novel_action_next_chapter'))
         .fontSize(15)
         .fontColor(this.state.canNavigateNext
           ? this.resolveTextColor(this.effectiveTheme())
@@ -543,7 +550,9 @@ export struct NovelReaderOverlay {
         .type(ButtonType.Normal)
         .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
         .borderRadius(16)
-        .accessibilityText(`退出${this.resolveReadingModeAccessibilityLabel()}`)
+        .accessibilityText(resolveAppResourceText(
+          $r('app.string.novel_action_exit_mode', this.resolveReadingModeAccessibilityLabel())
+        ))
         .onClick(() => {
           this.closeReader();
         })
@@ -562,7 +571,7 @@ export struct NovelReaderOverlay {
         .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
         .borderRadius(16)
         .stateEffect(true)
-        .accessibilityText('更多原网页操作')
+        .accessibilityText(resolveAppResourceText($r('app.string.novel_action_more_original')))
         .bindMenu(this.buildBookOverflowMenu())
     }
     .width(this.layoutState.bookSurfaceWidth)
@@ -620,10 +629,10 @@ export struct NovelReaderOverlay {
       if (this.state.catalogTransition.status === 'failed' && this.state.catalog.length === 0) {
         ListItem() {
           Column({ space: 8 }) {
-            Text('章节目录加载失败')
+            Text($r('app.string.novel_catalog_load_failed'))
               .fontSize(15)
               .fontColor(this.resolveBookPrimaryTextColor())
-            Text('可以稍后重试，当前书籍信息仍然保留。')
+            Text($r('app.string.novel_catalog_load_failed_hint'))
               .fontSize(13)
               .fontColor(this.resolveBookSecondaryTextColor())
           }
@@ -715,7 +724,9 @@ export struct NovelReaderOverlay {
     .height(48)
     .padding({ left: NOVEL_READER_H_PADDING, right: NOVEL_READER_H_PADDING })
     .alignItems(VerticalAlign.Center)
-    .accessibilityText(this.isBookCatalogRangeExpanded(startOrdinal) ? '折叠章节范围' : '展开章节范围')
+    .accessibilityText(this.isBookCatalogRangeExpanded(startOrdinal)
+      ? resolveAppResourceText($r('app.string.novel_catalog_range_collapse'))
+      : resolveAppResourceText($r('app.string.novel_catalog_range_expand')))
     .onClick((): void => {
       this.toggleBookCatalogRange(startOrdinal);
     })
@@ -812,14 +823,16 @@ export struct NovelReaderOverlay {
       }
       .width(120)
       .height(160)
-      Text(this.state.bookTitle.length > 0 ? this.state.bookTitle : '本书')
+      Text(this.state.bookTitle.length > 0 ? this.state.bookTitle : resolveAppResourceText(
+        $r('app.string.novel_book_fallback_title')
+      ))
         .fontSize(22)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.resolveBookPrimaryTextColor())
         .textAlign(TextAlign.Center)
         .margin({ top: 14 })
       if (this.state.sourceHost.length > 0) {
-        Text(`来源：${this.state.sourceHost}`)
+        Text(resolveAppResourceText($r('app.string.novel_book_source', this.state.sourceHost)))
           .fontSize(13)
           .fontColor(this.resolveBookSecondaryTextColor())
           .margin({ top: 8 })
@@ -827,9 +840,12 @@ export struct NovelReaderOverlay {
 
       // 作者 / 类别 / 最新
       Row() {
-        this.buildInfoCol('作者', this.state.bookAuthor.length > 0 ? this.state.bookAuthor : '—')
-        this.buildInfoCol('类别', this.state.bookCategory.length > 0 ? this.state.bookCategory : '—')
-        this.buildInfoCol('最新', this.state.bookLatest.length > 0 ? this.state.bookLatest : '—')
+        this.buildInfoCol(resolveAppResourceText($r('app.string.novel_book_author')),
+          this.state.bookAuthor.length > 0 ? this.state.bookAuthor : '—')
+        this.buildInfoCol(resolveAppResourceText($r('app.string.novel_book_category')),
+          this.state.bookCategory.length > 0 ? this.state.bookCategory : '—')
+        this.buildInfoCol(resolveAppResourceText($r('app.string.novel_book_latest')),
+          this.state.bookLatest.length > 0 ? this.state.bookLatest : '—')
       }
       .width('100%')
       .margin({ top: 18 })
@@ -838,7 +854,7 @@ export struct NovelReaderOverlay {
       .borderRadius(14)
 
       if (this.state.bookSynopsis.length > 0) {
-        Text('简介')
+        Text($r('app.string.novel_book_synopsis'))
           .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .fontColor(this.resolveBookPrimaryTextColor())
@@ -867,7 +883,7 @@ export struct NovelReaderOverlay {
 
   @Builder
   buildBookCatalogHeadingLabels() {
-    Text('目录')
+    Text($r('app.string.novel_action_catalog'))
       .fontSize(18)
       .fontWeight(FontWeight.Bold)
       .fontColor(this.resolveBookPrimaryTextColor())
@@ -1005,15 +1021,15 @@ export struct NovelReaderOverlay {
             }
           })
       }
-      MenuItem({ content: '复制链接' })
+      MenuItem({ content: $r('app.string.bookshelf_copy_link') })
         .onClick(() => {
           this.onAction({ type: 'copy_source_link' });
         })
-      MenuItem({ content: '分享' })
+      MenuItem({ content: $r('app.string.bookshelf_share') })
         .onClick(() => {
           this.onAction({ type: 'share_source_link' });
         })
-      MenuItem({ content: '访问原网页' })
+      MenuItem({ content: $r('app.string.bookshelf_visit_original') })
         .onClick(() => {
           this.reportCurrentProgress();
           this.onAction({ type: 'return_to_source' });
@@ -1097,12 +1113,14 @@ export struct NovelReaderOverlay {
 
   private resolveBookCatalogCount(): string {
     if (this.state.catalogTotalHint > this.state.catalog.length) {
-      return `${this.state.catalog.length} / ${this.state.catalogTotalHint} 章`;
+      return resolveAppResourceText(
+        $r('app.string.novel_catalog_count_progress', this.state.catalog.length, this.state.catalogTotalHint)
+      );
     }
     if (this.state.catalogHasMore && this.state.catalogTotalHint === 0) {
-      return `已载入 ${this.state.catalog.length} 章`;
+      return resolveAppResourceText($r('app.string.novel_catalog_count_loaded', this.state.catalog.length));
     }
-    return `共 ${this.state.catalog.length} 章`;
+    return resolveAppResourceText($r('app.string.novel_catalog_count_total', this.state.catalog.length));
   }
 
   private isBookStartActionLoading(): boolean {
@@ -1111,28 +1129,29 @@ export struct NovelReaderOverlay {
 
   private resolveBookStartActionTitle(): string {
     if (this.state.chapterTransition.status === 'loading') {
-      return '正在打开';
+      return resolveAppResourceText($r('app.string.novel_action_opening'));
     }
-    return '开始阅读';
+    return resolveAppResourceText($r('app.string.novel_action_start_reading'));
   }
 
   private resolveChapterTransitionMessage(): string {
     const code: string = this.state.chapterTransition.failureCode;
     if (code === 'retryable') {
-      return '这一章加载失败，请重试。';
+      return resolveAppResourceText($r('app.string.novel_chapter_failed_retryable'));
     }
     if (code === 'content_rejected') {
-      return this.state.contentKind === 'comic' ?
-        '这一章漫画图片加载失败，请重试。' : '这一章正文不完整，请重试。';
+      return this.state.contentKind === 'comic'
+        ? resolveAppResourceText($r('app.string.novel_chapter_failed_comic'))
+        : resolveAppResourceText($r('app.string.novel_chapter_failed_incomplete'));
     }
     if (code === 'identity_mismatch') {
-      return '章节身份校验失败，请返回原网页后重试。';
+      return resolveAppResourceText($r('app.string.novel_chapter_failed_identity'));
     }
     if (code === 'unsupported_source') {
-      return '当前来源暂不支持继续读取。';
+      return resolveAppResourceText($r('app.string.novel_chapter_failed_unsupported'));
     }
     if (code === 'authentication_required') {
-      return '请先在来源网站登录，登录后再开始阅读。';
+      return resolveAppResourceText($r('app.string.novel_chapter_failed_login'));
     }
     return '';
   }
@@ -1143,8 +1162,9 @@ export struct NovelReaderOverlay {
   }
 
   private resolveChapterReturnActionTitle(): string {
-    return this.state.chapterTransition.failureCode === 'authentication_required' ?
-      '返回来源网站登录' : '返回原网页';
+    return this.state.chapterTransition.failureCode === 'authentication_required'
+      ? resolveAppResourceText($r('app.string.novel_action_back_to_login'))
+      : resolveAppResourceText($r('app.string.novel_action_back_to_page'));
   }
 
   private canToggleBookshelf(): boolean {
@@ -1152,14 +1172,16 @@ export struct NovelReaderOverlay {
       this.state.bookshelfDetailUrl.trim().length > 0 && this.state.bookTitle.trim().length > 0;
   }
 
-  private resolveBookshelfActionTitle(): string {
+  private resolveBookshelfActionTitle(): Resource {
     if (!this.state.bookshelfAvailable) {
-      return '无痕模式不可用';
+      return $r('app.string.bookshelf_incognito_unavailable');
     }
     if (this.state.bookshelfActionBusy) {
-      return this.state.bookInBookshelf ? '正在移出' : '正在加入';
+      return this.state.bookInBookshelf ?
+        $r('app.string.bookshelf_removing') : $r('app.string.bookshelf_adding');
     }
-    return this.state.bookInBookshelf ? '移出书架' : '加入书架';
+    return this.state.bookInBookshelf ?
+      $r('app.string.bookshelf_remove') : $r('app.string.bookshelf_add');
   }
 
   private canStartBookReading(): boolean {
@@ -1176,7 +1198,7 @@ export struct NovelReaderOverlay {
         .maxLines(2)
       Row({ space: 8 }) {
         if (this.canRetryChapterTransition()) {
-          Button('重试')
+          Button($r('app.string.novel_action_retry'))
             .buttonStyle(ButtonStyleMode.TEXTUAL)
             .fontColor(this.resolveBookPrimaryTextColor())
             .onClick(() => {
@@ -1264,7 +1286,7 @@ export struct NovelReaderOverlay {
       pageNumberVisible: !vertical && this.state.preferences.pageNumberVisible,
       paragraphIndentVisible: true,
       continuationAvailable: !vertical && this.state.canNavigateNext,
-      continuationLabel: '继续下一章',
+      continuationLabel: $r('app.string.novel_action_continue_next_chapter'),
       contentTopInset: this.layoutState.readerContentTopInset,
       contentBottomInset: this.layoutState.readerContentBottomInset
     };

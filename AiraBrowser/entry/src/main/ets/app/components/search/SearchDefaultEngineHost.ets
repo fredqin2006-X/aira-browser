@@ -38,6 +38,7 @@ import { SearchDefaultEngineBuiltInList } from './SearchDefaultEngineBuiltInList
 import { SearchEngineEditHost } from './SearchEngineEditHost';
 import { SearchBuiltInEnginesHost } from './SearchBuiltInEnginesHost';
 import { SearchSettingsBoundary } from '../../../core/search/SearchEngineSettingsCoordinator';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 /**
  * 默认搜索引擎页的共享主体：手机端由 SearchDefaultEnginePage 全屏承载，大屏端由搜索面板
@@ -119,7 +120,7 @@ export struct SearchDefaultEngineHost {
     Column() {
       if (this.desktopPresentation) {
         SettingsDesktopWorkspaceHeader({
-          title: '默认搜索引擎',
+          title: $r('app.string.settings_search_engine_default'),
           showBackButton: true,
           primaryTextColor: this.theme.textPrimary,
           iconColor: this.theme.accent,
@@ -131,7 +132,7 @@ export struct SearchDefaultEngineHost {
       }
 
       SettingsHdsScaffold({
-        title: '默认搜索引擎',
+        title: $r('app.string.settings_search_engine_default'),
         backIconKind: 'back',
         pageBackground: this.theme.pageBackground,
         headerButtonBackground: this.theme.controlBackground,
@@ -219,9 +220,9 @@ export struct SearchDefaultEngineHost {
       desktopPresentation: this.desktopPresentation
     }) {
       SettingsNavigationRow({
-        title: '管理更多搜索引擎',
+        title: $r('app.string.settings_search_engine_manage_more'),
         desktopPresentation: this.desktopPresentation,
-        value: `${this.state.builtInEngines.length} 个常用`,
+        value: resolveAppResourceText($r('app.string.settings_search_engine_common_count'), `${this.state.builtInEngines.length}`),
         primaryTextColor: this.theme.textPrimary,
         secondaryTextColor: this.theme.textSecondary,
         pressedBackgroundColor: this.theme.pressedBackground,
@@ -236,7 +237,7 @@ export struct SearchDefaultEngineHost {
   @Builder
   private buildCustomSection() {
     SettingsSection({
-      title: '自定义搜索引擎',
+      title: $r('app.string.settings_search_engine_custom_section'),
       secondaryTextColor: this.theme.textSecondary
     }) {
       if (this.state.customEngines.length > 0) {
@@ -253,7 +254,7 @@ export struct SearchDefaultEngineHost {
         }
       }
       SettingsActionButton({
-        title: '添加搜索引擎',
+        title: $r('app.string.settings_search_engine_add'),
         accentColor: this.theme.accent,
         pressedBackgroundColor: this.theme.pressedBackground,
         onAction: () => {

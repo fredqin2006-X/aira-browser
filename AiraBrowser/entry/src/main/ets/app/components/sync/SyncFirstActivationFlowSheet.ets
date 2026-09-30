@@ -89,7 +89,7 @@ export struct SyncFirstActivationFlowSheet {
       isBusy: this.isBusy,
       canSubmit: this.hasSelectedItems(),
       layoutMode: this.layoutMode,
-      submitLabel: '下一步',
+      submitLabel: $r('app.string.settings_sync_next'),
       settingsIconBackgrounds: this.settingsIconBackgrounds,
       maxHeightVp: this.maxHeightVp,
       onToggle: (id: SyncFirstActivationItemId, enabled: boolean) => {

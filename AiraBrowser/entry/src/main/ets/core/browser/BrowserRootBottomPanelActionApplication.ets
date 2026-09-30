@@ -267,7 +267,7 @@ export class BrowserRootBottomPanelFixedActionApplication implements BrowserRoot
     return this.actionPresentationCoordinator.resolveToolbarSlotActions();
   }
 
-  resolveThemeModeActionTitleForMode(mode: BrowserThemeMode): string {
+  resolveThemeModeActionTitleForMode(mode: BrowserThemeMode): ResourceStr {
     return this.actionPresentationCoordinator.resolveThemeModeActionTitleForMode(mode);
   }
 

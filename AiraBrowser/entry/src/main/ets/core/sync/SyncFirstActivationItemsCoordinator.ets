@@ -13,15 +13,15 @@ export type SyncFirstActivationItemId = 'bookmarks' | 'history' | Personalizatio
 
 export interface SyncFirstActivationItemState {
   id: SyncFirstActivationItemId;
-  title: string;
-  summary: string;
+  title: ResourceStr;
+  summary: ResourceStr;
   enabled: boolean;
   kind: 'bookmarks' | 'history' | 'personalization';
 }
 
 export interface SyncFirstActivationItemsState {
-  title: string;
-  summary: string;
+  title: ResourceStr;
+  summary: ResourceStr;
   items: SyncFirstActivationItemState[];
 }
 
@@ -33,17 +33,17 @@ export class SyncFirstActivationItemsCoordinator {
     const items: SyncFirstActivationItemState[] = [
       {
         id: 'bookmarks',
-        title: '书签',
+        title: $r('app.string.settings_sync_bookmarks'),
         summary: bookmarkProvider === 'huawei_space'
-          ? '同步本机书签、文件夹和排序到华为云空间'
-          : '同步本机书签、文件夹和排序',
+          ? $r('app.string.settings_sync_bookmarks_huawei_summary')
+          : $r('app.string.settings_sync_bookmarks_summary'),
         enabled: true,
         kind: 'bookmarks'
       },
       {
         id: 'history',
-        title: '历史记录',
-        summary: '在支持的设备之间增量合并浏览历史',
+        title: $r('app.string.settings_sync_history'),
+        summary: $r('app.string.settings_sync_history_summary'),
         enabled: true,
         kind: 'history'
       }
@@ -58,8 +58,8 @@ export class SyncFirstActivationItemsCoordinator {
       });
     });
     return {
-      title: '选择同步内容',
-      summary: '先选择要在设备之间保持一致的内容，下一步再选择同步方式。',
+      title: $r('app.string.settings_sync_choose_content_title'),
+      summary: $r('app.string.settings_sync_choose_content_summary'),
       items: items
     };
   }

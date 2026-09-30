@@ -39,7 +39,7 @@ export struct BrowserLargeScreenWebZoomDialog {
           .width(64)
           .height(44)
 
-        Text('网页缩放')
+        Text($r('app.string.web_text_zoom_dialog_title'))
           .layoutWeight(1)
           .fontSize(20)
           .fontWeight(FontWeight.Bold)
@@ -48,7 +48,7 @@ export struct BrowserLargeScreenWebZoomDialog {
           .maxLines(1)
 
         BrowserSheetActionButton({
-          label: '默认',
+          label: $r('app.string.web_text_zoom_default'),
           fillAvailableWidth: false,
           buttonWidth: 64,
           actionEnabled: this.snapshot.available && (!this.snapshot.percentKnown || this.snapshot.percent !== 100),
@@ -65,9 +65,9 @@ export struct BrowserLargeScreenWebZoomDialog {
       Row({ space: 0 }) {
         Stack() {
           if (this.snapshot.canDecrease) {
-            this.buildZoomButton('browser.toolbar.zoomOut', '缩小网页', 'decrease', true)
+            this.buildZoomButton('browser.toolbar.zoomOut', $r('app.string.web_text_zoom_decrease_page'), 'decrease', true)
           } else {
-            this.buildZoomButton('browser.toolbar.zoomOut', '缩小网页', 'decrease', false)
+            this.buildZoomButton('browser.toolbar.zoomOut', $r('app.string.web_text_zoom_decrease_page'), 'decrease', false)
           }
         }
         .width(LARGE_SCREEN_WEB_ZOOM_CONTROL_HEIGHT_VP)
@@ -90,9 +90,9 @@ export struct BrowserLargeScreenWebZoomDialog {
 
         Stack() {
           if (this.snapshot.canIncrease) {
-            this.buildZoomButton('browser.toolbar.zoomIn', '放大网页', 'increase', true)
+            this.buildZoomButton('browser.toolbar.zoomIn', $r('app.string.web_text_zoom_increase_page'), 'increase', true)
           } else {
-            this.buildZoomButton('browser.toolbar.zoomIn', '放大网页', 'increase', false)
+            this.buildZoomButton('browser.toolbar.zoomIn', $r('app.string.web_text_zoom_increase_page'), 'increase', false)
           }
         }
         .width(LARGE_SCREEN_WEB_ZOOM_CONTROL_HEIGHT_VP)
@@ -108,7 +108,7 @@ export struct BrowserLargeScreenWebZoomDialog {
 
       BrowserSheetActionButton({
         stacked: true,
-        label: '完成',
+        label: $r('app.string.web_text_zoom_done'),
         emphasis: 'primary',
         fontSize: 15,
         onAction: () => {
@@ -123,7 +123,7 @@ export struct BrowserLargeScreenWebZoomDialog {
   @Builder
   private buildZoomButton(
     iconId: AiraRenderableIconId,
-    label: string,
+    label: ResourceStr,
     action: BrowserLargeScreenWebZoomAction,
     enabled: boolean
   ) {

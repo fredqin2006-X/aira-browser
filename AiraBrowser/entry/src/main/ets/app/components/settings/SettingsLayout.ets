@@ -123,6 +123,11 @@ export struct SettingsPresentationScrollBody {
   @Prop topPadding: number = 0;
   @Prop bottomPadding: number = 28;
   @Prop desktopPresentation: boolean = false;
+  /** False when a page paints its own full-bleed background inside the scroll. */
+  @Prop includeHorizontalPadding: boolean = true;
+  /** True when this scroll is stacked over a background and must fill that stack. */
+  @Prop expandToParent: boolean = false;
+  onScrollOffset: (offset: number) => void = (_offset: number): void => {};
   @Prop scrollEnabled: boolean = true;
   @Prop scrollInteractionEnabled: boolean = true;
   @Prop clipContent: boolean = false;
@@ -146,8 +151,8 @@ export struct SettingsPresentationScrollBody {
       .width('100%')
       .constraintSize({ minHeight: '100%' })
       .padding({
-        left: this.desktopPresentation ? 0 : APP_STANDARD_HORIZONTAL_PADDING,
-        right: this.desktopPresentation ? SETTINGS_DESKTOP_SCROLLBAR_GUTTER : APP_STANDARD_HORIZONTAL_PADDING,
+        left: this.resolveHorizontalPaddingLeft(),
+        right: this.resolveHorizontalPaddingRight(),
         top: this.topPadding,
         bottom: this.bottomPadding
       })
@@ -159,12 +164,18 @@ export struct SettingsPresentationScrollBody {
     }
     .layoutWeight(1)
     .width('100%')
+    .height(this.expandToParent ? '100%' : '')
+    .backgroundColor(Color.Transparent)
     .scrollable(this.scrollEnabled ? ScrollDirection.Vertical : ScrollDirection.None)
     .enableScrollInteraction(this.scrollInteractionEnabled)
     .scrollBar(BarState.Auto)
     .onDidScroll((xOffset: number, yOffset: number): void => {
       if (xOffset !== 0 || yOffset !== 0) {
         sharedBrowsingActivitySignal.markBrowsingInteraction();
+      }
+      const scrollOffsetListener = this.onScrollOffset;
+      if (scrollOffsetListener !== undefined) {
+        scrollOffsetListener(this.resolveScroller().currentOffset().yOffset);
       }
     })
     .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
@@ -173,6 +184,20 @@ export struct SettingsPresentationScrollBody {
 
   private resolveScroller(): Scroller {
     return this.scroller !== undefined ? this.scroller : this.headerBlurScrollerRef.scroller;
+  }
+
+  private resolveHorizontalPaddingLeft(): number {
+    if (!this.includeHorizontalPadding || this.desktopPresentation) {
+      return 0;
+    }
+    return APP_STANDARD_HORIZONTAL_PADDING;
+  }
+
+  private resolveHorizontalPaddingRight(): number {
+    if (!this.includeHorizontalPadding) {
+      return 0;
+    }
+    return this.desktopPresentation ? SETTINGS_DESKTOP_SCROLLBAR_GUTTER : APP_STANDARD_HORIZONTAL_PADDING;
   }
 
   @Builder

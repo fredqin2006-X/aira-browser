@@ -34,18 +34,18 @@ const LIFETIME_UPGRADE_REFRESH_DELAYS_MS: number[] = [0, 800, 1600];
 export interface AiraProPurchaseFlowHost {
   onMembershipStateChanged(): void;
   onLoginRequired(): void;
-  showMessage(message: string): void;
+  showMessage(message: ResourceStr): void;
 }
 
 export class AiraProPurchaseFlowHostAdapter implements AiraProPurchaseFlowHost {
   private membershipStateChangedHandler: () => void;
   private loginRequiredHandler: () => void;
-  private messageHandler: (message: string) => void;
+  private messageHandler: (message: ResourceStr) => void;
 
   constructor(
     membershipStateChangedHandler: () => void,
     loginRequiredHandler: () => void,
-    messageHandler: (message: string) => void
+    messageHandler: (message: ResourceStr) => void
   ) {
     this.membershipStateChangedHandler = membershipStateChangedHandler;
     this.loginRequiredHandler = loginRequiredHandler;
@@ -60,7 +60,7 @@ export class AiraProPurchaseFlowHostAdapter implements AiraProPurchaseFlowHost {
     this.loginRequiredHandler();
   }
 
-  showMessage(message: string): void {
+  showMessage(message: ResourceStr): void {
     this.messageHandler(message);
   }
 }
@@ -120,7 +120,7 @@ export class AiraProPurchaseCoordinator {
   ): Promise<void> {
     try {
       if (!this.isEffectAllowed('membership_purchase', boundaryInput)) {
-        host.showMessage('请回到普通会话后购买 Aira Pro。');
+        host.showMessage($r('app.string.settings_pro_purchase_private'));
         return;
       }
       if (!await this.canStartPlanPurchase(period, host)) {
@@ -140,7 +140,7 @@ export class AiraProPurchaseCoordinator {
         );
       }
     } catch (_error) {
-      host.showMessage('Aira Pro 购买暂时不可用');
+      host.showMessage($r('app.string.settings_pro_purchase_unavailable'));
     }
   }
 
@@ -153,7 +153,7 @@ export class AiraProPurchaseCoordinator {
   ): Promise<void> {
     try {
       if (!this.isEffectAllowed('membership_restore_purchase', boundaryInput)) {
-        host.showMessage('请回到普通会话后恢复购买。');
+        host.showMessage($r('app.string.settings_pro_restore_private'));
         return;
       }
       const result = await this.restorePurchase(context, uid, period);
@@ -170,7 +170,7 @@ export class AiraProPurchaseCoordinator {
         );
       }
     } catch (_error) {
-      host.showMessage('恢复购买暂时不可用');
+      host.showMessage($r('app.string.settings_pro_restore_unavailable'));
     }
   }
 
@@ -180,11 +180,11 @@ export class AiraProPurchaseCoordinator {
     boundaryInput: BrowserDataBoundaryInput
   ): Promise<void> {
     if (!this.isEffectAllowed('membership_subscription_management', boundaryInput)) {
-      host.showMessage('请回到普通会话后管理订阅。');
+      host.showMessage($r('app.string.settings_pro_manage_private'));
       return;
     }
     this.awaitingSubscriptionManagementReturn = true;
-    host.showMessage('请在华为订阅管理中关闭自动续费，返回后 Aira 会自动检查');
+    host.showMessage($r('app.string.settings_pro_manage_hint'));
     try {
       const result = await this.manageSubscription(context);
       if (!result.ok) {
@@ -197,7 +197,7 @@ export class AiraProPurchaseCoordinator {
       }
     } catch (_error) {
       this.awaitingSubscriptionManagementReturn = false;
-      host.showMessage('华为订阅管理暂时无法打开');
+      host.showMessage($r('app.string.settings_pro_manage_unavailable'));
     }
   }
 
@@ -210,11 +210,11 @@ export class AiraProPurchaseCoordinator {
     }
     if (!this.isEffectAllowed('membership_subscription_management', boundaryInput)) {
       this.awaitingSubscriptionManagementReturn = false;
-      host.showMessage('请回到普通会话后管理订阅。');
+      host.showMessage($r('app.string.settings_pro_manage_private'));
       return;
     }
     this.refreshAfterSubscriptionManagement(host).catch((_error: Error) => {
-      host.showMessage('订阅状态检查失败，请稍后重试');
+      host.showMessage($r('app.string.settings_pro_subscription_check_failed'));
     });
   }
 
@@ -283,7 +283,7 @@ export class AiraProPurchaseCoordinator {
 
   private async canStartPlanPurchase(period: string, host: AiraProPurchaseFlowHost): Promise<boolean> {
     if (this.membershipFeature === undefined) {
-      host.showMessage('会员状态暂时无法检查，请稍后重试');
+      host.showMessage($r('app.string.settings_pro_status_check_failed'));
       return false;
     }
     const state = await this.membershipFeature.refreshState({ force: true });
@@ -296,12 +296,12 @@ export class AiraProPurchaseCoordinator {
       return true;
     }
     if (action === 'manage_subscription') {
-      host.showMessage('检测到自动续费仍可能开启，请先在华为订阅管理中关闭后再购买长期会员');
+      host.showMessage($r('app.string.settings_pro_renewal_still_on'));
       return false;
     }
     host.showMessage(this.purchasePolicyService.isLongTermMember(state)
-      ? '当前账号已拥有长期 Aira Pro 权益，无需再次订阅或购买'
-      : '当前订阅权益仍有效，无需重复订阅');
+      ? $r('app.string.settings_pro_already_lifetime')
+      : $r('app.string.settings_pro_already_subscribed'));
     return false;
   }
 
@@ -322,7 +322,7 @@ export class AiraProPurchaseCoordinator {
 
   private async pollLifetimeUpgradeAvailability(host: AiraProPurchaseFlowHost): Promise<void> {
     if (this.membershipFeature === undefined) {
-      host.showMessage('会员状态暂时无法检查，请稍后重试');
+      host.showMessage($r('app.string.settings_pro_status_check_failed'));
       return;
     }
     let action: AiraProPlanPurchaseAction = 'manage_subscription';
@@ -338,14 +338,14 @@ export class AiraProPurchaseCoordinator {
       }
     }
     if (action === 'purchase') {
-      host.showMessage('已确认自动续费关闭，现在可以购买长期会员');
+      host.showMessage($r('app.string.settings_pro_renewal_off_ready'));
       return;
     }
     if (action === 'unavailable') {
-      host.showMessage('当前账号已拥有长期 Aira Pro 权益');
+      host.showMessage($r('app.string.settings_pro_already_lifetime_short'));
       return;
     }
-    host.showMessage('华为取消状态可能仍在同步，请稍后回到此页面重新检查；确认关闭前不会开放长期会员购买');
+    host.showMessage($r('app.string.settings_pro_renewal_syncing'));
   }
 
   private delay(delayMs: number): Promise<void> {
@@ -355,7 +355,7 @@ export class AiraProPurchaseCoordinator {
   }
 
   private showOperationResult(host: AiraProPurchaseFlowHost, result: HuaweiIapOperationResult): void {
-    if (result.silent === true || result.message.trim().length <= 0) {
+    if (result.silent === true || !this.hasVisibleMessage(result.message)) {
       return;
     }
     host.showMessage(result.message);
@@ -421,7 +421,7 @@ export class AiraProPurchaseCoordinator {
     let lastVerification: HuaweiIapVerificationResponseBody = {
       ok: false,
       code: 'missing_purchase_data',
-      message: '华为 IAP 未返回可提交的购买凭证。'
+      message: ''
     };
     let lastPurchaseData = '';
     for (const purchaseData of purchaseDataList) {
@@ -443,10 +443,10 @@ export class AiraProPurchaseCoordinator {
   private buildVerificationMessage(
     result: HuaweiIapOperationResult,
     verification: HuaweiIapVerificationResponseBody,
-    finishPurchaseMessage: string = ''
-  ): string {
+    finishPurchaseMessage: ResourceStr = ''
+  ): ResourceStr {
     if (verification.ok === true) {
-      if (finishPurchaseMessage.length > 0) {
+      if (this.hasVisibleMessage(finishPurchaseMessage)) {
         return finishPurchaseMessage;
       }
       if (this.showDiagnosticMessages) {
@@ -454,7 +454,15 @@ export class AiraProPurchaseCoordinator {
       }
       return this.buildUserVerificationMessage(result, verification);
     }
-    return verification.message ?? result.message;
+    if (verification.code === 'missing_purchase_data') {
+      return $r('app.string.settings_pro_iap_missing_purchase');
+    }
+    const verificationMessage = verification.message ?? '';
+    return verificationMessage.length > 0 ? verificationMessage : result.message;
+  }
+
+  private hasVisibleMessage(message: ResourceStr): boolean {
+    return typeof message !== 'string' || message.trim().length > 0;
   }
 
   private buildDiagnosticVerificationMessage(verification: HuaweiIapVerificationResponseBody): string {
@@ -469,13 +477,22 @@ export class AiraProPurchaseCoordinator {
   private buildUserVerificationMessage(
     result: HuaweiIapOperationResult,
     verification: HuaweiIapVerificationResponseBody
-  ): string {
-    const actionText = result.action === 'restore_purchase' ? '已恢复' : '已开通';
-    const membershipName = this.resolveMembershipName(verification);
-    const expiresText = this.buildExpiresText(verification.expiresAt);
-    return expiresText.length > 0
-      ? `${membershipName}${actionText}，${expiresText.substring(0, expiresText.length - 1)}。`
-      : `${membershipName}${actionText}。`;
+  ): ResourceStr {
+    const restored = result.action === 'restore_purchase';
+    const until = this.formatExpiresDate(verification.expiresAt);
+    if (this.isLongTermPurchase(verification)) {
+      return restored
+        ? $r('app.string.settings_pro_restored_lifetime')
+        : $r('app.string.settings_pro_opened_lifetime_done');
+    }
+    if (until.length > 0) {
+      return restored
+        ? $r('app.string.settings_pro_restored_until', until)
+        : $r('app.string.settings_pro_opened_until', until);
+    }
+    return restored
+      ? $r('app.string.settings_pro_restored')
+      : $r('app.string.settings_pro_opened');
   }
 
   private buildExpiresText(expiresAt?: number): string {
@@ -497,6 +514,13 @@ export class AiraProPurchaseCoordinator {
     return isAiraProLifetimeProductId(verification.productId ?? '');
   }
 
+  private formatExpiresDate(expiresAt?: number): string {
+    if (expiresAt === undefined || expiresAt <= 0) {
+      return '';
+    }
+    return this.formatDate(expiresAt);
+  }
+
   private formatDate(timestamp: number): string {
     const date = new Date(timestamp);
     return `${date.getFullYear()}.${this.pad2(date.getMonth() + 1)}.${this.pad2(date.getDate())}`;
@@ -511,14 +535,20 @@ export class AiraProPurchaseCoordinator {
     result: HuaweiIapOperationResult,
     purchaseData: string,
     verification: HuaweiIapVerificationResponseBody
-  ): Promise<string> {
+  ): Promise<ResourceStr> {
     try {
       await this.iapService.finishPurchase(context, purchaseData, verification.productType);
       return '';
-    } catch (error) {
-      const detail = this.showDiagnosticMessages ? ` ${String((error as Error).message ?? error)}` : '';
-      const actionText = result.action === 'restore_purchase' ? '已恢复' : '已开通';
-      return `${this.resolveMembershipName(verification)}${actionText}，但华为订单确认暂时失败，请稍后点“恢复购买”重试。${detail}`;
+    } catch (_error) {
+      const restored = result.action === 'restore_purchase';
+      if (this.isLongTermPurchase(verification)) {
+        return restored
+          ? $r('app.string.settings_pro_finish_failed_lifetime_restore')
+          : $r('app.string.settings_pro_finish_failed_lifetime_open');
+      }
+      return restored
+        ? $r('app.string.settings_pro_finish_failed_restore')
+        : $r('app.string.settings_pro_finish_failed_open');
     }
   }
 
@@ -531,8 +561,10 @@ export class AiraProPurchaseCoordinator {
       : '';
     return {
       ok: false,
-      title: '暂时无法购买',
-      message: `华为当前没有拉起新的支付页面，只返回了已过期的旧订阅记录。请先确认华为订阅管理里没有未清理的沙盒订阅，或清除沙盒购买记录后稍等几分钟再购买。${diagnosticText}`,
+      title: $r('app.string.settings_pro_purchase_unavailable'),
+      message: this.showDiagnosticMessages
+        ? `华为当前没有拉起新的支付页面，只返回了已过期的旧订阅记录。请先确认华为订阅管理里没有未清理的沙盒订阅，或清除沙盒购买记录后稍等几分钟再购买。${diagnosticText}`
+        : $r('app.string.settings_pro_purchase_blocked'),
       action: purchaseResult.action,
       purchaseData: restoreResult.purchaseData,
       purchaseDataList: restoreResult.purchaseDataList,
@@ -547,8 +579,8 @@ export class AiraProPurchaseCoordinator {
   ): HuaweiIapOperationResult {
     return {
       ok: false,
-      title: '请先使用华为账号登录',
-      message: 'Aira Pro 权益需要先绑定华为账号，登录后再继续购买或恢复购买。',
+      title: $r('app.string.settings_pro_sign_in_title'),
+      message: $r('app.string.settings_pro_login_required'),
       action: action,
       verificationCode: 'login_required'
     };
@@ -560,8 +592,8 @@ export class AiraProPurchaseCoordinator {
   ): HuaweiIapOperationResult {
     return {
       ok: false,
-      title: '当前方案暂不可用',
-      message: '当前会员方案无法识别，请刷新页面后重试。',
+      title: $r('app.string.settings_pro_plan_unavailable'),
+      message: $r('app.string.settings_pro_plan_unavailable'),
       action: action,
       verificationCode: 'unsupported_plan'
     };

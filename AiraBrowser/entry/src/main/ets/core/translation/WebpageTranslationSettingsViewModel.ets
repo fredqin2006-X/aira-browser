@@ -5,6 +5,7 @@ import {
   TranslationSettingsPreferences
 } from '../../common/models/BrowserModels';
 import { TranslationProviderTemplateService } from '../../services/translation/TranslationProviderTemplateService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface TranslationProviderRowView {
   id: string;
@@ -83,8 +84,10 @@ export class WebpageTranslationSettingsViewModel {
         id: `template_${template.id}`,
         templateId: template.id,
         title: template.displayName,
-        subtitle: template.id === 'custom_http' ? '需要填写 HTTPS Endpoint' : '需要填写 API 凭据',
-        statusText: '未配置',
+        subtitle: resolveAppResourceText(template.id === 'custom_http'
+          ? $r('app.string.settings_web_translation_subtitle_custom_endpoint')
+          : $r('app.string.settings_web_translation_subtitle_credentials_required')),
+        statusText: resolveAppResourceText($r('app.string.settings_web_translation_status_unconfigured')),
         isActive: false,
         isConfigured: false,
         requiresPro: template.requiresPro,
@@ -146,30 +149,34 @@ export class WebpageTranslationSettingsViewModel {
 
   private buildProviderStatusText(provider: TranslationProviderConfig | undefined): string {
     if (provider === undefined) {
-      return '未配置';
+      return resolveAppResourceText($r('app.string.settings_web_translation_status_unconfigured'));
     }
     if (provider.status === 'configured') {
-      return '已配置';
+      return resolveAppResourceText($r('app.string.settings_web_translation_status_configured'));
     }
     if (provider.status === 'failed') {
-      return provider.failureReason.length > 0 ? `失败：${provider.failureReason}` : '配置失败';
+      return provider.failureReason.length > 0
+        ? resolveAppResourceText($r('app.string.settings_web_translation_status_failed_detail', provider.failureReason))
+        : resolveAppResourceText($r('app.string.settings_web_translation_status_failed'));
     }
     if (provider.status === 'unavailable') {
-      return provider.failureReason.length > 0 ? `不可用：${provider.failureReason}` : '不可用';
+      return provider.failureReason.length > 0
+        ? resolveAppResourceText($r('app.string.settings_web_translation_status_unavailable_detail', provider.failureReason))
+        : resolveAppResourceText($r('app.string.settings_web_translation_status_unavailable'));
     }
-    return '未完成配置';
+    return resolveAppResourceText($r('app.string.settings_web_translation_status_incomplete'));
   }
 
   private buildProviderSubtitle(provider: TranslationProviderConfig): string {
     if (provider.templateId === 'aira_system') {
-      return '由 Aira 系统翻译服务提供';
+      return resolveAppResourceText($r('app.string.settings_web_translation_subtitle_aira'));
     }
     if (provider.templateId === 'edge_web' || provider.templateId === 'google_web' ||
       provider.templateId === 'tencent_web' || provider.templateId === 'yandex_web') {
-      return '免密钥，页面文字直接发给该公开接口';
+      return resolveAppResourceText($r('app.string.settings_web_translation_subtitle_public'));
     }
     if (provider.status === 'configured') {
-      return '已填写 API 凭据';
+      return resolveAppResourceText($r('app.string.settings_web_translation_subtitle_credentials'));
     }
     return this.templateService.buildTemplateLabel(provider.templateId);
   }
@@ -177,17 +184,29 @@ export class WebpageTranslationSettingsViewModel {
   buildLanguageLabel(languageCode: string): string {
     switch (languageCode) {
       case 'zh-CN':
-        return '简体中文';
+        return resolveAppResourceText($r('app.string.settings_lang_zh_cn'));
       case 'zh-TW':
-        return '繁体中文';
+        return resolveAppResourceText($r('app.string.settings_lang_zh_tw'));
       case 'en':
-        return 'English';
+        return resolveAppResourceText($r('app.string.settings_lang_en'));
       case 'ja':
-        return '日本語';
+        return resolveAppResourceText($r('app.string.settings_lang_ja'));
       case 'ko':
-        return '한국어';
+        return resolveAppResourceText($r('app.string.settings_lang_ko'));
+      case 'fr':
+        return resolveAppResourceText($r('app.string.settings_lang_fr'));
+      case 'de':
+        return resolveAppResourceText($r('app.string.settings_lang_de'));
+      case 'es':
+        return resolveAppResourceText($r('app.string.settings_lang_es'));
+      case 'pt':
+        return resolveAppResourceText($r('app.string.settings_lang_pt'));
+      case 'ru':
+        return resolveAppResourceText($r('app.string.settings_lang_ru'));
       default:
-        return languageCode.trim().length > 0 ? languageCode : '简体中文';
+        return languageCode.trim().length > 0
+          ? languageCode
+          : resolveAppResourceText($r('app.string.settings_lang_zh_cn'));
     }
   }
 
@@ -206,25 +225,33 @@ export class WebpageTranslationSettingsViewModel {
   }
 
   private buildTargetLanguageDescription(): string {
-    return '手动翻译网页时默认使用此语言';
+    return resolveAppResourceText($r('app.string.settings_web_translation_target_desc'));
   }
 
   buildTargetLanguageSheetHelperText(): string {
-    return '多语言能力由当前服务商提供，实际可用语种以服务商为准。';
+    return resolveAppResourceText($r('app.string.settings_web_translation_target_helper'));
   }
 
   buildTargetLanguageOptions(): TranslationLanguageOptionView[] {
     return [
-      { code: 'zh-CN', label: '简体中文', helperText: 'Chinese Simplified' },
-      { code: 'zh-TW', label: '繁体中文', helperText: 'Chinese Traditional' },
-      { code: 'en', label: 'English', helperText: '英语' },
-      { code: 'ja', label: '日本語', helperText: '日语' },
-      { code: 'ko', label: '한국어', helperText: '韩语' },
-      { code: 'fr', label: 'Français', helperText: '法语' },
-      { code: 'de', label: 'Deutsch', helperText: '德语' },
-      { code: 'es', label: 'Español', helperText: '西班牙语' },
-      { code: 'pt', label: 'Português', helperText: '葡萄牙语' },
-      { code: 'ru', label: 'Русский', helperText: '俄语' }
+      this.languageOption('zh-CN', $r('app.string.settings_lang_zh_cn'), $r('app.string.settings_lang_helper_zh_cn')),
+      this.languageOption('zh-TW', $r('app.string.settings_lang_zh_tw'), $r('app.string.settings_lang_helper_zh_tw')),
+      this.languageOption('en', $r('app.string.settings_lang_en'), $r('app.string.settings_lang_helper_en')),
+      this.languageOption('ja', $r('app.string.settings_lang_ja'), $r('app.string.settings_lang_helper_ja')),
+      this.languageOption('ko', $r('app.string.settings_lang_ko'), $r('app.string.settings_lang_helper_ko')),
+      this.languageOption('fr', $r('app.string.settings_lang_fr'), $r('app.string.settings_lang_helper_fr')),
+      this.languageOption('de', $r('app.string.settings_lang_de'), $r('app.string.settings_lang_helper_de')),
+      this.languageOption('es', $r('app.string.settings_lang_es'), $r('app.string.settings_lang_helper_es')),
+      this.languageOption('pt', $r('app.string.settings_lang_pt'), $r('app.string.settings_lang_helper_pt')),
+      this.languageOption('ru', $r('app.string.settings_lang_ru'), $r('app.string.settings_lang_helper_ru'))
     ];
+  }
+
+  private languageOption(code: string, label: ResourceStr, helperText: ResourceStr): TranslationLanguageOptionView {
+    return {
+      code: code,
+      label: resolveAppResourceText(label),
+      helperText: resolveAppResourceText(helperText)
+    };
   }
 }

@@ -96,7 +96,7 @@ struct BrowserToolbarScrollBehaviorSettingsPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '滚动时',
+        title: $r('app.string.toolbar_settings_scroll_title'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -115,7 +115,7 @@ struct BrowserToolbarScrollBehaviorSettingsPage {
           }
         }) {
           SettingsSection({
-            title: '浏览网页时',
+            title: $r('app.string.toolbar_settings_browsing_section'),
             secondaryTextColor: this.storedSecondaryTextColor
           }) {
             SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {

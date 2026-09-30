@@ -2,8 +2,8 @@ import { BrowserDesktopSiteMode } from '../../services/web/BrowserUserAgentServi
 
 export interface BrowserDesktopSiteModeOptionState {
   mode: BrowserDesktopSiteMode;
-  title: string;
-  helperText: string;
+  title: ResourceStr;
+  helperText: ResourceStr;
   isSelected: boolean;
 }
 
@@ -19,28 +19,43 @@ export class BrowserDesktopSiteModeSheetViewModel {
   ): BrowserDesktopSiteModeSheetState {
     return {
       options: [
-        this.buildOption('default', '跟随默认', `使用默认网页标识：${defaultUserAgentSummary}`, selectedMode),
-        this.buildOption('mobile', '移动版', '只让当前站点使用移动版网页', selectedMode),
-        this.buildOption('desktop', '桌面版', '只让当前站点使用桌面版网页', selectedMode)
+        this.buildOption(
+          'default',
+          $r('app.string.site_version_mode_default'),
+          $r('app.string.site_version_mode_default_helper', defaultUserAgentSummary),
+          selectedMode
+        ),
+        this.buildOption(
+          'mobile',
+          $r('app.string.site_version_mode_mobile'),
+          $r('app.string.site_version_mode_mobile_helper'),
+          selectedMode
+        ),
+        this.buildOption(
+          'desktop',
+          $r('app.string.site_version_mode_desktop'),
+          $r('app.string.site_version_mode_desktop_helper'),
+          selectedMode
+        )
       ],
       defaultUserAgentSummary: defaultUserAgentSummary
     };
   }
 
-  resolveToolbarLabel(mode: BrowserDesktopSiteMode): string {
+  resolveToolbarLabel(mode: BrowserDesktopSiteMode): ResourceStr {
     if (mode === 'desktop') {
-      return '桌面版';
+      return $r('app.string.site_version_mode_desktop');
     }
     if (mode === 'mobile') {
-      return '移动版';
+      return $r('app.string.site_version_mode_mobile');
     }
-    return '跟随默认';
+    return $r('app.string.site_version_mode_default');
   }
 
   private buildOption(
     mode: BrowserDesktopSiteMode,
-    title: string,
-    helperText: string,
+    title: ResourceStr,
+    helperText: ResourceStr,
     selectedMode: BrowserDesktopSiteMode
   ): BrowserDesktopSiteModeOptionState {
     return {

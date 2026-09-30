@@ -18,6 +18,7 @@ import {
   UserScriptsSettingsViewModel
 } from './UserScriptsSettingsViewModel';
 import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundaryService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 const USER_SCRIPT_AUTO_UPDATE_INTERVAL_MS: number = 24 * 60 * 60 * 1000;
 
@@ -32,18 +33,18 @@ export interface UserScriptRiskConsentSheetState {
 
 function buildUserScriptRiskConsentState(): UserScriptRiskConsentSheetState {
   return {
-    title: '使用用户脚本前，请先了解风险',
-    intro: '用户脚本会在匹配的网站中运行，可以读取和修改网页内容，也可能向第三方服务发送网络请求。它们能增强网页，也可能带来隐私、安全和稳定性风险。',
+    title: resolveAppResourceText($r('app.string.user_script_risk_title')),
+    intro: resolveAppResourceText($r('app.string.user_script_risk_intro')),
     riskItems: [
-      '只安装来自可信作者和可信来源的脚本，安装前尽量查看脚本说明、权限和源码。',
-      '脚本可能读取页面中的账号信息、表单内容、网页文本或站点数据，并可能改变网页行为。',
-      '脚本发起的网络请求、依赖资源和第三方服务由脚本作者或服务方控制，Aira 无法保证其安全性、可用性或处理结果。',
-      'Aira 的用户脚本能力仍处于实验阶段，目前主要兼容常见用户脚本接口，不保证所有脚本、油猴 API、网站环境或桌面浏览器扩展能力都完整可用。',
-      '如果脚本导致网页异常、性能下降、登录状态变化、翻译或其他网页服务不可用，请停用或删除相关脚本。'
+      resolveAppResourceText($r('app.string.user_script_risk_item_source')),
+      resolveAppResourceText($r('app.string.user_script_risk_item_data')),
+      resolveAppResourceText($r('app.string.user_script_risk_item_network')),
+      resolveAppResourceText($r('app.string.user_script_risk_item_experimental')),
+      resolveAppResourceText($r('app.string.user_script_risk_item_disable'))
     ],
-    confirmation: '继续使用表示你理解上述风险，并愿意自行判断脚本来源和使用后果。',
-    primaryActionLabel: '我已了解并继续',
-    secondaryActionLabel: '暂不使用'
+    confirmation: resolveAppResourceText($r('app.string.user_script_risk_confirmation')),
+    primaryActionLabel: resolveAppResourceText($r('app.string.user_script_risk_accept')),
+    secondaryActionLabel: resolveAppResourceText($r('app.string.user_script_risk_decline'))
   };
 }
 
@@ -393,7 +394,7 @@ export class UserScriptManagementSessionCoordinator {
 
   private async acceptRiskConsent(): Promise<void> {
     if (!this.canWriteDevicePreference()) {
-      this.publish([UserScriptManagementEffect.message('当前会话不可修改用户脚本配置。')]);
+      this.publish([UserScriptManagementEffect.message(resolveAppResourceText($r('app.string.user_script_session_readonly')))]);
       return;
     }
     try {
@@ -401,7 +402,7 @@ export class UserScriptManagementSessionCoordinator {
       this.activeSheet = 'none';
       this.publish([UserScriptManagementEffect.settingsChanged()]);
     } catch (_error) {
-      this.publish([UserScriptManagementEffect.message('暂时无法保存确认，请稍后再试。')]);
+      this.publish([UserScriptManagementEffect.message(resolveAppResourceText($r('app.string.user_script_consent_save_failed')))]);
     }
   }
 
@@ -428,7 +429,7 @@ export class UserScriptManagementSessionCoordinator {
 
   private async dismissNotice(): Promise<void> {
     if (!this.canWriteDevicePreference()) {
-      this.publish([UserScriptManagementEffect.message('当前会话不可修改用户脚本配置。')]);
+      this.publish([UserScriptManagementEffect.message(resolveAppResourceText($r('app.string.user_script_session_readonly')))]);
       return;
     }
     try {
@@ -476,12 +477,12 @@ export class UserScriptManagementSessionCoordinator {
 
   private requestExportScript(scriptId: string): void {
     if (!this.canExportScript()) {
-      this.publish([UserScriptManagementEffect.message('当前会话不可导出用户脚本。')]);
+      this.publish([UserScriptManagementEffect.message(resolveAppResourceText($r('app.string.user_script_export_not_allowed')))]);
       return;
     }
     const script = this.packageLifecycle.findInstalledScript(scriptId);
     if (script === undefined) {
-      this.publish([UserScriptManagementEffect.message('脚本不存在，无法导出。')]);
+      this.publish([UserScriptManagementEffect.message(resolveAppResourceText($r('app.string.user_script_export_missing_script')))]);
       return;
     }
     this.publish([UserScriptManagementEffect.exportScript(script)]);
@@ -511,7 +512,7 @@ export class UserScriptManagementSessionCoordinator {
       );
       this.updateResults = [result];
     } catch (_error) {
-      this.updateResults = [this.buildFailedUpdateCheckResult(scriptId, '脚本更新检查失败。')];
+      this.updateResults = [this.buildFailedUpdateCheckResult(scriptId, resolveAppResourceText($r('app.string.user_script_update_check_failed')))];
     }
     this.updateBusy = false;
     this.updateChecking = false;
@@ -538,7 +539,7 @@ export class UserScriptManagementSessionCoordinator {
       const summary = await this.checkAllScriptUpdates(false);
       this.updateResults = summary.results;
     } catch (_error) {
-      this.updateResults = [this.buildFailedUpdateCheckResult('', '脚本更新检查失败。')];
+      this.updateResults = [this.buildFailedUpdateCheckResult('', resolveAppResourceText($r('app.string.user_script_update_check_failed')))];
     }
     this.updateBusy = false;
     this.updateChecking = false;
@@ -579,7 +580,7 @@ export class UserScriptManagementSessionCoordinator {
           failedResults.push(result);
         }
       } catch (_error) {
-        failedResults.push(this.buildFailedUpdateCheckResult(scriptIds[index], '脚本更新失败。'));
+        failedResults.push(this.buildFailedUpdateCheckResult(scriptIds[index], resolveAppResourceText($r('app.string.user_script_update_failed'))));
       }
     }
     this.updateBusy = false;
@@ -589,16 +590,18 @@ export class UserScriptManagementSessionCoordinator {
     const effects: UserScriptManagementEffect[] = [];
     if (updatedCount > 0) {
       effects.push(UserScriptManagementEffect.settingsChanged());
-      effects.push(UserScriptManagementEffect.message(`已更新 ${updatedCount} 个脚本。`));
+      effects.push(UserScriptManagementEffect.message(
+        resolveAppResourceText($r('app.string.user_script_updated_count'), updatedCount)
+      ));
     } else if (failedResults.length > 0) {
-      effects.push(UserScriptManagementEffect.message('脚本更新失败。'));
+      effects.push(UserScriptManagementEffect.message(resolveAppResourceText($r('app.string.user_script_update_failed'))));
     }
     this.publish(effects);
   }
 
   private async setAutoUpdate(enabled: boolean): Promise<void> {
     if (!this.canWriteDevicePreference()) {
-      this.publish([UserScriptManagementEffect.message('当前会话不可修改用户脚本配置。')]);
+      this.publish([UserScriptManagementEffect.message(resolveAppResourceText($r('app.string.user_script_session_readonly')))]);
       return;
     }
     this.autoUpdatePreferenceSerial += 1;
@@ -614,7 +617,7 @@ export class UserScriptManagementSessionCoordinator {
       }
     } catch (_error) {
       if (serial === this.autoUpdatePreferenceSerial) {
-        this.publish([UserScriptManagementEffect.message('自动更新设置保存失败。')]);
+        this.publish([UserScriptManagementEffect.message(resolveAppResourceText($r('app.string.user_script_auto_update_save_failed')))]);
       }
     }
   }
@@ -633,7 +636,9 @@ export class UserScriptManagementSessionCoordinator {
         return;
       }
       if (summary.availableCount > 0) {
-        this.publish([UserScriptManagementEffect.message(`发现 ${summary.availableCount} 个脚本有更新。`)]);
+        this.publish([UserScriptManagementEffect.message(
+          resolveAppResourceText($r('app.string.user_script_updates_found'), summary.availableCount)
+        )]);
       } else {
         this.publish();
       }
@@ -690,7 +695,7 @@ export class UserScriptManagementSessionCoordinator {
     const script = scriptId.length > 0 ? this.packageLifecycle.findInstalledScript(scriptId) : undefined;
     return {
       scriptId: scriptId.length > 0 ? scriptId : `failed-${Date.now()}`,
-      scriptName: script?.name ?? '脚本更新检查',
+      scriptName: script?.name ?? resolveAppResourceText($r('app.string.user_script_update_check_title')),
       status: 'failed',
       previousVersion: script?.version ?? '',
       nextVersion: '',

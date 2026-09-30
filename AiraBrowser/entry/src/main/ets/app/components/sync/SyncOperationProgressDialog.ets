@@ -14,10 +14,10 @@ export struct SyncOperationProgressDialog {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string = '#5F6875';
   controller?: CustomDialogController;
   @Link inProgress: boolean;
-  @Link title: string;
-  @Link subtitle: string;
+  @Link title: ResourceStr;
+  @Link subtitle: ResourceStr;
   @Link progress: number;
-  @Link details: string;
+  @Link details: ResourceStr;
   @Link detailOpacity: number;
 
   build() {
@@ -33,16 +33,24 @@ export struct SyncOperationProgressDialog {
           .fontColor([this.storedAccentColor])
       }
 
-      Text(`${this.title.length > 0 ? this.title : '正在处理'}${this.resolveProgress()}%`)
-        .width('100%')
-        .fontSize(20)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(this.storedPrimaryTextColor)
-        .textAlign(TextAlign.Center)
-        .maxLines(1)
-        .textOverflow({ overflow: TextOverflow.Ellipsis })
+      Row() {
+        Text(this.resolveTitle())
+          .fontSize(20)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(this.storedPrimaryTextColor)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .constraintSize({ maxWidth: '78%' })
+        Text(`${this.resolveProgress()}%`)
+          .fontSize(20)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(this.storedPrimaryTextColor)
+          .margin({ left: 4 })
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.Center)
 
-      Text(this.details.length > 0 ? this.details : (this.subtitle.length > 0 ? this.subtitle : '请稍候'))
+      Text(this.resolveDetails())
         .width('100%')
         .fontSize(14)
         .lineHeight(20)
@@ -60,5 +68,20 @@ export struct SyncOperationProgressDialog {
 
   private resolveProgress(): number {
     return Math.max(0, Math.min(100, Math.round(this.progress)));
+  }
+
+  private resolveTitle(): ResourceStr {
+    return this.hasVisibleText(this.title) ? this.title : $r('app.string.settings_sync_processing');
+  }
+
+  private resolveDetails(): ResourceStr {
+    if (this.hasVisibleText(this.details)) {
+      return this.details;
+    }
+    return this.hasVisibleText(this.subtitle) ? this.subtitle : $r('app.string.settings_sync_please_wait');
+  }
+
+  private hasVisibleText(value: ResourceStr): boolean {
+    return typeof value !== 'string' || value.length > 0;
   }
 }

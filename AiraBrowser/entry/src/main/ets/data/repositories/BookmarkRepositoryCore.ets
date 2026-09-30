@@ -9,6 +9,7 @@ import {
   BookmarkStorageScope,
   UpdateBookmarkCommand
 } from '../../common/models/BrowserModels';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 export const DEFAULT_DEVICE_ID: string = 'aira-phone-local';
 export const DEFAULT_ACTOR: string = 'browser-shell-seed';
 export const BOOKMARK_TOOLBAR_ROOT_ID: string = 'bookmark-root-toolbar';
@@ -138,7 +139,7 @@ export class InMemoryBookmarkRepository {
     const node = buildLocalBookmarkNode(
       createLocalBookmarkId(command.type, resolveBookmarkScope(command.scope)),
       command.type,
-      sanitizeBookmarkTitle(command.title, command.type === 'folder' ? '新文件夹' : '新书签'),
+      sanitizeBookmarkTitle(command.title, defaultBookmarkTitle(command.type)),
       parentId,
       this.resolveNextPosition(parentId),
       now,
@@ -609,6 +610,16 @@ export function createLocalBookmarkId(kind: 'folder' | 'bookmark', scope: Bookma
 export function sanitizeBookmarkTitle(title: string, fallback: string): string {
   const trimmed = title.trim();
   return trimmed.length > 0 ? trimmed : fallback;
+}
+
+/**
+ * Default title for a locally created node without one. The value is persisted,
+ * so it is localized once at creation time rather than at display.
+ */
+export function defaultBookmarkTitle(type: 'folder' | 'bookmark'): string {
+  return type === 'folder'
+    ? resolveAppResourceText($r('app.string.bookmark_new_folder'))
+    : resolveAppResourceText($r('app.string.bookmark_new_bookmark'));
 }
 
 export function sanitizeBookmarkUrl(url: string): string {

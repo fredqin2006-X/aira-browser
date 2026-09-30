@@ -1,4 +1,5 @@
 import { AiraRenderableIconId } from '../../../core/resources/GeneratedAiraIconCatalog';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BROWSER_THEME_STORAGE_ACCENT_KEY,
   BROWSER_THEME_STORAGE_CONTROL_BACKGROUND_KEY,
@@ -38,7 +39,7 @@ export function resolveManagementListContentWidth(contentPaneWidth: number, surf
 export struct ManagementLargeScreenNavSection {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY)
   private storedSecondaryTextColor: string = DEFAULT_THEME_PALETTE.light.textSecondary;
-  @Prop title: string = '';
+  @Prop title: ResourceStr = '';
 
   build() {
     Text(this.title)
@@ -62,7 +63,7 @@ export struct ManagementLargeScreenNavItem {
   private storedPrimaryTextColor: string = DEFAULT_THEME_PALETTE.light.textPrimary;
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY)
   private storedSecondaryTextColor: string = DEFAULT_THEME_PALETTE.light.textSecondary;
-  @Prop title: string = '';
+  @Prop title: ResourceStr = '';
   @Prop count: string = '';
   @Prop selected: boolean = false;
   @Prop iconId: AiraRenderableIconId = 'settings.general';
@@ -127,7 +128,7 @@ export struct ManagementLargeScreenIconButton {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY)
   private storedPrimaryTextColor: string = DEFAULT_THEME_PALETTE.light.textPrimary;
   @Prop iconId: AiraRenderableIconId = 'settings.general';
-  @Prop label: string = '';
+  @Prop label: ResourceStr = '';
   @Prop isEnabled: boolean = true;
   @Prop grouped: boolean = false;
   @State private hovered: boolean = false;
@@ -149,7 +150,7 @@ export struct ManagementLargeScreenIconButton {
     .enabled(this.isEnabled)
     .backgroundColor(this.resolveBackground())
     .borderRadius(MANAGEMENT_LARGE_SCREEN_CONTROL_RADIUS)
-    .accessibilityText(this.label)
+    .accessibilityText(resolveAppResourceText(this.label))
     .onHover((hovered: boolean): void => {
       this.hovered = hovered;
     })
@@ -181,13 +182,13 @@ export struct ManagementLargeScreenTextButton {
   private storedPressedBackgroundColor: string = DEFAULT_THEME_PALETTE.light.pressedBackground;
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY)
   private storedPrimaryTextColor: string = DEFAULT_THEME_PALETTE.light.textPrimary;
-  @Prop label: string = '';
+  @Prop label: ResourceStr = '';
   @Prop isEnabled: boolean = true;
   @State private hovered: boolean = false;
   onAction: () => void = (): void => {};
 
   build() {
-    Button(this.label)
+    Button(resolveAppResourceText(this.label))
       .height(MANAGEMENT_LARGE_SCREEN_CONTROL_HEIGHT)
       .padding({ left: 12, right: 12 })
       .fontSize(13)
@@ -249,9 +250,9 @@ export struct ManagementLargeScreenShell {
   private storedPrimaryTextColor: string = DEFAULT_THEME_PALETTE.light.textPrimary;
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY)
   private storedSecondaryTextColor: string = DEFAULT_THEME_PALETTE.light.textSecondary;
-  @Prop title: string = '';
-  @Prop badge: string = '';
-  @Prop searchPlaceholder: string = '';
+  @Prop title: ResourceStr = '';
+  @Prop badge: ResourceStr = '';
+  @Prop searchPlaceholder: ResourceStr = '';
   @Prop searchQuery: string = '';
   @Prop searchFocusKey: string = '';
   @Prop showSidebar: boolean = true;
@@ -341,6 +342,10 @@ export struct ManagementLargeScreenShell {
     return width;
   }
 
+  private hasBadge(): boolean {
+    return typeof this.badge !== 'string' || this.badge.length > 0;
+  }
+
   private toVp(raw: Length): number {
     const value = Number(raw);
     if (!Number.isFinite(value) || value <= 0) {
@@ -360,7 +365,7 @@ export struct ManagementLargeScreenShell {
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .flexShrink(1)
 
-      if (this.badge.length > 0) {
+      if (this.hasBadge()) {
         Text(this.badge)
           .fontSize(12)
           .fontColor(this.storedSecondaryTextColor)

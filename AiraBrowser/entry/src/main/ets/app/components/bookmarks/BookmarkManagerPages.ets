@@ -31,21 +31,21 @@ export struct BookmarkSelectionToolbarOverlay {
           actions: [
             {
               airaIconId: 'bookmarks.edit.selectAll',
-              title: '全选',
+              title: $r('app.string.ui_select_all'),
               action: (): void => {
                 this.onSelectAll();
               }
             },
             {
               airaIconId: 'browser.tabs.delete',
-              title: '删除',
+              title: $r('app.string.settings_delete'),
               action: (): void => {
                 this.onDelete();
               }
             },
             {
               airaIconId: 'bookmarks.edit.move',
-              title: '移动',
+              title: $r('app.string.ui_move'),
               action: (): void => {
                 this.onMove();
               }
@@ -71,8 +71,8 @@ export struct BookmarkManagerListPane {
   @Prop isSearchMode: boolean = false;
   @Prop isSelectionMode: boolean = false;
   @Prop secondaryTextColor: string = '#5F6875';
-  @Prop emptyTitle: string = '';
-  @Prop emptyMessage: string = '';
+  @Prop emptyTitle: ResourceStr = '';
+  @Prop emptyMessage: ResourceStr = '';
   @Prop icons: SiteIconListRenderState[] = [];
   @Prop selectedNodeIds: string[] = [];
   @Prop pressedNodeId: string = '';
@@ -122,7 +122,7 @@ export struct BookmarkManagerListPane {
             .width(32)
             .height(32)
             .color(this.secondaryTextColor)
-          Text('正在加载书签')
+          Text($r('app.string.bookmark_loading'))
             .fontSize(14)
             .fontColor(this.secondaryTextColor)
         }
@@ -214,8 +214,8 @@ struct BookmarkRootSwipePage {
   @Prop isInitialLoadPending: boolean = false;
   @Prop isSelectionMode: boolean = false;
   @Prop secondaryTextColor: string = '#5F6875';
-  @Prop emptyTitle: string = '';
-  @Prop emptyMessage: string = '';
+  @Prop emptyTitle: ResourceStr = '';
+  @Prop emptyMessage: ResourceStr = '';
   @Prop icons: SiteIconListRenderState[] = [];
   @Prop selectedNodeIds: string[] = [];
   @Prop pressedNodeId: string = '';
@@ -294,8 +294,8 @@ export struct BookmarkRootPageSwiper {
   @Prop isSelectionMode: boolean = false;
   @Prop isInitialLoadPending: boolean = false;
   @Prop secondaryTextColor: string = '#5F6875';
-  @Prop emptyTitle: string = '';
-  @Prop emptyMessage: string = '';
+  @Prop emptyTitle: ResourceStr = '';
+  @Prop emptyMessage: ResourceStr = '';
   @Prop icons: SiteIconListRenderState[] = [];
   @Prop selectedNodeIds: string[] = [];
   @Prop pressedNodeId: string = '';
@@ -486,8 +486,8 @@ export struct BookmarkManagerPages {
   @Prop isInitialLoadPending: boolean = false;
   @Prop isSearchMode: boolean = false;
   @Prop secondaryTextColor: string = '#5F6875';
-  @Prop emptyTitle: string = '';
-  @Prop emptyMessage: string = '';
+  @Prop emptyTitle: ResourceStr = '';
+  @Prop emptyMessage: ResourceStr = '';
   @Prop icons: SiteIconListRenderState[] = [];
   @Prop selectedNodeIds: string[] = [];
   @Prop pressedNodeId: string = '';

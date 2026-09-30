@@ -51,6 +51,7 @@ import {
   requestOpenBrowserUrlWithRouteParams
 } from '../../../core/navigation/BrowserNativeNavigationRequestCenter';
 import { buildSavedPageWebTabUrl } from '../../../core/offline/SavedPageWebTabUrl';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { BROWSER_SHELL_ROUTE, OFFLINE_PAGE_VIEWER_ROUTE } from '../../router/AppRoutes';
 
 const OFFLINE_PAGES_BOTTOM_PADDING: number = 28;
@@ -116,7 +117,9 @@ export struct OfflinePagesScreen {
   private buildPhonePage() {
     Column() {
       ManagementHdsScaffold({
-        title: this.isSessionEphemeral() ? '常规离线页面' : '已保存的页面',
+        title: this.isSessionEphemeral()
+          ? $r('app.string.offline_pages_ephemeral_title')
+          : $r('app.string.offline_pages_title'),
         backIconKind: 'back',
         showBackButton: this.presentationMode !== 'native_tab',
         useTopSafeInset: this.presentationMode !== 'native_tab',
@@ -168,9 +171,13 @@ export struct OfflinePagesScreen {
   @Builder
   private buildDesktopWorkspace() {
     ManagementLargeScreenShell({
-      title: this.isSessionEphemeral() ? '常规离线页面' : '我的网页',
-      badge: this.listState.loading ? '' : `${this.resolveDesktopItems().length} 项`,
-      searchPlaceholder: '搜索网页',
+      title: this.isSessionEphemeral()
+        ? $r('app.string.offline_pages_ephemeral_title')
+        : $r('app.string.offline_pages_desktop_title'),
+      badge: this.listState.loading
+        ? ''
+        : $r('app.string.offline_pages_desktop_badge', this.resolveDesktopItems().length),
+      searchPlaceholder: $r('app.string.offline_pages_search_placeholder'),
       searchQuery: this.desktopQuery,
       showSidebar: false,
       onSearchChange: (value: string): void => {
@@ -189,7 +196,7 @@ export struct OfflinePagesScreen {
   private buildDesktopToolbarActions() {
     ManagementLargeScreenIconButton({
       iconId: 'reader.refresh',
-      label: '刷新',
+      label: resolveAppResourceText($r('app.string.offline_action_refresh')),
       onAction: (): void => {
         this.refresh();
       }
@@ -201,7 +208,9 @@ export struct OfflinePagesScreen {
     if (this.listState.loading) {
       this.buildStatus(this.listState.message)
     } else if (this.resolveDesktopItems().length === 0) {
-      this.buildStatus(this.desktopQuery.trim().length > 0 ? '没有匹配的网页' : this.listState.message)
+      this.buildStatus(this.desktopQuery.trim().length > 0
+        ? $r('app.string.offline_pages_no_match')
+        : this.listState.message)
     } else {
       List({ space: MANAGEMENT_LARGE_SCREEN_ROW_GAP }) {
         ForEach(this.resolveDesktopItems(), (item: OfflinePageListItem) => {
@@ -293,7 +302,7 @@ export struct OfflinePagesScreen {
   private buildHeaderMenuActions(): ManagementHdsMenuAction[] {
     const actions: ManagementHdsMenuAction[] = [
       {
-        label: '刷新',
+        label: resolveAppResourceText($r('app.string.offline_action_refresh')),
         icon: $r('sys.symbol.arrow_clockwise'),
         action: () => {
           this.refresh();
@@ -304,11 +313,11 @@ export struct OfflinePagesScreen {
   }
 
   @Builder
-  private buildStatus(message: string) {
+  private buildStatus(message: ResourceStr) {
     AppEmptyState({
       airaIconId: 'browser.toolbar.offline',
       title: message,
-      message: this.listState.loading ? '' : '保存网页后，这里会显示可离线打开的页面。',
+      message: this.listState.loading ? '' : $r('app.string.offline_pages_empty_hint'),
       fillHeight: true
     })
     .layoutWeight(1)
@@ -393,7 +402,7 @@ export struct OfflinePagesScreen {
       .backgroundColor(this.storedControlBackgroundColor)
       .borderRadius(18)
       .stateEffect(false)
-      .accessibilityText('更多离线页面操作')
+      .accessibilityText(resolveAppResourceText($r('app.string.offline_action_more')))
       .onClick((): void => {
         this.desktopMenuItemId = item.id;
       })
@@ -422,31 +431,31 @@ export struct OfflinePagesScreen {
     BrowserDesktopContextMenu() {
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
-          label: '打开离线页面',
+          label: $r('app.string.offline_action_open_saved'),
           onAction: (): void => {
             this.openOfflinePageIfAvailable(item);
           }
         })
         BrowserDesktopContextMenuItem({
-          label: '打开原网页',
+          label: $r('app.string.offline_action_open_original'),
           onAction: (): void => {
             this.openOriginalPage(item.originalUrl);
           }
         })
         BrowserDesktopContextMenuItem({
-          label: '复制链接',
+          label: $r('app.string.offline_action_copy_link'),
           onAction: (): void => {
             this.copyOriginalUrl(item.originalUrl);
           }
         })
         BrowserDesktopContextMenuItem({
-          label: '分享',
+          label: $r('app.string.offline_action_share_short'),
           onAction: (): void => {
             this.shareOriginalUrl(item);
           }
         })
         BrowserDesktopContextMenuItem({
-          label: '导出网页',
+          label: $r('app.string.offline_action_export'),
           onAction: (): void => {
             this.exportOfflinePage(item);
           }
@@ -454,7 +463,7 @@ export struct OfflinePagesScreen {
       }
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
-          label: '删除',
+          label: $r('app.string.offline_action_delete_trailing'),
           onAction: (): void => {
             this.confirmDeleteItem(item);
           }
@@ -477,40 +486,40 @@ export struct OfflinePagesScreen {
       .backgroundColor(this.storedControlBackgroundColor)
       .borderRadius(18)
       .stateEffect(false)
-      .accessibilityText('更多离线页面操作')
+      .accessibilityText(resolveAppResourceText($r('app.string.offline_action_more')))
       .bindMenu([
         {
-          value: '打开离线页面',
+          value: $r('app.string.offline_action_open_saved'),
           action: () => {
             this.openOfflinePageIfAvailable(item);
           }
         },
         {
-          value: '打开原网页',
+          value: $r('app.string.offline_action_open_original'),
           action: () => {
             this.openOriginalPage(item.originalUrl);
           }
         },
         {
-          value: '复制链接',
+          value: $r('app.string.offline_action_copy_link'),
           action: () => {
             this.copyOriginalUrl(item.originalUrl);
           }
         },
         {
-          value: '分享',
+          value: $r('app.string.offline_action_share_short'),
           action: () => {
             this.shareOriginalUrl(item);
           }
         },
         {
-          value: '导出网页',
+          value: $r('app.string.offline_action_export'),
           action: () => {
             this.exportOfflinePage(item);
           }
         },
         {
-          value: '删除',
+          value: $r('app.string.offline_action_delete_trailing'),
           action: () => {
             this.confirmDeleteItem(item);
           }
@@ -546,7 +555,7 @@ export struct OfflinePagesScreen {
         this.syncSiteIcons();
       })
       .catch((_error: Error) => {
-        this.listState = this.viewModel.buildFailureState('已保存页面读取失败');
+        this.listState = this.viewModel.buildFailureState($r('app.string.offline_list_load_failed'));
       });
   }
 
@@ -557,22 +566,22 @@ export struct OfflinePagesScreen {
         this.refresh();
       })
       .catch((_error: Error) => {
-        this.showToast('删除离线页面失败');
+        this.showToast($r('app.string.offline_delete_failed'));
       });
   }
 
   private confirmDeleteItem(item: OfflinePageListItem): void {
     showCenteredAlertDialog({
-      title: '删除离线页面',
-      message: `确定删除“${item.title}”的离线副本吗？`,
+      title: $r('app.string.offline_action_delete'),
+      message: $r('app.string.offline_delete_dialog_message', item.title),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.offline_dialog_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.offline_dialog_delete'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.deleteItem(item.id);
@@ -583,7 +592,7 @@ export struct OfflinePagesScreen {
 
   private openOfflinePage(item: OfflinePageListItem): void {
     if (!this.coordinator.canNavigate(this.dataScope, this.privacyMode)) {
-      this.showToast('当前隐私策略不允许打开离线页面');
+      this.showToast($r('app.string.offline_open_blocked'));
       return;
     }
     if (this.presentationMode === 'native_tab') {
@@ -601,7 +610,7 @@ export struct OfflinePagesScreen {
         privacyMode: this.privacyMode
       }
     }).catch((_error: Error) => {
-      this.showToast('离线页面打开失败');
+      this.showToast($r('app.string.offline_open_failed'));
     });
   }
 
@@ -697,7 +706,7 @@ export struct OfflinePagesScreen {
 
   private openOriginalPage(url: string): void {
     if (!this.coordinator.canNavigate(this.dataScope, this.privacyMode)) {
-      this.showToast('当前隐私策略不允许打开原网页');
+      this.showToast($r('app.string.offline_open_original_blocked'));
       return;
     }
     if (this.presentationMode === 'native_tab') {
@@ -746,7 +755,7 @@ export struct OfflinePagesScreen {
     return this.getUIContext().getHostContext() as common.UIAbilityContext;
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

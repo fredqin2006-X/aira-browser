@@ -1,5 +1,6 @@
 import { curves } from '@kit.ArkUI';
 import { BROWSER_TABS_OVERVIEW_IDENTITY_MORPH_OFFSET_Y } from './BrowserTabsOverviewVisualTokens';
+import { BrowserTabsOverviewSnapshotMotion } from './tabsOverview/BrowserTabsOverviewStyleEntryPolicy';
 
 export interface BrowserTabsOverviewDirectWebEntryState {
   webEntryProgress: number;
@@ -30,6 +31,12 @@ export interface BrowserTabsOverviewIdentityMotionInput {
 export interface BrowserTabsOverviewIdentityMotionState {
   opacity: number;
   translateY: number;
+}
+
+export interface BrowserTabsOverviewSnapshotMotionPlan {
+  durationMs: number;
+  curve: Curve | string | ICurve;
+  handoffDelayMs: number;
 }
 
 const TABS_OVERLAY_ENTRY_START_DELAY_MS: number = 16;
@@ -139,6 +146,38 @@ export class BrowserTabsOverlayAnimationViewModel {
 
   getExitCurve(): Curve | string {
     return TABS_OVERLAY_EXIT_CURVE;
+  }
+
+  /**
+   * Timing for the active style's snapshot motion.
+   *
+   * Callers pass the motion from the style entry profile. They do not re-check the style name,
+   * so list clip timing cannot be copied onto a card shrink by the next edit.
+   */
+  resolveSharedSnapshotMotion(
+    motion: BrowserTabsOverviewSnapshotMotion,
+    direction: 'enter' | 'exit'
+  ): BrowserTabsOverviewSnapshotMotionPlan {
+    if (motion === 'clip') {
+      return direction === 'enter' ? {
+        durationMs: this.getListEntryDurationMs(),
+        curve: this.getListEntryCurve(),
+        handoffDelayMs: this.getListEntryHandoffDelayMs()
+      } : {
+        durationMs: this.getListExitDurationMs(),
+        curve: this.getListExitCurve(),
+        handoffDelayMs: this.getListExitHandoffDelayMs()
+      };
+    }
+    return direction === 'enter' ? {
+      durationMs: this.getSharedSnapshotEnterDurationMs(),
+      curve: this.getSharedSnapshotEnterCurve(),
+      handoffDelayMs: this.getSharedSnapshotEnterHandoffDelayMs()
+    } : {
+      durationMs: this.getSharedSnapshotExitDurationMs(),
+      curve: this.getSharedSnapshotExitCurve(),
+      handoffDelayMs: this.getSharedSnapshotExitHandoffDelayMs()
+    };
   }
 
   getSharedSnapshotEnterDurationMs(): number {

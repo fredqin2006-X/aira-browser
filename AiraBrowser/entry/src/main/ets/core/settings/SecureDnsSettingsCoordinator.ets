@@ -14,10 +14,11 @@ import {
 import { AppModeSwitchRestartService } from '../../services/settings/AppModeSwitchRestartService';
 import { BrowserPrivacyEffectPolicyService } from '../../services/privacy/BrowserPrivacyEffectPolicyService';
 import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundaryService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface SecureDnsSettingsOptionState {
   id: SecureDnsSelectionId;
-  title: string;
+  title: ResourceStr;
 }
 
 export interface SecureDnsCustomProfileState {
@@ -31,7 +32,7 @@ export interface SecureDnsSettingsState {
   settings: SecureDnsSettings;
   options: SecureDnsSettingsOptionState[];
   customProfiles: SecureDnsCustomProfileState[];
-  summaryLabel: string;
+  summaryLabel: ResourceStr;
   draftSelectionId: SecureDnsSelectionId;
   saving: boolean;
 }
@@ -114,7 +115,7 @@ export class SecureDnsSettingsCoordinator {
   }
 
   getSummaryLabel(): string {
-    return this.resolveSummaryLabel(this.repository.getSettings());
+    return resolveAppResourceText(this.resolveSummaryLabel(this.repository.getSettings()));
   }
 
   handleOptionSelected(
@@ -329,9 +330,9 @@ export class SecureDnsSettingsCoordinator {
     });
   }
 
-  private resolveSelectionTitle(selectionId: SecureDnsSelectionId): string {
+  private resolveSelectionTitle(selectionId: SecureDnsSelectionId): ResourceStr {
     if (selectionId === 'auto') {
-      return '自动优选';
+      return $r('app.string.settings_privacy_protection_dns_auto');
     }
     if (selectionId === 'alidns') {
       return 'AliDNS';
@@ -346,16 +347,20 @@ export class SecureDnsSettingsCoordinator {
       return 'Google';
     }
     if (selectionId === 'custom') {
-      return '自定义 DoH';
+      return $r('app.string.settings_privacy_protection_dns_custom');
     }
-    return '系统 DNS';
+    return $r('app.string.settings_privacy_protection_dns_system');
   }
 
-  private resolveSummaryLabel(settings: SecureDnsSettings): string {
+  private resolveSummaryLabel(settings: SecureDnsSettings): ResourceStr {
     if (settings.selectionId !== 'custom') {
       return this.resolveSelectionTitle(settings.selectionId);
     }
-    return this.settingsModel.findProfile(settings, settings.activeCustomProfileId)?.name ?? '系统 DNS';
+    const profile = this.settingsModel.findProfile(settings, settings.activeCustomProfileId);
+    if (profile !== undefined && profile.name.trim().length > 0) {
+      return profile.name;
+    }
+    return $r('app.string.settings_privacy_protection_dns_system');
   }
 
   private copyState(source: SecureDnsSettingsState): SecureDnsSettingsState {

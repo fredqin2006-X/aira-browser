@@ -57,11 +57,11 @@ export struct SyncMasterControlSection {
   @Prop pageBusy: boolean = false;
   @State private state: SyncExperienceViewState = DEFAULT_SYNC_EXPERIENCE_STATE;
   @State private isBusy: boolean = false;
-  @State private progressTitle: string = '';
-  @State private progressSubtitle: string = '';
+  @State private progressTitle: ResourceStr = '';
+  @State private progressSubtitle: ResourceStr = '';
   @State private progressValue: number = 0;
   @State private progressInProgress: boolean = false;
-  @State private progressDetails: string = '';
+  @State private progressDetails: ResourceStr = '';
   @State private progressDetailOpacity: number = 1;
   private refreshRevision: number = 0;
   private progressDialogOpen: boolean = false;
@@ -104,7 +104,7 @@ export struct SyncMasterControlSection {
     (): void => {
       this.closeProgressDialog();
     },
-    (title: string, subtitle: string): void => {
+    (title: ResourceStr, subtitle: ResourceStr): void => {
       this.showDialog(title, subtitle);
     }
   );
@@ -125,12 +125,12 @@ export struct SyncMasterControlSection {
 
   build() {
     SettingsSection({
-      title: '同步控制',
+      title: $r('app.string.settings_sync_advanced_control'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsSwitchRow({
-          title: '同步总开关',
+          title: $r('app.string.settings_sync_advanced_master'),
           checked: this.state.masterEnabled,
           icon: $r('sys.symbol.arrow_clockwise'),
           imageIcon: SettingsColoredTileIconResources.foregroundIcon('sync'),
@@ -147,7 +147,7 @@ export struct SyncMasterControlSection {
         })
       }
       SettingsFooterText({
-        text: '关闭后会暂停书签、历史记录、主页收藏、小说书架和所有常用设置同步，但不会删除本机或云端已有数据。',
+        text: $r('app.string.settings_sync_advanced_master_note'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -159,15 +159,15 @@ export struct SyncMasterControlSection {
       return;
     }
     showCenteredAlertDialog({
-      title: '关闭同步？',
-      message: '关闭后会暂停书签、历史记录、主页收藏、小说书架和所有常用设置同步，但不会删除本机或云端已有数据。',
+      title: $r('app.string.settings_sync_advanced_turn_off_title'),
+      message: $r('app.string.settings_sync_advanced_master_note'),
       autoCancel: true,
       primaryButton: {
-        value: '继续同步',
+        value: $r('app.string.settings_sync_advanced_keep'),
         action: () => {}
       },
       secondaryButton: {
-        value: '确认关闭',
+        value: $r('app.string.settings_sync_advanced_confirm_off'),
         fontColor: this.storedAccentColor,
         action: () => {
           this.changeMasterState(false);
@@ -182,8 +182,13 @@ export struct SyncMasterControlSection {
     }
     this.isBusy = true;
     this.progressController.begin(
-      enabled ? '正在开启同步' : '正在暂停同步',
-      enabled ? '正在恢复同步方式和内容' : '正在安全保存当前同步状态'
+      enabled
+        ? $r('app.string.settings_sync_advanced_turning_on')
+        : $r('app.string.settings_sync_advanced_turning_off'),
+      enabled
+        ? $r('app.string.settings_sync_advanced_restoring')
+        : $r('app.string.settings_sync_advanced_saving_state'),
+      'sync'
     );
     sharedSyncExperienceCoordinator.setMasterEnabled(enabled)
       .then((outcome: SyncExperienceActionOutcome) => {
@@ -196,7 +201,10 @@ export struct SyncMasterControlSection {
       })
       .catch((_error: Error) => {
         this.progressController.complete();
-        this.showDialog('同步设置未更改', '本机和云端已有数据都已保留，请稍后再试。');
+        this.showDialog(
+          $r('app.string.settings_sync_advanced_unchanged'),
+          $r('app.string.settings_sync_advanced_unchanged_message')
+        );
       })
       .finally(() => {
         this.isBusy = false;
@@ -216,11 +224,11 @@ export struct SyncMasterControlSection {
       .catch((_error: Error) => undefined);
   }
 
-  private showDialog(title: string, message: string): void {
+  private showDialog(title: ResourceStr, message: ResourceStr): void {
     showCenteredAlertDialog({
       title: title,
       message: message,
-      confirm: { value: '知道了', action: () => {} }
+      confirm: { value: $r('app.string.settings_pro_got_it'), action: () => {} }
     });
   }
 

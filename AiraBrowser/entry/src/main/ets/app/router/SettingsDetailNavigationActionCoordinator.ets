@@ -7,6 +7,7 @@ import {
   AIRA_COMMUNITY_TELEGRAM_URL
 } from '../../common/constants/AiraCommunityProjectLinks';
 import { BrowserBoundaryRouteState } from '../../common/utils/RouteParamUtils';
+import { localizeAboutReviewFailure } from '../../core/settings/SettingsAboutCopy';
 import { SettingsDetailActionResolver } from '../../core/settings/SettingsDetailActionResolver';
 import { SettingsDetailRowAction } from '../../core/settings/SettingsDetailViewModel';
 import { SystemSettingsLaunchService } from '../../services/system/SystemSettingsLaunchService';
@@ -15,7 +16,7 @@ import { SettingsNavigationCoordinator } from './SettingsNavigationCoordinator';
 export interface SettingsDetailNavigationActionHandlers {
   buildBoundaryRouteState(): BrowserBoundaryRouteState;
   getAbilityContext(): common.UIAbilityContext;
-  showToast(message: string): void;
+  showToast(message: ResourceStr): void;
   openSupportQqGroupDialog(): void;
   checkCommunityUpdate(): void;
   confirmClearAllSiteData(): void;
@@ -27,7 +28,7 @@ export interface SettingsDetailNavigationActionHandlers {
 export class SettingsDetailNavigationActionCallbackHandlers implements SettingsDetailNavigationActionHandlers {
   private buildBoundaryRouteStateHandler: () => BrowserBoundaryRouteState;
   private getAbilityContextHandler: () => common.UIAbilityContext;
-  private showToastHandler: (message: string) => void;
+  private showToastHandler: (message: ResourceStr) => void;
   private openSupportQqGroupDialogHandler: () => void;
   private checkCommunityUpdateHandler: () => void;
   private confirmClearAllSiteDataHandler: () => void;
@@ -38,7 +39,7 @@ export class SettingsDetailNavigationActionCallbackHandlers implements SettingsD
   constructor(
     buildBoundaryRouteStateHandler: () => BrowserBoundaryRouteState,
     getAbilityContextHandler: () => common.UIAbilityContext,
-    showToastHandler: (message: string) => void,
+    showToastHandler: (message: ResourceStr) => void,
     openSupportQqGroupDialogHandler: () => void,
     checkCommunityUpdateHandler: () => void,
     confirmClearAllSiteDataHandler: () => void,
@@ -65,7 +66,7 @@ export class SettingsDetailNavigationActionCallbackHandlers implements SettingsD
     return this.getAbilityContextHandler();
   }
 
-  showToast(message: string): void {
+  showToast(message: ResourceStr): void {
     this.showToastHandler(message);
   }
 
@@ -241,25 +242,25 @@ export class SettingsDetailNavigationActionCoordinator {
     }
     if (action === 'open_general_startup_settings') {
       this.navigationCoordinator.openGeneralStartupSettings(boundary, () => {
-        handlers.showToast('通用设置暂时无法打开，请稍后重试。');
+        handlers.showToast($r('app.string.settings_general_open_failed'));
       });
       return true;
     }
     if (action === 'open_general_tab_auto_close_settings') {
       this.navigationCoordinator.openGeneralTabAutoCloseSettings(boundary, () => {
-        handlers.showToast('通用设置暂时无法打开，请稍后重试。');
+        handlers.showToast($r('app.string.settings_general_open_failed'));
       });
       return true;
     }
     if (action === 'open_general_private_tabs_settings') {
       this.navigationCoordinator.openGeneralPrivateTabsSettings(boundary, () => {
-        handlers.showToast('通用设置暂时无法打开，请稍后重试。');
+        handlers.showToast($r('app.string.settings_privacy_open_failed'));
       });
       return true;
     }
     if (action === 'open_general_history_retention_settings') {
       this.navigationCoordinator.openGeneralHistoryRetentionSettings(boundary, () => {
-        handlers.showToast('通用设置暂时无法打开，请稍后重试。');
+        handlers.showToast($r('app.string.settings_general_open_failed'));
       });
       return true;
     }
@@ -273,7 +274,7 @@ export class SettingsDetailNavigationActionCoordinator {
     }
     if (action === 'open_keyboard_shortcuts_settings') {
       this.navigationCoordinator.openKeyboardShortcutsSettings(boundary, () => {
-        handlers.showToast('快捷键说明暂时无法打开，请稍后重试。');
+        handlers.showToast($r('app.string.settings_general_shortcuts_unavailable'));
       });
       return true;
     }
@@ -328,20 +329,22 @@ export class SettingsDetailNavigationActionCoordinator {
       AIRA_COMMUNITY_TELEGRAM_URL
     ).then((result) => {
       if (!result.success) {
-        handlers.showToast('Telegram 群暂时无法打开，请稍后重试。');
+        handlers.showToast($r('app.string.settings_about_telegram_failed'));
       }
     }).catch((_error: Error) => {
-      handlers.showToast('Telegram 群暂时无法打开，请稍后重试。');
+      handlers.showToast($r('app.string.settings_about_telegram_failed'));
     });
   }
 
   private openIcpFilingQuery(handlers: SettingsDetailNavigationActionHandlers): void {
     this.systemSettingsLaunchService.openExternalUrl(handlers.getAbilityContext(), APP_ICP_FILING_QUERY_URL)
       .then((result) => {
-        handlers.showToast(result.success ? '已打开工信部备案系统。' : '备案系统暂时无法打开，请稍后重试。');
+        handlers.showToast(result.success ?
+          $r('app.string.settings_about_icp_opened') :
+          $r('app.string.settings_about_icp_failed'));
       })
       .catch((_error: Error) => {
-        handlers.showToast('备案系统暂时无法打开，请稍后重试。');
+        handlers.showToast($r('app.string.settings_about_icp_failed'));
       });
   }
 
@@ -349,21 +352,33 @@ export class SettingsDetailNavigationActionCoordinator {
     this.systemSettingsLaunchService.openAppReviewPage(handlers.getAbilityContext())
       .then((result) => {
         if (!result.success) {
-          handlers.showToast(result.message.length > 0 ? result.message : '暂时无法打开应用市场，请稍后重试。');
+          handlers.showToast(result.message.length > 0 ?
+            localizeAboutReviewFailure(result.message) :
+            $r('app.string.settings_about_review_failed'));
         }
       })
       .catch((_error: Error) => {
-        handlers.showToast('暂时无法打开应用市场，请稍后重试。');
+        handlers.showToast($r('app.string.settings_about_review_failed'));
       });
   }
 
   private openDefaultBrowserSettings(handlers: SettingsDetailNavigationActionHandlers): void {
     this.systemSettingsLaunchService.openDefaultBrowserSettings(handlers.getAbilityContext())
       .then((result) => {
-        handlers.showToast(result.message);
+        handlers.showToast(this.localizeDefaultBrowserMessage(result.message));
       })
       .catch((_error: Error) => {
-        handlers.showToast('无法打开默认浏览器设置，请手动进入系统设置更改。');
+        handlers.showToast($r('app.string.settings_general_default_browser_failed'));
       });
+  }
+
+  private localizeDefaultBrowserMessage(message: string): ResourceStr {
+    if (message === '已打开系统设置，请选择默认浏览器。') {
+      return $r('app.string.settings_general_default_browser_opened');
+    }
+    if (message === '无法打开默认浏览器设置，请手动进入系统设置更改。' || message.length === 0) {
+      return $r('app.string.settings_general_default_browser_failed');
+    }
+    return message;
   }
 }

@@ -8,7 +8,7 @@ import { BrowserProfileBoundaryService } from '../../core/browser/BrowserProfile
 
 export interface OfflinePageExportResult {
   ok: boolean;
-  message: string;
+  message: ResourceStr;
 }
 
 export class OfflinePageExportService {
@@ -39,7 +39,7 @@ export class OfflinePageExportService {
     if (normalizedPageId.length === 0) {
       return {
         ok: false,
-        message: '未找到要导出的离线页面'
+        message: $r('app.string.offline_export_missing')
       };
     }
     try {
@@ -48,38 +48,38 @@ export class OfflinePageExportService {
       if (record === undefined) {
         return {
           ok: false,
-          message: '离线页面不存在'
+          message: $r('app.string.offline_page_not_found')
         };
       }
       if (!await this.fileStore.textFileAvailable(record.snapshotPath)) {
         return {
           ok: false,
-          message: '离线网页文件不存在'
+          message: $r('app.string.offline_export_file_missing')
         };
       }
       const targetUri = await this.pickSaveUri(context, this.buildExportFileName(record));
       if (targetUri.length <= 0) {
         return {
           ok: false,
-          message: '已取消导出'
+          message: $r('app.string.offline_export_cancelled')
         };
       }
       if (!this.canExport(dataScope, privacyMode)) {
         return {
           ok: false,
-          message: '当前隐私策略不允许导出离线页面'
+          message: $r('app.string.offline_export_blocked')
         };
       }
       const html = await this.fileStore.readText(record.snapshotPath);
       await this.writeTextToUri(targetUri, html);
       return {
         ok: true,
-        message: '已导出网页文件'
+        message: $r('app.string.offline_export_done')
       };
     } catch (_error) {
       return {
         ok: false,
-        message: '导出网页失败'
+        message: $r('app.string.offline_export_failed')
       };
     }
   }

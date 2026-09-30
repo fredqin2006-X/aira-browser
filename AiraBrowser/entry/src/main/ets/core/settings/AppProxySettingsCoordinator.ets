@@ -20,8 +20,12 @@ export interface AppProxySettingsCoordinatorState {
 
 export interface AppProxySettingsMutationResult {
   state: AppProxySettingsCoordinatorState;
-  message: string;
+  message: ResourceStr;
   success: boolean;
+}
+
+export function hasAppProxyUserMessage(message: ResourceStr): boolean {
+  return typeof message !== 'string' || message.length > 0;
 }
 
 export class AppProxySettingsCoordinator {
@@ -72,8 +76,8 @@ export class AppProxySettingsCoordinator {
       previous,
       next,
       boundaryInput,
-      () => `已切换到 ${this.viewModel.buildPageState(next).activeProfileName}`,
-      '切换代理失败。'
+      () => $r('app.string.proxy_sheet_switched', this.viewModel.buildPageState(next).activeProfileName),
+      $r('app.string.proxy_sheet_switch_failed')
     );
   }
 
@@ -87,8 +91,8 @@ export class AppProxySettingsCoordinator {
       previous,
       next,
       boundaryInput,
-      () => enabled ? '应用内代理已开启。' : '应用内代理已关闭。',
-      '代理状态更新失败。'
+      () => enabled ? $r('app.string.proxy_sheet_enabled') : $r('app.string.proxy_sheet_disabled'),
+      $r('app.string.proxy_sheet_state_failed')
     );
   }
 
@@ -98,7 +102,13 @@ export class AppProxySettingsCoordinator {
   ): Promise<AppProxySettingsMutationResult> {
     const previous = this.preferencesRepository.getPreferences().experiments;
     const next = this.viewModel.buildSettingsWithDeletedProfile(previous, profileId);
-    return this.commit(previous, next, boundaryInput, () => '代理已删除。', '删除代理失败。');
+    return this.commit(
+      previous,
+      next,
+      boundaryInput,
+      () => $r('app.string.proxy_sheet_deleted'),
+      $r('app.string.proxy_sheet_delete_failed')
+    );
   }
 
   async saveProfile(
@@ -115,8 +125,8 @@ export class AppProxySettingsCoordinator {
       previous,
       settings,
       boundaryInput,
-      () => '代理已保存。',
-      '保存代理失败。',
+      () => $r('app.string.proxy_sheet_saved'),
+      $r('app.string.proxy_sheet_save_failed'),
       shouldApplyRuntime,
       shouldApplyRuntime
     );
@@ -132,7 +142,7 @@ export class AppProxySettingsCoordinator {
       settings,
       boundaryInput,
       () => '',
-      '保存代理认证信息失败。',
+      $r('app.string.proxy_sheet_auth_failed'),
       true,
       false
     );
@@ -142,8 +152,8 @@ export class AppProxySettingsCoordinator {
     previous: BrowserExperimentSettings,
     next: BrowserExperimentSettings,
     boundaryInput: BrowserDataBoundaryInput,
-    successMessage: () => string,
-    failureMessage: string,
+    successMessage: () => ResourceStr,
+    failureMessage: ResourceStr,
     shouldApplyRuntime: boolean = true,
     shouldRequestRuntimeRefresh: boolean = true
   ): Promise<AppProxySettingsMutationResult> {

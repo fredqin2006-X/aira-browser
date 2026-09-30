@@ -20,7 +20,7 @@ export interface BrowserThemeModeBoundary {
 export interface BrowserThemeModeMutationResult {
   allowed: boolean;
   mode: BrowserThemeMode;
-  message: string;
+  message: ResourceStr;
 }
 
 export class BrowserThemeModeCoordinator {
@@ -121,14 +121,14 @@ export class BrowserThemeModeCoordinator {
       return {
         allowed: false,
         mode: this.resolveCurrentMode(),
-        message: '当前会话不可修改全局外观偏好。'
+        message: $r('app.string.bottom_panel_theme_session_locked')
       };
     }
     const nextMode = await this.setThemeMode(mode);
     return {
       allowed: true,
       mode: nextMode,
-      message: '外观模式已更新。'
+      message: $r('app.string.bottom_panel_theme_updated')
     };
   }
 

@@ -48,7 +48,7 @@ export struct ReaderSpeechPlayerSheet {
   };
   @Prop readerTheme: ReaderModeTheme = 'system';
   @Prop speed: number = 1;
-  @Prop voiceLabel: string = '系统默认音色';
+  @Prop voiceLabel: ResourceStr = $r('app.string.reader_voice_default');
   @Prop bottomSafeInsetVp: number = 0;
   private viewModel: ReaderSpeechPlayerViewModel = new ReaderSpeechPlayerViewModel();
   onClose: () => void = () => {};
@@ -83,7 +83,7 @@ export struct ReaderSpeechPlayerSheet {
     Row() {
       this.buildTopIconButton($r('sys.symbol.chevron_down'), this.onClose)
 
-      Text('听读正文')
+      Text($r('app.string.reader_speech_title'))
         .layoutWeight(1)
         .fontSize(16)
         .fontWeight(FontWeight.Medium)
@@ -336,7 +336,7 @@ export struct ReaderSpeechPlayerSheet {
 
   @Builder
   private buildSecondaryActions() {
-    Button('回到阅读模式')
+    Button($r('app.string.reader_back_to_reading_mode'))
       .width('100%')
       .height(42)
       .fontSize(14)
@@ -390,11 +390,11 @@ export struct ReaderSpeechPlayerSheet {
     return this.viewModel.buildSnapshot(this.article, this.chunks, this.speechState);
   }
 
-  private resolveSnapshotTitle(): string {
+  private resolveSnapshotTitle(): ResourceStr {
     return this.buildSnapshot().title;
   }
 
-  private resolveSnapshotSubtitle(): string {
+  private resolveSnapshotSubtitle(): ResourceStr {
     return this.buildSnapshot().subtitle;
   }
 
@@ -406,11 +406,11 @@ export struct ReaderSpeechPlayerSheet {
     return this.buildSnapshot().coverImageUrl;
   }
 
-  private resolveSnapshotCurrentText(): string {
+  private resolveSnapshotCurrentText(): ResourceStr {
     return this.buildSnapshot().currentText;
   }
 
-  private resolveSnapshotProgressLabel(): string {
+  private resolveSnapshotProgressLabel(): ResourceStr {
     return this.buildSnapshot().progressLabel;
   }
 
@@ -418,7 +418,7 @@ export struct ReaderSpeechPlayerSheet {
     return this.buildSnapshot().progressPercent;
   }
 
-  private resolveSnapshotStatusLabel(): string {
+  private resolveSnapshotStatusLabel(): ResourceStr {
     return this.buildSnapshot().statusLabel;
   }
 
@@ -494,7 +494,7 @@ export struct ReaderSpeechPlayerOverlay {
   };
   @Prop readerTheme: ReaderModeTheme = 'system';
   @Prop speed: number = 1;
-  @Prop voiceLabel: string = '系统默认音色';
+  @Prop voiceLabel: ResourceStr = $r('app.string.reader_voice_default');
   @Prop bottomSafeInsetVp: number = 0;
   onAction: (action: ReaderSpeechPlayerAction) => void = (_action: ReaderSpeechPlayerAction) => {};
 

@@ -66,7 +66,7 @@ export struct PasswordSettingsScreen {
 
   build() {
     SettingsHdsScaffold({
-      title: '密码',
+      title: $r('app.string.settings_privacy_protection_passwords'),
       backIconKind: 'back',
       pageBackground: this.resolvePageBackground(),
       headerButtonBackground: this.resolveControlBackground(),
@@ -209,7 +209,7 @@ export struct PasswordSettingsContent {
   @Builder
   private buildProviderSection() {
     SettingsSection({
-      title: '官方能力',
+      title: $r('app.string.settings_privacy_protection_password_official'),
       secondaryTextColor: this.resolveSecondaryTextColor()
     }) {
       SettingsGroupCard({
@@ -225,9 +225,9 @@ export struct PasswordSettingsContent {
           }
         }) {
           SettingsSwitchRow({
-            title: '网页密码保险箱',
+            title: $r('app.string.settings_privacy_protection_password_vault'),
             desktopPresentation: this.desktopPresentation,
-            description: '使用系统密码能力',
+            description: $r('app.string.settings_privacy_protection_password_vault_detail'),
             checked: this.state.officialVaultEnabled,
             primaryTextColor: this.resolvePrimaryTextColor(),
             secondaryTextColor: this.resolveSecondaryTextColor(),
@@ -245,7 +245,7 @@ export struct PasswordSettingsContent {
   @Builder
   private buildRegularControlsSection() {
     SettingsSection({
-      title: '普通标签页',
+      title: $r('app.string.settings_privacy_protection_password_regular'),
       secondaryTextColor: this.resolveSecondaryTextColor()
     }) {
       SettingsGroupCard({
@@ -261,9 +261,9 @@ export struct PasswordSettingsContent {
           }
         }) {
           SettingsSwitchRow({
-            title: '自动填充已有密码',
+            title: $r('app.string.settings_privacy_protection_password_autofill'),
             desktopPresentation: this.desktopPresentation,
-            description: '由系统验证后填充',
+            description: $r('app.string.settings_privacy_protection_password_autofill_detail'),
             checked: this.state.regularAutofillEnabled,
             rowPosition: 'first',
             isEnabled: this.state.officialVaultEnabled,
@@ -285,9 +285,9 @@ export struct PasswordSettingsContent {
           }
         }) {
           SettingsSwitchRow({
-            title: '提示保存新密码',
+            title: $r('app.string.settings_privacy_protection_password_save_prompt'),
             desktopPresentation: this.desktopPresentation,
-            description: '登录后询问保存',
+            description: $r('app.string.settings_privacy_protection_password_save_prompt_detail'),
             checked: this.state.regularSavePromptEnabled,
             rowPosition: 'last',
             isEnabled: this.state.officialVaultEnabled,
@@ -306,7 +306,7 @@ export struct PasswordSettingsContent {
   @Builder
   private buildRegularSummarySection() {
     SettingsSection({
-      title: '普通标签页规则',
+      title: $r('app.string.settings_privacy_protection_password_regular_rules'),
       secondaryTextColor: this.resolveSecondaryTextColor()
     }) {
       SettingsGroupCard({
@@ -314,7 +314,7 @@ export struct PasswordSettingsContent {
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsStaticValueRow({
-          title: '当前规则',
+          title: $r('app.string.settings_privacy_protection_password_current_rule'),
           desktopPresentation: this.desktopPresentation,
           value: '',
           description: this.state.regularSummary,
@@ -330,7 +330,7 @@ export struct PasswordSettingsContent {
   @Builder
   private buildPrivateControlsSection() {
     SettingsSection({
-      title: '私密标签页',
+      title: $r('app.string.settings_privacy_protection_password_private'),
       secondaryTextColor: this.resolveSecondaryTextColor()
     }) {
       SettingsGroupCard({
@@ -346,9 +346,9 @@ export struct PasswordSettingsContent {
           }
         }) {
           SettingsSwitchRow({
-            title: '一次性填充已有密码',
+            title: $r('app.string.settings_privacy_protection_password_private_autofill'),
             desktopPresentation: this.desktopPresentation,
-            description: '不保存新密码',
+            description: $r('app.string.settings_privacy_protection_password_private_no_save'),
             checked: this.state.privateAutofillEnabled,
             rowPosition: 'single',
             isEnabled: this.state.officialVaultEnabled,
@@ -367,7 +367,7 @@ export struct PasswordSettingsContent {
   @Builder
   private buildPrivateSummarySection() {
     SettingsSection({
-      title: '私密标签页规则',
+      title: $r('app.string.settings_privacy_protection_password_private_rules'),
       secondaryTextColor: this.resolveSecondaryTextColor()
     }) {
       SettingsGroupCard({
@@ -375,9 +375,9 @@ export struct PasswordSettingsContent {
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsStaticValueRow({
-          title: '保存新密码',
+          title: $r('app.string.settings_privacy_protection_password_save_new'),
           desktopPresentation: this.desktopPresentation,
-          value: '始终关闭',
+          value: $r('app.string.settings_privacy_protection_password_always_off'),
           description: this.state.privateSummary,
           rowPosition: 'single',
           isEnabled: this.state.officialVaultEnabled,

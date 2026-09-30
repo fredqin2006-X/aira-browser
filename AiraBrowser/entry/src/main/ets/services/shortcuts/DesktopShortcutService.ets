@@ -42,7 +42,7 @@ export interface DesktopShortcutIconPreparationTarget {
 
 export interface DesktopShortcutResult {
   ok: boolean;
-  message: string;
+  message: ResourceStr;
   code: number;
   shortcutId: string;
   record?: DesktopWebEntryRecord;
@@ -96,7 +96,7 @@ export class DesktopShortcutService {
     if (normalizedUrl.length <= 0) {
       return {
         ok: false,
-        message: '当前没有可添加到桌面的网址。',
+        message: $r('app.string.settings_desktop_shortcut_no_url'),
         code: 0,
         shortcutId: ''
       };
@@ -140,7 +140,7 @@ export class DesktopShortcutService {
         await this.rollbackPendingInstallRecord(shortcutId, previousRecord);
         return {
           ok: false,
-          message: '暂时无法添加到桌面，请稍后重试。',
+          message: $r('app.string.settings_desktop_shortcut_unavailable'),
           code: result.code,
           shortcutId: shortcutId,
           record: pendingRecord
@@ -157,7 +157,7 @@ export class DesktopShortcutService {
       );
       return {
         ok: true,
-        message: '已添加到桌面。',
+        message: $r('app.string.settings_desktop_shortcut_added'),
         code: result.code,
         shortcutId: shortcutId,
         record: record
@@ -184,7 +184,7 @@ export class DesktopShortcutService {
         );
         return {
           ok: true,
-          message: '这个网页已在桌面，已更新入口信息。',
+          message: $r('app.string.settings_desktop_shortcut_updated'),
           code: SHORTCUT_ALREADY_EXISTS_CODE,
           shortcutId: shortcutId,
           record: record
@@ -543,16 +543,16 @@ export class DesktopShortcutService {
     };
   }
 
-  private resolveFailureMessage(code: number): string {
+  private resolveFailureMessage(code: number): ResourceStr {
     if (code === SHORTCUT_ALREADY_EXISTS_CODE) {
-      return '这个网页已在桌面。';
+      return $r('app.string.settings_desktop_shortcut_exists');
     }
     if (code === SHORTCUT_LIMIT_REACHED_CODE) {
-      return '受鸿蒙系统限制，网页应用最多只能添加 2 个。';
+      return $r('app.string.settings_desktop_shortcut_limit');
     }
     if (code === SHORTCUT_REJECTED_CODE) {
-      return '已取消添加到桌面。';
+      return $r('app.string.settings_desktop_shortcut_cancelled');
     }
-    return '添加到桌面失败，请稍后重试。';
+    return $r('app.string.settings_web_app_install_failed');
   }
 }

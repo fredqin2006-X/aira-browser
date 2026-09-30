@@ -35,6 +35,7 @@ import {
 } from '../../../core/siteicons/SiteIconListPresenter';
 import { SiteControlsManualOriginDialog } from './SiteControlsManualOriginDialog';
 import { resolveCenteredDialogControllerWidth,  resolveCenteredDialogSurfaceColor, CENTERED_DIALOG_CORNER_RADIUS_VP } from '../common/CenteredDialogSurface';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 const SITE_CONTROLS_OVERVIEW_CARD_GAP: number = 10;
 const SITE_CONTROLS_OVERVIEW_CARD_HEIGHT: number = 88;
@@ -74,9 +75,9 @@ export struct SiteControlsManagementScreen {
     hasRows: false,
     hasFilteredRows: false,
     summaryLine: '',
-    listTitle: '站点规则',
-    emptyTitle: '还没有站点权限规则',
-    emptyMessage: '网站请求权限或被设置打开应用规则后，会出现在这里'
+    listTitle: resolveAppResourceText($r('app.string.settings_site_controls_list_title')),
+    emptyTitle: resolveAppResourceText($r('app.string.settings_site_controls_empty_title')),
+    emptyMessage: resolveAppResourceText($r('app.string.settings_site_controls_empty_message'))
   };
   @Prop dataScope: string = '';
   @Prop privacyMode: string = '';
@@ -128,14 +129,14 @@ export struct SiteControlsManagementScreen {
 
   build() {
     SettingsHdsScaffold({
-      title: '站点设置',
+      title: $r('app.string.settings_site_customization_title'),
       backIconKind: 'back',
       pageBackground: this.storedPageBackgroundColor,
       headerButtonBackground: this.storedPressedBackgroundColor,
       primaryTextColor: this.storedPrimaryTextColor,
       dividerColor: this.storedDividerColor,
       showPrivateIndicator: isPrivateBoundaryRoute(this.dataScope, this.privacyMode),
-      menuActionLabel: '添加站点',
+      menuActionLabel: resolveAppResourceText($r('app.string.settings_site_controls_add_site')),
       menuActionAiraIconId: 'browser.tabs.overviewAdd',
       onBack: () => {
         this.onClose?.();
@@ -193,7 +194,7 @@ export struct SiteControlsManagementScreen {
     Column() {
       SettingsTextField({
         text: this.state.query,
-        placeholder: '搜索站点',
+        placeholder: $r('app.string.settings_site_controls_search_placeholder'),
         controlBackgroundColor: this.storedSurfaceBackgroundColor,
         primaryTextColor: this.storedPrimaryTextColor,
         secondaryTextColor: this.storedSecondaryTextColor,
@@ -207,22 +208,22 @@ export struct SiteControlsManagementScreen {
 
   @Builder
   private buildPermissionCapabilitySection() {
-    SettingsSection({ title: '权限' }) {
+    SettingsSection({ title: $r('app.string.settings_site_controls_section_permissions') }) {
       Column({ space: SITE_CONTROLS_OVERVIEW_CARD_GAP }) {
         Row({ space: SITE_CONTROLS_OVERVIEW_CARD_GAP }) {
-          this.buildCapabilityOverviewCard(this.getCapabilityOption('location', '位置信息'))
-          this.buildCapabilityOverviewCard(this.getCapabilityOption('camera', '摄像头'))
+          this.buildCapabilityOverviewCard(this.getCapabilityOption('location', $r('app.string.settings_site_capability_location')))
+          this.buildCapabilityOverviewCard(this.getCapabilityOption('camera', $r('app.string.settings_site_capability_camera')))
         }
         .width('100%')
 
         Row({ space: SITE_CONTROLS_OVERVIEW_CARD_GAP }) {
-          this.buildCapabilityOverviewCard(this.getCapabilityOption('microphone', '麦克风'))
-          this.buildCapabilityOverviewCard(this.getCapabilityOption('sensor', '传感器'))
+          this.buildCapabilityOverviewCard(this.getCapabilityOption('microphone', $r('app.string.settings_site_capability_microphone')))
+          this.buildCapabilityOverviewCard(this.getCapabilityOption('sensor', $r('app.string.settings_site_capability_sensor')))
         }
         .width('100%')
 
         Row({ space: SITE_CONTROLS_OVERVIEW_CARD_GAP }) {
-          this.buildCapabilityOverviewCard(this.getCapabilityOption('clipboard', '剪贴板'))
+          this.buildCapabilityOverviewCard(this.getCapabilityOption('clipboard', $r('app.string.settings_site_capability_clipboard')))
           Blank()
             .layoutWeight(1)
         }
@@ -234,17 +235,20 @@ export struct SiteControlsManagementScreen {
 
   @Builder
   private buildSiteSettingsCapabilitySection() {
-    SettingsSection({ title: '站点设置' }) {
+    SettingsSection({ title: $r('app.string.settings_site_customization_title') }) {
       Column({ space: SITE_CONTROLS_OVERVIEW_CARD_GAP }) {
         Row({ space: SITE_CONTROLS_OVERVIEW_CARD_GAP }) {
-          this.buildCapabilityOverviewCard(this.getCapabilityOption('open_app', '打开应用'))
-          this.buildCustomizationCapabilityCard(this.getCustomizationCapabilityOption('external_actions', '外部动作'))
+          this.buildCapabilityOverviewCard(this.getCapabilityOption('open_app', $r('app.string.settings_site_capability_open_app')))
+          this.buildCustomizationCapabilityCard(
+            this.getCustomizationCapabilityOption('external_actions', $r('app.string.settings_site_customization_external_actions')))
         }
         .width('100%')
 
         Row({ space: SITE_CONTROLS_OVERVIEW_CARD_GAP }) {
-          this.buildCustomizationCapabilityCard(this.getCustomizationCapabilityOption('desktop_site', '网页标识'))
-          this.buildCustomizationCapabilityCard(this.getCustomizationCapabilityOption('private_site', '关闭后清除'))
+          this.buildCustomizationCapabilityCard(
+            this.getCustomizationCapabilityOption('desktop_site', $r('app.string.settings_site_customization_helper_identity')))
+          this.buildCustomizationCapabilityCard(
+            this.getCustomizationCapabilityOption('private_site', $r('app.string.settings_site_customization_fragment_clear_on_close')))
         }
         .width('100%')
 
@@ -262,15 +266,15 @@ export struct SiteControlsManagementScreen {
   @Builder
   private buildSearchResultListItems() {
     if (this.siteRows.length > 0) {
-      SettingsSectionTitle({ title: '网站' })
+      SettingsSectionTitle({ title: $r('app.string.settings_site_controls_section_sites') })
         .margin({ bottom: -8 })
 
       this.buildSiteRowListItems()
     } else {
       AppEmptyState({
         airaIconId: 'settings.search',
-        title: '没有找到这个站点',
-        message: '换个关键词再试试',
+        title: $r('app.string.settings_site_controls_empty_search_title'),
+        message: $r('app.string.settings_site_controls_no_match_hint'),
         topPadding: 92,
         bottomPadding: 92,
         fillHeight: false
@@ -281,7 +285,7 @@ export struct SiteControlsManagementScreen {
   @Builder
   private buildCustomizedSiteListItems() {
     if (this.siteRowsTotalCount > 0) {
-      SettingsSectionTitle({ title: '已自定义站点' })
+      SettingsSectionTitle({ title: $r('app.string.settings_site_controls_section_customized') })
         .margin({ bottom: -8 })
 
       this.buildSiteRowListItems()
@@ -395,7 +399,7 @@ export struct SiteControlsManagementScreen {
       .width('100%')
       .alignItems(VerticalAlign.Center)
 
-      Text(`${option.count} 个网站`)
+      Text(resolveAppResourceText($r('app.string.settings_site_controls_site_count'), option.count))
         .width('100%')
         .fontSize(14)
         .fontColor(this.storedSecondaryTextColor)
@@ -516,11 +520,15 @@ export struct SiteControlsManagementScreen {
       .fontColor([this.storedSecondaryTextColor])
   }
 
-  private getCapabilityOption(filterId: SiteControlsFilterId, title: string): SiteControlsFilterOptionState {
+  private resolveText(value: ResourceStr): string {
+    return typeof value === 'string' ? value : resolveAppResourceText(value);
+  }
+
+  private getCapabilityOption(filterId: SiteControlsFilterId, title: ResourceStr): SiteControlsFilterOptionState {
     const option = this.state.filterOptions.find((item: SiteControlsFilterOptionState) => item.id === filterId);
     return option ?? {
       id: filterId,
-      title: title,
+      title: this.resolveText(title),
       count: 0,
       isSelected: false
     };
@@ -528,20 +536,20 @@ export struct SiteControlsManagementScreen {
 
   private getCustomizationCapabilityOption(
     filterId: SiteCustomizationCapabilityFilterId,
-    title: string
+    title: ResourceStr
   ): SiteControlsCustomizationCapabilityState {
     const option = this.customizationCapabilities.find((item: SiteControlsCustomizationCapabilityState) => {
       return item.id === filterId;
     });
     return option ?? {
       id: filterId,
-      title: title,
+      title: this.resolveText(title),
       count: 0
     };
   }
 
   private buildCapabilityCountText(option: SiteControlsFilterOptionState): string {
-    return `${option.count} 个网站`;
+    return resolveAppResourceText($r('app.string.settings_site_controls_site_count'), option.count);
   }
 
   private resolveOverviewCardBackgroundColor(option: SiteControlsFilterOptionState): ResourceColor {

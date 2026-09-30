@@ -27,7 +27,7 @@ struct BrowserTrackingProtectionSettingsPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '防跟踪防护',
+        title: $r('app.string.settings_site_info_tracking_protection'),
         backIconKind: 'back',
         pageBackground: this.theme.pageBackground,
         headerButtonBackground: this.theme.pressedBackground,

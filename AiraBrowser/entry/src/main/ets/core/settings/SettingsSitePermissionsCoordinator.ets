@@ -27,6 +27,7 @@ import {
   SiteControlsDefaultCapabilityState,
   SiteControlsOverviewState
 } from '../sitecontrols/SiteControlsCoordinator';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface SettingsSitePermissionsBoundary {
   profileId?: BrowserProfileId | string;
@@ -202,18 +203,19 @@ export class SettingsSitePermissionsCoordinator {
           return {
             hasError: false,
             message: cleanupResult.removed > 0
-              ? `已清除 ${cleanupResult.removed} 条本次私密会话权限。`
-              : '当前没有需要清除的私密会话权限'
+              ? resolveAppResourceText(
+                  $r('app.string.settings_site_permissions_cleared'), cleanupResult.removed)
+              : resolveAppResourceText($r('app.string.settings_site_permissions_nothing_to_clear'))
           };
         }
         return {
           hasError: false,
-          message: '私密会话权限会在关闭所有私密标签页后清除'
+          message: resolveAppResourceText($r('app.string.settings_site_permissions_private_note'))
         };
       } catch (_error) {
         return {
           hasError: true,
-          message: '站点权限重置失败'
+          message: resolveAppResourceText($r('app.string.settings_site_permissions_reset_failed'))
         };
       }
     }
@@ -232,12 +234,12 @@ export class SettingsSitePermissionsCoordinator {
       sharedBrowserSslDecisionCacheRuntime.requestClear();
       return {
         hasError: false,
-        message: '站点权限已重置'
+        message: resolveAppResourceText($r('app.string.settings_site_permissions_reset_done'))
       };
     } catch (_error) {
       return {
         hasError: true,
-        message: '站点权限重置失败'
+        message: resolveAppResourceText($r('app.string.settings_site_permissions_reset_failed'))
       };
     }
   }
@@ -246,18 +248,20 @@ export class SettingsSitePermissionsCoordinator {
     const state = this.buildState(boundary);
     if (state.dataScope === 'session_ephemeral') {
       return {
-        title: '私密会话权限',
+        title: resolveAppResourceText($r('app.string.settings_site_permissions_private_title')),
         message: state.canClearPermissions
-          ? '清除本次临时站点权限'
-          : '私密权限关闭后自动清除',
-        confirmLabel: state.canClearPermissions ? '清除' : '知道了',
+          ? resolveAppResourceText($r('app.string.settings_site_permissions_clear_private_action'))
+          : resolveAppResourceText($r('app.string.settings_site_permissions_private_auto_note')),
+        confirmLabel: state.canClearPermissions
+          ? resolveAppResourceText($r('app.string.settings_site_permissions_clear_confirm'))
+          : resolveAppResourceText($r('app.string.settings_site_permissions_got_it')),
         canResetPermissions: state.canClearPermissions
       };
     }
     return {
-      title: '重置站点权限',
-      message: '清除已保存的站点权限',
-      confirmLabel: '重置',
+      title: resolveAppResourceText($r('app.string.settings_site_permissions_reset_title')),
+      message: resolveAppResourceText($r('app.string.settings_site_permissions_reset_message')),
+      confirmLabel: resolveAppResourceText($r('app.string.settings_site_customization_reset_confirm')),
       canResetPermissions: state.canClearPermissions
     };
   }

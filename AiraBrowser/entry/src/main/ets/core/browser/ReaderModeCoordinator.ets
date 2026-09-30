@@ -65,7 +65,7 @@ interface ReaderModeSpeechSessionSnapshot {
   state: ReaderSpeechState;
   chunks: string[];
   speed: number;
-  voiceLabel: string;
+  voiceLabel: ResourceStr;
   voiceDialog: ReaderModeSpeechVoiceDialogPresentation;
 }
 
@@ -74,7 +74,7 @@ export interface ReaderModeSpeechVoiceDialogPresentation {
   selectedVoiceId: string;
   options: ReaderSpeechVoiceOption[];
   loading: boolean;
-  errorMessage: string;
+  errorMessage: ResourceStr;
 }
 
 export type ReaderModeSessionSnapshotTransition = 'none' | 'theme';
@@ -132,7 +132,7 @@ interface ReaderModeSimpleEffect {
 
 interface ReaderModeToastEffect {
   type: 'toast';
-  message: string;
+  message: ResourceStr;
 }
 
 interface ReaderModeRestoreStatusBarEffect {
@@ -314,7 +314,7 @@ export class ReaderModeCoordinator implements ArticleReadingSessionOperations {
   private selectedSpeechVoice?: ReaderSpeechVoiceOption;
   private speechVoiceDialogTheme: ReaderModeTheme = 'system';
   private speechVoiceDialogLoading: boolean = false;
-  private speechVoiceDialogErrorMessage: string = '';
+  private speechVoiceDialogErrorMessage: ResourceStr = '';
   private speechVoiceDialogGeneration: number = 0;
   private speechCommandGeneration: number = 0;
 
@@ -530,7 +530,7 @@ export class ReaderModeCoordinator implements ArticleReadingSessionOperations {
   ): Promise<void> {
     const controller = this.resolveVisibleActiveController(runtimeLifecyclePort, webPageVisible);
     if (controller === undefined) {
-      this.emitToast('网页内容还在准备，请稍后再试。');
+      this.emitToast($r('app.string.reader_page_not_ready'));
       return;
     }
     const generation = this.beginSessionOpen();
@@ -556,7 +556,7 @@ export class ReaderModeCoordinator implements ArticleReadingSessionOperations {
     if (sessionArticle.blocks.length <= 0) {
       this.readerState = this.viewModel.buildErrorState(
         this.readerState,
-        '没有整理出可阅读的正文。'
+        $r('app.string.reader_extraction_failed')
       );
       this.emitSessionSnapshot();
       this.emitEffect({ type: 'sync_status_bar_style' });
@@ -793,7 +793,7 @@ export class ReaderModeCoordinator implements ArticleReadingSessionOperations {
       };
     } catch (_error) {
       return {
-        state: this.viewModel.buildErrorState(currentState, '阅读模式打开失败，请稍后重试。'),
+        state: this.viewModel.buildErrorState(currentState, $r('app.string.reader_open_failed')),
         available: false,
         diagnosticEvent: 'reader_mode_open_failed',
         diagnosticText: '',
@@ -960,7 +960,7 @@ export class ReaderModeCoordinator implements ArticleReadingSessionOperations {
       })
       .catch((_error: Error) => {
         if (this.preferenceGeneration === generation) {
-          this.emitToast('阅读偏好保存失败。');
+          this.emitToast($r('app.string.reader_preferences_save_failed'));
         }
       });
   }
@@ -989,7 +989,7 @@ export class ReaderModeCoordinator implements ArticleReadingSessionOperations {
     }
     this.presentationModeOverride = 'vertical';
     this.emitSessionSnapshot();
-    this.emitToast('当前内容无法安全分页，已临时切换为上下滚动。');
+    this.emitToast($r('app.string.reader_pagination_fallback'));
   }
 
   private resolveReadingPresentationMode(): ReadingPresentationMode {
@@ -1001,7 +1001,7 @@ export class ReaderModeCoordinator implements ArticleReadingSessionOperations {
   private shareCurrentArticle(context: ReaderModeActionContext): void {
     const url = this.resolveCurrentUrl(context.fallbackUrl);
     if (url.length <= 0) {
-      this.emitToast('当前没有可分享的网址。');
+      this.emitToast($r('app.string.reader_share_no_link'));
       return;
     }
     const articleTitle = this.readerState.article.title.trim();
@@ -1107,7 +1107,7 @@ export class ReaderModeCoordinator implements ArticleReadingSessionOperations {
       onComplete: (): void => {
         this.speechState = createDefaultReaderSpeechState();
         this.emitSessionSnapshot();
-        this.emitToast('朗读完成。');
+        this.emitToast($r('app.string.reader_speech_completed'));
       },
       onStop: (): void => {
         if (shouldResetReaderSpeechStateOnStop(this.speechState)) {
@@ -1115,7 +1115,7 @@ export class ReaderModeCoordinator implements ArticleReadingSessionOperations {
           this.emitSessionSnapshot();
         }
       },
-      onError: (message: string): void => {
+      onError: (message: ResourceStr): void => {
         this.speechState = this.speechPlaybackViewModel.buildErrorState(message);
         this.emitSessionSnapshot();
         this.emitToast(message);
@@ -1149,23 +1149,24 @@ export class ReaderModeCoordinator implements ArticleReadingSessionOperations {
       if (this.speechCommandGeneration !== commandGeneration) {
         return;
       }
-      this.speechState = this.speechPlaybackViewModel.buildErrorState('朗读启动失败，请稍后再试。');
+      this.speechState = this.speechPlaybackViewModel.buildErrorState(
+        $r('app.string.reader_speech_start_failed'));
       this.emitSessionSnapshot();
     }
   }
 
   private prepareSpeechChunks(): boolean {
     if (this.readerState.loading) {
-      this.emitToast('正文还在整理中，请稍后再试。');
+      this.emitToast($r('app.string.reader_speech_text_preparing'));
       return false;
     }
-    if (this.readerState.errorMessage.length > 0) {
+    if (`${this.readerState.errorMessage}`.length > 0) {
       this.emitToast(this.readerState.errorMessage);
       return false;
     }
     const chunks = this.speechTextBuilder.buildChunks(this.readerState.article);
     if (chunks.length <= 0) {
-      this.emitToast('没有可朗读的正文。');
+      this.emitToast($r('app.string.reader_speech_no_body'));
       return false;
     }
     this.speechState = this.speechPlaybackViewModel.reconcileChunksState(
@@ -1196,7 +1197,7 @@ export class ReaderModeCoordinator implements ArticleReadingSessionOperations {
     this.speechVoiceOptions = options;
     this.speechVoiceDialogLoading = false;
     if (options.length <= 0) {
-      this.speechVoiceDialogErrorMessage = '当前设备暂未返回中文音色。';
+      this.speechVoiceDialogErrorMessage = $r('app.string.reader_voice_unavailable');
       this.emitSessionSnapshot();
       return;
     }
@@ -1229,7 +1230,7 @@ export class ReaderModeCoordinator implements ArticleReadingSessionOperations {
     this.emitEffect({ type: 'restore_window_brightness' });
   }
 
-  private emitToast(message: string): void {
+  private emitToast(message: ResourceStr): void {
     this.emitEffect({
       type: 'toast',
       message: message
@@ -1244,12 +1245,17 @@ export class ReaderModeCoordinator implements ArticleReadingSessionOperations {
     this.sessionListener?.onEffect?.(effect);
   }
 
-  private buildExtractionFailureMessage(article: ReaderModeArticle): string {
+  private buildExtractionFailureMessage(article: ReaderModeArticle): ResourceStr {
     const diagnostics = article.diagnostics;
     if (diagnostics === undefined) {
-      return '没有整理出可阅读的正文。';
+      return $r('app.string.reader_extraction_failed');
     }
-    return `没有整理出可阅读的正文。诊断：${diagnostics.extractionStrategy}，文本 ${diagnostics.sourceTextLength}，候选 ${diagnostics.candidateCount}`;
+    return $r(
+      'app.string.reader_extraction_failed_detail',
+      diagnostics.extractionStrategy,
+      diagnostics.sourceTextLength,
+      diagnostics.candidateCount
+    );
   }
 
   private buildOpenDiagnosticText(article: ReaderModeArticle, readable: boolean, reason: string): string {

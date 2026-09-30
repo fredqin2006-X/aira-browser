@@ -1,5 +1,6 @@
 import { BookmarkNode } from '../../common/models/BrowserModels';
 import { AiraBookmarkImportNode, AiraBookmarkImportPlan } from '../../common/models/AiraSyncModels';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 const BOOKMARK_HTML_TITLE: string = 'Aira Bookmarks';
 const IMPORT_ROOT_ID: string = 'html-root';
@@ -55,7 +56,7 @@ export class BookmarkHtmlTransferService {
         const title = this.decodeHtml(this.extractElementText(trimmed, '<H3', '</H3>'));
         const id = this.nextImportId(counters, 'folder');
         const parentId = this.currentParentId(stack);
-        nodes.push(this.buildImportNode(id, 'folder', title.length > 0 ? title : '导入文件夹', parentId, '', counters));
+        nodes.push(this.buildImportNode(id, 'folder', title.length > 0 ? title : this.importedFolderTitle(), parentId, '', counters));
         if (parentId === undefined) {
           rootOrderIds.push(id);
         }
@@ -96,8 +97,17 @@ export class BookmarkHtmlTransferService {
     return {
       nodes: nodes,
       rootOrderIds: rootOrderIds,
-      summary: `HTML 书签文件包含 ${folderCount} 个文件夹、${bookmarkCount} 个书签。`
+      summary: resolveAppResourceText($r('app.string.bookmark_html_import_summary', folderCount, bookmarkCount))
     };
+  }
+
+  /** Imported nodes are persisted, so the fallback title is localized at creation time. */
+  private importedFolderTitle(): string {
+    return resolveAppResourceText($r('app.string.bookmark_imported_folder'));
+  }
+
+  private untitledBookmarkTitle(): string {
+    return resolveAppResourceText($r('app.string.bookmark_untitled_bookmark'));
   }
 
   private appendChildren(lines: string[], nodes: BookmarkNode[], parentId: string | undefined, depth: number): void {
@@ -170,7 +180,7 @@ export class BookmarkHtmlTransferService {
       id: id,
       type: type,
       parentId: parentId,
-      title: title.trim().length > 0 ? title.trim() : (type === 'folder' ? '导入文件夹' : '未命名书签'),
+      title: title.trim().length > 0 ? title.trim() : (type === 'folder' ? this.importedFolderTitle() : this.untitledBookmarkTitle()),
       position: position,
       sourceEntityId: id,
       createdAt: now,

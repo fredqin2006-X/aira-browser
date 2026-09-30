@@ -42,7 +42,7 @@ export type BrowserFullscreenSessionEffectType =
 export interface BrowserFullscreenSessionEffect {
   type: BrowserFullscreenSessionEffectType;
   source: string;
-  message: string;
+  message: ResourceStr;
   restoreInsets: boolean;
 }
 
@@ -453,7 +453,7 @@ export class BrowserFullscreenSessionCoordinator {
       this.emitEffect('toast', '', result.message);
     } catch (_error) {
       this.publishOrientationState(previousMode);
-      this.emitEffect('toast', '', '屏幕方向切换失败。');
+      this.emitEffect('toast', '', $r('app.string.settings_screen_orientation_failed'));
     }
   }
 
@@ -558,7 +558,7 @@ export class BrowserFullscreenSessionCoordinator {
   private emitEffect(
     type: BrowserFullscreenSessionEffectType,
     source: string = '',
-    message: string = '',
+    message: ResourceStr = '',
     restoreInsets: boolean = false
   ): void {
     this.sink.applyEffect({

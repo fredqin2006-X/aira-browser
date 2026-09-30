@@ -53,10 +53,7 @@ import {
   BrowserTabsSharedSnapshotInterruptedEntryExitInput,
   buildBrowserTabsSharedSnapshotIdleState
 } from './BrowserTabsSharedSnapshotTransitionCoordinator';
-import {
-  BROWSER_TABS_OVERVIEW_CARD_CORNER_RADIUS,
-  BROWSER_TABS_OVERVIEW_LIST_ROW_CORNER_RADIUS
-} from './BrowserTabsOverviewVisualTokens';
+import { BrowserTabsOverviewStyleEntryPolicy } from './tabsOverview/BrowserTabsOverviewStyleEntryPolicy';
 import {
   BrowserTabsOverviewSnapshotMorphSource,
   BrowserTabsOverviewSnapshotPipelineCoordinator
@@ -646,6 +643,8 @@ export class BrowserTabsOverviewSessionCoordinator {
     new BrowserTabsSharedSnapshotTransitionCoordinator();
   private sharedSnapshotAnimationViewModel: BrowserTabsOverlayAnimationViewModel =
     new BrowserTabsOverlayAnimationViewModel();
+  private styleEntryPolicy: BrowserTabsOverviewStyleEntryPolicy =
+    new BrowserTabsOverviewStyleEntryPolicy();
   private readonly hostedWebLayerPresentationViewModel: BrowserHostedWebLayerPresentationViewModel;
   private selectionPolicy: BrowserTabSharedSnapshotSelectionPolicy = new BrowserTabSharedSnapshotSelectionPolicy();
   private keyboardCoordinator: BrowserTabsOverviewKeyboardCoordinator = new BrowserTabsOverviewKeyboardCoordinator();
@@ -1628,7 +1627,11 @@ export class BrowserTabsOverviewSessionCoordinator {
     const runId = this.createSharedSnapshotRunId();
     const facts = host.readSessionFacts();
     const windowFacts = facts.sharedSnapshotWindow;
-    const listEntry = facts.tabOverviewLayoutStyle === 'list';
+    const profile = this.styleEntryPolicy.resolve(facts.tabOverviewLayoutStyle);
+    const motion = this.sharedSnapshotAnimationViewModel.resolveSharedSnapshotMotion(
+      profile.snapshotMotion,
+      'enter'
+    );
     const morphSource = this.snapshotPipelineCoordinator.resolveEntryMorphSourceForOwner({
       tabId: tabId,
       fallbackWebRect: this.buildSharedSnapshotWebRect(windowFacts),
@@ -1646,9 +1649,9 @@ export class BrowserTabsOverviewSessionCoordinator {
         morphSource.previewState,
         this.buildSharedSnapshotWindowInput(windowFacts, morphSource),
         this.buildSharedSnapshotTargetInput(tabId, facts, preparedTargetRect),
-        listEntry ? BROWSER_TABS_OVERVIEW_LIST_ROW_CORNER_RADIUS : BROWSER_TABS_OVERVIEW_CARD_CORNER_RADIUS,
+        profile.cornerRadius,
         0,
-        listEntry
+        profile.pinImageToSource
       );
     }
     if (state === undefined) {
@@ -1661,15 +1664,9 @@ export class BrowserTabsOverviewSessionCoordinator {
     return this.buildSharedSnapshotAnimationPlan(
       state,
       runId,
-      listEntry ?
-        this.sharedSnapshotAnimationViewModel.getListEntryDurationMs() :
-        this.sharedSnapshotAnimationViewModel.getSharedSnapshotEnterDurationMs(),
-      listEntry ?
-        this.sharedSnapshotAnimationViewModel.getListEntryCurve() :
-        this.sharedSnapshotAnimationViewModel.getSharedSnapshotEnterCurve(),
-      listEntry ?
-        this.sharedSnapshotAnimationViewModel.getListEntryHandoffDelayMs() :
-        this.sharedSnapshotAnimationViewModel.getSharedSnapshotEnterHandoffDelayMs(),
+      motion.durationMs,
+      motion.curve,
+      motion.handoffDelayMs,
       false
     );
   }
@@ -1683,15 +1680,19 @@ export class BrowserTabsOverviewSessionCoordinator {
     const runId = this.createSharedSnapshotRunId();
     const windowFacts = facts.sharedSnapshotWindow;
     const previewState = visualFacts.morphSource.previewState;
-    const listEntry = facts.tabOverviewLayoutStyle === 'list';
+    const profile = this.styleEntryPolicy.resolve(facts.tabOverviewLayoutStyle);
+    const motion = this.sharedSnapshotAnimationViewModel.resolveSharedSnapshotMotion(
+      profile.snapshotMotion,
+      'exit'
+    );
     const state = this.sharedSnapshotTransitionCoordinator.buildExitStateFromContext(
       tabId,
       previewState,
       this.buildSharedSnapshotWindowInput(windowFacts, visualFacts.morphSource),
       this.buildSharedSnapshotTargetInput(tabId, facts),
-      listEntry ? BROWSER_TABS_OVERVIEW_LIST_ROW_CORNER_RADIUS : BROWSER_TABS_OVERVIEW_CARD_CORNER_RADIUS,
+      profile.cornerRadius,
       0,
-      listEntry
+      profile.pinImageToSource
     );
     if (state === undefined) {
       host.executeEffect({
@@ -1732,15 +1733,9 @@ export class BrowserTabsOverviewSessionCoordinator {
     return this.buildSharedSnapshotAnimationPlan(
       state,
       runId,
-      listEntry ?
-        this.sharedSnapshotAnimationViewModel.getListExitDurationMs() :
-        this.sharedSnapshotAnimationViewModel.getSharedSnapshotExitDurationMs(),
-      listEntry ?
-        this.sharedSnapshotAnimationViewModel.getListExitCurve() :
-        this.sharedSnapshotAnimationViewModel.getSharedSnapshotExitCurve(),
-      listEntry ?
-        this.sharedSnapshotAnimationViewModel.getListExitHandoffDelayMs() :
-        this.sharedSnapshotAnimationViewModel.getSharedSnapshotExitHandoffDelayMs(),
+      motion.durationMs,
+      motion.curve,
+      motion.handoffDelayMs,
       true
     );
   }
@@ -1762,29 +1757,25 @@ export class BrowserTabsOverviewSessionCoordinator {
     if (state === undefined) {
       return undefined;
     }
-    const listClip = currentState.pinImageToSource === true;
+    // Follow the morph already in flight. Do not re-read the style: a switch mid-shrink must not
+    // retarget a clip onto card timing, or the other way around.
+    const motion = this.sharedSnapshotAnimationViewModel.resolveSharedSnapshotMotion(
+      currentState.pinImageToSource === true ? 'clip' : 'scale',
+      'exit'
+    );
     const durationMs = this.sharedSnapshotTransitionCoordinator.resolveInterruptedEntryExitDurationMs(
       currentState,
       targetRect,
-      listClip ?
-        this.sharedSnapshotAnimationViewModel.getListExitDurationMs() :
-        this.sharedSnapshotAnimationViewModel.getSharedSnapshotExitDurationMs()
+      motion.durationMs
     );
-    const handoffDelayMs = Math.min(
-      40,
-      listClip ?
-        this.sharedSnapshotAnimationViewModel.getListExitHandoffDelayMs() :
-        this.sharedSnapshotAnimationViewModel.getSharedSnapshotExitHandoffDelayMs()
-    );
+    const handoffDelayMs = Math.min(40, motion.handoffDelayMs);
     this.previewCoordinator.recordTransitionImageUse(tabId, 'exit');
     this.snapshotPipelineCoordinator.resetMeasuredEntryFrameForOwner();
     return this.buildSharedSnapshotAnimationPlan(
       state,
       runId,
       durationMs,
-      listClip ?
-        this.sharedSnapshotAnimationViewModel.getListExitCurve() :
-        this.sharedSnapshotAnimationViewModel.getSharedSnapshotExitCurve(),
+      motion.curve,
       handoffDelayMs,
       true
     );

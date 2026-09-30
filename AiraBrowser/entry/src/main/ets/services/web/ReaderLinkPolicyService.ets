@@ -3,7 +3,7 @@ export type ReaderLinkOpenKind = 'app_web' | 'external' | 'blocked';
 export interface ReaderLinkOpenDecision {
   kind: ReaderLinkOpenKind;
   url: string;
-  message: string;
+  message: ResourceStr;
 }
 
 export class ReaderLinkPolicyService {
@@ -13,7 +13,7 @@ export class ReaderLinkPolicyService {
       return {
         kind: 'blocked',
         url: '',
-        message: '链接为空。'
+        message: $r('app.string.reader_link_empty')
       };
     }
     const scheme = this.getUrlScheme(normalizedUrl);
@@ -21,27 +21,27 @@ export class ReaderLinkPolicyService {
       return {
         kind: 'app_web',
         url: normalizedUrl,
-        message: '正在打开链接。'
+        message: $r('app.string.reader_link_opening')
       };
     }
     if (scheme === 'mailto' || scheme === 'tel' || scheme === 'sms' || scheme === 'geo') {
       return {
         kind: 'external',
         url: normalizedUrl,
-        message: '正在交给系统打开。'
+        message: $r('app.string.reader_link_system')
       };
     }
     if (scheme.length > 0) {
       return {
         kind: 'external',
         url: normalizedUrl,
-        message: '正在交给外部应用打开。'
+        message: $r('app.string.reader_link_external_app')
       };
     }
     return {
       kind: 'blocked',
       url: normalizedUrl,
-      message: '暂不支持打开这个链接。'
+      message: $r('app.string.reader_link_unsupported')
     };
   }
 

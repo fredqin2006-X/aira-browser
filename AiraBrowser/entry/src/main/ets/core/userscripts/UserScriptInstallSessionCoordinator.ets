@@ -21,6 +21,7 @@ import {
 } from './UserScriptPackageLifecycleCoordinator';
 import { formatUserScriptPackageCommitMessage } from './UserScriptFeatureCopy';
 import { UserScriptManualSourceEditCompletionSignal } from './UserScriptManualSourceEditCompletionSignal';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface UserScriptInstallSessionStartInput {
   existingScriptId?: string;
@@ -510,13 +511,16 @@ export class UserScriptInstallSessionCoordinator {
 
   async loadSource(request: UserScriptInstallSourceRequest): Promise<UserScriptInstallSourceResult> {
     if (this.manualSourceInstallOwner !== undefined) {
-      return this.failed('另一个窗口正在安装脚本，请稍后重试。');
+      return this.failed(resolveAppResourceText($r('app.string.user_script_busy_another_window_install')));
     }
     if (this.draft.commitBusy) {
-      return this.failed('脚本正在安装，请稍后重试。');
+      return this.failed(resolveAppResourceText($r('app.string.user_script_busy_installing')));
     }
     const operationSerial = this.beginImportOperation();
-    this.updateImportState(true, request.type === 'url' ? '正在下载脚本...' : '');
+    this.updateImportState(
+      true,
+      request.type === 'url' ? resolveAppResourceText($r('app.string.user_script_downloading')) : ''
+    );
     try {
       let result: UserScriptInstallSourceResult;
       switch (request.type) {
@@ -544,7 +548,7 @@ export class UserScriptInstallSessionCoordinator {
         return { status: 'cancelled' };
       }
       const fallback = request.type === 'url' ?
-        USER_SCRIPT_SOURCE_DOWNLOAD_FAILED_MESSAGE : '读取脚本文件失败。';
+        USER_SCRIPT_SOURCE_DOWNLOAD_FAILED_MESSAGE : resolveAppResourceText($r('app.string.user_script_file_read_failed'));
       const message = error instanceof Error && error.message.length > 0 ? error.message : fallback;
       const result = this.failed(message);
       this.updateImportState(false, message);
@@ -562,10 +566,10 @@ export class UserScriptInstallSessionCoordinator {
     manualSourceInstallToken: string = ''
   ): Promise<UserScriptPackageMutationResult> {
     if (this.manualSourceEditSession?.completionPending) {
-      return this.blockedCommit('脚本编辑正在返回安装页，请稍后重试。');
+      return this.blockedCommit(resolveAppResourceText($r('app.string.user_script_edit_returning')));
     }
     if (!this.canAccessManualSourceInstall(manualSourceInstallOwner, manualSourceInstallToken)) {
-      return this.blockedCommit('另一个窗口正在安装脚本，请稍后重试。');
+      return this.blockedCommit(resolveAppResourceText($r('app.string.user_script_busy_another_window_install')));
     }
     if (this.commitPromise !== undefined) {
       return this.commitPromise;
@@ -574,7 +578,7 @@ export class UserScriptInstallSessionCoordinator {
       return {
         status: 'failed',
         warnings: [],
-        errorMessage: '脚本仍在导入，请稍后再保存。'
+        errorMessage: resolveAppResourceText($r('app.string.user_script_import_still_running'))
       };
     }
     const sourceInput = this.buildSourceInput();
@@ -634,7 +638,7 @@ export class UserScriptInstallSessionCoordinator {
   private async loadUrlSource(url: string, operationSerial: number): Promise<UserScriptInstallSourceResult> {
     const normalizedUrl = url.trim();
     if (normalizedUrl.length === 0) {
-      return this.failed('请输入脚本 URL。');
+      return this.failed(resolveAppResourceText($r('app.string.user_script_enter_url')));
     }
     const result: UserScriptSourceFetchResult = await this.sourceFetchService.fetchSource(normalizedUrl, true);
     if (!this.isCurrentImportOperation(operationSerial)) {
@@ -666,14 +670,14 @@ export class UserScriptInstallSessionCoordinator {
   ): Promise<UserScriptInstallSourceResult> {
     const normalizedUri = uri.trim();
     if (normalizedUri.length === 0) {
-      return this.failed('未收到可读取的用户脚本文件。');
+      return this.failed(resolveAppResourceText($r('app.string.user_script_no_file')));
     }
     const source = await this.localFileService.readScriptFile(normalizedUri);
     if (!this.isCurrentImportOperation(operationSerial)) {
       return { status: 'cancelled' };
     }
     if (source.length === 0) {
-      return this.failed('脚本文件为空。');
+      return this.failed(resolveAppResourceText($r('app.string.user_script_file_empty')));
     }
     return this.applyLoadedSource(source, normalizedUri, 'file');
   }

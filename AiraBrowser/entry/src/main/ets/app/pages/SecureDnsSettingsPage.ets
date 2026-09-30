@@ -8,6 +8,7 @@ import {
 } from '../bootstrap/BrowserAppRuntime';
 import { SettingsNavigationCoordinator } from '../router/SettingsNavigationCoordinator';
 import { BrowserBoundaryRouteState, readBrowserBoundaryRouteState } from '../../common/utils/RouteParamUtils';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 @Entry
 @Component
@@ -29,13 +30,13 @@ struct SecureDnsSettingsPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '安全 DNS',
+        title: $r('app.string.settings_privacy_protection_secure_dns'),
         backIconKind: 'back',
         pageBackground: this.theme.pageBackground,
         headerButtonBackground: this.theme.pressedBackground,
         primaryTextColor: this.theme.textPrimary,
         dividerColor: this.theme.divider,
-        menuActionLabel: '添加自定义 DNS',
+        menuActionLabel: resolveAppResourceText($r('app.string.settings_add_custom_dns')),
         menuActionAiraIconId: 'browser.tabs.add',
         onBack: (): void => {
           this.navigationCoordinator.back();

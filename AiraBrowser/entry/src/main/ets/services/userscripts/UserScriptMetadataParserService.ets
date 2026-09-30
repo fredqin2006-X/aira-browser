@@ -8,6 +8,7 @@ import {
 } from '../../features/userscripts/UserScriptMetadataModels';
 import { UserScriptCapabilityContractService } from './UserScriptCapabilityContractService';
 import { UserScriptIconService } from './UserScriptIconService';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 interface UserScriptMetadataFields {
   names: string[];
@@ -51,30 +52,30 @@ export class UserScriptMetadataParserService {
   ): UserScriptMetadataParseResult {
     const normalizedSource = source.trim();
     if (normalizedSource.length === 0) {
-      return this.fail('脚本内容不能为空。');
+      return this.fail(resolveAppResourceText($r('app.string.user_script_parse_empty')));
     }
     if (normalizedSource.length > MAX_USER_SCRIPT_SOURCE_LENGTH) {
-      return this.fail('脚本超过 50 MB，无法安装。');
+      return this.fail(resolveAppResourceText($r('app.string.user_script_source_too_large')));
     }
     const header = this.extractHeader(normalizedSource);
     if (header.length === 0) {
-      return this.fail('未找到 userscript 元数据头。');
+      return this.fail(resolveAppResourceText($r('app.string.user_script_source_no_metadata')));
     }
     const fields = this.parseHeaderFields(header);
     const primaryName = this.firstNonEmpty(fields.names);
     const name = primaryName.length > 0 ? primaryName : this.firstNonEmpty(fields.localizedNames);
     if (name.length === 0) {
-      return this.fail('脚本缺少 @name。', fields.warnings);
+      return this.fail(resolveAppResourceText($r('app.string.user_script_parse_missing_name')), fields.warnings);
     }
     if (primaryName.length === 0) {
-      fields.warnings.push('脚本缺少基础 @name，已使用本地化名称。');
+      fields.warnings.push(resolveAppResourceText($r('app.string.user_script_parse_used_localized_name')));
     }
     const matches = this.normalizeStringList(fields.matches);
     const includes = this.normalizeStringList(fields.includes);
     const excludeMatches = this.normalizeStringList(fields.excludeMatches);
     const excludes = this.normalizeStringList(fields.excludes);
     if (matches.length === 0 && includes.length === 0) {
-      return this.fail('脚本缺少 @match 或 @include，无法确定运行站点。', fields.warnings);
+      return this.fail(resolveAppResourceText($r('app.string.user_script_parse_missing_match')), fields.warnings);
     }
     const candidate: UserScriptPackageCandidate = {
       name: name,
@@ -228,13 +229,13 @@ export class UserScriptMetadataParserService {
     const trimmed = value.trim();
     const separator = trimmed.search(/\s/);
     if (separator <= 0) {
-      fields.warnings.push('忽略格式不正确的 @resource。');
+      fields.warnings.push(resolveAppResourceText($r('app.string.user_script_parse_bad_resource')));
       return;
     }
     const name = trimmed.slice(0, separator).trim();
     const url = trimmed.slice(separator + 1).trim();
     if (name.length === 0 || url.length === 0) {
-      fields.warnings.push('忽略格式不正确的 @resource。');
+      fields.warnings.push(resolveAppResourceText($r('app.string.user_script_parse_bad_resource')));
       return;
     }
     fields.resources.push({
@@ -257,7 +258,7 @@ export class UserScriptMetadataParserService {
         }
         return;
       }
-      warnings.push(`暂不支持 @grant ${value}，安装后会忽略该授权。`);
+      warnings.push(resolveAppResourceText($r('app.string.user_script_parse_unsupported_grant'), value));
     });
     return grants.length > 0 ? grants : ['none'];
   }
@@ -275,7 +276,7 @@ export class UserScriptMetadataParserService {
     if (value === 'document-end' || value.length === 0) {
       return 'document-end';
     }
-    warnings.push(`暂不支持 @run-at ${value}，将按 document-end 运行。`);
+    warnings.push(resolveAppResourceText($r('app.string.user_script_parse_unsupported_run_at'), value));
     return 'document-end';
   }
 

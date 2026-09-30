@@ -92,3 +92,79 @@ export class SettingsGeneralCoordinator {
     return '关闭后不恢复';
   }
 }
+
+export function localizeGeneralSettingsCopy(value: string): ResourceStr {
+  switch (value) {
+    case '默认浏览器':
+      return $r('app.string.settings_general_default_browser');
+    case '到系统默认浏览器设置中更改':
+      return $r('app.string.settings_general_default_browser_detail');
+    case '由系统设置管理':
+      return $r('app.string.settings_general_system_managed');
+    case '启动行为':
+      return $r('app.string.settings_general_startup');
+    case '设置启动时是否恢复常规标签页':
+      return $r('app.string.settings_general_startup_detail');
+    case '恢复常规标签':
+      return $r('app.string.settings_general_restore_tabs');
+    case '恢复常规标签页':
+      return $r('app.string.settings_general_restore_tabs_page');
+    case '打开首页':
+      return $r('app.string.settings_general_open_home');
+    case '自动关闭标签页':
+      return $r('app.string.settings_general_tab_auto_close');
+    case '选择多久后自动关闭未使用标签页':
+      return $r('app.string.settings_general_tab_auto_close_detail');
+    case '不自动关闭':
+      return $r('app.string.settings_general_tab_manual');
+    case '退出后清除':
+      return $r('app.string.settings_general_clear_on_exit');
+    case '历史保留':
+      return $r('app.string.settings_general_history_retention');
+    case '选择历史记录保留条数':
+      return $r('app.string.settings_general_history_retention_detail');
+    case '不保存历史':
+      return $r('app.string.settings_general_history_off');
+    case '键盘快捷键':
+      return $r('app.string.settings_general_keyboard_shortcuts');
+    case '查看':
+      return $r('app.string.settings_pro_value_view');
+    case '外接键盘可用的浏览器操作':
+      return $r('app.string.settings_general_keyboard_detail');
+    default:
+      break;
+  }
+  return localizeGeneralSettingsCount(value);
+}
+
+function localizeGeneralSettingsCount(value: string): ResourceStr {
+  const unusedMarker = ' 天未使用';
+  if (value.endsWith(unusedMarker)) {
+    const daysText = value.substring(0, value.length - unusedMarker.length);
+    const days = Number(daysText);
+    if (daysText.length > 0 && `${days}` === daysText) {
+      return $r('app.string.settings_general_unused_days', days);
+    }
+  }
+  const countSeparator = ' 天 / ';
+  const countMarker = ' 条';
+  const separatorIndex = value.indexOf(countSeparator);
+  if (separatorIndex > 0 && value.endsWith(countMarker)) {
+    const daysText = value.substring(0, separatorIndex);
+    const rowsText = value.substring(separatorIndex + countSeparator.length, value.length - countMarker.length);
+    const days = Number(daysText);
+    const rows = Number(rowsText);
+    if (`${days}` === daysText && `${rows}` === rowsText) {
+      return $r('app.string.settings_general_history_count', days, rows);
+    }
+  }
+  const dayMarker = ' 天';
+  if (value.endsWith(dayMarker) && value.indexOf('/') < 0) {
+    const daysText = value.substring(0, value.length - dayMarker.length);
+    const days = Number(daysText);
+    if (daysText.length > 0 && `${days}` === daysText) {
+      return $r('app.string.settings_general_days', days);
+    }
+  }
+  return value;
+}

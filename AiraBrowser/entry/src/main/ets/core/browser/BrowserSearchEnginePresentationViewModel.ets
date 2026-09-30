@@ -6,12 +6,12 @@ import {
 export class BrowserSearchEngineChromePresentation {
   selectedSearchEngine: SearchEngineId;
   searchEngines: SearchEngineRecord[];
-  placeholder: string;
+  placeholder: ResourceStr;
 
   constructor(
     selectedSearchEngine: SearchEngineId,
     searchEngines: SearchEngineRecord[],
-    placeholder: string
+    placeholder: ResourceStr
   ) {
     this.selectedSearchEngine = selectedSearchEngine;
     this.searchEngines = searchEngines.slice();
@@ -31,8 +31,8 @@ export class BrowserSearchEnginePresentationViewModel {
     );
   }
 
-  buildPlaceholder(_selectedSearchEngine: SearchEngineId, _availableSearchEngines: SearchEngineRecord[]): string {
-    return '搜索或输入网址';
+  buildPlaceholder(_selectedSearchEngine: SearchEngineId, _availableSearchEngines: SearchEngineRecord[]): ResourceStr {
+    return $r('app.string.aira_search_card_placeholder');
   }
 
   resolveName(searchEngine: SearchEngineId, availableSearchEngines: SearchEngineRecord[]): string {

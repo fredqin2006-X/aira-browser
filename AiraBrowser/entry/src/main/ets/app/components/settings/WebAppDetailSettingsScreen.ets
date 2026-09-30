@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
 import { WebAppSettingsDetailState } from '../../../core/webapps/WebAppSettingsViewModel';
 import {
@@ -40,7 +41,7 @@ export struct WebAppDetailSettingsScreen {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string = '#5F6875';
   @Prop state: WebAppSettingsDetailState = {
     shortcutId: '',
-    title: '网页应用',
+    title: resolveAppResourceText($r('app.string.settings_web_apps')),
     subtitle: '',
     iconPath: '',
     defaultFullscreen: false,
@@ -56,7 +57,7 @@ export struct WebAppDetailSettingsScreen {
     summary: '',
     externalNavigationPolicy: 'ask',
     hasExternalNavigationRule: false,
-    desktopSiteSummary: '跟随全局',
+    desktopSiteSummary: resolveAppResourceText($r('app.string.settings_site_customization_follow_global')),
     hasDesktopSiteRule: false,
     privateSiteEnabled: false,
     preserveCookiesOnClose: false,
@@ -221,13 +222,13 @@ export struct WebAppDetailSettingsScreen {
 
   @Builder
   private buildDisplaySection() {
-    SettingsSection({ title: '显示' }) {
+    SettingsSection({ title: $r('app.string.settings_web_apps_display') }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsSwitchRow({
-          title: '全屏模式',
+          title: $r('app.string.settings_web_apps_fullscreen'),
           desktopPresentation: this.desktopPresentation,
           checked: this.state.defaultFullscreen,
           rowPosition: 'single',
@@ -240,7 +241,7 @@ export struct WebAppDetailSettingsScreen {
         })
       }
       SettingsFooterText({
-        text: '打开后，从桌面进入这个网页应用时会让网页从屏幕顶部开始显示。',
+        text: $r('app.string.settings_web_apps_fullscreen_note'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -250,7 +251,7 @@ export struct WebAppDetailSettingsScreen {
   private buildSiteControls() {
     if (this.state.canOpenSiteSettings) {
       SettingsFooterText({
-        text: '下面这些设置只影响这个网页应用对应的站点。',
+        text: $r('app.string.settings_web_apps_site_note'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
       SiteCustomizationDetailSections({
@@ -284,7 +285,7 @@ export struct WebAppDetailSettingsScreen {
 
   @Builder
   private buildMissingState() {
-    Text('这个网页应用记录不存在，可能已经被移除。')
+    Text($r('app.string.settings_web_app_missing'))
       .width('100%')
       .fontSize(14)
       .lineHeight(20)

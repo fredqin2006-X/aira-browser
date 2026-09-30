@@ -24,6 +24,7 @@ import { UserScriptNativeCookieService, UserScriptCookieDetails } from '../../se
 import { UserScriptNativeBridgePermissionCoordinator } from './UserScriptNativeBridgePermissionCoordinator';
 import { UserScriptRuntimeReadinessCoordinator } from './UserScriptRuntimeReadinessCoordinator';
 import { UserScriptTabStorageService } from './UserScriptTabStorageService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface UserScriptNativeBridgeHost {
   openInTab: (openerTabId: string, url: string, active: boolean) => void;
@@ -946,7 +947,7 @@ export class UserScriptNativeBridgeCoordinator {
       return;
     }
     this.warnedValueIncidentId = error.incidentId;
-    this.host.showMessage('用户脚本数据暂时未保存，可前往用户脚本管理查看状态。');
+    this.host.showMessage(resolveAppResourceText($r('app.string.user_script_value_not_saved')));
   }
 
   private resolveValuePublicError(error: Error): string {

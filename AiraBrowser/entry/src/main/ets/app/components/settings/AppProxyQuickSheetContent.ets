@@ -68,7 +68,7 @@ export struct AppProxyQuickSheetContent {
       }) {
         BrowserImmersiveSheetLayout({
           closeVisible: true,
-          closeAccessibilityLabel: '关闭应用内代理',
+          closeAccessibilityLabel: $r('app.string.proxy_sheet_close'),
           onClose: (): void => {
             this.onClose?.();
           },
@@ -87,7 +87,7 @@ export struct AppProxyQuickSheetContent {
   private buildLargeScreenDialog() {
     Column() {
       BrowserLargeScreenModalHeader({
-        title: '应用内代理',
+        title: $r('app.string.settings_app_proxy'),
         dialogMode: true,
         onClose: (): void => {
           this.onClose?.();
@@ -115,7 +115,7 @@ export struct AppProxyQuickSheetContent {
   @Builder
   private buildHeader() {
     BrowserFeatureSheetHeader({
-      title: '应用内代理',
+      title: $r('app.string.settings_app_proxy'),
       titleColor: this.storedPrimaryTextColor
     })
   }
@@ -174,7 +174,7 @@ export struct AppProxyQuickSheetContent {
   private buildGlobalSwitchSection() {
     SettingsGroupCard({ surfaceColor: this.resolveGroupSurfaceColor() }) {
       SettingsSwitchRow({
-        title: '启用应用内代理',
+        title: $r('app.string.settings_app_proxy_enable'),
         checked: this.state.globalEnabled,
         rowPosition: 'single',
         isEnabled: this.state.hasProfiles && !this.state.switchingGlobalEnabled,
@@ -188,14 +188,14 @@ export struct AppProxyQuickSheetContent {
   @Builder
   private buildProfilesSection() {
     SettingsSection({
-      title: '代理配置',
+      title: $r('app.string.settings_app_proxy_profile'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       Column({ space: 10 }) {
         if (this.state.profiles.length <= 0) {
           SettingsGroupCard({ surfaceColor: this.resolveGroupSurfaceColor() }) {
             SettingsOptionRow({
-              title: '暂无代理',
+              title: $r('app.string.settings_app_proxy_empty'),
               helperText: '',
               rowPosition: 'single',
               isSelected: false,
@@ -233,7 +233,7 @@ export struct AppProxyQuickSheetContent {
   private buildSettingsAction() {
     Row() {
       BrowserSheetActionButton({
-        label: '代理设置',
+        label: $r('app.string.proxy_sheet_open_settings'),
         onAction: () => {
           this.onOpenSettings?.();
         }

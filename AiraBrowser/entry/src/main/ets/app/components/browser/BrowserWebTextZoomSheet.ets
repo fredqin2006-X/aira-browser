@@ -29,7 +29,7 @@ export struct BrowserWebTextZoomSheet {
           .width(56)
           .height(44)
 
-        Text('网页文字大小')
+        Text($r('app.string.web_text_zoom_title'))
           .layoutWeight(1)
           .fontSize(20)
           .fontWeight(FontWeight.Bold)
@@ -38,7 +38,7 @@ export struct BrowserWebTextZoomSheet {
           .maxLines(1)
 
         BrowserSheetActionButton({
-          label: '默认',
+          label: $r('app.string.web_text_zoom_default'),
           fillAvailableWidth: false,
           buttonWidth: 56,
           buttonHeight: 44,
@@ -54,7 +54,7 @@ export struct BrowserWebTextZoomSheet {
       .alignItems(VerticalAlign.Center)
 
       Row({ space: 0 }) {
-        this.buildZoomButton('browser.toolbar.zoomOut', '减小网页文字', this.state.canDecrease, () => {
+        this.buildZoomButton('browser.toolbar.zoomOut', $r('app.string.web_text_zoom_decrease'), this.state.canDecrease, () => {
           this.onAction('decrease');
         })
 
@@ -71,7 +71,7 @@ export struct BrowserWebTextZoomSheet {
 
         this.buildDivider()
 
-        this.buildZoomButton('browser.toolbar.zoomIn', '增大网页文字', this.state.canIncrease, () => {
+        this.buildZoomButton('browser.toolbar.zoomIn', $r('app.string.web_text_zoom_increase'), this.state.canIncrease, () => {
           this.onAction('increase');
         })
       }
@@ -81,7 +81,7 @@ export struct BrowserWebTextZoomSheet {
 
       Row() {
         BrowserSheetActionButton({
-          label: '完成',
+          label: $r('app.string.web_text_zoom_done'),
           buttonHeight: 44,
           fontSize: 15,
           onAction: () => {
@@ -95,7 +95,7 @@ export struct BrowserWebTextZoomSheet {
   }
 
   @Builder
-  private buildZoomButton(iconId: AiraRenderableIconId, label: string, enabled: boolean, action: () => void) {
+  private buildZoomButton(iconId: AiraRenderableIconId, label: ResourceStr, enabled: boolean, action: () => void) {
     BrowserSheetIconButton({
       airaIconId: iconId,
       iconSize: 17,

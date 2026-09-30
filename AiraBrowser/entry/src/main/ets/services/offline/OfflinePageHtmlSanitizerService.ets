@@ -1,3 +1,5 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
+
 export interface OfflinePageHtmlSanitizeInput {
   html: string;
   originalUrl: string;
@@ -152,11 +154,14 @@ export class OfflinePageHtmlSanitizerService {
   }
 
   private addImageFallbacks(html: string): string {
+    const missingImageLabel = this.escapeSingleQuotedScriptText(
+      resolveAppResourceText($r('app.string.offline_missing_image'))
+    );
     return html.replace(/<img\b([^>]*)>/gi, (match: string, attrs: string): string => {
       if (/onerror\s*=/i.test(attrs)) {
         return match;
       }
-      return `<img${attrs} onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'aira-offline-missing-image',textContent:'图片未能保存'}));">`;
+      return `<img${attrs} onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'aira-offline-missing-image',textContent:'${missingImageLabel}'}));">`;
     });
   }
 
@@ -211,7 +216,16 @@ export class OfflinePageHtmlSanitizerService {
   }
 
   private buildMissingFramePlaceholder(): string {
-    return '<div class="aira-offline-missing-image">嵌入内容未保存</div>';
+    return `<div class="aira-offline-missing-image">${this.escapeText(
+      resolveAppResourceText($r('app.string.offline_missing_embed'))
+    )}</div>`;
+  }
+
+  private escapeSingleQuotedScriptText(value: string): string {
+    return value
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/</g, '\\x3C');
   }
 
   private escapeText(value: string): string {

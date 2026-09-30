@@ -28,7 +28,6 @@ import {
 } from '../../core/browser/BrowserPrivateBoundaryNavigationService';
 import {
   SYNC_OPERATION_PROGRESS_TIMING,
-  SyncOperationProgressTipsState,
   SyncOperationProgressViewModel
 } from '../../core/sync/SyncOperationProgressViewModel';
 import {
@@ -64,6 +63,7 @@ import {
   SettingsSection
 } from '../components/settings/SettingsLayout';
 import { SyncFailureDialog } from '../components/sync/SyncFailureDialog';
+import { SyncExperienceLinesDialog } from '../components/sync/SyncExperienceLinesDialog';
 import { SyncResultDialog } from '../components/sync/SyncResultDialog';
 import { SyncMasterControlSection } from '../components/sync/SyncMasterControlSection';
 import {
@@ -99,12 +99,12 @@ struct SyncAdvancedSettingsPage {
 
   @State private isBusy: boolean = false;
   @State private isSessionEphemeral: boolean = false;
-  @State private baselineText: string = '正在读取...';
-  @State private localText: string = '正在读取...';
-  @State private remoteText: string = '尚未检查';
-  @State private lastSyncText: string = '暂无';
-  @State private providerText: string = '正在读取...';
-  @State private mergeActionLabel: string = '立即合并同步';
+  @State private baselineText: ResourceStr = $r('app.string.settings_sync_advanced_reading');
+  @State private localText: ResourceStr = $r('app.string.settings_sync_advanced_reading');
+  @State private remoteText: ResourceStr = $r('app.string.settings_sync_advanced_not_checked');
+  @State private lastSyncText: ResourceStr = $r('app.string.settings_sync_advanced_none');
+  @State private providerText: ResourceStr = $r('app.string.settings_sync_advanced_reading');
+  @State private mergeActionLabel: ResourceStr = $r('app.string.settings_sync_advanced_merge');
   @State private providerActionState: SyncAdvancedProviderActionState = {
     showHuaweiCloud: false,
     showHuaweiSpace: false,
@@ -115,19 +115,23 @@ struct SyncAdvancedSettingsPage {
   private activeSyncServiceKey: AiraFeatureKey = '' as AiraFeatureKey;
   private activeSyncServiceName: string = '同步服务';
   private activeSyncReady: boolean = false;
-  private activeSyncMissingConfigurationMessage: string = '请先开启华为云空间同步、Aira 云同步或 WebDAV。';
+  private activeSyncMissingConfigurationMessage: ResourceStr =
+    $r('app.string.settings_sync_advanced_enable_one');
   private providerReadiness: SyncExperienceAdvancedProviderReadiness[] = [];
-  @State private syncFloatingTitle: string = '';
-  @State private syncFloatingSubtitle: string = '';
+  @State private syncFloatingTitle: ResourceStr = '';
+  @State private syncFloatingSubtitle: ResourceStr = '';
   @State private syncFloatingProgress: number = 0;
   @State private syncFloatingInProgress: boolean = false;
-  @State private syncProgressDetailsText: string = '';
+  @State private syncProgressDetailsText: ResourceStr = '';
   @State private syncProgressDetailOpacity: number = 1;
-  @State private syncFailureDialogTitle: string = '';
-  @State private syncFailureDialogSummary: string = '';
+  @State private syncFailureDialogTitle: ResourceStr = '';
+  @State private syncFailureDialogSummary: ResourceStr = '';
   @State private syncFailureDialogDetails: SyncFailureDetailItem[] = [];
-  @State private syncResultDialogTitle: string = '';
-  @State private syncResultDialogMessage: string = '';
+  @State private syncResultDialogTitle: ResourceStr = '';
+  @State private syncResultDialogMessage: ResourceStr = '';
+  @State private outcomeDialogTitle: ResourceStr = '';
+  @State private outcomeDialogLines: ResourceStr[] = [];
+  @State private outcomeDialogActionKind: string = 'confirm';
   private syncFailureDiagnosticsText: string = '';
   private syncFailureDialogController: CustomDialogController = new CustomDialogController({
     builder: SyncFailureDialog({
@@ -159,6 +163,28 @@ struct SyncAdvancedSettingsPage {
     cornerRadius: CENTERED_DIALOG_CORNER_RADIUS_VP,
     width: resolveCenteredDialogControllerWidth('m'),
   });
+  private outcomeLinesDialogOpen: boolean = false;
+  private outcomeLinesDialogController: CustomDialogController = new CustomDialogController({
+    builder: SyncExperienceLinesDialog({
+      title: $outcomeDialogTitle,
+      lines: $outcomeDialogLines,
+      actionKind: $outcomeDialogActionKind,
+      onDismiss: () => {
+        this.closeOutcomeLinesDialog();
+      }
+    }),
+    alignment: DialogAlignment.Center,
+    autoCancel: true,
+    customStyle: false,
+    backgroundColor: resolveCenteredDialogSurfaceColor(),
+    backgroundBlurStyle: BlurStyle.NONE,
+    cornerRadius: CENTERED_DIALOG_CORNER_RADIUS_VP,
+    width: resolveCenteredDialogControllerWidth('m'),
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      this.outcomeLinesDialogOpen = false;
+      dismissDialogAction.dismiss();
+    }
+  });
   private syncProgressDialogOpen: boolean = false;
   private syncProgressTipTimer: number = -1;
   private syncProgressVisualTimer: number = -1;
@@ -168,7 +194,8 @@ struct SyncAdvancedSettingsPage {
   private syncProgressTargetProgress: number = SYNC_OPERATION_PROGRESS_TIMING.inProgressTarget;
   private syncProgressFinishTimer: number = -1;
   private syncProgressCompletionTimer: number = -1;
-  private syncProgressTipsState: SyncOperationProgressTipsState = { tips: [], index: 0, activeTip: '' };
+  private syncProgressResourceTips: ResourceStr[] = [];
+  private syncProgressResourceTipIndex: number = 0;
   private syncProgressDialogController: CustomDialogController = new CustomDialogController({
     builder: SyncOperationProgressDialog({
       inProgress: $syncFloatingInProgress,
@@ -213,7 +240,7 @@ struct SyncAdvancedSettingsPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '高级同步选项',
+        title: $r('app.string.settings_sync_advanced_options'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -246,34 +273,34 @@ struct SyncAdvancedSettingsPage {
 
   @Builder
   private buildStatusSection() {
-    SettingsSection({ title: '当前状态' }) {
+    SettingsSection({ title: $r('app.string.settings_sync_advanced_status') }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsStaticValueRow({
-          title: '启用方式',
+          title: $r('app.string.settings_sync_advanced_method'),
           value: this.providerText,
           rowPosition: 'first'
         })
         this.buildDivider()
         SettingsStaticValueRow({
-          title: '同步起点',
+          title: $r('app.string.settings_sync_advanced_baseline'),
           value: this.baselineText,
           rowPosition: 'middle'
         })
         this.buildDivider()
         SettingsStaticValueRow({
-          title: '本机数据',
+          title: $r('app.string.settings_sync_advanced_local'),
           value: this.localText,
           rowPosition: 'middle'
         })
         this.buildDivider()
         SettingsStaticValueRow({
-          title: '远端数据',
+          title: $r('app.string.settings_sync_advanced_remote'),
           value: this.remoteText,
           rowPosition: 'middle'
         })
         this.buildDivider()
         SettingsStaticValueRow({
-          title: '最近同步',
+          title: $r('app.string.settings_sync_advanced_last'),
           value: this.lastSyncText,
           rowPosition: 'last'
         })
@@ -387,21 +414,31 @@ struct SyncAdvancedSettingsPage {
     this.isBusy = true;
     this.beginSyncFloatingOperation(
       title,
-      `正在读取${this.resolveProviderShortLabel(remoteKind)}同步状态`,
+      this.syncAdvancedSettingsViewModel.resolveReadingStatus(remoteKind),
       this.resolveProviderOperationTimeoutMs(remoteKind)
     );
-    this.updateSyncFloatingStep(title, `正在连接${this.resolveProviderShortLabel(remoteKind)}`, 28);
+    this.updateSyncFloatingStep(title, this.syncAdvancedSettingsViewModel.resolveConnecting(remoteKind), 28);
     sharedSyncExperienceCoordinator.readAdvancedRemoteSummary(remoteKind)
       .then((outcome: SyncExperienceAdvancedRemoteSummaryOutcome) => {
         this.remoteText = this.syncAdvancedSettingsViewModel.updateRemoteSummaryText(
           outcome.summary
         );
-        this.updateSyncFloatingStep(title, '正在更新状态显示', 72);
-        this.finishSyncFloatingOperation('远端数据已更新', `${this.resolveProviderShortLabel(remoteKind)}状态已经刷新`);
+        this.updateSyncFloatingStep(title, $r('app.string.settings_sync_advanced_updating_status'), 72);
+        this.finishSyncFloatingOperation(
+          $r('app.string.settings_sync_advanced_remote_updated'),
+          this.syncAdvancedSettingsViewModel.resolveRefreshed(remoteKind),
+          100,
+          true
+        );
       })
       .catch((error: Error) => {
-        this.finishSyncFloatingOperation('检查失败', '请稍后再试');
-        this.showSyncFailureDialog(title, this.resolveProviderServiceName(remoteKind), error);
+        this.finishSyncFloatingOperation(
+          $r('app.string.settings_sync_advanced_check_failed'),
+          $r('app.string.settings_sync_advanced_try_later'),
+          100,
+          false
+        );
+        this.showSyncFailureDialog('检查远端数据', this.resolveProviderServiceName(remoteKind), error);
       })
       .finally(() => {
         this.isBusy = false;
@@ -409,20 +446,20 @@ struct SyncAdvancedSettingsPage {
   }
 
   private confirmPushLocalSnapshot(remoteKind: AiraSyncRemoteKind): void {
-    const title = `本机覆盖${this.resolveProviderShortLabel(remoteKind)}`;
+    const title = this.syncAdvancedSettingsViewModel.resolvePushActionLabel(remoteKind);
     if (!this.guardSyncBoundary('push_webdav') || !this.guardProviderSyncReady(remoteKind, title)) {
       return;
     }
     showCenteredAlertDialog({
-      title: `${title}？`,
-      message: `会把当前本机完整书签快照写入${this.resolveProviderServiceName(remoteKind)}，远端现有内容可能被替换。`,
+      title: this.syncAdvancedSettingsViewModel.resolvePushConfirmTitle(remoteKind),
+      message: this.syncAdvancedSettingsViewModel.resolvePushConfirmMessage(remoteKind),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: () => {}
       },
       secondaryButton: {
-        value: '覆盖',
+        value: $r('app.string.settings_sync_advanced_overwrite'),
         action: () => {
           this.forceBookmarkAuthority(remoteKind, 'prefer-local');
         }
@@ -431,20 +468,20 @@ struct SyncAdvancedSettingsPage {
   }
 
   private confirmPullRemoteSnapshot(remoteKind: AiraSyncRemoteKind): void {
-    const title = `${this.resolveProviderShortLabel(remoteKind)}覆盖本机`;
+    const title = this.syncAdvancedSettingsViewModel.resolvePullActionLabel(remoteKind);
     if (!this.guardSyncBoundary('pull_webdav') || !this.guardProviderSyncReady(remoteKind, title)) {
       return;
     }
     showCenteredAlertDialog({
-      title: `${title}？`,
-      message: `会用${this.resolveProviderServiceName(remoteKind)}的完整书签快照覆盖本机，云端删除记录也会在本机生效。`,
+      title: this.syncAdvancedSettingsViewModel.resolvePullConfirmTitle(remoteKind),
+      message: this.syncAdvancedSettingsViewModel.resolvePullConfirmMessage(remoteKind),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: () => {}
       },
       secondaryButton: {
-        value: '覆盖',
+        value: $r('app.string.settings_sync_advanced_overwrite'),
         action: () => {
           this.forceBookmarkAuthority(remoteKind, 'prefer-remote');
         }
@@ -460,8 +497,8 @@ struct SyncAdvancedSettingsPage {
       return;
     }
     const title = resolution === 'prefer-remote'
-      ? `${this.resolveProviderShortLabel(remoteKind)}覆盖本机`
-      : `本机覆盖${this.resolveProviderShortLabel(remoteKind)}`;
+      ? this.syncAdvancedSettingsViewModel.resolvePullActionLabel(remoteKind)
+      : this.syncAdvancedSettingsViewModel.resolvePushActionLabel(remoteKind);
     const boundaryAction = resolution === 'prefer-remote' ? 'pull_webdav' : 'push_webdav';
     if (!this.guardSyncBoundary(boundaryAction) || !this.guardProviderSyncReady(remoteKind, title)) {
       return;
@@ -473,33 +510,43 @@ struct SyncAdvancedSettingsPage {
     this.beginSyncFloatingOperation(
       title,
       resolution === 'prefer-remote'
-        ? `正在读取${this.resolveProviderShortLabel(remoteKind)}数据`
-        : `正在准备${this.resolveProviderShortLabel(remoteKind)}空间`,
+        ? this.syncAdvancedSettingsViewModel.resolveReadingData(remoteKind)
+        : this.syncAdvancedSettingsViewModel.resolvePreparingSpace(remoteKind),
       this.resolveProviderOperationTimeoutMs(remoteKind)
     );
     this.updateSyncFloatingStep(
       title,
       resolution === 'prefer-remote'
-        ? '正在更新本机书签'
-        : `正在保存本机书签到${this.resolveProviderShortLabel(remoteKind)}`,
+        ? $r('app.string.settings_sync_advanced_updating_local')
+        : this.syncAdvancedSettingsViewModel.resolveSavingBookmarks(remoteKind),
       48
     );
     sharedSyncExperienceCoordinator.forceAdvancedBookmarkAuthority(remoteKind, resolution)
       .then((outcome: SyncExperienceAdvancedMergeOutcome) => {
         if (outcome.result.blocked) {
-          this.finishSyncFloatingOperation('覆盖未完成', '请先查看同步状态', 100);
+          this.finishSyncFloatingOperation(
+            $r('app.string.settings_sync_advanced_overwrite_incomplete'),
+            $r('app.string.settings_sync_advanced_check_status'),
+            100,
+            false
+          );
           this.showDialog(outcome.dialogTitle, outcome.message);
           return;
         }
-        this.updateSyncFloatingStep(title, '正在确认同步结果', 84);
-        this.finishSyncFloatingOperation(outcome.completionTitle, outcome.completionSubtitle);
+        this.updateSyncFloatingStep(title, $r('app.string.settings_sync_advanced_confirming'), 84);
+        this.finishSyncFloatingOperation(outcome.completionTitle, outcome.completionSubtitle, 100, true);
         this.recordProviderSyncUsageIfNeeded(remoteKind);
         this.showDialog(outcome.dialogTitle, outcome.message);
         this.refreshStatus();
       })
       .catch((error: Error) => {
-        this.finishSyncFloatingOperation('覆盖失败', '请检查网络或同步设置');
-        this.showSyncFailureDialog(title, this.resolveProviderServiceName(remoteKind), error);
+        this.finishSyncFloatingOperation(
+          $r('app.string.settings_sync_advanced_overwrite_failed'),
+          $r('app.string.settings_sync_advanced_check_network'),
+          100,
+          false
+        );
+        this.showSyncFailureDialog('覆盖书签', this.resolveProviderServiceName(remoteKind), error);
       })
       .finally(() => {
         this.isBusy = false;
@@ -510,38 +557,52 @@ struct SyncAdvancedSettingsPage {
     if (this.isBusy || !this.guardSyncBoundary('merge_webdav')) {
       return;
     }
-    if (!this.guardActiveSyncReady('立即合并同步')) {
+    const mergeTitle = $r('app.string.settings_sync_advanced_merge');
+    if (!this.guardActiveSyncReady(mergeTitle)) {
       return;
     }
-    if (!await this.ensureActiveSyncAccess('立即合并同步')) {
+    if (!await this.ensureActiveSyncAccess(mergeTitle)) {
       return;
     }
     this.isBusy = true;
+    const syncingTitle = $r('app.string.settings_sync_advanced_syncing');
     this.beginSyncFloatingOperation(
-      '正在同步',
-      '正在准备本机和云端数据',
+      syncingTitle,
+      $r('app.string.settings_sync_advanced_preparing_both'),
       this.resolveProviderOperationTimeoutMs(this.resolveActiveRemoteKind())
     );
-    this.updateSyncFloatingStep('正在同步', '正在比较本机和云端变化', 34);
+    this.updateSyncFloatingStep(syncingTitle, $r('app.string.settings_sync_advanced_comparing'), 34);
     const activeRemoteKind = this.resolveActiveRemoteKind();
     sharedSyncExperienceCoordinator.mergeAdvancedActiveBookmarks(activeRemoteKind)
       .then((outcome: SyncExperienceAdvancedMergeOutcome) => {
         if (outcome.result.blocked) {
-          this.finishSyncFloatingOperation('同步需要确认', '请先查看需要处理的内容', 100);
-          this.showDialog('同步已停止', outcome.message);
+          this.finishSyncFloatingOperation(
+            $r('app.string.settings_sync_advanced_needs_confirm'),
+            $r('app.string.settings_sync_advanced_review'),
+            100,
+            false
+          );
+          this.showDialog($r('app.string.settings_sync_advanced_stopped'), outcome.message);
           return;
         }
-        this.updateSyncFloatingStep('正在同步', '正在整理同步结果', 82);
+        this.updateSyncFloatingStep(syncingTitle, $r('app.string.settings_sync_advanced_organizing'), 82);
         this.finishSyncFloatingOperation(
           outcome.completionTitle,
-          outcome.completionSubtitle
+          outcome.completionSubtitle,
+          100,
+          true
         );
         this.recordCloudSyncUsageIfNeeded();
         this.showDialog(outcome.dialogTitle, outcome.message);
         this.refreshStatus();
       })
       .catch((error: Error) => {
-        this.finishSyncFloatingOperation('同步失败', '请稍后再试');
+        this.finishSyncFloatingOperation(
+          $r('app.string.settings_sync_failed'),
+          $r('app.string.settings_sync_advanced_try_later'),
+          100,
+          false
+        );
         this.showSyncFailureDialog('立即合并同步', this.resolveActiveSyncServiceName(), error);
       })
       .finally(() => {
@@ -553,17 +614,16 @@ struct SyncAdvancedSettingsPage {
     if (remoteKind === 'none') {
       return;
     }
-    const targetName = this.resolveProviderServiceName(remoteKind);
     showCenteredAlertDialog({
-      title: `改用${targetName}？`,
-      message: `会先分别合并本机与${targetName}中的书签和已开启常用设置，完成后只修改当前设备的同步方式。`,
+      title: this.syncAdvancedSettingsViewModel.resolveSwitchConfirmTitle(remoteKind),
+      message: this.syncAdvancedSettingsViewModel.resolveSwitchConfirmMessage(remoteKind),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: () => {}
       },
       secondaryButton: {
-        value: '合并并更改',
+        value: $r('app.string.settings_sync_advanced_merge_and_change'),
         action: () => {
           this.selectProvider(remoteKind);
         }
@@ -577,30 +637,37 @@ struct SyncAdvancedSettingsPage {
     }
     this.isBusy = true;
     this.beginSyncFloatingOperation(
-      '正在更改同步方式',
-      `正在合并${this.resolveProviderServiceName(remoteKind)}数据`,
+      $r('app.string.settings_sync_changing'),
+      this.syncAdvancedSettingsViewModel.resolveMergingData(remoteKind),
       this.resolveProviderOperationTimeoutMs(remoteKind)
     );
     sharedSyncExperienceCoordinator.selectAdvancedProvider(remoteKind)
       .then((presentation: SyncExperienceProviderSelectionPresentation) => {
-        this.finishSyncFloatingOperation(presentation.completionTitle, presentation.completionSubtitle);
-        if (presentation.type === 'blocked') {
-          this.showDialog(presentation.dialogTitle, presentation.message);
-          return;
-        }
-        if (presentation.type === 'selected') {
-          this.showDialog(presentation.dialogTitle, presentation.message);
-          this.refreshStatus();
+        this.finishSyncFloatingOperation(
+          presentation.completionTitle,
+          presentation.completionSubtitle,
+          100,
+          presentation.type === 'selected'
+        );
+        if (presentation.type === 'blocked' || presentation.type === 'selected') {
+          this.showProviderSelectionMessage(presentation);
+          if (presentation.type === 'selected') {
+            this.refreshStatus();
+          }
           return;
         }
         if (presentation.type === 'membership-required' && presentation.membershipDecision !== undefined) {
           this.showSyncMembershipDialog(presentation.dialogTitle, presentation.membershipDecision);
           return;
         }
+        const failureTitle = typeof presentation.dialogTitle === 'string'
+          ? presentation.dialogTitle
+          : '更改同步方式';
+        const failureMessage = typeof presentation.message === 'string' ? presentation.message : '';
         this.showSyncFailureDialog(
-          presentation.dialogTitle,
+          failureTitle,
           presentation.providerLabel,
-          new Error(presentation.message)
+          new Error(failureMessage)
         );
       })
       .finally(() => {
@@ -617,21 +684,24 @@ struct SyncAdvancedSettingsPage {
     if (plan.allowed) {
       return true;
     }
-    this.showDialog('私密会话已隔离', plan.helperText);
+    this.showDialog(
+      $r('app.string.settings_sync_advanced_private_title'),
+      $r('app.string.settings_sync_advanced_private_message')
+    );
     return false;
   }
 
-  private async ensureActiveSyncAccess(title: string): Promise<boolean> {
+  private async ensureActiveSyncAccess(title: ResourceStr): Promise<boolean> {
     const featureKey = this.resolveActiveSyncServiceKey();
     return this.ensureFeatureAccess(featureKey, title);
   }
 
-  private async ensureProviderSyncAccess(remoteKind: AiraSyncRemoteKind, title: string): Promise<boolean> {
+  private async ensureProviderSyncAccess(remoteKind: AiraSyncRemoteKind, title: ResourceStr): Promise<boolean> {
     const featureKey = this.resolveProviderSyncServiceKey(remoteKind);
     return this.ensureFeatureAccess(featureKey, title);
   }
 
-  private async ensureFeatureAccess(featureKey: AiraFeatureKey, title: string): Promise<boolean> {
+  private async ensureFeatureAccess(featureKey: AiraFeatureKey, title: ResourceStr): Promise<boolean> {
     if (featureKey.length <= 0) {
       return true;
     }
@@ -647,14 +717,16 @@ struct SyncAdvancedSettingsPage {
     return false;
   }
 
-  private showSyncMembershipDialog(title: string, decision: EntitlementDecision): void {
-    const primaryLabel = decision.primaryAction === 'open_pro' ? '查看 Aira Pro' : '查看权益';
+  private showSyncMembershipDialog(title: ResourceStr, decision: EntitlementDecision): void {
+    const primaryLabel = decision.primaryAction === 'open_pro'
+      ? $r('app.string.settings_sync_view_pro')
+      : $r('app.string.settings_sync_view_benefits');
     showCenteredAlertDialog({
       title: decision.title.length > 0 ? decision.title : title,
       message: decision.message,
       autoCancel: true,
       primaryButton: {
-        value: '稍后',
+        value: $r('app.string.settings_sync_later'),
         action: () => {}
       },
       secondaryButton: {
@@ -690,12 +762,12 @@ struct SyncAdvancedSettingsPage {
     return this.syncAdvancedSettingsViewModel.resolveProviderSyncServiceKey(remoteKind);
   }
 
-  private guardActiveSyncReady(title: string): boolean {
+  private guardActiveSyncReady(title: ResourceStr): boolean {
     if (this.activeSyncReady) {
       return true;
     }
     if (this.activeRemoteKind === 'none') {
-      this.showDialog(title, '请先开启华为云空间同步、Aira 云同步或 WebDAV。');
+      this.showDialog(title, $r('app.string.settings_sync_advanced_enable_one'));
       return false;
     }
     showCenteredAlertDialog({
@@ -703,11 +775,11 @@ struct SyncAdvancedSettingsPage {
       message: this.activeSyncMissingConfigurationMessage,
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: () => {}
       },
       secondaryButton: {
-        value: '去填写',
+        value: $r('app.string.settings_sync_advanced_fill'),
         action: () => {
           this.openActiveSyncConfigPage(this.activeRemoteKind);
         }
@@ -716,21 +788,23 @@ struct SyncAdvancedSettingsPage {
     return false;
   }
 
-  private guardProviderSyncReady(remoteKind: AiraSyncRemoteKind, title: string): boolean {
+  private guardProviderSyncReady(remoteKind: AiraSyncRemoteKind, title: ResourceStr): boolean {
     const readiness = this.resolveProviderReadiness(remoteKind);
     if (readiness !== undefined && readiness.ready) {
       return true;
     }
     showCenteredAlertDialog({
       title: title,
-      message: readiness?.missingConfigurationMessage ?? '请先启用这个同步方式。',
+      message: readiness !== undefined
+        ? readiness.missingConfigurationMessage
+        : $r('app.string.settings_sync_advanced_enable_method'),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: () => {}
       },
       secondaryButton: {
-        value: '去设置',
+        value: $r('app.string.settings_sync_advanced_go_settings'),
         action: () => {
           this.openActiveSyncConfigPage(remoteKind);
         }
@@ -757,10 +831,6 @@ struct SyncAdvancedSettingsPage {
 
   private resolveProviderServiceName(remoteKind: AiraSyncRemoteKind): string {
     return this.syncAdvancedSettingsViewModel.resolveProviderServiceName(remoteKind);
-  }
-
-  private resolveProviderShortLabel(remoteKind: AiraSyncRemoteKind): string {
-    return this.syncAdvancedSettingsViewModel.resolveProviderShortLabel(remoteKind);
   }
 
   private resolveProviderOperationTimeoutMs(remoteKind: AiraSyncRemoteKind): number {
@@ -797,10 +867,37 @@ struct SyncAdvancedSettingsPage {
     };
   }
 
-  private showDialog(title: string, message: string): void {
+  private showDialog(title: ResourceStr, message: ResourceStr): void {
     this.syncResultDialogTitle = title;
     this.syncResultDialogMessage = message;
     this.syncResultDialogController.open();
+  }
+
+  private showProviderSelectionMessage(presentation: SyncExperienceProviderSelectionPresentation): void {
+    if (typeof presentation.message !== 'string') {
+      this.showDialog(presentation.dialogTitle, presentation.message);
+      return;
+    }
+    const lines = this.syncFailurePresentationService.localizeProviderMessageLines(presentation.message);
+    if (lines.length > 1) {
+      this.outcomeDialogTitle = presentation.dialogTitle;
+      this.outcomeDialogLines = lines;
+      this.outcomeDialogActionKind = 'confirm';
+      if (!this.outcomeLinesDialogOpen) {
+        this.outcomeLinesDialogOpen = true;
+        this.outcomeLinesDialogController.open();
+      }
+      return;
+    }
+    this.showDialog(presentation.dialogTitle, lines.length === 1 ? lines[0] : presentation.message);
+  }
+
+  private closeOutcomeLinesDialog(): void {
+    if (!this.outcomeLinesDialogOpen) {
+      return;
+    }
+    this.outcomeLinesDialogOpen = false;
+    this.outcomeLinesDialogController.close();
   }
 
   private showSyncFailureDialog(operationName: string, serviceName: string, error: Error): void {
@@ -818,24 +915,24 @@ struct SyncAdvancedSettingsPage {
 
   private copyCurrentSyncFailureDiagnostics(): void {
     if (this.syncFailureDiagnosticsText.length === 0) {
-      this.showToast('当前没有可复制的错误详情。');
+      this.showToast($r('app.string.settings_sync_advanced_copy_empty'));
       return;
     }
     try {
       const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.syncFailureDiagnosticsText);
       pasteboard.getSystemPasteboard().setData(data)
         .then(() => {
-          this.showToast('错误详情已复制。');
+          this.showToast($r('app.string.settings_sync_advanced_copied'));
         })
         .catch((_error: Error) => {
-          this.showToast('复制失败，请稍后重试。');
+          this.showToast($r('app.string.settings_account_copy_failed'));
         });
     } catch (_error) {
-      this.showToast('复制失败，请稍后重试。');
+      this.showToast($r('app.string.settings_account_copy_failed'));
     }
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,
@@ -846,8 +943,8 @@ struct SyncAdvancedSettingsPage {
   }
 
   private beginSyncFloatingOperation(
-    title: string,
-    subtitle: string,
+    title: ResourceStr,
+    subtitle: ResourceStr,
     timeoutMs: number = SYNC_OPERATION_PROGRESS_TIMING.timeoutMs
   ): void {
     this.stopSyncProgressTimers();
@@ -858,25 +955,29 @@ struct SyncAdvancedSettingsPage {
     this.syncProgressTargetProgress = SYNC_OPERATION_PROGRESS_TIMING.inProgressTarget;
     this.syncProgressStartTime = Date.now();
     this.syncFloatingInProgress = true;
-    this.beginSyncProgressTips(title, subtitle);
+    this.beginSyncProgressTips(subtitle);
     this.startSyncProgressVisualTimer();
     this.startSyncProgressTimeoutTimer();
     this.openSyncProgressDialog();
   }
 
-  private updateSyncFloatingStep(title: string, subtitle: string, progress: number): void {
+  private updateSyncFloatingStep(title: ResourceStr, subtitle: ResourceStr, progress: number): void {
     this.syncFloatingTitle = title;
     this.syncFloatingSubtitle = subtitle;
     this.syncProgressTargetProgress = Math.max(this.syncProgressTargetProgress, progress);
-    this.appendSyncProgressTip(subtitle);
     this.showSyncProgressTip(subtitle);
   }
 
-  private finishSyncFloatingOperation(title: string, subtitle: string, progress: number = 100): void {
+  private finishSyncFloatingOperation(
+    title: ResourceStr,
+    subtitle: ResourceStr,
+    progress: number = 100,
+    animateCompletion: boolean = true
+  ): void {
     if (!this.syncProgressDialogOpen) {
       return;
     }
-    if (this.shouldAnimateProgressCompletion(title, progress)) {
+    if (animateCompletion && progress >= 100) {
       this.completeSyncProgressWithRamp(title, subtitle);
       return;
     }
@@ -895,27 +996,37 @@ struct SyncAdvancedSettingsPage {
     this.completeSyncProgressDialog();
   }
 
-  private beginSyncProgressTips(title: string, firstTip: string): void {
-    this.syncProgressTipsState = this.syncOperationProgressViewModel.buildInitialTips(title, firstTip);
-    this.showSyncProgressTip(this.syncProgressTipsState.activeTip);
+  private beginSyncProgressTips(firstTip: ResourceStr): void {
+    this.syncProgressResourceTips = this.buildSyncProgressResourceTips(firstTip);
+    this.syncProgressResourceTipIndex = 0;
+    this.showSyncProgressTip(this.syncProgressResourceTips.length > 0 ? this.syncProgressResourceTips[0] : firstTip);
     this.syncProgressTipTimer = setInterval(() => {
       this.advanceSyncProgressTip();
     }, SYNC_OPERATION_PROGRESS_TIMING.tipIntervalMs);
   }
 
-  private appendSyncProgressTip(tip: string): void {
-    this.syncProgressTipsState = this.syncOperationProgressViewModel.appendTip(this.syncProgressTipsState, tip);
+  private buildSyncProgressResourceTips(firstTip: ResourceStr): ResourceStr[] {
+    return [
+      firstTip,
+      $r('app.string.settings_sync_tip_local'),
+      $r('app.string.settings_sync_tip_cloud_status'),
+      $r('app.string.settings_sync_tip_compare'),
+      $r('app.string.settings_sync_tip_protect'),
+      $r('app.string.settings_sync_tip_changes'),
+      $r('app.string.settings_sync_tip_records'),
+      $r('app.string.settings_sync_tip_wrap_up')
+    ];
   }
 
   private advanceSyncProgressTip(): void {
-    if (!this.syncFloatingInProgress || this.syncProgressTipsState.tips.length === 0) {
+    if (!this.syncFloatingInProgress || this.syncProgressResourceTips.length === 0) {
       return;
     }
-    this.syncProgressTipsState = this.syncOperationProgressViewModel.advanceTip(this.syncProgressTipsState);
-    this.showSyncProgressTip(this.syncProgressTipsState.activeTip);
+    this.syncProgressResourceTipIndex = (this.syncProgressResourceTipIndex + 1) % this.syncProgressResourceTips.length;
+    this.showSyncProgressTip(this.syncProgressResourceTips[this.syncProgressResourceTipIndex]);
   }
 
-  private showSyncProgressTip(tip: string): void {
+  private showSyncProgressTip(tip: ResourceStr): void {
     this.syncProgressDetailOpacity = 0.22;
     setTimeout(() => {
       this.syncProgressDetailsText = tip;
@@ -941,10 +1052,12 @@ struct SyncAdvancedSettingsPage {
       if (!this.syncFloatingInProgress) {
         return;
       }
-      const message = this.syncOperationProgressViewModel.resolveTimeoutMessage(this.syncFloatingTitle);
       this.completeSyncProgressDialog();
       this.isBusy = false;
-      this.showDialog('操作超时', message);
+      this.showDialog(
+        $r('app.string.settings_sync_advanced_timeout'),
+        $r('app.string.settings_sync_advanced_timeout_message')
+      );
     }, this.syncProgressTimeoutMs);
   }
 
@@ -954,10 +1067,10 @@ struct SyncAdvancedSettingsPage {
     this.closeSyncProgressDialog();
   }
 
-  private completeSyncProgressWithRamp(title: string, subtitle: string): void {
+  private completeSyncProgressWithRamp(title: ResourceStr, subtitle: ResourceStr): void {
     this.stopSyncProgressActiveTimers();
-    this.syncFloatingSubtitle = '正在完成处理';
-    this.showSyncProgressTip('正在完成处理');
+    this.syncFloatingSubtitle = $r('app.string.settings_sync_advanced_finishing');
+    this.showSyncProgressTip($r('app.string.settings_sync_advanced_finishing'));
     this.syncProgressCompletionTimer = setInterval(() => {
       const nextProgress = Math.min(100, this.syncFloatingProgress + 4);
       this.syncFloatingProgress = nextProgress;
@@ -976,15 +1089,6 @@ struct SyncAdvancedSettingsPage {
         this.completeSyncProgressDialog();
       }, SYNC_OPERATION_PROGRESS_TIMING.successVisibleMs);
     }, SYNC_OPERATION_PROGRESS_TIMING.finishIntervalMs);
-  }
-
-  private shouldAnimateProgressCompletion(title: string, progress: number): boolean {
-    if (progress < 100) {
-      return false;
-    }
-    return title.indexOf('失败') < 0 &&
-      title.indexOf('取消') < 0 &&
-      title.indexOf('需要确认') < 0;
   }
 
   private stopSyncProgressActiveTimers(): void {

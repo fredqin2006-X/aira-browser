@@ -9,11 +9,19 @@ import {
   BROWSER_DESKTOP_MENU_ITEM_HEIGHT_VP,
   BROWSER_DESKTOP_MENU_VERTICAL_INSET_VP
 } from './BrowserDesktopMenuPresentationTokens';
+import {
+  bottomPanelActionTitle,
+  bottomPanelManageScripts,
+  bottomPanelPageTools,
+  bottomPanelWebZoom,
+  bottomPanelZoomUnavailable,
+  resourceStrPresent
+} from './BrowserBottomPanelText';
 
-export const BROWSER_LARGE_SCREEN_PAGE_TOOLS_TITLE: string = '页面工具';
-export const BROWSER_LARGE_SCREEN_SCRIPT_MANAGEMENT_TITLE: string = '管理用户脚本';
-export const BROWSER_LARGE_SCREEN_PRIVACY_MODE_TITLE: string = '隐私模式';
-export const BROWSER_LARGE_SCREEN_WEB_ZOOM_TITLE: string = '网页缩放';
+export const BROWSER_LARGE_SCREEN_PAGE_TOOLS_TITLE: ResourceStr = bottomPanelPageTools();
+export const BROWSER_LARGE_SCREEN_SCRIPT_MANAGEMENT_TITLE: ResourceStr = bottomPanelManageScripts();
+export const BROWSER_LARGE_SCREEN_PRIVACY_MODE_TITLE: ResourceStr = bottomPanelActionTitle('newPrivateTab');
+export const BROWSER_LARGE_SCREEN_WEB_ZOOM_TITLE: ResourceStr = bottomPanelWebZoom();
 
 export type BrowserLargeScreenToolbarMenuSectionId = 'destinations' | 'page' | 'zoom' | 'preferences';
 export type BrowserLargeScreenToolbarMenuPageToolGroupId = 'reading' | 'media' | 'development' | 'more';
@@ -27,7 +35,7 @@ export interface BrowserLargeScreenToolbarMenuEntry {
 
 export interface BrowserLargeScreenToolbarMenuPageToolGroup {
   id: BrowserLargeScreenToolbarMenuPageToolGroupId;
-  title: string;
+  title: ResourceStr;
   items: BrowserLargeScreenToolbarMenuEntry[];
 }
 
@@ -50,7 +58,7 @@ export interface BrowserLargeScreenToolbarMenuHeight {
 
 interface BrowserLargeScreenToolbarMenuPageToolGroupSpec {
   id: BrowserLargeScreenToolbarMenuPageToolGroupId;
-  title: string;
+  title: ResourceStr;
   actionIds: BrowserBottomAddressPanelActionId[];
 }
 
@@ -78,9 +86,13 @@ const EMPTY_PAGE_TOOLS: BrowserLargeScreenToolbarMenuPageToolGroup[] = [];
 const EMPTY_MENU_PLAN: BrowserLargeScreenToolbarMenuPlan = { sections: [] };
 
 const PAGE_TOOL_GROUP_SPECS: BrowserLargeScreenToolbarMenuPageToolGroupSpec[] = [
-  { id: 'reading', title: '阅读', actionIds: ['find', 'reader', 'translate'] },
-  { id: 'media', title: '媒体', actionIds: ['video', 'offline'] },
-  { id: 'development', title: '开发', actionIds: ['scripts', 'elementInspection', 'manualElementHide', 'userAgent'] },
+  { id: 'reading', title: $r('app.string.bottom_panel_group_reading'), actionIds: ['find', 'reader', 'translate'] },
+  { id: 'media', title: $r('app.string.bottom_panel_group_media'), actionIds: ['video', 'offline'] },
+  {
+    id: 'development',
+    title: $r('app.string.bottom_panel_group_development'),
+    actionIds: ['scripts', 'elementInspection', 'manualElementHide', 'userAgent']
+  },
   { id: 'more', title: '', actionIds: ['addToDesktop', 'themeMode', 'reportSite', 'savedPages'] }
 ];
 
@@ -176,7 +188,7 @@ function measureOverflowMenuContentHeight(plan: BrowserLargeScreenToolbarMenuPla
     itemCount += section.items.length;
     section.pageTools.forEach((group: BrowserLargeScreenToolbarMenuPageToolGroup): void => {
       itemCount += group.items.length;
-      if (group.title.length > 0) {
+      if (resourceStrPresent(group.title)) {
         headerCount += 1;
       }
     });
@@ -273,7 +285,7 @@ export class BrowserLargeScreenToolbarMenuViewModel {
       imageIcon: action.imageIcon,
       airaIconId: action.airaIconId,
       enabled: webZoomAvailable,
-      disabledMessage: webZoomAvailable ? '' : '当前页面暂不可缩放',
+      disabledMessage: webZoomAvailable ? '' : bottomPanelZoomUnavailable(),
       selected: action.selected,
       renderVersion: action.renderVersion
     };
@@ -325,7 +337,7 @@ function projectEntry(
         action,
         BROWSER_LARGE_SCREEN_WEB_ZOOM_TITLE,
         webZoomAvailable,
-        webZoomAvailable ? '' : '当前页面暂不可缩放'
+        webZoomAvailable ? '' : bottomPanelZoomUnavailable()
       ),
       showsSelection: false,
       activation: 'web_zoom'
@@ -354,9 +366,9 @@ function projectEntry(
 
 function copyAction(
   action: BrowserBottomAddressPanelAction,
-  title: string,
+  title: ResourceStr,
   enabled: boolean,
-  disabledMessage: string
+  disabledMessage: ResourceStr
 ): BrowserBottomAddressPanelAction {
   return {
     id: action.id,

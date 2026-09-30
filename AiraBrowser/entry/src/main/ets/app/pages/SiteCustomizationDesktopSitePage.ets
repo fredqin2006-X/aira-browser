@@ -96,7 +96,7 @@ struct SiteCustomizationDesktopSitePage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '网页标识',
+        title: $r('app.string.settings_site_customization_helper_identity'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -110,7 +110,9 @@ struct SiteCustomizationDesktopSitePage {
         SettingsScrollBody({ topPadding: 16, bottomPadding: 22 }) {
           this.buildIdentitySection()
           SettingsActionButton({
-            title: this.isSaving ? '应用中' : '应用并重新加载',
+            title: this.isSaving
+              ? $r('app.string.settings_site_customization_applying')
+              : $r('app.string.settings_site_customization_apply_reload'),
             variant: 'filled',
             isEnabled: this.canApply && !this.isSaving && !this.isLeaving &&
               this.selectedIdentityId !== this.savedIdentityId,
@@ -128,7 +130,7 @@ struct SiteCustomizationDesktopSitePage {
 
   @Builder
   private buildIdentitySection() {
-    SettingsSection({ title: '当前站点' }) {
+    SettingsSection({ title: $r('app.string.settings_site_customization_current_site') }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         ForEach(this.identities, (identity: BrowserUserAgentIdentity, index: number) => {
           this.buildIdentityRow(identity, index, this.identities.length)

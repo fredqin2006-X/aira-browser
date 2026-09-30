@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { ShortcutRecord } from '../../../common/models/BrowserModels';
 import {
   DEFAULT_HOME_WALLPAPER_PRESENTATION_STATE,
@@ -280,7 +281,7 @@ export struct CustomHomepagePicker {
       .stateEffect(true)
       .backgroundColor(this.resolveCardSettingsBackground())
       .borderRadius(18)
-      .accessibilityText('主页设置')
+      .accessibilityText(resolveAppResourceText($r('app.string.settings_custom_home_title')))
       .enabled(!this.busy)
       .hitTestBehavior(HitTestMode.Default)
       .onClick(() => {
@@ -434,15 +435,15 @@ export struct CustomHomepagePicker {
 
   private resolveFocusedTitle(): string {
     const card = this.resolveFocusedCard();
-    return card !== undefined ? card.title : '主页设置';
+    return card !== undefined ? card.title : resolveAppResourceText($r('app.string.settings_custom_home_title'));
   }
 
   private resolveApplyLabel(): string {
     const card = this.resolveFocusedCard();
     if (card !== undefined && card.isCurrent) {
-      return '当前主页';
+      return resolveAppResourceText($r('app.string.settings_custom_home_current'));
     }
-    return '应用主页';
+    return resolveAppResourceText($r('app.string.settings_custom_home_apply'));
   }
 
   private canApply(): boolean {

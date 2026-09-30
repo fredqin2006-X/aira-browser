@@ -21,6 +21,7 @@ import {
   ManualElementHideSelectionAction,
   ManualElementHideSelectionPresentation
 } from '../../../core/adblock/ManualElementHideRuntimeCoordinator';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 const MANUAL_ELEMENT_HIDE_BAR_HEIGHT: number = FLOATING_PROMPT_CARD_HEIGHT + 20;
 const MANUAL_ELEMENT_HIDE_BAR_MAX_WIDTH: number = 372;
@@ -94,19 +95,19 @@ export struct ManualElementHideSelectionOverlay {
             Row({ space: 8 }) {
               this.buildSelectionCountBadge()
 
-              this.buildTextButton('扩大', true, false, () => {
+              this.buildTextButton($r('app.string.element_hide_expand'), true, false, () => {
                 this.onAction('navigate_parent');
               })
 
-              this.buildTextButton('缩小', true, false, () => {
+              this.buildTextButton($r('app.string.element_hide_narrow'), true, false, () => {
                 this.onAction('navigate_child');
               })
 
-              this.buildTextButton('取消', true, false, () => {
+              this.buildTextButton($r('app.string.element_hide_cancel'), true, false, () => {
                 this.onAction('cancel');
               })
 
-              this.buildTextButton('完成', true, true, () => {
+              this.buildTextButton($r('app.string.element_hide_finish'), true, true, () => {
                 this.onAction('finish');
               })
             }
@@ -128,7 +129,7 @@ export struct ManualElementHideSelectionOverlay {
     .width(this.resolveBarWidth())
     .position({ x: this.resolveBarLeft(), y: this.resolveBarTop() })
     .zIndex(this.zIndexValue)
-    .accessibilityText(this.buildAccessibilityText())
+    .accessibilityText(resolveAppResourceText(this.buildAccessibilityText()))
     .gesture(
       PanGesture({ direction: PanDirection.All, distance: MANUAL_ELEMENT_HIDE_BAR_PAN_DISTANCE })
         .onActionStart(() => {
@@ -169,11 +170,11 @@ export struct ManualElementHideSelectionOverlay {
     .width(MANUAL_ELEMENT_HIDE_COUNT_BADGE_SIZE)
     .height(MANUAL_ELEMENT_HIDE_COUNT_BADGE_SIZE)
     .borderRadius(MANUAL_ELEMENT_HIDE_COUNT_BADGE_SIZE / 2)
-    .accessibilityText(`已选择 ${this.presentation.selectedCount} 个元素`)
+    .accessibilityText($r('app.string.element_hide_a11y_selected', this.presentation.selectedCount))
   }
 
   @Builder
-  private buildTextButton(label: string, enabled: boolean, primary: boolean, action: () => void) {
+  private buildTextButton(label: ResourceStr, enabled: boolean, primary: boolean, action: () => void) {
     Stack({ alignContent: Alignment.Center }) {
       FloatingGlassMaterialSurface({
         surfaceWidth: '100%',
@@ -289,17 +290,24 @@ export struct ManualElementHideSelectionOverlay {
     }
   }
 
-  private buildAccessibilityText(): string {
-    const targetHost = this.presentation.host.length > 0 ? this.presentation.host : '当前网站';
+  private buildAccessibilityText(): ResourceStr {
+    const targetHost = this.presentation.host.length > 0
+      ? this.presentation.host
+      : resolveAppResourceText($r('app.string.element_hide_a11y_current_site'));
     const selectedElement = this.selectedElementSelector.length > 0
-      ? `，当前选择器 ${this.selectedElementSelector}`
+      ? resolveAppResourceText($r('app.string.element_hide_a11y_selector', this.selectedElementSelector))
       : '';
-    return `标记广告工具栏，${targetHost}，已选择 ${this.presentation.selectedCount} 个元素${selectedElement}`;
+    return $r(
+      'app.string.element_hide_a11y_toolbar',
+      targetHost,
+      this.presentation.selectedCount,
+      selectedElement
+    );
   }
 
-  private buildSelectedElementLabel(): string {
+  private buildSelectedElementLabel(): ResourceStr {
     return this.selectedElementSelector.length > 0
       ? this.selectedElementSelector
-      : '尚未选择元素';
+      : $r('app.string.element_hide_no_selection_yet');
   }
 }

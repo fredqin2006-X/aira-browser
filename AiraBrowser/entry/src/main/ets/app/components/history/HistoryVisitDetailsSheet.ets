@@ -36,7 +36,7 @@ export struct HistoryVisitDetailsSheet {
       BrowserImmersiveSheetLayout({
         footerVisible: true,
         closeVisible: true,
-        closeAccessibilityLabel: '关闭历史详情',
+        closeAccessibilityLabel: $r('app.string.history_close_details'),
         onClose: (): void => {
           this.onClose();
         },
@@ -88,7 +88,7 @@ export struct HistoryVisitDetailsSheet {
   @Builder
   private buildHeader() {
     BrowserFeatureSheetHeader({
-      title: '历史详情',
+      title: $r('app.string.history_details_title'),
       titleColor: this.storedPrimaryTextColor
     })
   }
@@ -116,7 +116,7 @@ export struct HistoryVisitDetailsSheet {
   private buildFooter() {
     Column({ space: 8 }) {
       BrowserSheetActionButton({
-        label: '复制链接',
+        label: $r('app.string.ui_copy_link'),
         emphasis: 'primary',
         stacked: true,
         onAction: () => {
@@ -125,7 +125,7 @@ export struct HistoryVisitDetailsSheet {
       })
 
       BrowserSheetActionButton({
-        label: '完成',
+        label: $r('app.string.ui_done'),
         emphasis: 'ghost',
         stacked: true,
         onAction: () => {

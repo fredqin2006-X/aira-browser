@@ -4,6 +4,12 @@ import {
   resolveHomeWallpaperAutoColor
 } from '../../../common/models/WallpaperModels';
 import { resolveHomeWallpaperRenderedMaskOpacity } from '../../../services/wallpaper/HomeWallpaperAnalysisPolicy';
+import {
+  HOME_WALLPAPER_RESUME_ATTEMPT_LIMIT,
+  HOME_WALLPAPER_RESUME_FORCE_DELAY_MS,
+  HOME_WALLPAPER_RESUME_NUDGE_DELAY_MS,
+  shouldForceHomeWallpaperResume
+} from '../../../services/wallpaper/HomeWallpaperPlaybackPolicy';
 import { BROWSER_THEME_STORAGE_PAGE_BACKGROUND_KEY } from '../../../core/theme/BrowserThemeStorageKeys';
 
 /** Wait until a presented frame exists before uncovering the surface. */
@@ -17,6 +23,8 @@ export struct HomeWallpaperLayer {
   @Prop darkModeActive: boolean = false;
   @Prop themeBackgroundColor: ResourceColor | undefined = undefined;
   @Prop @Watch('syncVideoPlayback') playbackEnabled: boolean = false;
+  @Prop @Watch('onPageForegroundChanged') pageForeground: boolean = true;
+  @Prop @Watch('onResumeEpochChanged') resumeEpoch: number = 0;
   @State private videoMountLatched: boolean = false;
   @State private videoFrameReady: boolean = false;
   private videoController: VideoController = new VideoController();
@@ -24,6 +32,10 @@ export struct HomeWallpaperLayer {
   private videoRevealTimer: number = -1;
   private videoPauseTimer: number = -1;
   private boundVideoPath: string = '';
+  private lastProgressAtMs: number = 0;
+  private progressAtResumeRequestMs: number = 0;
+  private resumeAttempts: number = 0;
+  private resumeRetryGeneration: number = 0;
 
   aboutToAppear(): void {
     this.boundVideoPath = this.state.videoPath;
@@ -31,6 +43,7 @@ export struct HomeWallpaperLayer {
   }
 
   aboutToDisappear(): void {
+    this.cancelResumeRetries();
     this.clearVideoRevealTimer();
     this.clearVideoPauseTimer();
     this.videoController.stop();
@@ -107,11 +120,14 @@ export struct HomeWallpaperLayer {
         this.syncVideoPlayback();
       })
       .onStart((): void => {
-        this.scheduleVideoFrameReady();
+        this.notePlaybackProgress();
+      })
+      .onPause((): void => {
+        this.noteExternalPause();
       })
       .onUpdate((_info: PlaybackInfo): void => {
         if (this.playbackEnabled) {
-          this.scheduleVideoFrameReady();
+          this.notePlaybackProgress();
         }
       })
       .hitTestBehavior(HitTestMode.None)
@@ -146,9 +162,30 @@ export struct HomeWallpaperLayer {
     this.syncVideoPlayback();
   }
 
+  private onPageForegroundChanged(): void {
+    if (this.pageForeground) {
+      return;
+    }
+    this.cancelResumeRetries();
+  }
+
+  private onResumeEpochChanged(): void {
+    const epoch = this.resumeEpoch;
+    // Props from the same page-show can land in either order. Replay after both settle.
+    setTimeout((): void => {
+      if (epoch !== this.resumeEpoch) {
+        return;
+      }
+      this.replayAfterForeground();
+    }, 0);
+  }
+
   private syncVideoPlayback(): void {
     if (this.playbackEnabled && this.hasPlayableVideo()) {
       this.videoMountLatched = true;
+    }
+    if (!this.playbackEnabled) {
+      this.cancelResumeRetries();
     }
     if (!this.videoPrepared) {
       if (!this.playbackEnabled) {
@@ -160,6 +197,9 @@ export struct HomeWallpaperLayer {
     this.clearVideoPauseTimer();
     if (this.playbackEnabled && this.hasPlayableVideo()) {
       this.videoController.start();
+      if (this.pageForeground) {
+        this.armResumeRetries();
+      }
       return;
     }
     this.videoPauseTimer = setTimeout((): void => {
@@ -169,6 +209,88 @@ export struct HomeWallpaperLayer {
       }
       this.videoController.pause();
     }, 400);
+  }
+
+  private replayAfterForeground(): void {
+    if (!this.pageForeground || !this.playbackEnabled || !this.hasPlayableVideo()) {
+      return;
+    }
+    this.clearVideoPauseTimer();
+    this.progressAtResumeRequestMs = this.lastProgressAtMs;
+    this.resumeAttempts = 0;
+    if (this.videoPrepared) {
+      this.videoController.start();
+    }
+    this.scheduleResumeRetries();
+  }
+
+  private noteExternalPause(): void {
+    // The system pauses Video on background even when our flag never changes.
+    if (!this.pageForeground || !this.playbackEnabled || !this.videoPrepared) {
+      return;
+    }
+    if (this.resumeAttempts >= HOME_WALLPAPER_RESUME_ATTEMPT_LIMIT) {
+      return;
+    }
+    this.scheduleResumeRetries();
+  }
+
+  private notePlaybackProgress(): void {
+    this.lastProgressAtMs = Date.now();
+    this.scheduleVideoFrameReady();
+  }
+
+  private armResumeRetries(): void {
+    this.progressAtResumeRequestMs = this.lastProgressAtMs;
+    this.scheduleResumeRetries();
+  }
+
+  private scheduleResumeRetries(): void {
+    this.cancelResumeRetries();
+    const generation = this.resumeRetryGeneration;
+    setTimeout((): void => {
+      if (generation !== this.resumeRetryGeneration) {
+        return;
+      }
+      this.nudgeResume();
+    }, HOME_WALLPAPER_RESUME_NUDGE_DELAY_MS);
+    setTimeout((): void => {
+      if (generation !== this.resumeRetryGeneration) {
+        return;
+      }
+      this.forceResumeIfStalled();
+    }, HOME_WALLPAPER_RESUME_FORCE_DELAY_MS);
+  }
+
+  private nudgeResume(): void {
+    if (!this.pageForeground || !this.playbackEnabled || !this.hasPlayableVideo() || !this.videoPrepared) {
+      return;
+    }
+    this.clearVideoPauseTimer();
+    this.videoController.start();
+  }
+
+  private forceResumeIfStalled(): void {
+    if (this.resumeAttempts >= HOME_WALLPAPER_RESUME_ATTEMPT_LIMIT) {
+      return;
+    }
+    if (!shouldForceHomeWallpaperResume({
+      playbackRequested: this.pageForeground && this.playbackEnabled && this.hasPlayableVideo(),
+      prepared: this.videoPrepared,
+      progressAtRequestMs: this.progressAtResumeRequestMs,
+      lastProgressAtMs: this.lastProgressAtMs
+    })) {
+      return;
+    }
+    this.resumeAttempts += 1;
+    this.clearVideoPauseTimer();
+    // start() is a no-op while the controller still believes it is started.
+    this.videoController.pause();
+    this.videoController.start();
+  }
+
+  private cancelResumeRetries(): void {
+    this.resumeRetryGeneration += 1;
   }
 
   private scheduleVideoFrameReady(): void {

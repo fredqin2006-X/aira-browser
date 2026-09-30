@@ -57,10 +57,11 @@ export class ChangelogContentService {
       const rawFile = context.resourceManager.getRawFileContentSync(this.resolveRawFileName());
       return this.applyRuntimePlaceholders(buffer.from(rawFile.buffer).toString('utf8'));
     } catch (error) {
+      const detail = this.stringifyError(error);
       return [
-        '# 更新日志',
+        `# ${this.readLocalizedName(context, 'settings_about_changelog', '更新日志')}`,
         '',
-        `更新日志加载失败：${this.stringifyError(error)}`
+        this.readLocalizedName(context, 'settings_about_changelog_load_failed_detail', `更新日志加载失败：${detail}`, detail)
       ].join('\n');
     }
   }
@@ -178,5 +179,16 @@ export class ChangelogContentService {
       return error.message;
     }
     return JSON.stringify(error);
+  }
+
+  private readLocalizedName(context: common.Context, name: string, fallback: string, formatArg?: string): string {
+    try {
+      const value = formatArg === undefined ?
+        context.resourceManager.getStringByNameSync(name) :
+        context.resourceManager.getStringByNameSync(name, formatArg);
+      return value.length > 0 ? value : fallback;
+    } catch (_error) {
+      return fallback;
+    }
   }
 }

@@ -53,7 +53,7 @@ export struct KeyboardShortcutsContent {
         }, (group: KeyboardShortcutGroupState) => group.id)
 
         SettingsFooterText({
-          text: '快捷键在外接键盘或桌面/平板键盘环境下使用。',
+          text: $r('app.string.settings_shortcuts_footer'),
           secondaryTextColor: this.storedSecondaryTextColor
         })
       }

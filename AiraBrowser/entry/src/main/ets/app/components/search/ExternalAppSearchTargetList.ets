@@ -11,6 +11,7 @@ import {
   SettingsRowPosition,
   SettingsSwitchRow
 } from '../settings/SettingsRows';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 const EXTERNAL_APP_SEARCH_ROW_HEIGHT: number = 62;
 const EXTERNAL_APP_SEARCH_DIVIDER_HEIGHT: number = 1;
@@ -80,7 +81,7 @@ export struct ExternalAppSearchTargetList {
         secondaryTextColor: this.theme.textSecondary,
         pressedBackgroundColor: this.theme.pressedBackground,
         dragHandleIcon: $r('sys.symbol.line_3_horizontal'),
-        dragHandleAccessibilityText: `拖动调整${target.title}顺序`,
+        dragHandleAccessibilityText: resolveAppResourceText($r('app.string.settings_search_engine_external_drag_one'), target.title),
         dragHandleBackgroundColor: this.theme.controlBackground,
         onChange: (enabled: boolean) => {
           this.onTargetEnabledChange(target.id, enabled);

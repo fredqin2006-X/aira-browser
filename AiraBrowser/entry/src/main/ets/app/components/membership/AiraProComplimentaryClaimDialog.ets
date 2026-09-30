@@ -39,7 +39,7 @@ export struct AiraProComplimentaryClaimDialog {
         Column({ space: 0 }) {
           this.buildDaysMark()
 
-          Text('免费领取 Aira Pro')
+          Text($r('app.string.settings_pro_claim_free_title'))
             .width('100%')
             .fontSize(15)
             .fontWeight(FontWeight.Medium)
@@ -50,7 +50,7 @@ export struct AiraProComplimentaryClaimDialog {
         .width('100%')
         .alignItems(HorizontalAlign.Center)
 
-        if (this.state.complimentaryClaim.statusText.length > 0) {
+        if (this.hasVisibleText(this.state.complimentaryClaim.statusText)) {
           Text(this.state.complimentaryClaim.statusText)
             .width('100%')
             .fontSize(13)
@@ -80,7 +80,7 @@ export struct AiraProComplimentaryClaimDialog {
           })
 
           BrowserSheetActionButton({
-            label: '取消',
+            label: $r('app.string.settings_account_cancel'),
             emphasis: 'ghost',
             stacked: true,
             buttonHeight: 44,
@@ -116,7 +116,7 @@ export struct AiraProComplimentaryClaimDialog {
         .fontColor(this.storedPrimaryTextColor)
         .lineHeight(CLAIM_DAYS_FONT_SIZE)
 
-      Text('天')
+      Text($r('app.string.settings_pro_claim_days_unit'))
         .fontSize(CLAIM_DAYS_UNIT_FONT_SIZE)
         .fontWeight(FontWeight.Medium)
         .fontColor(this.storedPrimaryTextColor)
@@ -126,9 +126,13 @@ export struct AiraProComplimentaryClaimDialog {
     .alignItems(VerticalAlign.Bottom)
   }
 
-  private resolveActionText(): string {
-    return this.state.complimentaryClaim.actionText.length > 0 ?
-      this.state.complimentaryClaim.actionText : '领取会员';
+  private resolveActionText(): ResourceStr {
+    return this.hasVisibleText(this.state.complimentaryClaim.actionText) ?
+      this.state.complimentaryClaim.actionText : $r('app.string.settings_pro_claim_action');
+  }
+
+  private hasVisibleText(value: ResourceStr): boolean {
+    return typeof value !== 'string' || value.length > 0;
   }
 
   private resolveDaysText(): string {

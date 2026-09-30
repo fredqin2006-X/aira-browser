@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@ohos/hypium';
+import { isAppString } from '../main/ets/core/resources/AppResourceText';
 import {
   BrowserAppearanceSettings,
   BrowserExperimentSettings,
@@ -184,6 +185,16 @@ function selectedOptionId(row: SettingsDetailRowState): string {
   return '';
 }
 
+function visibilityLabel(id: string): Resource {
+  if (id === 'never') {
+    return $r('app.string.bookmark_bar_visibility_never');
+  }
+  if (id === 'always') {
+    return $r('app.string.bookmark_bar_visibility_always');
+  }
+  return $r('app.string.bookmark_bar_visibility_new_tab');
+}
+
 function optionIds(row: SettingsDetailRowState): string {
   const options: SettingsDetailOption[] = row.options ?? [];
   const ids: string[] = [];
@@ -238,19 +249,15 @@ export default function settingsDesktopBookmarkBarVisibilityRowTest(): void {
 
     it('words the setting exactly like the bar menu, in the same order', 0, () => {
       const row = bookmarkBarRow(appearanceDetailState(appearance(true, 'always'), true));
-      const optionLabels: string[] = [];
-      (row?.options ?? []).forEach((option: SettingsDetailOption): void => {
-        optionLabels.push(option.label);
+      const options: SettingsDetailOption[] = row?.options ?? [];
+      const menuItems: BrowserDesktopBookmarkBarMenuItem[] =
+        buildDesktopBookmarkBarBlankMenuModel({ barVisibility: 'always' }).groups[0];
+
+      expect(options.length).assertEqual(menuItems.length);
+      options.forEach((option: SettingsDetailOption, index: number): void => {
+        expect(option.id).assertEqual(menuItems[index].id.replace('bar_visibility_', ''));
+        expect(isAppString(menuItems[index].label, visibilityLabel(option.id))).assertTrue();
       });
-
-      const menuLabels: string[] = [];
-      buildDesktopBookmarkBarBlankMenuModel({ barVisibility: 'always' }).groups[0].forEach(
-        (item: BrowserDesktopBookmarkBarMenuItem): void => {
-          menuLabels.push(item.label);
-        }
-      );
-
-      expect(optionLabels.join('|')).assertEqual(menuLabels.join('|'));
     });
   });
 }

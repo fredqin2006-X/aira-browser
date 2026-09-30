@@ -27,6 +27,8 @@ import {
 } from '../../../common/models/BrowserModels';
 import { BrowserBoundaryRouteState } from '../../../common/utils/RouteParamUtils';
 import { BrowserThemeModeBoundary } from '../../../core/browser/BrowserThemeModeCoordinator';
+import { localizeCommunityUpdateMessage } from '../../../core/settings/SettingsAboutCopy';
+import { localizeExperimentUpdateToast, localizeExperimentsRiskPromptCopy } from '../../../core/settings/SettingsExperimentsCopy';
 import {
   SettingsCenterDestination
 } from '../../../core/settings/SettingsCenterViewModel';
@@ -480,7 +482,7 @@ export struct SettingsInlineDetailPanel {
     return new SettingsDetailNavigationActionCallbackHandlers(
       (): BrowserBoundaryRouteState => this.buildForwardRouteParams(),
       (): common.UIAbilityContext => this.getAbilityContext(),
-      (message: string): void => {
+      (message: ResourceStr): void => {
         this.showToast(message);
       },
       (): void => {
@@ -516,15 +518,19 @@ export struct SettingsInlineDetailPanel {
     try {
       const result = await this.communityUpdateCheckService.check();
       this.nativeAlertDialogPresenter.inform({
-        title: '检查更新',
-        message: result.message,
-        confirmLabel: '知道了'
+        title: $r('app.string.user_script_check_updates'),
+        message: localizeCommunityUpdateMessage(
+          result.outcome,
+          result.outcome === 'up_to_date' ? result.current.versionName : (result.release?.versionName ?? ''),
+          result.message
+        ),
+        confirmLabel: $r('app.string.settings_pro_got_it')
       });
     } catch (_error) {
       this.nativeAlertDialogPresenter.inform({
-        title: '检查更新',
-        message: '检查更新失败，请稍后再试。',
-        confirmLabel: '知道了'
+        title: $r('app.string.user_script_check_updates'),
+        message: $r('app.string.settings_about_update_failed'),
+        confirmLabel: $r('app.string.settings_pro_got_it')
       });
     } finally {
       this.communityUpdateChecking = false;
@@ -535,9 +541,9 @@ export struct SettingsInlineDetailPanel {
     try {
       const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, AIRA_SUPPORT_QQ_GROUP_NUMBER);
       await pasteboard.getSystemPasteboard().setData(data);
-      this.showToast('已复制QQ群号');
+      this.showToast($r('app.string.settings_about_qq_copied'));
     } catch (_error) {
-      this.showToast('QQ群号复制失败，请稍后再试。');
+      this.showToast($r('app.string.settings_about_qq_copy_failed'));
     }
   }
 
@@ -557,7 +563,7 @@ export struct SettingsInlineDetailPanel {
     } catch (_error) {
       this.selectedThemeMode = previousThemeMode;
       this.rebuildStateFromLocalSettings();
-      this.showToast('外观模式更新失败。');
+      this.showToast($r('app.string.bottom_panel_theme_update_failed'));
     }
   }
 
@@ -588,7 +594,7 @@ export struct SettingsInlineDetailPanel {
     } catch (_error) {
       this.settingsRenderVersion += 1;
       this.refreshState();
-      this.showToast('应用服务模式更新失败。');
+      this.showToast($r('app.string.settings_advanced_service_mode_update_failed'));
     }
   }
 
@@ -607,7 +613,7 @@ export struct SettingsInlineDetailPanel {
     } catch (_error) {
       this.appearanceSettings = previousSettings;
       this.rebuildStateFromLocalSettings();
-      this.showToast('外观设置更新失败。');
+      this.showToast($r('app.string.settings_appearance_update_failed'));
     }
   }
 
@@ -643,7 +649,7 @@ export struct SettingsInlineDetailPanel {
       this.onSettingsChanged?.();
     } catch (_error) {
       this.refreshState();
-      this.showToast('隐私模式验证设置更新失败。');
+      this.showToast($r('app.string.settings_privacy_auth_failed'));
     }
   }
 
@@ -680,7 +686,7 @@ export struct SettingsInlineDetailPanel {
       this.onSettingsChanged?.();
     } catch (_error) {
       this.refreshState();
-      this.showToast('始终保持隐私模式设置更新失败。');
+      this.showToast($r('app.string.settings_privacy_always_failed'));
     }
   }
 
@@ -704,7 +710,7 @@ export struct SettingsInlineDetailPanel {
       this.onSettingsChanged?.();
     } catch (_error) {
       this.refreshState();
-      this.showToast('隐私模式 Cookie 设置更新失败。');
+      this.showToast($r('app.string.settings_privacy_cookies_failed'));
     }
   }
 
@@ -729,7 +735,7 @@ export struct SettingsInlineDetailPanel {
       this.onSettingsChanged?.();
     } catch (_error) {
       this.refreshState();
-      this.showToast('隐私模式用户脚本设置更新失败。');
+      this.showToast($r('app.string.settings_privacy_scripts_failed'));
     }
   }
 
@@ -746,11 +752,11 @@ export struct SettingsInlineDetailPanel {
       this.refreshState();
       this.onSettingsChanged?.();
       this.experimentSettingsRefreshSignal.bump();
-      this.showToast(this.viewModel.buildExperimentUpdateToast(previousSettings, settings));
+      this.showToast(localizeExperimentUpdateToast(this.viewModel.buildExperimentUpdateToast(previousSettings, settings)));
     } catch (_error) {
       this.experimentSettings = previousSettings;
       this.rebuildStateFromLocalSettings();
-      this.showToast('实验室设置更新失败。');
+      this.showToast($r('app.string.settings_experiments_update_failed'));
     }
   }
 
@@ -825,7 +831,7 @@ export struct SettingsInlineDetailPanel {
     };
   }
 
-  private async applyGeneralSettings(nextSettings: BrowserGeneralSettings, failureMessage: string): Promise<void> {
+  private async applyGeneralSettings(nextSettings: BrowserGeneralSettings, failureMessage: ResourceStr): Promise<void> {
     try {
       await this.interactionCoordinator.commitGeneralSettings({
         dataScope: this.dataScope,
@@ -840,15 +846,15 @@ export struct SettingsInlineDetailPanel {
   }
 
   private async applyStartupRestorePolicy(policy: BrowserStartupRestorePolicy): Promise<void> {
-    await this.applyGeneralSettings(this.buildNextGeneralSettings({ startupRestorePolicy: policy }), '启动行为更新失败。');
+    await this.applyGeneralSettings(this.buildNextGeneralSettings({ startupRestorePolicy: policy }), $r('app.string.settings_general_startup_update_failed'));
   }
 
   private async applyTabAutoClosePolicy(policy: BrowserTabAutoClosePolicy): Promise<void> {
-    await this.applyGeneralSettings(this.buildNextGeneralSettings({ tabAutoClosePolicy: policy }), '自动关闭标签页更新失败。');
+    await this.applyGeneralSettings(this.buildNextGeneralSettings({ tabAutoClosePolicy: policy }), $r('app.string.settings_general_tab_update_failed'));
   }
 
   private async applyPrivateTabRestorePolicy(policy: BrowserPrivateTabRestorePolicy): Promise<void> {
-    await this.applyGeneralSettings(this.buildNextGeneralSettings({ privateTabRestorePolicy: policy }), '私密标签页恢复更新失败。');
+    await this.applyGeneralSettings(this.buildNextGeneralSettings({ privateTabRestorePolicy: policy }), $r('app.string.settings_privacy_restore_failed'));
   }
 
   private async applyHistoryRetentionOption(optionId: string): Promise<void> {
@@ -866,7 +872,7 @@ export struct SettingsInlineDetailPanel {
       this.onSettingsChanged?.();
     } catch (_error) {
       this.refreshState();
-      this.showToast('历史保留更新失败。');
+      this.showToast($r('app.string.settings_general_history_update_failed'));
     }
   }
 
@@ -892,7 +898,7 @@ export struct SettingsInlineDetailPanel {
       this.showToast(result.message);
     } catch (_error) {
       this.refreshState();
-      this.showToast('后台标签页策略更新失败。');
+      this.showToast($r('app.string.settings_advanced_retention_panel_update_failed'));
     }
   }
 
@@ -996,7 +1002,7 @@ export struct SettingsInlineDetailPanel {
       message: resetState.message,
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_privacy_protection_dialog_cancel'),
         action: () => {
         }
       },
@@ -1025,16 +1031,16 @@ export struct SettingsInlineDetailPanel {
 
   private confirmRefreshSiteIcons(): void {
     showCenteredAlertDialog({
-      title: '刷新网站图标？',
-      message: '会保留当前图标，并在后台重新获取高清图标。获取失败的网站会继续显示文字图标或旧图标。',
+      title: $r('app.string.settings_privacy_protection_refresh_icons_title'),
+      message: $r('app.string.settings_privacy_protection_refresh_icons_message'),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_privacy_protection_dialog_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '开始刷新',
+        value: $r('app.string.settings_privacy_protection_start_refresh'),
         action: () => {
           void this.refreshSiteIcons();
         }
@@ -1048,12 +1054,12 @@ export struct SettingsInlineDetailPanel {
     }
     this.siteIconRefreshing = true;
     this.rebuildStateFromLocalSettings();
-    this.showToast('正在刷新网站图标...');
+    this.showToast($r('app.string.settings_privacy_protection_refreshing'));
     try {
       const result = await this.siteIconCacheMaintenanceCoordinator.refreshKnownSiteIcons();
       this.showToast(result.message);
     } catch (_error) {
-      this.showToast('网站图标刷新失败，请稍后再试。');
+      this.showToast($r('app.string.settings_privacy_protection_refresh_failed'));
     } finally {
       this.siteIconRefreshing = false;
       this.refreshState();
@@ -1063,17 +1069,17 @@ export struct SettingsInlineDetailPanel {
 
   private showRiskPrompt(prompt: SettingsRiskPromptState, onConfirm: () => void): void {
     showCenteredAlertDialog({
-      title: prompt.title,
-      message: prompt.message,
+      title: localizeExperimentsRiskPromptCopy(prompt.title),
+      message: localizeExperimentsRiskPromptCopy(prompt.message),
       autoCancel: true,
       primaryButton: {
-        value: prompt.cancelLabel,
+        value: localizeExperimentsRiskPromptCopy(prompt.cancelLabel),
         action: () => {
           this.refreshState();
         }
       },
       secondaryButton: {
-        value: prompt.confirmLabel,
+        value: localizeExperimentsRiskPromptCopy(prompt.confirmLabel),
         fontColor: prompt.confirmIsDestructive ? $r('app.color.permission_blocked') : this.accentColor,
         action: () => {
           onConfirm();
@@ -1103,7 +1109,7 @@ export struct SettingsInlineDetailPanel {
     });
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

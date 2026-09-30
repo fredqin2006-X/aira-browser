@@ -73,7 +73,7 @@ export struct AdBlockSettingsScreen {
 
   build() {
     SettingsHdsScaffold({
-      title: '网页内容过滤',
+      title: $r('app.string.settings_site_info_content_filter'),
       backIconKind: 'back',
       pageBackground: this.resolvePageBackground(),
       headerButtonBackground: this.resolveControlBackground(),
@@ -221,7 +221,7 @@ export struct AdBlockSettingsContent {
   @Builder
   private buildStatusSection() {
     SettingsSection({
-      title: '保护',
+      title: $r('app.string.settings_privacy_protection_adblock_protection'),
       secondaryTextColor: this.resolveSecondaryTextColor()
     }) {
       SettingsGroupCard({
@@ -229,9 +229,9 @@ export struct AdBlockSettingsContent {
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsSwitchRow({
-          title: '网页内容过滤',
+          title: $r('app.string.settings_site_info_content_filter'),
           desktopPresentation: this.desktopPresentation,
-          description: '按你启用的规则过滤网页内容',
+          description: $r('app.string.settings_privacy_protection_adblock_subtitle'),
           checked: this.state.enabled,
           isEnabled: this.controlsEnabled,
           primaryTextColor: this.resolvePrimaryTextColor(),
@@ -249,7 +249,7 @@ export struct AdBlockSettingsContent {
   @Builder
   private buildCustomRuleSection() {
     SettingsSection({
-      title: '过滤规则',
+      title: $r('app.string.settings_privacy_protection_adblock_rules'),
       secondaryTextColor: this.resolveSecondaryTextColor()
     }) {
       SettingsGroupCard({
@@ -265,10 +265,10 @@ export struct AdBlockSettingsContent {
           }
         }) {
           SettingsNavigationRow({
-            title: '过滤规则',
+            title: $r('app.string.settings_privacy_protection_adblock_rules'),
             desktopPresentation: this.desktopPresentation,
             value: `${this.state.customRuleSources.length}`,
-            description: '管理第三方和自定义过滤规则',
+            description: $r('app.string.settings_privacy_protection_adblock_rules_detail'),
             isEnabled: this.controlsEnabled && this.state.enabled,
             primaryTextColor: this.resolvePrimaryTextColor(),
             secondaryTextColor: this.resolveSecondaryTextColor(),
@@ -286,7 +286,7 @@ export struct AdBlockSettingsContent {
   @Builder
   private buildManualHideSection() {
     SettingsSection({
-      title: '页面元素清理',
+      title: $r('app.string.settings_privacy_protection_adblock_elements'),
       secondaryTextColor: this.resolveSecondaryTextColor()
     }) {
       SettingsGroupCard({
@@ -302,10 +302,10 @@ export struct AdBlockSettingsContent {
           }
         }) {
           SettingsNavigationRow({
-            title: '已清理页面元素',
+            title: $r('app.string.element_hide_settings_title'),
             desktopPresentation: this.desktopPresentation,
-            value: '管理',
-            description: '查看和恢复你手动隐藏的网页元素',
+            value: $r('app.string.settings_privacy_protection_adblock_manage'),
+            description: $r('app.string.settings_privacy_protection_adblock_hidden_detail'),
             isEnabled: this.controlsEnabled,
             primaryTextColor: this.resolvePrimaryTextColor(),
             secondaryTextColor: this.resolveSecondaryTextColor(),
@@ -331,7 +331,7 @@ export struct AdBlockSettingsContent {
       }
     }) {
       SettingsActionButton({
-        title: '清空统计',
+        title: $r('app.string.settings_privacy_protection_adblock_clear_stats'),
         emphasis: 'danger',
         isEnabled: this.controlsEnabled && this.state.enabled && this.state.hasProtectionStats,
         pressedBackgroundColor: this.resolvePressedBackground(),
@@ -345,7 +345,7 @@ export struct AdBlockSettingsContent {
   @Builder
   private buildExceptionsSection() {
     SettingsSection({
-      title: '站点例外',
+      title: $r('app.string.settings_privacy_protection_adblock_exceptions'),
       secondaryTextColor: this.resolveSecondaryTextColor()
     }) {
       SettingsGroupCard({
@@ -361,7 +361,7 @@ export struct AdBlockSettingsContent {
           }, (item: AdBlockExceptionRowView) => item.host)
         } else {
           SettingsStaticValueRow({
-            title: '暂无站点例外',
+            title: $r('app.string.settings_privacy_protection_adblock_no_exceptions'),
             desktopPresentation: this.desktopPresentation,
             value: '',
             primaryTextColor: this.resolvePrimaryTextColor(),
@@ -388,7 +388,7 @@ export struct AdBlockSettingsContent {
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
 
-      Button('移除')
+      Button($r('app.string.settings_privacy_protection_adblock_remove'))
         .height(34)
         .type(ButtonType.Normal)
         .buttonStyle(ButtonStyleMode.NORMAL)

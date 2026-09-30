@@ -4,6 +4,7 @@ import {
   ReadingSurfaceAppearance
 } from '../../../features/reading/ReadingSurfaceModels';
 import { AiraIcon } from '../common/AiraIcon';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   resolveEffectiveReadingTheme,
   resolveReadingThemeTokens
@@ -38,7 +39,7 @@ export function resolveReadingExperienceBottomChromeHeight(
 @Component
 export struct ReadingExperienceChrome {
   @Prop title: string = '';
-  @Prop closeAccessibilityLabel: string = '退出阅读';
+  @Prop closeAccessibilityLabel: string = '';
   @Prop visible: boolean = true;
   @Prop appearance: ReadingSurfaceAppearance;
   @Prop topSafeInset: number = 0;
@@ -111,7 +112,7 @@ export struct ReadingExperienceChrome {
           .type(ButtonType.Normal)
           .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
           .borderRadius(READING_CHROME_TOP_ACTION_HEIGHT / 2)
-          .accessibilityText(this.closeAccessibilityLabel)
+          .accessibilityText(this.resolveCloseAccessibilityLabel())
           .onClick((): void => {
             this.onClose();
           })
@@ -156,10 +157,18 @@ export struct ReadingExperienceChrome {
         Row() {
           this.buildNavItem(this.primaryActionIcon, this.primaryActionLabel, 'primary')
           if (this.textActionVisible) {
-            this.buildNavItem('novelReader.text', '文字', 'text')
+            this.buildNavItem('novelReader.text', resolveAppResourceText($r('app.string.reader_panel_text')), 'text')
           }
-          this.buildNavItem('novelReader.theme', '亮度与主题', 'appearance')
-          this.buildNavItem('novelReader.settings', '设置', 'settings')
+          this.buildNavItem(
+            'novelReader.theme',
+            resolveAppResourceText($r('app.string.reader_panel_appearance')),
+            'appearance'
+          )
+          this.buildNavItem(
+            'novelReader.settings',
+            resolveAppResourceText($r('app.string.reader_nav_settings')),
+            'settings'
+          )
           if (this.trailingActionVisible) {
             this.buildNavItem(this.trailingActionIcon, this.trailingActionLabel, 'trailing')
           }
@@ -176,6 +185,13 @@ export struct ReadingExperienceChrome {
     .backgroundColor(this.resolveControlBackgroundColor())
     .alignItems(HorizontalAlign.Center)
     .align(Alignment.Bottom)
+  }
+
+  private resolveCloseAccessibilityLabel(): string {
+    if (this.closeAccessibilityLabel.length > 0) {
+      return this.closeAccessibilityLabel;
+    }
+    return resolveAppResourceText($r('app.string.reader_exit_reading'));
   }
 
   @Builder

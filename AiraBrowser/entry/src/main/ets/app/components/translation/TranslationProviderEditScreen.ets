@@ -44,7 +44,7 @@ export struct TranslationProviderEditScreen {
 
   build() {
     SettingsHdsScaffold({
-      title: '选择翻译服务',
+      title: $r('app.string.settings_web_translation_choose_service'),
       backIconKind: 'back',
       pageBackground: this.storedPageBackgroundColor,
       headerButtonBackground: this.storedPressedBackgroundColor,
@@ -69,7 +69,7 @@ export struct TranslationProviderEditScreen {
         bottomPadding: 32
       }) {
         SettingsSection({
-          title: '选择翻译服务',
+          title: $r('app.string.settings_web_translation_choose_service'),
           secondaryTextColor: this.storedSecondaryTextColor
         }) {
           this.buildTemplateCard()

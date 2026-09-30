@@ -5,13 +5,13 @@ import {
 
 export interface GeneralTabAutoCloseOptionState {
   policy: BrowserTabAutoClosePolicy;
-  title: string;
+  title: ResourceStr;
 }
 
 export interface GeneralTabAutoCloseSettingsState {
   tabAutoClosePolicy: BrowserTabAutoClosePolicy;
   tabAutoCloseOptions: GeneralTabAutoCloseOptionState[];
-  footer: string;
+  footer: ResourceStr;
 }
 
 export class GeneralTabAutoCloseSettingsViewModel {
@@ -21,27 +21,27 @@ export class GeneralTabAutoCloseSettingsViewModel {
       tabAutoCloseOptions: [
         {
           policy: 'manual',
-          title: '不自动关闭'
+          title: $r('app.string.settings_general_tab_manual')
         },
         {
           policy: 'after_15_days',
-          title: '15 天未使用'
+          title: $r('app.string.settings_general_unused_days', 15)
         },
         {
           policy: 'after_7_days',
-          title: '7 天未使用'
+          title: $r('app.string.settings_general_unused_days', 7)
         },
         {
           policy: 'after_3_days',
-          title: '3 天未使用'
+          title: $r('app.string.settings_general_unused_days', 3)
         },
         {
           policy: 'after_1_day',
-          title: '1 天未使用'
+          title: $r('app.string.settings_general_unused_days', 1)
         },
         {
           policy: 'on_app_exit',
-          title: '退出后清除'
+          title: $r('app.string.settings_general_clear_on_exit')
         }
       ],
       footer: this.resolveFooter(general.tabAutoClosePolicy)
@@ -81,13 +81,26 @@ export class GeneralTabAutoCloseSettingsViewModel {
     }
   }
 
-  private resolveFooter(policy: BrowserTabAutoClosePolicy): string {
+  private resolveFooter(policy: BrowserTabAutoClosePolicy): ResourceStr {
     if (policy === 'on_app_exit') {
-      return '退出后清除会在下次启动时不再恢复上次打开的常规标签页。';
+      return $r('app.string.settings_general_tab_footer_exit');
     }
     if (policy === 'manual') {
-      return 'Aira 会保留常规标签页，直到你手动关闭。';
+      return $r('app.string.settings_general_tab_footer_manual');
     }
-    return `超过 ${this.resolveLabel(policy)} 没有使用的常规标签页，会在下次启动或保存会话时自动关闭。`;
+    return $r('app.string.settings_general_tab_footer_days', this.resolveUnusedDays(policy));
+  }
+
+  private resolveUnusedDays(policy: BrowserTabAutoClosePolicy): number {
+    if (policy === 'after_15_days') {
+      return 15;
+    }
+    if (policy === 'after_7_days') {
+      return 7;
+    }
+    if (policy === 'after_3_days') {
+      return 3;
+    }
+    return 1;
   }
 }

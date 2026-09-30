@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BROWSER_THEME_STORAGE_ACCENT_KEY,
   BROWSER_THEME_STORAGE_DIVIDER_KEY,
@@ -22,7 +23,7 @@ export struct BookmarkImportResultDialog {
 
   build() {
     Column({ space: 16 }) {
-      Text('导入成功')
+      Text($r('app.string.history_import_success'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -32,19 +33,19 @@ export struct BookmarkImportResultDialog {
         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Column({ space: 0 }) {
-        this.buildResultRow('结果', this.buildOutcomeText(), 2)
+        this.buildResultRow($r('app.string.bookmark_import_result'), this.buildOutcomeText(), 2)
         this.buildDivider()
-        this.buildResultRow('新增内容', this.formatImportedContent(), 2)
+        this.buildResultRow($r('app.string.bookmark_import_added'), this.formatImportedContent(), 2)
         if (this.duplicateCount > 0 || this.skippedNodeCount > 0) {
           this.buildDivider()
-          this.buildResultRow('未导入', this.formatSkippedContent(), 2)
+          this.buildResultRow($r('app.string.bookmark_import_skipped'), this.formatSkippedContent(), 2)
         }
       }
       .width('100%')
 
       BrowserSheetActionButton({
         stacked: true,
-        label: '知道了',
+        label: $r('app.string.settings_pro_got_it'),
         emphasis: 'primary',
         accentColor: this.storedAccentColor,
         fillAvailableWidth: false,
@@ -60,7 +61,7 @@ export struct BookmarkImportResultDialog {
   }
 
   @Builder
-  private buildResultRow(label: string, value: string, maxLines: number) {
+  private buildResultRow(label: ResourceStr, value: ResourceStr, maxLines: number) {
     Row({ space: 16 }) {
       Text(label)
         .width(86)
@@ -93,38 +94,38 @@ export struct BookmarkImportResultDialog {
       .color(this.storedDividerColor)
   }
 
-  private buildOutcomeText(): string {
+  private buildOutcomeText(): ResourceStr {
     if (this.importedFolderCount > 0 || this.importedBookmarkCount > 0) {
-      return '已添加到本机书签。';
+      return $r('app.string.bookmark_import_added_local');
     }
     if (this.duplicateCount > 0) {
-      return '没有新增内容，文件里的书签已存在。';
+      return $r('app.string.bookmark_import_none_duplicate');
     }
     if (this.skippedNodeCount > 0) {
-      return '没有新增内容，部分内容格式不完整。';
+      return $r('app.string.bookmark_import_none_invalid');
     }
-    return this.summary.length > 0 ? this.summary : '没有新增内容。';
+    return this.summary.length > 0 ? this.summary : $r('app.string.bookmark_import_none');
   }
 
-  private formatImportedContent(): string {
+  private formatImportedContent(): ResourceStr {
     const segments: string[] = [];
     if (this.importedFolderCount > 0) {
-      segments.push(`${Math.max(0, Math.floor(this.importedFolderCount))} 个文件夹`);
+      segments.push(resolveAppResourceText($r('app.string.bookmark_import_folder_count', Math.max(0, Math.floor(this.importedFolderCount)))));
     }
     if (this.importedBookmarkCount > 0) {
-      segments.push(`${Math.max(0, Math.floor(this.importedBookmarkCount))} 个书签`);
+      segments.push(resolveAppResourceText($r('app.string.bookmark_import_bookmark_count', Math.max(0, Math.floor(this.importedBookmarkCount)))));
     }
-    return segments.length > 0 ? segments.join('，') : '没有新增内容';
+    return segments.length > 0 ? segments.join(resolveAppResourceText($r('app.string.ui_list_separator'))) : $r('app.string.bookmark_import_none_added');
   }
 
-  private formatSkippedContent(): string {
+  private formatSkippedContent(): ResourceStr {
     const segments: string[] = [];
     if (this.duplicateCount > 0) {
-      segments.push(`${Math.max(0, Math.floor(this.duplicateCount))} 个已存在`);
+      segments.push(resolveAppResourceText($r('app.string.bookmark_import_duplicate_count', Math.max(0, Math.floor(this.duplicateCount)))));
     }
     if (this.skippedNodeCount > 0) {
-      segments.push(`${Math.max(0, Math.floor(this.skippedNodeCount))} 个格式不完整`);
+      segments.push(resolveAppResourceText($r('app.string.bookmark_import_invalid_count', Math.max(0, Math.floor(this.skippedNodeCount)))));
     }
-    return segments.length > 0 ? segments.join('，') : '无';
+    return segments.length > 0 ? segments.join(resolveAppResourceText($r('app.string.ui_list_separator'))) : $r('app.string.bookmark_import_none_skipped');
   }
 }

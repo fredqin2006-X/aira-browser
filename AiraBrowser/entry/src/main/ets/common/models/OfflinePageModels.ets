@@ -38,7 +38,7 @@ export interface OfflinePageSaveEligibility {
   reason: OfflinePageSaveBlockedReason;
   targetUrl: string;
   title: string;
-  message: string;
+  message: ResourceStr;
 }
 
 export interface OfflinePageSnapshotMetadata {
@@ -100,7 +100,7 @@ export interface OfflinePageSaveResult {
   ok: boolean;
   status: OfflinePageSaveStatus;
   reason: OfflinePageFailureReason | '';
-  message: string;
+  message: ResourceStr;
   record?: OfflinePageRecord;
 }
 
@@ -115,24 +115,24 @@ export interface OfflinePageListItem {
   faviconUri: string;
   originalUrl: string;
   canOpen: boolean;
-  openStatusText: string;
+  openStatusText: ResourceStr;
 }
 
 export interface OfflinePageListState {
   loading: boolean;
   empty: boolean;
   items: OfflinePageListItem[];
-  message: string;
+  message: ResourceStr;
 }
 
 export interface OfflinePageDeleteResult {
   ok: boolean;
-  message: string;
+  message: ResourceStr;
 }
 
 export interface OfflinePageOpenResult {
   ok: boolean;
-  message: string;
+  message: ResourceStr;
   record?: OfflinePageRecord;
   html: string;
   archiveUri: string;
@@ -157,12 +157,14 @@ export interface OfflinePageViewerState {
   html: string;
   archiveUri: string;
   contentKind: OfflinePageContentKind;
-  message: string;
+  message: ResourceStr;
 }
 
 export interface OfflinePageViewerInfoRow {
-  label: string;
-  value: string;
+  id: string;
+  label: ResourceStr;
+  value: ResourceStr;
+  multiline: boolean;
 }
 
 export type OfflinePageContentKind = 'html' | 'web_archive';

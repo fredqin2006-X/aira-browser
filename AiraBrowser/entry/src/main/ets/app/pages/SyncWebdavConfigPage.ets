@@ -132,17 +132,17 @@ struct SyncWebdavConfigPage {
     statusText: '未配置',
     renderKey: 'empty|off|empty'
   };
-  @State private syncFloatingTitle: string = '';
-  @State private syncFloatingSubtitle: string = '';
+  @State private syncFloatingTitle: ResourceStr = '';
+  @State private syncFloatingSubtitle: ResourceStr = '';
   @State private syncFloatingProgress: number = 0;
   @State private syncFloatingInProgress: boolean = false;
-  @State private syncProgressDetailsText: string = '';
+  @State private syncProgressDetailsText: ResourceStr = '';
   @State private syncProgressDetailOpacity: number = 1;
-  @State private syncFailureDialogTitle: string = '';
-  @State private syncFailureDialogSummary: string = '';
+  @State private syncFailureDialogTitle: ResourceStr = '';
+  @State private syncFailureDialogSummary: ResourceStr = '';
   @State private syncFailureDialogDetails: SyncFailureDetailItem[] = [];
-  @State private syncResultDialogTitle: string = '';
-  @State private syncResultDialogMessage: string = '';
+  @State private syncResultDialogTitle: ResourceStr = '';
+  @State private syncResultDialogMessage: ResourceStr = '';
   @State private showHuaweiLoginPanel: boolean = false;
   private syncFailureDiagnosticsText: string = '';
   private syncFailureDialogController: CustomDialogController = new CustomDialogController({
@@ -643,7 +643,7 @@ struct SyncWebdavConfigPage {
       });
   }
 
-  private showMembershipDialog(title: string, decision: EntitlementDecision): void {
+  private showMembershipDialog(title: ResourceStr, decision: EntitlementDecision): void {
     if (decision.primaryAction === 'login') {
       this.showHuaweiLoginPanel = true;
       return;
@@ -786,10 +786,16 @@ struct SyncWebdavConfigPage {
       return;
     }
     if (outcome.type === 'failed') {
-      this.showSyncFailureDialog(outcome.title, 'WebDAV', new Error(outcome.message));
+      this.showExperienceFailureDialog(outcome);
       return;
     }
     this.showDialog(outcome.title, outcome.message);
+  }
+
+  private showExperienceFailureDialog(outcome: SyncExperienceActionOutcome): void {
+    const operationName = typeof outcome.title === 'string' ? outcome.title : '同步';
+    const message = typeof outcome.message === 'string' ? outcome.message : '';
+    this.showSyncFailureDialog(operationName, 'WebDAV', new Error(message));
   }
 
   private resolveExperienceBookmarkConflicts(
@@ -832,7 +838,7 @@ struct SyncWebdavConfigPage {
     this.showSyncProgressTip(subtitle);
   }
 
-  private finishSyncFloatingOperation(title: string, subtitle: string, afterClose?: () => void): void {
+  private finishSyncFloatingOperation(title: ResourceStr, subtitle: ResourceStr, afterClose?: () => void): void {
     if (!this.syncProgressDialogOpen) {
       if (afterClose !== undefined) {
         afterClose();
@@ -873,7 +879,7 @@ struct SyncWebdavConfigPage {
     this.showSyncProgressTip(this.syncProgressTipsState.activeTip);
   }
 
-  private showSyncProgressTip(tip: string): void {
+  private showSyncProgressTip(tip: ResourceStr): void {
     this.syncProgressDetailOpacity = 0.22;
     setTimeout(() => {
       this.syncProgressDetailsText = tip;
@@ -907,7 +913,7 @@ struct SyncWebdavConfigPage {
     }, SYNC_OPERATION_PROGRESS_TIMING.timeoutMs);
   }
 
-  private completeSyncProgressWithRamp(title: string, subtitle: string, afterClose?: () => void): void {
+  private completeSyncProgressWithRamp(title: ResourceStr, subtitle: ResourceStr, afterClose?: () => void): void {
     this.stopSyncProgressActiveTimers();
     this.syncFloatingSubtitle = '正在完成处理';
     this.showSyncProgressTip('正在完成处理');
@@ -977,7 +983,7 @@ struct SyncWebdavConfigPage {
     this.syncProgressDialogController.close();
   }
 
-  private showDialog(title: string, message: string): void {
+  private showDialog(title: ResourceStr, message: ResourceStr): void {
     this.syncResultDialogTitle = title;
     this.syncResultDialogMessage = message;
     this.syncResultDialogController.open();

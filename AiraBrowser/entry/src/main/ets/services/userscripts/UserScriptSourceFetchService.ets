@@ -2,6 +2,7 @@ import { connection, http } from '@kit.NetworkKit';
 import { NativeHttpProxyResolutionService } from '../network/NativeHttpProxyResolutionService';
 import { UserScriptInstallSourceResolver } from './UserScriptInstallSourceResolver';
 import { UserScriptInstallUrlService } from './UserScriptInstallUrlService';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export interface UserScriptSourceFetchResult {
   ok: boolean;
@@ -18,11 +19,11 @@ export interface UserScriptSourceFetchResult {
 }
 
 export const USER_SCRIPT_SOURCE_OFFLINE_MESSAGE: string =
-  '当前没有可用网络。请连接网络后重试。';
+  resolveAppResourceText($r('app.string.user_script_source_offline'));
 export const USER_SCRIPT_SOURCE_UNREACHABLE_MESSAGE: string =
-  '当前网络访问不到这个来源，可能需要可访问外网的网络或代理。连接后可以重试。';
+  resolveAppResourceText($r('app.string.user_script_source_unreachable'));
 export const USER_SCRIPT_SOURCE_DOWNLOAD_FAILED_MESSAGE: string =
-  '下载脚本失败，请稍后重试。';
+  resolveAppResourceText($r('app.string.user_script_source_download_failed'));
 
 const USER_SCRIPT_HTTP_ERROR_BASE: number = 2300000;
 const USER_SCRIPT_UNREACHABLE_CURL_CODES: number[] = [5, 6, 7, 28, 35, 52, 55, 56];
@@ -82,7 +83,7 @@ function isUserScriptUnreachableTransportText(message: string): boolean {
 const USER_SCRIPT_SOURCE_FETCH_TIMEOUT_MS: number = 12000;
 // http.request receives at most 5 MB unless maxLimit is set. From API 23 the receive ceiling is 50 MB.
 const MAX_USER_SCRIPT_SOURCE_BYTES: number = 50 * 1024 * 1024;
-const USER_SCRIPT_SOURCE_TOO_LARGE_MESSAGE: string = '脚本超过 50 MB，无法安装。';
+const USER_SCRIPT_SOURCE_TOO_LARGE_MESSAGE: string = resolveAppResourceText($r('app.string.user_script_source_too_large'));
 const USER_SCRIPT_METADATA_MARKER: string = '// ==UserScript==';
 
 export class UserScriptSourceFetchService {
@@ -97,10 +98,10 @@ export class UserScriptSourceFetchService {
   async fetchSource(url: string, allowAnyHttpScriptUrl: boolean = false): Promise<UserScriptSourceFetchResult> {
     const trimmedUrl = url.trim();
     if (!this.isHttpUrl(trimmedUrl)) {
-      return this.fail('请输入 http 或 https 链接。');
+      return this.fail(resolveAppResourceText($r('app.string.user_script_source_http_url')));
     }
     if (!allowAnyHttpScriptUrl && !this.installUrlService.canInstallFromUrl(trimmedUrl)) {
-      return this.fail('不是可安装的 .user.js 链接。');
+      return this.fail(resolveAppResourceText($r('app.string.user_script_source_not_user_js')));
     }
     if (!this.hasDefaultNetwork()) {
       return this.fail(USER_SCRIPT_SOURCE_OFFLINE_MESSAGE);
@@ -121,7 +122,7 @@ export class UserScriptSourceFetchService {
       return result;
     }
     if (sawNonScript && (failure === undefined || !this.isReachabilityFailure(failure))) {
-      return this.fail('未找到 userscript 元数据头。');
+      return this.fail(resolveAppResourceText($r('app.string.user_script_source_no_metadata')));
     }
     if (failure === undefined) {
       return this.fail(USER_SCRIPT_SOURCE_DOWNLOAD_FAILED_MESSAGE);
@@ -157,7 +158,7 @@ export class UserScriptSourceFetchService {
       }
       const source = response.result.trim();
       if (source.length === 0) {
-        return this.fail('脚本内容为空。');
+        return this.fail(resolveAppResourceText($r('app.string.user_script_source_empty')));
       }
       if (source.length > MAX_USER_SCRIPT_SOURCE_BYTES) {
         return this.fail(USER_SCRIPT_SOURCE_TOO_LARGE_MESSAGE);
@@ -195,7 +196,7 @@ export class UserScriptSourceFetchService {
   }
 
   private describeHttpStatusFailure(status: number): string {
-    return `下载脚本失败（HTTP ${status}）。请稍后重试。`;
+    return resolveAppResourceText($r('app.string.user_script_source_http_status'), `${status}`);
   }
 
   private preferSourceFetchFailure(
@@ -217,8 +218,7 @@ export class UserScriptSourceFetchService {
   }
 
   private isGenericDownloadFailure(result: UserScriptSourceFetchResult): boolean {
-    return result.errorMessage === USER_SCRIPT_SOURCE_DOWNLOAD_FAILED_MESSAGE ||
-      result.errorMessage === '下载脚本失败。';
+    return result.errorMessage === USER_SCRIPT_SOURCE_DOWNLOAD_FAILED_MESSAGE;
   }
 
   private looksLikeUserScript(source: string): boolean {

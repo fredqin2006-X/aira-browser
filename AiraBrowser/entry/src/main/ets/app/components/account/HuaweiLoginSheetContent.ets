@@ -46,7 +46,7 @@ export struct HuaweiLoginSheetContent {
             .textAlign(TextAlign.Center)
             .maxLines(1)
 
-          Text('使用华为账号登录，安全同步你的书签')
+          Text($r('app.string.settings_huawei_login_subtitle'))
             .width('100%')
             .fontSize(15)
             .lineHeight(22)
@@ -81,7 +81,7 @@ export struct HuaweiLoginSheetContent {
             .backgroundColor(this.storedFloatingSurfaceColor)
             .opacity(0.01)
             .borderRadius(this.buttonHeight / 2)
-            .accessibilityText('请先同意用户服务协议和隐私政策')
+            .accessibilityText($r('app.string.settings_huawei_login_agree_first_a11y'))
             .onClick(() => {
               this.showAgreementRequiredToast();
             })
@@ -120,7 +120,7 @@ export struct HuaweiLoginSheetContent {
         })
         .margin({ right: 6, bottom: 4 })
 
-      Text('已阅读并同意')
+      Text($r('app.string.settings_huawei_login_agree'))
         .fontSize(HUAWEI_LOGIN_AGREEMENT_FONT_SIZE)
         .lineHeight(20)
         .fontColor(this.storedSecondaryTextColor)
@@ -130,18 +130,18 @@ export struct HuaweiLoginSheetContent {
         })
         .margin({ right: 6, bottom: 4 })
 
-      this.buildAgreementLink('《用户服务协议》', () => {
+      this.buildAgreementLink($r('app.string.settings_huawei_login_user_agreement'), () => {
         this.onOpenUserAgreement();
       })
 
-      Text('和')
+      Text($r('app.string.settings_huawei_login_and'))
         .fontSize(HUAWEI_LOGIN_AGREEMENT_FONT_SIZE)
         .lineHeight(20)
         .fontColor(this.storedSecondaryTextColor)
         .maxLines(1)
         .margin({ right: 2, bottom: 4 })
 
-      this.buildAgreementLink('《隐私政策》', () => {
+      this.buildAgreementLink($r('app.string.settings_huawei_login_privacy'), () => {
         this.onOpenPrivacyPolicy();
       })
     }
@@ -150,7 +150,7 @@ export struct HuaweiLoginSheetContent {
   }
 
   @Builder
-  private buildAgreementLink(label: string, action: () => void) {
+  private buildAgreementLink(label: ResourceStr, action: () => void) {
     Text(label)
       .fontSize(HUAWEI_LOGIN_AGREEMENT_FONT_SIZE)
       .lineHeight(20)
@@ -175,7 +175,7 @@ export struct HuaweiLoginSheetContent {
 
   private showAgreementRequiredToast(): void {
     this.getUIContext().getPromptAction().showToast({
-      message: '请先阅读并同意用户服务协议和隐私政策',
+      message: $r('app.string.settings_huawei_login_agree_required'),
       duration: 1800
     });
   }

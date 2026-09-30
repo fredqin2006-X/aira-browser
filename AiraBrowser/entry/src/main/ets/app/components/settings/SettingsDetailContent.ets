@@ -1,10 +1,18 @@
 import {
   SettingsDetailActionButtonState,
   SettingsDetailGroupState,
+  SettingsDetailOption,
   SettingsDetailRowAction,
   SettingsDetailRowState,
   SettingsDetailState
 } from '../../../core/settings/SettingsDetailViewModel';
+import { localizeAppearanceSettingsCopy } from '../../../core/settings/SettingsAppearanceCopy';
+import { localizeAboutSettingsCopy } from '../../../core/settings/SettingsAboutCopy';
+import { localizePrivacyModeSettingsCopy } from '../../../core/settings/SettingsPrivacyModeCopy';
+import { localizePrivacyProtectionCopy } from '../../../core/settings/SettingsPrivacyProtectionCopy';
+import { localizeAdvancedSettingsCopy } from '../../../core/settings/SettingsAdvancedCopy';
+import { localizeExperimentsSettingsCopy } from '../../../core/settings/SettingsExperimentsCopy';
+import { localizeGeneralSettingsCopy } from '../../../core/settings/SettingsGeneralCoordinator';
 import { SettingsDetailActionResolver } from '../../../core/settings/SettingsDetailActionResolver';
 import { BrowserTabsOverviewLayoutStyle, BrowserThemeMode } from '../../../common/models/BrowserModels';
 import { BrowserDataBoundaryInput } from '../../../common/models/BrowserModels';
@@ -68,7 +76,7 @@ export struct SettingsDetailContent {
     new TabOverviewLayoutSettingsCoordinator(sharedPreferencesRepository);
   @Prop state: SettingsDetailState = {
     id: 'general',
-    title: '通用',
+    title: $r('app.string.settings_general'),
     groups: [],
     actionButtons: []
   };
@@ -294,10 +302,10 @@ export struct SettingsDetailContent {
       this.buildDesktopRowContent(row, groupId)
     } else if (row.kind === 'dropdown') {
       SettingsDropdownRow({
-        title: row.title,
-        value: row.value,
-        description: row.helperText,
-        options: row.options ?? [],
+        title: this.localizeGeneralCopy(row.title),
+        value: this.localizeGeneralCopy(row.value),
+        description: this.localizeGeneralCopy(row.helperText),
+        options: this.localizeGeneralOptions(row.options ?? []),
         rowPosition: this.resolveRowPosition(index, rowCount),
         isEnabled: this.isRowInteractive(row),
         primaryTextColor: this.primaryTextColor,
@@ -309,10 +317,10 @@ export struct SettingsDetailContent {
       })
     } else if (row.kind === 'navigation') {
       SettingsNavigationRow({
-        title: row.title,
-        value: row.value,
+        title: this.localizeGeneralCopy(row.title),
+        value: this.localizeGeneralCopy(row.value),
         valueSwatchColor: row.valueSwatchColor,
-        description: row.helperText,
+        description: this.localizeGeneralCopy(row.helperText),
         primaryTextColor: this.primaryTextColor,
         secondaryTextColor: this.secondaryTextColor,
         pressedBackgroundColor: this.pressedBackground,
@@ -324,8 +332,8 @@ export struct SettingsDetailContent {
       })
     } else if (row.kind === 'option') {
       SettingsOptionRow({
-        title: row.title,
-        helperText: row.helperText,
+        title: this.localizeGeneralCopy(row.title),
+        helperText: this.localizeGeneralCopy(row.helperText),
         rowPosition: this.resolveRowPosition(index, rowCount),
         isSelected: row.isSelected,
         isEnabled: row.isEnabled,
@@ -340,8 +348,8 @@ export struct SettingsDetailContent {
       })
     } else if (row.kind === 'switch') {
       SettingsSwitchRow({
-        title: row.title,
-        description: row.helperText,
+        title: this.localizeGeneralCopy(row.title),
+        description: this.localizeGeneralCopy(row.helperText),
         checked: row.checked,
         rowPosition: this.resolveRowPosition(index, rowCount),
         isEnabled: row.isEnabled,
@@ -354,9 +362,9 @@ export struct SettingsDetailContent {
       })
     } else {
       SettingsStaticValueRow({
-        title: row.title,
-        value: row.value,
-        description: row.helperText,
+        title: this.localizeGeneralCopy(row.title),
+        value: this.localizeGeneralCopy(row.value),
+        description: this.localizeGeneralCopy(row.helperText),
         primaryTextColor: this.primaryTextColor,
         secondaryTextColor: this.secondaryTextColor,
         rowPosition: this.resolveRowPosition(index, rowCount)
@@ -368,9 +376,9 @@ export struct SettingsDetailContent {
   private buildDesktopRowContent(row: SettingsDetailRowState, groupId: string) {
     if (row.kind === 'dropdown') {
       SettingsDesktopDropdownRow({
-        title: row.title,
-        value: row.value,
-        options: row.options ?? [],
+        title: this.localizeGeneralCopy(row.title),
+        value: this.localizeGeneralCopy(row.value),
+        options: this.localizeGeneralOptions(row.options ?? []),
         menuRadioGroup: `${this.state.id}_${groupId}_${row.id}_desktop_dropdown`,
         isEnabled: this.isRowInteractive(row),
         primaryTextColor: this.primaryTextColor,
@@ -383,8 +391,8 @@ export struct SettingsDetailContent {
       })
     } else if (row.kind === 'navigation') {
       SettingsDesktopNavigationRow({
-        title: row.title,
-        value: row.value,
+        title: this.localizeGeneralCopy(row.title),
+        value: this.localizeGeneralCopy(row.value),
         valueSwatchColor: row.valueSwatchColor,
         isEnabled: this.isRowInteractive(row),
         primaryTextColor: this.primaryTextColor,
@@ -397,7 +405,7 @@ export struct SettingsDetailContent {
       })
     } else if (row.kind === 'option') {
       SettingsDesktopOptionRow({
-        title: row.title,
+        title: this.localizeGeneralCopy(row.title),
         isSelected: row.isSelected,
         isEnabled: row.isEnabled,
         radioGroup: this.resolveOptionRadioGroup(groupId),
@@ -412,7 +420,7 @@ export struct SettingsDetailContent {
       })
     } else if (row.kind === 'switch') {
       SettingsDesktopSwitchRow({
-        title: row.title,
+        title: this.localizeGeneralCopy(row.title),
         checked: row.checked,
         isEnabled: row.isEnabled,
         primaryTextColor: this.primaryTextColor,
@@ -425,8 +433,8 @@ export struct SettingsDetailContent {
       })
     } else {
       SettingsDesktopStaticValueRow({
-        title: row.title,
-        value: row.value,
+        title: this.localizeGeneralCopy(row.title),
+        value: this.localizeGeneralCopy(row.value),
         primaryTextColor: this.primaryTextColor,
         secondaryTextColor: this.secondaryTextColor
       })
@@ -446,7 +454,7 @@ export struct SettingsDetailContent {
     }) {
       ThemeModeOptionCard({
         mode: this.resolveThemeModePreviewMode(row.action),
-        title: row.title,
+        title: this.localizeGeneralCopy(row.title),
         isSelected: this.isThemePreviewSelected(row, group),
         isEnabled: row.isEnabled,
         desktopPresentation: this.isLargeScreen,
@@ -482,7 +490,7 @@ export struct SettingsDetailContent {
       }) {
         if (this.isLargeScreen) {
           SettingsDesktopSwitchRow({
-            title: '跟随系统',
+            title: $r('app.string.settings_screen_orientation_system_title'),
             checked: row.isSelected,
             isEnabled: row.isEnabled,
             primaryTextColor: this.primaryTextColor,
@@ -495,7 +503,7 @@ export struct SettingsDetailContent {
           })
         } else {
           SettingsSwitchRow({
-            title: '跟随系统',
+            title: $r('app.string.settings_screen_orientation_system_title'),
             description: '',
             checked: row.isSelected,
             rowPosition: 'single',
@@ -514,7 +522,7 @@ export struct SettingsDetailContent {
   @Builder
   private buildGroupFooter(group: SettingsDetailGroupState) {
     SettingsFooterText({
-      text: group.footerText ?? '',
+      text: this.localizeGeneralCopy(group.footerText ?? ''),
       secondaryTextColor: this.secondaryTextColor
     })
   }
@@ -609,7 +617,7 @@ export struct SettingsDetailContent {
     }) {
       if (this.isLargeScreen) {
         SettingsDesktopActionButton({
-          title: button.title,
+          title: this.localizeGeneralCopy(button.title),
           emphasis: button.emphasis,
           isEnabled: button.isEnabled,
           accentColor: this.accentColor,
@@ -622,7 +630,7 @@ export struct SettingsDetailContent {
         })
       } else {
         SettingsActionButton({
-          title: button.title,
+          title: this.localizeGeneralCopy(button.title),
           emphasis: button.emphasis,
           isEnabled: button.isEnabled,
           accentColor: this.accentColor,
@@ -774,6 +782,53 @@ export struct SettingsDetailContent {
       dataScope: this.dataScope,
       privacyMode: this.privacyMode
     };
+  }
+
+  private localizeGeneralCopy(value: string): ResourceStr {
+    if (this.state.id === 'general') {
+      return localizeGeneralSettingsCopy(value);
+    }
+    if (this.state.id === 'appearance_toolbar') {
+      return localizeAppearanceSettingsCopy(value);
+    }
+    if (this.state.id === 'private_mode') {
+      return localizePrivacyModeSettingsCopy(value);
+    }
+    if (this.state.id === 'about') {
+      return localizeAboutSettingsCopy(value);
+    }
+    if (this.state.id === 'privacy_security' || this.state.id === 'site_settings') {
+      return localizePrivacyProtectionCopy(value);
+    }
+    if (this.state.id === 'advanced_settings' || this.state.id === 'app_service_mode') {
+      return localizeAdvancedSettingsCopy(value);
+    }
+    if (this.state.id === 'experiments') {
+      return localizeExperimentsSettingsCopy(value);
+    }
+    return value;
+  }
+
+  private localizeGeneralOptions(options: SettingsDetailOption[]): SettingsDetailOption[] {
+    if (this.state.id !== 'general' && this.state.id !== 'appearance_toolbar' && this.state.id !== 'private_mode' &&
+      this.state.id !== 'about' && this.state.id !== 'privacy_security' && this.state.id !== 'site_settings' &&
+      this.state.id !== 'advanced_settings' && this.state.id !== 'app_service_mode' &&
+      this.state.id !== 'experiments') {
+      return options;
+    }
+    const localized: SettingsDetailOption[] = [];
+    for (let index = 0; index < options.length; index += 1) {
+      const option = options[index];
+      const label = typeof option.label === 'string' ? this.localizeGeneralCopy(option.label) : option.label;
+      localized.push({
+        id: option.id,
+        label: label,
+        helperText: option.helperText,
+        isSelected: option.isSelected,
+        isEnabled: option.isEnabled
+      });
+    }
+    return localized;
   }
 
   private resolveRowRenderKey(row: SettingsDetailRowState, groupId: string): string {

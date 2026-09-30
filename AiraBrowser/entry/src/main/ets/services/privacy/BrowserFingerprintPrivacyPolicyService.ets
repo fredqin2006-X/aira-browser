@@ -46,13 +46,15 @@ export class BrowserFingerprintPrivacyPolicyService {
       BrowserFingerprintPrivacyPolicyService.currentCookiePolicyRuntimeApplied;
   }
 
-  static resolveCurrentSummary(): string {
+  static resolveCurrentSummary(): ResourceStr {
     if (BrowserFingerprintPrivacyPolicyService.isEnhancedEnabled()) {
       return BrowserFingerprintPrivacyPolicyService.isCurrentRuntimeApplied()
-        ? '增强已开启'
-        : '增强未完全生效';
+        ? $r('app.string.settings_site_info_fingerprint_enhanced_on')
+        : $r('app.string.settings_site_info_fingerprint_enhanced_partial');
     }
-    return BrowserFingerprintPrivacyPolicyService.isCurrentRuntimeApplied() ? '标准' : '标准模式待应用';
+    return BrowserFingerprintPrivacyPolicyService.isCurrentRuntimeApplied()
+      ? $r('app.string.settings_site_info_fingerprint_standard')
+      : $r('app.string.settings_site_info_fingerprint_standard_pending');
   }
 
   static reportClientHintsRuntimeApplied(applied: boolean): void {

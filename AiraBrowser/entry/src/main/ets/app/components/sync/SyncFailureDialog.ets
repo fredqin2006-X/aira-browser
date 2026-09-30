@@ -13,14 +13,14 @@ export struct SyncFailureDialog {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY) private storedPrimaryTextColor: string = '#111318';
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string = '#5F6875';
   controller?: CustomDialogController;
-  @Link title: string;
-  @Link summary: string;
+  @Link title: ResourceStr;
+  @Link summary: ResourceStr;
   @Link details: SyncFailureDetailItem[];
   copyDetails: () => void = () => {};
 
   build() {
     Column({ space: 16 }) {
-      Text(this.title.length > 0 ? this.title : '同步失败')
+      Text(this.resolveTitle())
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -39,7 +39,7 @@ export struct SyncFailureDialog {
         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Column({ space: 10 }) {
-        Text('技术详情')
+        Text($r('app.string.settings_sync_advanced_technical'))
           .width('100%')
           .fontSize(13)
           .fontWeight(FontWeight.Medium)
@@ -54,7 +54,7 @@ export struct SyncFailureDialog {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '知道了',
+          label: $r('app.string.settings_pro_got_it'),
           emphasis: 'primary',
           stacked: true,
           accentColor: this.storedAccentColor,
@@ -66,7 +66,7 @@ export struct SyncFailureDialog {
         })
 
         BrowserSheetActionButton({
-          label: '复制详情',
+          label: $r('app.string.settings_sync_advanced_copy_details'),
           emphasis: 'ghost',
           stacked: true,
           buttonHeight: 44,
@@ -81,10 +81,73 @@ export struct SyncFailureDialog {
     .attributeModifier(CENTERED_DIALOG_SYSTEM_SURFACE_MODIFIER)
   }
 
+  private resolveTitle(): ResourceStr {
+    if (typeof this.title !== 'string') {
+      return this.title;
+    }
+    if (this.title.length === 0 || this.title === '同步失败') {
+      return $r('app.string.settings_sync_failed');
+    }
+    return this.title;
+  }
+
+  private resolveDetailLabel(label: string): ResourceStr {
+    if (label === '同步方式') {
+      return $r('app.string.settings_sync_advanced_detail_method');
+    }
+    if (label === '操作') {
+      return $r('app.string.settings_sync_advanced_detail_action');
+    }
+    if (label === '请求路径') {
+      return $r('app.string.settings_sync_advanced_detail_path');
+    }
+    if (label === 'HTTP 状态码') {
+      return $r('app.string.settings_sync_advanced_detail_status');
+    }
+    if (label === '技术信息') {
+      return $r('app.string.settings_sync_advanced_technical');
+    }
+    if (label === '未提供') {
+      return $r('app.string.settings_sync_advanced_detail_missing');
+    }
+    return label;
+  }
+
+  private resolveDetailValue(value: string): ResourceStr {
+    if (value === '未提供') {
+      return $r('app.string.settings_sync_advanced_detail_missing');
+    }
+    if (value === '检查远端数据') {
+      return $r('app.string.settings_sync_advanced_check_remote');
+    }
+    if (value === '覆盖书签') {
+      return $r('app.string.settings_sync_advanced_overwrite');
+    }
+    if (value === '立即合并同步') {
+      return $r('app.string.settings_sync_advanced_merge');
+    }
+    if (value === '更改同步方式') {
+      return $r('app.string.settings_sync_advanced_change_method');
+    }
+    if (value === '同步服务') {
+      return $r('app.string.settings_sync_advanced_service');
+    }
+    if (value === '华为云空间同步') {
+      return $r('app.string.settings_sync_advanced_huawei_sync');
+    }
+    if (value === 'Aira 云同步') {
+      return $r('app.string.settings_sync_goal_cloud');
+    }
+    if (value === '私有化部署') {
+      return $r('app.string.settings_pro_self_hosting');
+    }
+    return value;
+  }
+
   @Builder
   private buildDetailRow(detail: SyncFailureDetailItem) {
     Row({ space: 12 }) {
-      Text(detail.label)
+      Text(this.resolveDetailLabel(detail.label))
         .width(78)
         .fontSize(13)
         .fontColor(this.storedSecondaryTextColor)
@@ -92,7 +155,7 @@ export struct SyncFailureDialog {
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-      Text(detail.value)
+      Text(this.resolveDetailValue(detail.value))
         .layoutWeight(1)
         .fontSize(13)
         .fontColor(this.storedPrimaryTextColor)

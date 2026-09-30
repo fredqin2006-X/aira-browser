@@ -5,7 +5,7 @@ import {
 
 export interface GeneralStartupRestoreOptionState {
   policy: BrowserStartupRestorePolicy;
-  title: string;
+  title: ResourceStr;
 }
 
 export interface GeneralStartupSettingsState {
@@ -20,11 +20,11 @@ export class GeneralStartupSettingsViewModel {
       startupOptions: [
         {
           policy: 'restore_regular_tabs',
-          title: '恢复常规标签页'
+          title: $r('app.string.settings_general_restore_tabs_page')
         },
         {
           policy: 'open_home',
-          title: '打开首页'
+          title: $r('app.string.settings_general_open_home')
         }
       ]
     };

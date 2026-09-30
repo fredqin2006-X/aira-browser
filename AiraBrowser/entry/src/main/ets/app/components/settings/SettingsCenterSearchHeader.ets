@@ -96,7 +96,7 @@ export struct SettingsCenterSearchHeader {
         .buttonStyle(ButtonStyleMode.TEXTUAL)
         .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
         .stateEffect(true)
-        .accessibilityText('清除搜索')
+        .accessibilityText($r('app.string.settings_clear_search'))
         .onClick(() => {
           this.onSearchQueryChange?.('');
         })
@@ -116,7 +116,7 @@ export struct SettingsCenterSearchHeader {
         .buttonStyle(ButtonStyleMode.TEXTUAL)
         .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
         .stateEffect(true)
-        .accessibilityText('扫码登录')
+        .accessibilityText($r('app.string.settings_scan_to_sign_in'))
         .onClick(() => {
           this.onScanLoginAction?.();
         })

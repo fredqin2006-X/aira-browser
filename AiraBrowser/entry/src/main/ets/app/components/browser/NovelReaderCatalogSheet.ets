@@ -11,6 +11,7 @@ import {
 } from '../../../core/theme/BrowserThemeStorageKeys';
 import { APP_STANDARD_HORIZONTAL_PADDING } from '../common/AppLayoutTokens';
 import { AiraIcon } from '../common/AiraIcon';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BrowserSheetActionButton,
   browserSheetHeaderBlurModifier,
@@ -49,7 +50,7 @@ export struct NovelReaderCatalogSheet {
     Stack({ alignContent: Alignment.TopStart }) {
       if (this.catalog.length === 0 && !this.catalogHasMore) {
         Column() {
-          Text('没有找到章节目录')
+          Text($r('app.string.novel_catalog_empty'))
             .fontSize(14)
             .fontColor(this.storedSecondaryTextColor)
         }
@@ -113,7 +114,9 @@ export struct NovelReaderCatalogSheet {
 
       Column() {
         Column({ space: 6 }) {
-          Text(this.bookTitle.length > 0 ? this.bookTitle : '本书')
+          Text(this.bookTitle.length > 0 ? this.bookTitle : resolveAppResourceText(
+            $r('app.string.novel_book_fallback_title')
+          ))
             .fontSize(20)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.storedPrimaryTextColor)
@@ -141,7 +144,7 @@ export struct NovelReaderCatalogSheet {
         Row() {
           Blank()
           BrowserSheetActionButton({
-            label: '去当前',
+            label: $r('app.string.novel_action_goto_current'),
             fillAvailableWidth: false,
             buttonWidth: 88,
             buttonHeight: 36,
@@ -168,10 +171,10 @@ export struct NovelReaderCatalogSheet {
   private resolveSubtitle(): string {
     const identity: string = this.bookAuthor.length > 0 ? this.bookAuthor : this.sourceHost;
     const count: string = this.catalogTotalHint > this.catalog.length
-      ? `已载入 ${this.catalog.length} / 共 ${this.catalogTotalHint} 章`
+      ? resolveAppResourceText($r('app.string.novel_catalog_count_partial', this.catalog.length, this.catalogTotalHint))
       : this.catalogHasMore && this.catalogTotalHint === 0
-        ? `已载入 ${this.catalog.length} 章`
-        : `共 ${this.catalog.length} 章`;
+        ? resolveAppResourceText($r('app.string.novel_catalog_count_loaded', this.catalog.length))
+        : resolveAppResourceText($r('app.string.novel_catalog_count_total', this.catalog.length));
     if (identity.length > 0) {
       return `${identity} · ${count}`;
     }
@@ -204,7 +207,9 @@ export struct NovelReaderCatalogSheet {
     .height(48)
     .padding({ left: 2, right: 2 })
     .alignItems(VerticalAlign.Center)
-    .accessibilityText(this.isCatalogRangeExpanded(startOrdinal) ? '折叠章节范围' : '展开章节范围')
+    .accessibilityText(this.isCatalogRangeExpanded(startOrdinal)
+      ? resolveAppResourceText($r('app.string.novel_catalog_range_collapse'))
+      : resolveAppResourceText($r('app.string.novel_catalog_range_expand')))
     .onClick((): void => {
       this.toggleCatalogRange(startOrdinal);
     })

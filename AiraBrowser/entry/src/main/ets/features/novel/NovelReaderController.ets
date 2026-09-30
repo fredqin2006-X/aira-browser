@@ -1,5 +1,6 @@
 import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { BrowserRuntimeLifecyclePort } from '../../services/web/BrowserRuntimeLifecyclePort';
 import { NovelExtractionService } from '../../services/novel/NovelExtractionService';
 import {
@@ -1358,7 +1359,7 @@ export class NovelReaderController implements NovelReaderSessionOperations {
       void this.loadChapterByUrl(nextUrl, intent);
       return;
     }
-    this.emitEffect({ type: 'toast', message: '没有下一页了' });
+    this.emitEffect({ type: 'toast', message: resolveAppResourceText($r('app.string.novel_no_next_page')) });
   }
 
   private loadPrevChapter(): void {
@@ -1367,7 +1368,7 @@ export class NovelReaderController implements NovelReaderSessionOperations {
       void this.loadChapterByUrl(previousUrl, 'previous');
       return;
     }
-    this.emitEffect({ type: 'toast', message: '没有上一页了' });
+    this.emitEffect({ type: 'toast', message: resolveAppResourceText($r('app.string.novel_no_previous_page')) });
   }
 
   private selectChapter(chapterId: string): void {
@@ -3136,19 +3137,19 @@ export class NovelReaderController implements NovelReaderSessionOperations {
 
   private resolveChapterFailureMessage(failureCode: string): string {
     if (failureCode === 'retryable') {
-      return '这一章加载失败，请重试。';
+      return resolveAppResourceText($r('app.string.novel_chapter_failed_retryable'));
     }
     if (failureCode === 'content_rejected') {
-      return '这一章正文不完整，请重试。';
+      return resolveAppResourceText($r('app.string.novel_chapter_failed_incomplete'));
     }
     if (failureCode === 'identity_mismatch') {
-      return '章节身份校验失败，请返回原网页后重试。';
+      return resolveAppResourceText($r('app.string.novel_chapter_failed_identity'));
     }
     if (failureCode === 'unsupported_source') {
-      return '当前来源暂不支持继续读取。';
+      return resolveAppResourceText($r('app.string.novel_chapter_failed_unsupported'));
     }
     if (failureCode === 'authentication_required') {
-      return '请先在来源网站登录，登录后再开始阅读。';
+      return resolveAppResourceText($r('app.string.novel_chapter_failed_login'));
     }
     return '';
   }
@@ -3833,7 +3834,10 @@ export class NovelReaderController implements NovelReaderSessionOperations {
         actionBusy: false
       });
       this.emit({ type: 'top_prompt_changed', prompt: this.createHiddenTopPrompt() });
-      this.emitEffect({ type: 'toast', message: wasInBookshelf ? '已移出书架。' : '已加入书架。' });
+      this.emitEffect({
+        type: 'toast',
+        message: wasInBookshelf ? $r('app.string.bookshelf_removed') : $r('app.string.bookshelf_added')
+      });
       if (!wasInBookshelf) {
         this.refreshPersistedBookMetadata();
       }
@@ -3842,7 +3846,8 @@ export class NovelReaderController implements NovelReaderSessionOperations {
         this.emit({ type: 'bookshelf_state', actionBusy: false });
         this.emitEffect({
           type: 'toast',
-          message: wasInBookshelf ? '移出书架失败，请稍后重试。' : '加入书架失败，请稍后重试。'
+          message: wasInBookshelf ?
+            $r('app.string.bookshelf_remove_failed') : $r('app.string.bookshelf_add_failed')
         });
       }
     }
@@ -4108,7 +4113,7 @@ export class NovelReaderController implements NovelReaderSessionOperations {
     const pending: NovelReadingCheckpointRecord | undefined = this.pendingPersistedCheckpoint;
     if (pending === undefined || session.privacyMode !== 'regular' || session.bookId.length === 0 ||
       pending.bookId !== session.bookId) {
-      return '从第一章开始阅读';
+      return resolveAppResourceText($r('app.string.novel_continue_from_first'));
     }
     const chapter: NovelSessionCatalogChapter | undefined = session.catalog.find(
       (candidate: NovelSessionCatalogChapter): boolean => candidate.id === pending.chapterId &&
@@ -4116,12 +4121,14 @@ export class NovelReaderController implements NovelReaderSessionOperations {
     );
     const title: string = chapter !== undefined ? chapter.title.trim() : pending.chapterTitle.trim();
     if (title.length > 0 && !this.isDigits(title)) {
-      return `继续阅读到${title}`;
+      return resolveAppResourceText($r('app.string.novel_continue_to_title', title));
     }
     const ordinal: number = title.length > 0
       ? this.resolveChapterOrdinal(title)
       : (chapter !== undefined ? chapter.ordinal + 1 : -1);
-    return ordinal > 0 ? `继续阅读到第${ordinal}章` : '继续阅读';
+    return ordinal > 0
+      ? resolveAppResourceText($r('app.string.novel_continue_to_chapter', ordinal))
+      : resolveAppResourceText($r('app.string.reader_continue_reading'));
   }
 
   private copyOperation(operation: NovelSessionOperationSnapshot): NovelSessionOperationSnapshot {

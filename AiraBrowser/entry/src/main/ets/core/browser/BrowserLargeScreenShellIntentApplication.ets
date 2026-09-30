@@ -315,15 +315,14 @@ export class BrowserLargeScreenShellIntentApplication {
       hilog.info(
         WEB_ZOOM_DIAG_DOMAIN,
         WEB_ZOOM_DIAG_TAG,
-        '%{public}s pre-ime action=%{public}s keyCode=%{public}d keyType=%{public}d tab=%{public}s applied=%{public}s percent=%{public}d label=%{public}s outcome=owned-consume',
+        '%{public}s pre-ime action=%{public}s keyCode=%{public}d keyType=%{public}d tab=%{public}s applied=%{public}s percent=%{public}d outcome=owned-consume',
         WEB_ZOOM_DIAG_PREFIX,
         action,
         event.keyCode,
         event.type,
         facts.activeTabId,
         result.applied ? 'true' : 'false',
-        result.snapshot.percent,
-        result.snapshot.shortcutNotificationLabel
+        result.snapshot.percent
       );
     }
     return true;
@@ -659,7 +658,11 @@ export class BrowserLargeScreenShellIntentApplication {
       return;
     }
     if (intent.kind === 'open_app_proxy') {
-      this.openNativeTab(APP_PROXY_NATIVE_TAB_URL, APP_PROXY_NATIVE_TAB_TITLE, facts.windowId);
+      this.openNativeTab(
+        APP_PROXY_NATIVE_TAB_URL,
+        browserNativeTabSceneService.resolveCanonicalTitleForTab(APP_PROXY_NATIVE_TAB_URL) ?? APP_PROXY_NATIVE_TAB_TITLE,
+        facts.windowId
+      );
       return;
     }
     if (intent.kind === 'open_saved_pages') {
@@ -667,7 +670,11 @@ export class BrowserLargeScreenShellIntentApplication {
       return;
     }
     if (intent.kind === 'open_bookshelf') {
-      this.openNativeTab(BOOKSHELF_NATIVE_TAB_URL, BOOKSHELF_NATIVE_TAB_TITLE, facts.windowId);
+      this.openNativeTab(
+        BOOKSHELF_NATIVE_TAB_URL,
+        browserNativeTabSceneService.resolveCanonicalTitleForTab(BOOKSHELF_NATIVE_TAB_URL) ?? BOOKSHELF_NATIVE_TAB_TITLE,
+        facts.windowId
+      );
       return;
     }
     if (intent.kind === 'close_active_tab') {

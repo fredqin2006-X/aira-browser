@@ -12,6 +12,7 @@ import {
   ReaderModePageWidth,
   ReaderModeTheme
 } from '../../common/models/BrowserModels';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   NovelBookCoverPalette,
   NovelBookPaletteThemeMode
@@ -117,15 +118,17 @@ export type NovelDetectedPageType = '' | 'book' | 'chapter';
 export type NovelContentKind = NovelSessionContentKind;
 
 export function resolveNovelContentLabel(contentKind: NovelContentKind): string {
-  return contentKind === 'comic' ? '漫画' : '小说';
+  return resolveAppResourceText(contentKind === 'comic'
+    ? $r('app.string.novel_content_comic')
+    : $r('app.string.novel_content_novel'));
 }
 
 export function resolveNovelModeLabel(contentKind: NovelContentKind): string {
-  return `${resolveNovelContentLabel(contentKind)}模式`;
+  return resolveAppResourceText($r('app.string.novel_content_mode', resolveNovelContentLabel(contentKind)));
 }
 
 export function resolveNovelReadingModeLabel(contentKind: NovelContentKind): string {
-  return `${resolveNovelContentLabel(contentKind)}阅读模式`;
+  return resolveAppResourceText($r('app.string.novel_content_reading_mode', resolveNovelContentLabel(contentKind)));
 }
 
 export type NovelReaderPageMode = ReadingPresentationMode;
@@ -513,7 +516,7 @@ export interface NovelReaderShareSourceUrlEffect {
 
 export interface NovelReaderToastEffect {
   type: 'toast';
-  message: string;
+  message: ResourceStr;
 }
 
 export type NovelReaderEffect = NovelReaderOpenCatalogEffect |

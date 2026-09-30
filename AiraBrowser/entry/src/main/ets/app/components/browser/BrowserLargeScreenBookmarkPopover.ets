@@ -13,6 +13,7 @@ import {
   BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY
 } from '../../../core/theme/BrowserThemeStorageKeys';
 import { AiraIcon } from '../common/AiraIcon';
+import { resourceStrPresent } from '../../../core/browser/BrowserBottomPanelText';
 import { AppWindowModalLayoutService } from '../../../services/layout/AppWindowModalLayoutService';
 
 const LARGE_SCREEN_BOOKMARK_BUTTON_SIZE_VP: number = 28;
@@ -36,7 +37,7 @@ const EMPTY_BOOKMARK_SESSION: BrowserBookmarkActionSessionSnapshot = {
 export struct BrowserLargeScreenBookmarkPopover {
   @Prop actionEnabled: boolean = false;
   @Prop actionSelected: boolean = false;
-  @Prop disabledMessage: string = '';
+  @Prop disabledMessage: ResourceStr = '';
   @Prop @Watch('syncSelectedFolder') session: BrowserBookmarkActionSessionSnapshot = EMPTY_BOOKMARK_SESSION;
   @Prop viewportWidthVp: number = 0;
   @Prop viewportHeightVp: number = 0;
@@ -78,7 +79,7 @@ export struct BrowserLargeScreenBookmarkPopover {
     .stateEffect(this.actionEnabled)
     .enabled(this.actionEnabled)
     .opacity(this.actionEnabled ? 1 : 0.38)
-    .accessibilityText(this.actionSelected ? '取消书签' : '添加书签')
+    .accessibilityText(this.actionSelected ? $r('app.string.history_remove_bookmark') : $r('app.string.history_add_bookmark'))
     .onClick(() => {
       if (!this.actionEnabled) {
         this.showDisabledMessage();
@@ -121,7 +122,7 @@ export struct BrowserLargeScreenBookmarkPopover {
   @Builder
   private buildBookmarkPopup() {
     Column({ space: 12 }) {
-      Text(this.session.scope === 'private' ? '添加隐私书签' : '添加书签')
+      Text(this.session.scope === 'private' ? $r('app.string.bookmark_popover_add_private') : $r('app.string.history_add_bookmark'))
         .width('100%')
         .fontSize(18)
         .fontWeight(FontWeight.Medium)
@@ -129,7 +130,7 @@ export struct BrowserLargeScreenBookmarkPopover {
         .maxLines(1)
 
       Column({ space: 6 }) {
-        Text('保存到')
+        Text($r('app.string.bookmark_popover_save_to'))
           .width('100%')
           .fontSize(12)
           .fontColor(this.storedSecondaryTextColor)
@@ -149,7 +150,7 @@ export struct BrowserLargeScreenBookmarkPopover {
               this.onAction({ type: 'set_add_to_home', selected: selected });
             })
 
-          Text('同时添加到主页')
+          Text($r('app.string.bookmark_also_home'))
             .fontSize(13)
             .fontColor(this.storedPrimaryTextColor)
             .maxLines(1)
@@ -164,7 +165,7 @@ export struct BrowserLargeScreenBookmarkPopover {
         .color(this.storedDividerColor)
 
       Row({ space: 10 }) {
-        Button('取消')
+        Button($r('app.string.settings_account_cancel'))
           .layoutWeight(1)
           .height(36)
           .fontSize(14)
@@ -175,7 +176,7 @@ export struct BrowserLargeScreenBookmarkPopover {
             this.closePopup(true);
           })
 
-        Button('添加')
+        Button($r('app.string.bookmark_popover_add'))
           .layoutWeight(1)
           .height(36)
           .fontSize(14)
@@ -209,7 +210,7 @@ export struct BrowserLargeScreenBookmarkPopover {
           .height(18)
           .color(this.storedAccentColor)
 
-        Text('正在准备文件夹')
+        Text($r('app.string.bookmark_preparing_folders'))
           .fontSize(13)
           .fontColor(this.storedSecondaryTextColor)
       }
@@ -219,7 +220,7 @@ export struct BrowserLargeScreenBookmarkPopover {
       .backgroundColor(this.storedControlBackgroundColor)
       .borderRadius(8)
     } else if (this.session.options.length <= 0) {
-      Text('没有可保存书签的文件夹')
+      Text($r('app.string.bookmark_no_save_folder'))
         .width('100%')
         .height(54)
         .fontSize(13)
@@ -295,11 +296,10 @@ export struct BrowserLargeScreenBookmarkPopover {
   }
 
   private showDisabledMessage(): void {
-    const message = this.disabledMessage.trim();
-    if (message.length <= 0) {
+    if (!resourceStrPresent(this.disabledMessage)) {
       return;
     }
-    this.getUIContext().getPromptAction().showToast({ message: message, duration: 1500 });
+    this.getUIContext().getPromptAction().showToast({ message: this.disabledMessage, duration: 1500 });
   }
 
   private resolvePopupWidth(): number {

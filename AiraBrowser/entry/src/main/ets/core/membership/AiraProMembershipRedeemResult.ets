@@ -1,10 +1,10 @@
 export type AiraProMembershipRedeemGrantKind = 'month' | 'year' | 'lifetime';
 
 export interface AiraProMembershipRedeemResultState {
-  valueText: string;
-  unitText: string;
-  caption: string;
-  actionText: string;
+  valueText: ResourceStr;
+  unitText: ResourceStr;
+  caption: ResourceStr;
+  actionText: ResourceStr;
 }
 
 /**
@@ -65,23 +65,23 @@ export function resolveAiraProMembershipRedeemResult(
   if (kind === 'year') {
     return {
       valueText: '1',
-      unitText: '年',
-      caption: '已兑换一年会员',
-      actionText: '知道了'
+      unitText: $r('app.string.settings_pro_redeem_year_unit'),
+      caption: $r('app.string.settings_pro_redeem_year_caption'),
+      actionText: $r('app.string.settings_pro_got_it')
     };
   }
   if (kind === 'lifetime') {
     return {
-      valueText: '永久',
+      valueText: $r('app.string.settings_pro_redeem_lifetime_value'),
       unitText: '',
-      caption: '已兑换长期会员',
-      actionText: '知道了'
+      caption: $r('app.string.settings_pro_redeem_lifetime_caption'),
+      actionText: $r('app.string.settings_pro_got_it')
     };
   }
   return {
     valueText: '1',
-    unitText: '个月',
-    caption: '已兑换一个月会员',
-    actionText: '知道了'
+    unitText: $r('app.string.settings_pro_redeem_month_unit'),
+    caption: $r('app.string.settings_pro_redeem_month_caption'),
+    actionText: $r('app.string.settings_pro_got_it')
   };
 }

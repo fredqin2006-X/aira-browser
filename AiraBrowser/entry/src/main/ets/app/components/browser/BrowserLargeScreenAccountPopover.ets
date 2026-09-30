@@ -43,14 +43,14 @@ const LARGE_SCREEN_ACCOUNT_POPUP_TARGET_SPACE_VP: number = 4;
 
 class BrowserLargeScreenAccountPopoverHostAdapter implements BrowserLargeScreenAccountPopoverHost {
   private onPublishSnapshot: (snapshot: BrowserLargeScreenAccountPopoverSnapshot) => void;
-  private onShowMessage: (message: string) => void;
+  private onShowMessage: (message: ResourceStr) => void;
   private onCopyText: (text: string) => Promise<void>;
   private onCloseSurface: () => void;
   private onNotifyAccountChanged: () => void;
 
   constructor(
     onPublishSnapshot: (snapshot: BrowserLargeScreenAccountPopoverSnapshot) => void,
-    onShowMessage: (message: string) => void,
+    onShowMessage: (message: ResourceStr) => void,
     onCopyText: (text: string) => Promise<void>,
     onCloseSurface: () => void,
     onNotifyAccountChanged: () => void
@@ -66,7 +66,7 @@ class BrowserLargeScreenAccountPopoverHostAdapter implements BrowserLargeScreenA
     this.onPublishSnapshot(snapshot);
   }
 
-  showMessage(message: string): void {
+  showMessage(message: ResourceStr): void {
     this.onShowMessage(message);
   }
 
@@ -104,7 +104,7 @@ export struct BrowserLargeScreenAccountPopover {
       (snapshot: BrowserLargeScreenAccountPopoverSnapshot): void => {
         this.snapshot = snapshot;
       },
-      (message: string): void => {
+      (message: ResourceStr): void => {
         this.showToast(message);
       },
       (text: string): Promise<void> => this.copyText(text),
@@ -291,20 +291,20 @@ export struct BrowserLargeScreenAccountPopover {
       return;
     }
     if (!this.coordinator.canSignOut(this.buildDataBoundaryInput())) {
-      this.showToast('请回到普通会话后退出华为账号。');
+      this.showToast($r('app.string.settings_account_sign_out_private'));
       return;
     }
     showCenteredAlertDialog({
-      title: '退出华为账号吗',
-      message: '退出后会关闭书签云同步并清除本机保存的华为账号身份，本机书签不会删除。WebDAV 配置和同步状态会保留。',
+      title: $r('app.string.settings_account_sign_out_title'),
+      message: $r('app.string.settings_account_sign_out_message'),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '退出',
+        value: $r('app.string.settings_account_sign_out'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.coordinator.signOutHuaweiAccount(this.buildDataBoundaryInput());
@@ -347,7 +347,7 @@ export struct BrowserLargeScreenAccountPopover {
     }
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     this.getUIContext().getPromptAction().showToast({
       message: message,
       duration: 1800

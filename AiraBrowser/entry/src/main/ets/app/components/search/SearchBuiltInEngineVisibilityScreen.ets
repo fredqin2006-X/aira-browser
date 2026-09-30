@@ -48,7 +48,7 @@ export struct SearchBuiltInEngineVisibilityScreen {
 
   build() {
     SettingsHdsScaffold({
-      title: '更多搜索引擎',
+      title: $r('app.string.settings_search_engine_more'),
       backIconKind: 'back',
       pageBackground: this.theme.pageBackground,
       headerButtonBackground: this.theme.controlBackground,
@@ -75,7 +75,7 @@ export struct SearchBuiltInEngineVisibilityScreen {
         }
       }) {
         SettingsSection({
-          title: '显示在常用列表',
+          title: $r('app.string.settings_search_engine_show_in_list'),
           secondaryTextColor: this.theme.textSecondary
         }) {
           SettingsGroupCard({
@@ -117,7 +117,7 @@ export struct SearchBuiltInEngineVisibilityScreen {
             .layoutWeight(1)
 
           if (row.isDefault) {
-            Text('默认')
+            Text($r('app.string.settings_search_engine_default_badge'))
               .fontSize(12)
               .fontWeight(FontWeight.Medium)
               .fontColor(this.theme.accent)

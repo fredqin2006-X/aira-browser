@@ -29,7 +29,7 @@ export struct ReaderSpeechVoiceDialog {
 
   build() {
     Column({ space: 16 }) {
-      Text('选择音色')
+      Text($r('app.string.reader_voice_dialog_title'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -44,7 +44,7 @@ export struct ReaderSpeechVoiceDialog {
 
       Row() {
         BrowserSheetActionButton({
-          label: '取消',
+          label: $r('app.string.reader_voice_dialog_cancel'),
           buttonHeight: 44,
           fontSize: 15,
           onAction: () => {
@@ -61,8 +61,8 @@ export struct ReaderSpeechVoiceDialog {
   @Builder
   private buildDialogContent() {
     if (this.presentation.loading) {
-      this.buildStateText('正在读取系统音色...')
-    } else if (this.presentation.errorMessage.length > 0) {
+      this.buildStateText($r('app.string.reader_voice_dialog_loading'))
+    } else if (`${this.presentation.errorMessage}`.length > 0) {
       this.buildStateText(this.presentation.errorMessage)
     } else {
       Scroll() {
@@ -138,7 +138,7 @@ export struct ReaderSpeechVoiceDialog {
   }
 
   @Builder
-  private buildStateText(message: string) {
+  private buildStateText(message: ResourceStr) {
     Text(message)
       .width('100%')
       .fontSize(14)

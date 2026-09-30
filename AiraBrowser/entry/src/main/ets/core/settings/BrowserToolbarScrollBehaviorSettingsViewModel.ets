@@ -7,30 +7,30 @@ import { resolveSplitToolbarScrollBehavior } from '../browser/BrowserToolbarChro
 
 export interface BrowserToolbarScrollBehaviorOptionState {
   behavior: BrowserBottomToolbarScrollBehavior;
-  title: string;
+  title: ResourceStr;
 }
 
 export interface BrowserToolbarScrollBehaviorSettingsState {
   behavior: BrowserBottomToolbarScrollBehavior;
   options: BrowserToolbarScrollBehaviorOptionState[];
-  footerText: string;
+  footerText: ResourceStr;
 }
 
 const BROWSER_TOOLBAR_SCROLL_BEHAVIOR_OPTIONS: BrowserToolbarScrollBehaviorOptionState[] = [
-  { behavior: 'fixed', title: '始终显示' },
-  { behavior: 'compact', title: '收起为胶囊' },
-  { behavior: 'hidden', title: '完全隐藏' }
+  { behavior: 'fixed', title: $r('app.string.toolbar_settings_scroll_fixed') },
+  { behavior: 'compact', title: $r('app.string.toolbar_settings_scroll_compact') },
+  { behavior: 'hidden', title: $r('app.string.toolbar_settings_scroll_hidden') }
 ];
 
 const SPLIT_TOOLBAR_SCROLL_BEHAVIOR_OPTIONS: BrowserToolbarScrollBehaviorOptionState[] = [
-  { behavior: 'fixed', title: '固定' },
-  { behavior: 'hidden', title: '收起地址栏和工具栏' }
+  { behavior: 'fixed', title: $r('app.string.toolbar_settings_scroll_split_fixed') },
+  { behavior: 'hidden', title: $r('app.string.toolbar_settings_scroll_split_hidden') }
 ];
 
-const FLOATING_TOOLBAR_SCROLL_BEHAVIOR_FOOTER: string =
-  '收起为胶囊时只留一排按钮，完全隐藏时工具栏移出屏幕。停止滚动后保持当前状态，向上滚动后恢复。';
-const SPLIT_TOOLBAR_SCROLL_BEHAVIOR_FOOTER: string =
-  '固定时地址栏和底部工具栏保持显示。收起时会在向下滚动网页时同时隐藏它们，向上滚动后恢复。';
+const FLOATING_TOOLBAR_SCROLL_BEHAVIOR_FOOTER: ResourceStr =
+  $r('app.string.toolbar_settings_scroll_footer_floating');
+const SPLIT_TOOLBAR_SCROLL_BEHAVIOR_FOOTER: ResourceStr =
+  $r('app.string.toolbar_settings_scroll_footer_split');
 
 export class BrowserToolbarScrollBehaviorSettingsViewModel {
   buildState(appearance: BrowserAppearanceSettings): BrowserToolbarScrollBehaviorSettingsState {
@@ -61,13 +61,15 @@ export class BrowserToolbarScrollBehaviorSettingsViewModel {
   formatBehaviorTitle(
     behavior: BrowserBottomToolbarScrollBehavior,
     style: BrowserToolbarChromeStyle = 'floating'
-  ): string {
+  ): ResourceStr {
     const resolved = style === 'split' ? resolveSplitToolbarScrollBehavior(behavior) : behavior;
     const options = style === 'split' ?
       SPLIT_TOOLBAR_SCROLL_BEHAVIOR_OPTIONS : BROWSER_TOOLBAR_SCROLL_BEHAVIOR_OPTIONS;
     const option = options.find(
       (item: BrowserToolbarScrollBehaviorOptionState): boolean => item.behavior === resolved
     );
-    return option?.title ?? (style === 'split' ? '固定' : '始终显示');
+    return option?.title ?? (style === 'split' ?
+      $r('app.string.toolbar_settings_scroll_split_fixed') :
+      $r('app.string.toolbar_settings_scroll_fixed'));
   }
 }

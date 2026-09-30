@@ -7,6 +7,7 @@ import {
   resolveNovelReadingModeLabel
 } from '../../features/novel/NovelReaderModels';
 import { AppRuntimeContext } from '../../app/runtime/AppRuntimeContext';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import promptAction from '@ohos.promptAction';
 import {
   BrowserClipboardCopyResult,
@@ -276,10 +277,10 @@ export class NovelReaderApplication {
     if (effect.type === 'show_exit_confirmation') {
       const modeLabel: string = resolveNovelReadingModeLabel(effect.contentKind);
       this.dependencies.confirmationPresenter.confirm({
-        title: `退出${modeLabel}`,
-        message: `确定要退出${modeLabel}并返回原网页吗？`,
-        cancelLabel: '继续阅读',
-        confirmLabel: '退出',
+        title: $r('app.string.novel_exit_title', modeLabel),
+        message: $r('app.string.novel_exit_message', modeLabel),
+        cancelLabel: $r('app.string.reader_continue_reading'),
+        confirmLabel: $r('app.string.reader_exit'),
         onCancel: (): void => this.dependencies.handleAction({ type: 'cancel_close' }),
         onConfirm: (): void => this.dependencies.handleAction({ type: 'confirm_close' })
       });
@@ -317,12 +318,12 @@ export class NovelReaderApplication {
     if (effect.type === 'copy_source_url') {
       void this.clipboardService.copyText({
         value: effect.url,
-        emptyMessage: '当前没有可复制的网址。',
-        successMessage: '链接已复制。'
+        emptyMessage: resolveAppResourceText($r('app.string.bookshelf_copy_url_empty')),
+        successMessage: resolveAppResourceText($r('app.string.bookshelf_copy_done'))
       }).then((result: BrowserClipboardCopyResult): void => {
         this.showToast(result.message);
       }).catch((_error: Error): void => {
-        this.showToast('复制失败，请稍后重试。');
+        this.showToast($r('app.string.bookshelf_copy_failed'));
       });
       return true;
     }
@@ -331,7 +332,7 @@ export class NovelReaderApplication {
         title: effect.title,
         url: effect.url
       }).catch((_error: Error): void => {
-        this.showToast('分享失败，请稍后重试。');
+        this.showToast($r('app.string.bookshelf_share_failed'));
       });
       return true;
     }
@@ -357,7 +358,7 @@ export class NovelReaderApplication {
     return false;
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     promptAction.showToast({ message: message, duration: 1500 });
   }
 

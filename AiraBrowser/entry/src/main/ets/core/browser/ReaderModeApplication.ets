@@ -7,6 +7,7 @@ import { BrowserClipboardCopyResult, BrowserClipboardService } from '../../servi
 import { WebPageShareService } from '../../services/share/WebPageShareService';
 import { ReadingWindowBrightnessService } from '../../services/reading/ReadingWindowBrightnessService';
 import { ReaderLinkPolicyService } from '../../services/web/ReaderLinkPolicyService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { BrowserCreateTabOptions } from '../tabs/TabManager';
 import { BrowserAppUrlOpenCoordinator } from './BrowserAppUrlOpenCoordinator';
 import { BrowserConfirmationSink } from './BrowserConfirmationSink';
@@ -45,7 +46,7 @@ export interface ReaderModeApplicationShell {
   readFacts: () => ReaderModeApplicationFacts;
   resolveCreateOptions: () => BrowserCreateTabOptions;
   resolveAbilityContext: () => common.UIAbilityContext;
-  showToast: (message: string) => void;
+  showToast: (message: ResourceStr) => void;
   publishHelper: (message: string) => void;
   publishError: (message: string) => void;
   syncStatusBarStyle: () => void;
@@ -167,10 +168,10 @@ export class ReaderModeApplication implements ReaderModeEffectApplication {
       return;
     }
     this.dependencies.confirmationPresenter.confirm({
-      title: '退出阅读模式',
-      message: '确定要退出阅读模式并返回原网页吗？',
-      cancelLabel: '继续阅读',
-      confirmLabel: '退出',
+      title: $r('app.string.reader_exit_reading_mode'),
+      message: $r('app.string.reader_exit_confirm_message'),
+      cancelLabel: $r('app.string.reader_continue_reading'),
+      confirmLabel: $r('app.string.reader_exit'),
       onCancel: (): void => {
         this.dependencies.readerModeCoordinator.endExitConfirmation();
       },
@@ -208,17 +209,29 @@ export class ReaderModeApplication implements ReaderModeEffectApplication {
   }
 
   private copyLink(url: string): void {
+    // The clipboard service carries plain-string messages, so the localized result is
+    // chosen here from the copy outcome instead of relying on the service text.
     void this.dependencies.clipboardService.copyText({
       value: url,
-      emptyMessage: '当前没有可复制的网址。',
-      successMessage: '链接已复制。'
+      emptyMessage: '',
+      successMessage: ''
     }).then((result: BrowserClipboardCopyResult): void => {
-      this.shell.publishHelper(result.message);
-      this.shell.showToast(result.message);
+      const message: Resource = this.resolveCopyLinkMessage(url, result.ok);
+      this.shell.publishHelper(resolveAppResourceText(message));
+      this.shell.showToast(message);
     }).catch((error: Error): void => {
-      this.shell.publishError(`复制失败：${JSON.stringify(error)}`);
-      this.shell.showToast('复制失败，请稍后重试。');
+      this.shell.publishError(resolveAppResourceText($r('app.string.reader_copy_failed_detail', JSON.stringify(error))));
+      this.shell.showToast($r('app.string.reader_copy_link_failed'));
     });
+  }
+
+  private resolveCopyLinkMessage(url: string, copied: boolean): Resource {
+    if (url.length <= 0) {
+      return $r('app.string.reader_copy_link_empty');
+    }
+    return copied
+      ? $r('app.string.reader_copy_link_done')
+      : $r('app.string.reader_copy_link_failed');
   }
 
   private share(title: string, url: string): void {
@@ -226,7 +239,7 @@ export class ReaderModeApplication implements ReaderModeEffectApplication {
       this.shell.resolveAbilityContext(),
       { title: title, url: url }
     ).catch((_error: Error): void => {
-      this.shell.showToast('分享失败，请稍后重试。');
+      this.shell.showToast($r('app.string.reader_share_failed'));
     });
   }
 
@@ -265,9 +278,13 @@ export class ReaderModeApplication implements ReaderModeEffectApplication {
     const createOptions = this.shell.resolveCreateOptions();
     this.dependencies.appUrlOpenCoordinator.openCurrentAppUi(
       decision.url,
-      decision.message,
+      this.resolveLinkHelperText(decision.message),
       createOptions
     );
+  }
+
+  private resolveLinkHelperText(message: ResourceStr): string {
+    return typeof message === 'string' ? message : resolveAppResourceText(message);
   }
 
   private resolveControlPanelSheet(panel: ReaderModeControlPanel): BrowserSystemSheetType {

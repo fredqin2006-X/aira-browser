@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
 import { TranslationLanguageOptionView } from '../../../core/translation/WebpageTranslationSettingsViewModel';
 import { WebpageTranslationTargetLanguageAction } from '../../../core/translation/WebpageTranslationCoordinator';
@@ -79,7 +80,7 @@ export struct WebpageTranslationTargetLanguageSheet {
   private buildImmersivePhoneLayout() {
     BrowserImmersiveSheetLayout({
             closeVisible: true,
-      closeAccessibilityLabel: '关闭目标语言',
+      closeAccessibilityLabel: resolveAppResourceText($r('app.string.settings_web_translation_close_language')),
       onClose: (): void => {
         this.onClose();
       },
@@ -140,7 +141,7 @@ export struct WebpageTranslationTargetLanguageSheet {
   @Builder
   private buildImmersivePhoneHeader() {
     BrowserFeatureSheetHeader({
-      title: '目标语言',
+      title: $r('app.string.settings_web_translation_target_language'),
       titleColor: this.storedPrimaryTextColor
     })
   }
@@ -168,7 +169,7 @@ export struct WebpageTranslationTargetLanguageSheet {
   private buildRegularLayout() {
     Column({ space: 16 }) {
       if (this.layoutMode === 'phone') {
-        Text('目标语言')
+        Text($r('app.string.settings_web_translation_target_language'))
           .width('100%')
           .fontSize(21)
           .fontWeight(FontWeight.Bold)
@@ -265,7 +266,7 @@ export struct WebpageTranslationTargetLanguageOverlay {
     BrowserAdaptiveModalOverlay({
       visible: this.visible,
       layoutMode: this.layoutMode,
-      title: '目标语言',
+      title: $r('app.string.settings_web_translation_target_language'),
       phoneSheetHeight: TRANSLATION_TARGET_LANGUAGE_OVERLAY_SHEET_HEIGHT,
       phoneEnterOffsetY: TRANSLATION_TARGET_LANGUAGE_OVERLAY_ENTER_OFFSET_Y,
       animationDurationMs: TRANSLATION_TARGET_LANGUAGE_OVERLAY_ANIMATION_DURATION_MS,

@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { AiraBookmarkOverview } from '../../common/models/AiraSyncModels';
 import {
   BookmarkNode,
@@ -140,7 +141,7 @@ export class BookmarksFeature {
   private resolveSubtitle(node: BookmarkNode): string {
     if (node.type === 'folder') {
       const children = this.listDisplayChildren(node.id);
-      return `${children.length} 个子项`;
+      return resolveAppResourceText($r('app.string.bookmark_child_count', children.length));
     }
 
     return node.url ?? '';

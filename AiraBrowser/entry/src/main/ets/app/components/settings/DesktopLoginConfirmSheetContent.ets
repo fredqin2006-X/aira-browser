@@ -32,7 +32,7 @@ export struct DesktopLoginConfirmSheetContent {
       Column({ space: 14 }) {
         this.buildHeaderIcon()
 
-        Text('确认登录Aira-sync 扩展')
+        Text($r('app.string.settings_confirm_aira_sync_title'))
           .fontSize(24)
           .lineHeight(30)
           .fontWeight(FontWeight.Bold)
@@ -40,7 +40,7 @@ export struct DesktopLoginConfirmSheetContent {
           .textAlign(TextAlign.Center)
           .maxLines(1)
 
-        Text('请确认是否使用当前账号登录电脑上的 Aira-sync 扩展。')
+        Text($r('app.string.settings_confirm_aira_sync_message'))
           .width('100%')
           .fontSize(15)
           .lineHeight(22)

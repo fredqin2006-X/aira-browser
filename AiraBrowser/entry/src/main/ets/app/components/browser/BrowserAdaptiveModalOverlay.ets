@@ -12,7 +12,7 @@ export type BrowserAdaptiveModalLayoutMode = 'phone' | 'large_screen';
 export struct BrowserAdaptiveModalOverlay {
   @Prop @Watch('syncVisible') visible: boolean = false;
   @Prop @Watch('handleLayoutModeChanged') layoutMode: BrowserAdaptiveModalLayoutMode = 'phone';
-  @Prop title: string = '';
+  @Prop title: ResourceStr = '';
   @Prop showDesktopHeader: boolean = true;
   @Prop showDesktopRefreshButton: boolean = false;
   /**

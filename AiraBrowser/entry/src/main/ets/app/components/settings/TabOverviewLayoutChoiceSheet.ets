@@ -1,5 +1,6 @@
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
 import { BrowserTabsOverviewLayoutStyle } from '../../../common/models/BrowserModels';
+import { localizeAppearanceSettingsCopy } from '../../../core/settings/SettingsAppearanceCopy';
 import {
   TabOverviewLayoutOptionState
 } from '../../../core/settings/TabOverviewLayoutSettingsCoordinator';
@@ -75,7 +76,7 @@ export struct TabOverviewLayoutChoiceSheet {
         BrowserImmersiveSheetLayout({
           footerVisible: true,
           closeVisible: true,
-          closeAccessibilityLabel: '关闭标签页样式',
+          closeAccessibilityLabel: $r('app.string.settings_appearance_close_tab_style'),
           onClose: (): void => {
             this.onCancel();
           },
@@ -96,7 +97,7 @@ export struct TabOverviewLayoutChoiceSheet {
   @Builder
   private buildLargeScreenHeader() {
     BrowserLargeScreenModalHeader({
-      title: '标签页样式',
+      title: $r('app.string.settings_appearance_tab_style'),
       dialogMode: true,
       onClose: () => {
         this.onCancel();
@@ -110,7 +111,7 @@ export struct TabOverviewLayoutChoiceSheet {
     // "class constructor cannot called without 'new'" if BrowserFeatureSheetHeader
     // is constructed directly inside a @BuilderParam arrow function.
     BrowserFeatureSheetHeader({
-      title: '标签页样式'
+      title: $r('app.string.settings_appearance_tab_style')
     })
   }
 
@@ -141,12 +142,26 @@ export struct TabOverviewLayoutChoiceSheet {
     )
   }
 
+  private localizedOptions(): TabOverviewLayoutOptionState[] {
+    const localized: TabOverviewLayoutOptionState[] = [];
+    for (let index = 0; index < this.options.length; index += 1) {
+      const option = this.options[index];
+      const title = typeof option.title === 'string' ? localizeAppearanceSettingsCopy(option.title) : option.title;
+      localized.push({
+        style: option.style,
+        title: title,
+        isSelected: option.isSelected
+      });
+    }
+    return localized;
+  }
+
   @Builder
   private buildChoiceScroll(topPadding: number, bottomPadding: number) {
     Scroll(this.sheetBlurScroller) {
       Column({ space: 18 }) {
         TabOverviewLayoutOptionGrid({
-          options: this.options,
+          options: this.localizedOptions(),
           onSelect: (style: BrowserTabsOverviewLayoutStyle) => {
             this.onSelect(style);
           }
@@ -154,7 +169,7 @@ export struct TabOverviewLayoutChoiceSheet {
 
         SettingsGroupCard({}) {
           SettingsSwitchRow({
-            title: '始终显示卡片关闭按钮',
+            title: $r('app.string.settings_appearance_close_button_always'),
             checked: this.closeButtonAlwaysVisible,
             rowPosition: 'single',
             isEnabled: !this.isSaving,
@@ -165,7 +180,7 @@ export struct TabOverviewLayoutChoiceSheet {
         }
 
         if (this.errorMessage.length > 0) {
-          Text(this.errorMessage)
+          Text(localizeAppearanceSettingsCopy(this.errorMessage))
             .width('100%')
             .fontSize(13)
             .lineHeight(18)
@@ -195,7 +210,7 @@ export struct TabOverviewLayoutChoiceSheet {
   private buildActionFooter() {
     Column({ space: 8 }) {
       BrowserSheetActionButton({
-        label: this.isSaving ? '应用中…' : '应用',
+        label: this.isSaving ? $r('app.string.settings_appearance_applying') : $r('app.string.settings_appearance_apply'),
         emphasis: 'primary',
         stacked: true,
         actionEnabled: !this.isSaving,
@@ -206,7 +221,7 @@ export struct TabOverviewLayoutChoiceSheet {
       })
 
       BrowserSheetActionButton({
-        label: '取消',
+        label: $r('app.string.settings_account_cancel'),
         emphasis: 'ghost',
         stacked: true,
         actionEnabled: !this.isSaving,

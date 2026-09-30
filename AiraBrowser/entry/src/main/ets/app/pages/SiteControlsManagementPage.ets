@@ -32,6 +32,7 @@ import {
   SiteCustomizationManualTargetResult
 } from '../../core/sitecustomization/SiteCustomizationManagementCoordinator';
 import { SiteCustomizationCapabilityFilterId } from '../../services/web/SiteCapabilityCatalogService';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 interface SiteControlsManagementPageParams {
   dataScope?: string;
@@ -208,15 +209,15 @@ struct SiteControlsManagementPage {
 
   private resolveCustomizationCapabilityTitle(capabilityId: SiteCustomizationCapabilityFilterId): string {
     if (capabilityId === 'external_actions') {
-      return '外部动作';
+      return resolveAppResourceText($r('app.string.settings_site_customization_external_actions'));
     }
     if (capabilityId === 'private_site') {
-      return '关闭后清除';
+      return resolveAppResourceText($r('app.string.settings_site_customization_fragment_clear_on_close'));
     }
     if (capabilityId === 'javascript') {
       return 'JavaScript';
     }
-    return '网页标识';
+    return resolveAppResourceText($r('app.string.settings_site_customization_helper_identity'));
   }
 
   private bindThemePreferencesUpdates(): void {

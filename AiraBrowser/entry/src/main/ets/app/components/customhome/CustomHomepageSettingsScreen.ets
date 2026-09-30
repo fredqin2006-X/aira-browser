@@ -49,6 +49,7 @@ import {
   sharedShortcutRepository,
   sharedWallpaperRepository
 } from '../../bootstrap/BrowserAppRuntime';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { HomeShortcutLogicService } from '../../../services/shortcuts/HomeShortcutLogicService';
 import { WallpaperPresentationService } from '../../../services/wallpaper/WallpaperPresentationService';
 import { CustomHomepagePicker } from './CustomHomepagePicker';
@@ -181,11 +182,11 @@ export struct CustomHomepageSettingsScreen {
   @State private remoteHomepageUrlError: string = '';
   @State private remoteHomepageWarmupTask: CustomHomepageRemoteWarmupTask | undefined = undefined;
   @State private remoteHomepageWarmupPurpose: RemoteHomepageWarmupPurpose = 'add';
-  @State private remoteHomepageProgressTitle: string = '';
-  @State private remoteHomepageProgressSubtitle: string = '';
+  @State private remoteHomepageProgressTitle: ResourceStr = '';
+  @State private remoteHomepageProgressSubtitle: ResourceStr = '';
   @State private remoteHomepageProgressValue: number = 0;
   @State private remoteHomepageProgressInProgress: boolean = false;
-  @State private remoteHomepageProgressDetailsText: string = '';
+  @State private remoteHomepageProgressDetailsText: ResourceStr = '';
   @State private remoteHomepageProgressDetailOpacity: number = 1;
   @State private previewState: CustomHomepagePreviewState = this.previewViewModel.buildInitialState();
   @State private homepageInfoSheetVisible: boolean = false;
@@ -237,10 +238,10 @@ export struct CustomHomepageSettingsScreen {
     },
     notifyCommitted: (result: CustomHomepageImportResult): void => {
       this.refreshHomepagePresentationAfterExternalImport();
-      this.showToast(result.updated ? '已更新自定义主页' : '已导入自定义主页');
+      this.showToast(result.updated ? $r('app.string.settings_custom_home_updated') : $r('app.string.settings_custom_home_imported'));
     },
     notifyCommitFailure: (message: string): void => {
-      this.showToast(`导入主页失败：${message}`);
+      this.showToast($r('app.string.settings_custom_home_import_failed', message));
       this.refreshState();
     }
   };
@@ -307,7 +308,7 @@ export struct CustomHomepageSettingsScreen {
     (): void => {
       this.closeRemoteHomepageProgressDialog();
     },
-    (_title: string, _subtitle: string): void => {}
+    (_title: ResourceStr, _subtitle: ResourceStr): void => {}
   );
 
   aboutToAppear(): void {
@@ -384,7 +385,7 @@ export struct CustomHomepageSettingsScreen {
       } else {
         Column() {
           SettingsHdsScaffold({
-            title: '主页设置',
+            title: $r('app.string.settings_custom_home_title'),
             backIconKind: 'back',
             pageBackground: this.resolveSettingsCanvasColor(),
             headerButtonBackground: this.storedPressedBackgroundColor,
@@ -457,7 +458,7 @@ export struct CustomHomepageSettingsScreen {
     Column({ space: 12 }) {
       if (this.desktopPresentation) {
         SettingsDesktopWorkspaceHeader({
-          title: '主页设置',
+          title: $r('app.string.settings_custom_home_title'),
           showTitle: false,
           primaryTextColor: this.storedPrimaryTextColor,
           iconColor: this.storedSecondaryTextColor,
@@ -466,7 +467,7 @@ export struct CustomHomepageSettingsScreen {
         })
       } else {
         Row({ space: 10 }) {
-          Button('导入主页')
+          Button($r('app.string.settings_custom_home_import'))
             .height(36)
             .type(ButtonType.Normal)
             .buttonStyle(ButtonStyleMode.TEXTUAL)
@@ -479,7 +480,7 @@ export struct CustomHomepageSettingsScreen {
               this.importHtmlFile();
             })
 
-          Button('添加网址主页')
+          Button($r('app.string.settings_custom_home_add_url'))
             .height(36)
             .type(ButtonType.Normal)
             .buttonStyle(ButtonStyleMode.TEXTUAL)
@@ -561,7 +562,7 @@ export struct CustomHomepageSettingsScreen {
 
   private buildHomepageSettingsSheetTitle(): SheetTitleOptions {
     return {
-      title: '主页设置'
+      title: $r('app.string.settings_custom_home_title')
     };
   }
 
@@ -575,13 +576,13 @@ export struct CustomHomepageSettingsScreen {
         contentSpace: 16
       }) {
         SettingsSection({
-          title: '这个主页',
+          title: $r('app.string.settings_custom_home_this'),
           secondaryTextColor: this.storedSecondaryTextColor
         }) {
           this.buildHomepageSettingsActions()
         }
         SettingsSection({
-          title: '主页系统入口',
+          title: $r('app.string.settings_custom_home_system_entry'),
           secondaryTextColor: this.storedSecondaryTextColor
         }) {
           this.buildHomepageSettingsChrome()
@@ -602,7 +603,7 @@ export struct CustomHomepageSettingsScreen {
     if (this.desktopPresentation) {
       SettingsDesktopGroup({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsDesktopNavigationRow({
-          title: '查看信息',
+          title: $r('app.string.settings_custom_home_view_info'),
           primaryTextColor: this.storedPrimaryTextColor,
           secondaryTextColor: this.storedSecondaryTextColor,
           hoverBackgroundColor: this.storedPressedBackgroundColor,
@@ -613,7 +614,7 @@ export struct CustomHomepageSettingsScreen {
         })
         SettingsDesktopDivider({ dividerColor: this.storedDividerColor })
         SettingsDesktopNavigationRow({
-          title: '导出',
+          title: $r('app.string.settings_custom_home_export'),
           primaryTextColor: this.storedPrimaryTextColor,
           secondaryTextColor: this.storedSecondaryTextColor,
           hoverBackgroundColor: this.storedPressedBackgroundColor,
@@ -624,7 +625,7 @@ export struct CustomHomepageSettingsScreen {
         })
         SettingsDesktopDivider({ dividerColor: this.storedDividerColor })
         SettingsDesktopNavigationRow({
-          title: '删除',
+          title: $r('app.string.settings_custom_home_delete'),
           primaryTextColor: this.storedPrimaryTextColor,
           secondaryTextColor: this.storedSecondaryTextColor,
           hoverBackgroundColor: this.storedPressedBackgroundColor,
@@ -637,7 +638,7 @@ export struct CustomHomepageSettingsScreen {
     } else {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsNavigationRow({
-          title: '查看信息',
+          title: $r('app.string.settings_custom_home_view_info'),
           rowPosition: 'first',
           primaryTextColor: this.storedPrimaryTextColor,
           secondaryTextColor: this.storedSecondaryTextColor,
@@ -648,7 +649,7 @@ export struct CustomHomepageSettingsScreen {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsNavigationRow({
-          title: '导出',
+          title: $r('app.string.settings_custom_home_export'),
           rowPosition: 'middle',
           primaryTextColor: this.storedPrimaryTextColor,
           secondaryTextColor: this.storedSecondaryTextColor,
@@ -659,7 +660,7 @@ export struct CustomHomepageSettingsScreen {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsNavigationRow({
-          title: '删除',
+          title: $r('app.string.settings_custom_home_delete'),
           rowPosition: 'last',
           primaryTextColor: this.storedPrimaryTextColor,
           secondaryTextColor: this.storedSecondaryTextColor,
@@ -677,7 +678,7 @@ export struct CustomHomepageSettingsScreen {
     if (this.desktopPresentation) {
       SettingsDesktopGroup({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsDesktopSwitchRow({
-          title: '在此主页显示系统搜索',
+          title: $r('app.string.settings_custom_home_show_search'),
           checked: this.homepageSettingsChrome.showSystemSearchBar,
           isEnabled: !this.systemChromeBusy,
           primaryTextColor: this.storedPrimaryTextColor,
@@ -690,7 +691,7 @@ export struct CustomHomepageSettingsScreen {
         })
         SettingsDesktopDivider({ dividerColor: this.storedDividerColor })
         SettingsDesktopSwitchRow({
-          title: '滚动时显示或隐藏',
+          title: $r('app.string.settings_custom_home_scroll'),
           checked: this.homepageSettingsChrome.hideToolbarOnScroll,
           isEnabled: !this.systemChromeBusy && this.homepageSettingsChrome.showSystemSearchBar,
           primaryTextColor: this.storedPrimaryTextColor,
@@ -703,7 +704,7 @@ export struct CustomHomepageSettingsScreen {
         })
         SettingsDesktopDivider({ dividerColor: this.storedDividerColor })
         SettingsDesktopSwitchRow({
-          title: '显示系统入口按钮',
+          title: $r('app.string.settings_custom_home_show_entry'),
           checked: this.homepageSettingsChrome.showSystemEntryButton,
           isEnabled: !this.systemChromeBusy,
           primaryTextColor: this.storedPrimaryTextColor,
@@ -718,7 +719,7 @@ export struct CustomHomepageSettingsScreen {
     } else {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsSwitchRow({
-          title: '在此主页显示系统搜索',
+          title: $r('app.string.settings_custom_home_show_search'),
           checked: this.homepageSettingsChrome.showSystemSearchBar,
           rowPosition: 'first',
           isEnabled: !this.systemChromeBusy,
@@ -731,7 +732,7 @@ export struct CustomHomepageSettingsScreen {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: '滚动时显示或隐藏',
+          title: $r('app.string.settings_custom_home_scroll'),
           checked: this.homepageSettingsChrome.hideToolbarOnScroll,
           rowPosition: 'middle',
           isEnabled: !this.systemChromeBusy && this.homepageSettingsChrome.showSystemSearchBar,
@@ -744,7 +745,7 @@ export struct CustomHomepageSettingsScreen {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: '显示系统入口按钮',
+          title: $r('app.string.settings_custom_home_show_entry'),
           checked: this.homepageSettingsChrome.showSystemEntryButton,
           rowPosition: 'last',
           isEnabled: !this.systemChromeBusy,
@@ -758,7 +759,7 @@ export struct CustomHomepageSettingsScreen {
       }
     }
     SettingsFooterText({
-      text: '以上设置只保存到这个第三方主页。系统入口按钮只在第三方主页上显示。',
+      text: $r('app.string.settings_custom_home_chrome_note'),
       secondaryTextColor: this.storedSecondaryTextColor
     })
   }
@@ -767,13 +768,13 @@ export struct CustomHomepageSettingsScreen {
   private buildHomepageSettingsAppearance() {
     Column({ space: 10 }) {
       SettingsSectionTitle({
-        title: '主页行为',
+        title: $r('app.string.settings_custom_home_behavior'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
       if (this.desktopPresentation) {
         SettingsDesktopGroup({ surfaceColor: this.storedSurfaceBackgroundColor }) {
           SettingsDesktopSwitchRow({
-            title: '尝试强制深色模式',
+            title: $r('app.string.settings_custom_home_force_dark'),
             checked: this.homepageSettingsChrome.forceDarkRemoteUrlHomepage,
             isEnabled: !this.systemChromeBusy,
             primaryTextColor: this.storedPrimaryTextColor,
@@ -788,7 +789,7 @@ export struct CustomHomepageSettingsScreen {
       } else {
         SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
           SettingsSwitchRow({
-            title: '尝试强制深色模式',
+            title: $r('app.string.settings_custom_home_force_dark'),
             checked: this.homepageSettingsChrome.forceDarkRemoteUrlHomepage,
             rowPosition: 'single',
             isEnabled: !this.systemChromeBusy,
@@ -802,7 +803,7 @@ export struct CustomHomepageSettingsScreen {
         }
       }
       SettingsFooterText({
-        text: '强制深色模式仅对网址主页生效。',
+        text: $r('app.string.settings_custom_home_force_dark_note'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -813,12 +814,12 @@ export struct CustomHomepageSettingsScreen {
   private buildHomepageSettingsMaintenance() {
     Column({ space: 10 }) {
       SettingsSectionTitle({
-        title: '维护',
+        title: $r('app.string.settings_custom_home_maintenance'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
       if (this.desktopPresentation) {
         SettingsDesktopActionButton({
-          title: '刷新主页预览图',
+          title: $r('app.string.settings_custom_home_refresh_previews'),
           isEnabled: !this.busy,
           accentColor: this.storedAccentColor,
           onAccentColor: this.storedOnPrimaryColor,
@@ -829,7 +830,7 @@ export struct CustomHomepageSettingsScreen {
         })
       } else {
         SettingsActionButton({
-          title: '刷新主页预览图',
+          title: $r('app.string.settings_custom_home_refresh_previews'),
           isEnabled: !this.busy,
           accentColor: this.storedAccentColor,
           pressedBackgroundColor: this.storedPressedBackgroundColor,
@@ -839,7 +840,7 @@ export struct CustomHomepageSettingsScreen {
         })
       }
       SettingsFooterText({
-        text: '会重新生成所有网址主页的预览图。',
+        text: $r('app.string.settings_custom_home_refresh_note'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -864,7 +865,7 @@ export struct CustomHomepageSettingsScreen {
     if (this.desktopPresentation) {
       SettingsDesktopGroup({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsDesktopNavigationRow({
-          title: '自定义主页开发文档',
+          title: $r('app.string.settings_custom_home_docs'),
           primaryTextColor: this.storedPrimaryTextColor,
           secondaryTextColor: this.storedSecondaryTextColor,
           hoverBackgroundColor: this.storedPressedBackgroundColor,
@@ -877,7 +878,7 @@ export struct CustomHomepageSettingsScreen {
     } else {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsNavigationRow({
-          title: '自定义主页开发文档',
+          title: $r('app.string.settings_custom_home_docs'),
           rowPosition: 'single',
           primaryTextColor: this.storedPrimaryTextColor,
           secondaryTextColor: this.storedSecondaryTextColor,
@@ -894,7 +895,7 @@ export struct CustomHomepageSettingsScreen {
   private buildSystemHomepageSection() {
     Column({ space: 10 }) {
       SettingsSectionTitle({
-        title: '系统主页',
+        title: $r('app.string.settings_custom_home_system'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
       SystemHomepageCards({
@@ -906,7 +907,7 @@ export struct CustomHomepageSettingsScreen {
         }
       })
       SettingsFooterText({
-        text: '内置主页随 Aira 更新，不需要下载。',
+        text: $r('app.string.settings_custom_home_system_note'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -917,7 +918,7 @@ export struct CustomHomepageSettingsScreen {
   private buildHomepageListSection() {
     Column({ space: 10 }) {
       SettingsSectionTitle({
-        title: '第三方主页',
+        title: $r('app.string.settings_custom_home_third_party'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
       CustomHomepagePreviewCards({
@@ -943,7 +944,7 @@ export struct CustomHomepageSettingsScreen {
         }
       })
       SettingsFooterText({
-        text: '卡片右上角可查看信息、导出或删除。',
+        text: $r('app.string.settings_custom_home_card_note'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -961,7 +962,7 @@ export struct CustomHomepageSettingsScreen {
   private buildHomepageChromeSection() {
     Column({ space: 10 }) {
       SettingsSectionTitle({
-        title: '主页系统入口',
+        title: $r('app.string.settings_custom_home_system_entry'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
       if (this.desktopPresentation) {
@@ -974,7 +975,7 @@ export struct CustomHomepageSettingsScreen {
         }
       }
       SettingsFooterText({
-        text: '以上设置按当前选中的第三方主页单独保存；系统入口按钮仅在第三方主页上显示。',
+        text: $r('app.string.settings_custom_home_chrome_note_selected'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -983,7 +984,7 @@ export struct CustomHomepageSettingsScreen {
   @Builder
   private buildTouchHomepageChromeRows() {
         SettingsSwitchRow({
-          title: '在此主页显示系统搜索',
+          title: $r('app.string.settings_custom_home_show_search'),
           checked: this.state.showSystemSearchBar,
           rowPosition: 'first',
           isEnabled: this.areCustomHomepageChromeControlsEnabled(),
@@ -996,7 +997,7 @@ export struct CustomHomepageSettingsScreen {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: '滚动时显示或隐藏',
+          title: $r('app.string.settings_custom_home_scroll'),
           checked: this.state.hideToolbarOnScroll,
           rowPosition: 'middle',
           isEnabled: this.areCustomHomepageChromeControlsEnabled() && this.state.showSystemSearchBar,
@@ -1009,7 +1010,7 @@ export struct CustomHomepageSettingsScreen {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: '显示系统入口按钮',
+          title: $r('app.string.settings_custom_home_show_entry'),
           checked: this.state.showSystemEntryButton,
           rowPosition: 'last',
           isEnabled: this.areCustomHomepageChromeControlsEnabled(),
@@ -1025,7 +1026,7 @@ export struct CustomHomepageSettingsScreen {
   @Builder
   private buildDesktopHomepageChromeRows() {
     SettingsDesktopSwitchRow({
-      title: '在此主页显示系统搜索',
+      title: $r('app.string.settings_custom_home_show_search'),
       checked: this.state.showSystemSearchBar,
       isEnabled: this.areCustomHomepageChromeControlsEnabled(),
       primaryTextColor: this.storedPrimaryTextColor,
@@ -1038,7 +1039,7 @@ export struct CustomHomepageSettingsScreen {
     })
     SettingsDesktopDivider({ dividerColor: this.storedDividerColor })
     SettingsDesktopSwitchRow({
-      title: '滚动时显示或隐藏',
+      title: $r('app.string.settings_custom_home_scroll'),
       checked: this.state.hideToolbarOnScroll,
       isEnabled: this.areCustomHomepageChromeControlsEnabled() && this.state.showSystemSearchBar,
       primaryTextColor: this.storedPrimaryTextColor,
@@ -1051,7 +1052,7 @@ export struct CustomHomepageSettingsScreen {
     })
     SettingsDesktopDivider({ dividerColor: this.storedDividerColor })
     SettingsDesktopSwitchRow({
-      title: '显示系统入口按钮',
+      title: $r('app.string.settings_custom_home_show_entry'),
       checked: this.state.showSystemEntryButton,
       isEnabled: this.areCustomHomepageChromeControlsEnabled(),
       primaryTextColor: this.storedPrimaryTextColor,
@@ -1068,13 +1069,13 @@ export struct CustomHomepageSettingsScreen {
   private buildHomepageBehaviorSection() {
     Column({ space: 10 }) {
       SettingsSectionTitle({
-        title: '网址主页外观',
+        title: $r('app.string.settings_custom_home_url_appearance'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
       if (this.desktopPresentation) {
         SettingsDesktopGroup({ surfaceColor: this.storedSurfaceBackgroundColor }) {
           SettingsDesktopSwitchRow({
-            title: '尝试强制深色模式',
+            title: $r('app.string.settings_custom_home_force_dark'),
             checked: this.state.forceDarkRemoteUrlHomepage,
             isEnabled: this.areRemoteUrlAppearanceRowsEnabled(),
             primaryTextColor: this.storedPrimaryTextColor,
@@ -1089,7 +1090,7 @@ export struct CustomHomepageSettingsScreen {
       } else {
         SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
           SettingsSwitchRow({
-          title: '尝试强制深色模式',
+          title: $r('app.string.settings_custom_home_force_dark'),
           checked: this.state.forceDarkRemoteUrlHomepage,
           rowPosition: 'single',
           isEnabled: this.areRemoteUrlAppearanceRowsEnabled(),
@@ -1103,7 +1104,7 @@ export struct CustomHomepageSettingsScreen {
         }
       }
       SettingsFooterText({
-        text: '强制深色模式仅对网址主页生效。',
+        text: $r('app.string.settings_custom_home_force_dark_note'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -1113,12 +1114,12 @@ export struct CustomHomepageSettingsScreen {
   private buildHomepageMaintenanceSection() {
     Column({ space: 10 }) {
       SettingsSectionTitle({
-        title: '维护',
+        title: $r('app.string.settings_custom_home_maintenance'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
       if (this.desktopPresentation) {
         SettingsDesktopActionButton({
-          title: '刷新主页预览图',
+          title: $r('app.string.settings_custom_home_refresh_previews'),
           isEnabled: true,
           accentColor: this.storedAccentColor,
           onAccentColor: this.storedOnPrimaryColor,
@@ -1129,7 +1130,7 @@ export struct CustomHomepageSettingsScreen {
         })
       } else {
         SettingsActionButton({
-          title: '刷新主页预览图',
+          title: $r('app.string.settings_custom_home_refresh_previews'),
           isEnabled: true,
           accentColor: this.storedAccentColor,
           pressedBackgroundColor: this.storedPressedBackgroundColor,
@@ -1139,7 +1140,7 @@ export struct CustomHomepageSettingsScreen {
         })
       }
       SettingsFooterText({
-        text: '会重新生成所有网址主页的预览图。',
+        text: $r('app.string.settings_custom_home_refresh_note'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -1149,21 +1150,21 @@ export struct CustomHomepageSettingsScreen {
 
   private buildHeaderActions(): SettingsHdsMenuAction[] {
     return [{
-      label: '开发文档',
+      label: resolveAppResourceText($r('app.string.settings_custom_home_docs_short')),
       airaIconId: 'browser.toolbar.savedPages',
       enabled: true,
       action: () => {
         this.openDeveloperGuide();
       }
     }, {
-      label: '添加网址主页',
+      label: resolveAppResourceText($r('app.string.settings_custom_home_add_url')),
       airaIconId: 'browser.toolbar.copyLink',
       enabled: !this.busy,
       action: () => {
         this.openRemoteHomepageDialog();
       }
     }, {
-      label: '导入主页',
+      label: resolveAppResourceText($r('app.string.settings_custom_home_import')),
       airaIconId: 'browser.tabs.add',
       enabled: !this.busy,
       action: () => {
@@ -1174,21 +1175,21 @@ export struct CustomHomepageSettingsScreen {
 
   private buildDesktopHeaderActions(): SettingsDesktopWorkspaceHeaderAction[] {
     return [{
-      label: '添加网址主页',
+      label: resolveAppResourceText($r('app.string.settings_custom_home_add_url')),
       action: () => {
         if (!this.busy) {
           this.openRemoteHomepageDialog();
         }
       }
     }, {
-      label: '导入主页',
+      label: resolveAppResourceText($r('app.string.settings_custom_home_import')),
       action: () => {
         if (!this.busy) {
           this.importHtmlFile();
         }
       }
     }, {
-      label: '开发文档',
+      label: resolveAppResourceText($r('app.string.settings_custom_home_docs_short')),
       action: () => {
         this.openDeveloperGuide();
       }
@@ -1216,14 +1217,14 @@ export struct CustomHomepageSettingsScreen {
       privacyMode: '',
       boundarySource: 'custom_homepage_settings'
     }, () => {
-      this.showToast('开发文档暂时无法打开，请稍后重试。');
+      this.showToast($r('app.string.settings_custom_home_docs_failed'));
     });
   }
 
   private openHomepageInfo(choice: CustomHomepageChoiceViewState): void {
     const item = this.coordinator.findItem(choice.id);
     if (item === undefined) {
-      this.showToast('自定义主页信息不可用。');
+      this.showToast($r('app.string.settings_custom_home_info_unavailable'));
       return;
     }
     this.homepageInfoActionLabel = '';
@@ -1236,11 +1237,11 @@ export struct CustomHomepageSettingsScreen {
     this.resetHomepageInfoPresentation();
     setTimeout(() => {
       showCenteredAlertDialog({
-        title: '无法导入主页',
+        title: $r('app.string.settings_custom_home_import_blocked_title'),
         message: message,
         autoCancel: true,
         confirm: {
-          value: '知道了',
+          value: $r('app.string.settings_custom_home_got_it'),
           action: () => {}
         }
       });
@@ -1286,15 +1287,15 @@ export struct CustomHomepageSettingsScreen {
       return;
     }
     showCenteredAlertDialog({
-      title: '使用该主页',
-      message: `确定使用“${choice.title}”作为主页？`,
+      title: $r('app.string.settings_custom_home_use_title'),
+      message: $r('app.string.settings_custom_home_use_message', choice.title),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_custom_home_cancel'),
         action: () => {}
       },
       secondaryButton: {
-        value: '确定',
+        value: $r('app.string.settings_custom_home_confirm'),
         action: () => {
           this.applyPreviewHomepage(choice);
         }
@@ -1318,8 +1319,8 @@ export struct CustomHomepageSettingsScreen {
       this.coordinator.selectCustomHomepage(choice.id),
       previousState,
       previousSelectedChoiceId,
-      '已切换为自定义主页',
-      '切换主页失败',
+      $r('app.string.settings_custom_home_switched_custom'),
+      $r('app.string.settings_custom_home_switch_failed'),
       true
     );
   }
@@ -1367,11 +1368,11 @@ export struct CustomHomepageSettingsScreen {
       .then((result: CustomHomepageImportResult) => {
         this.applyRefreshedHomepageState(result.imported);
         if (result.imported) {
-          this.showToast(result.updated ? '已更新自定义主页' : '已导入自定义主页');
+          this.showToast(result.updated ? $r('app.string.settings_custom_home_updated') : $r('app.string.settings_custom_home_imported'));
         }
       })
       .catch((error: Error) => {
-        this.showToast(`导入主页失败：${this.stringifyError(error)}`);
+        this.showToast($r('app.string.settings_custom_home_import_failed', this.stringifyError(error)));
         this.refreshState();
       })
       .finally(() => {
@@ -1388,11 +1389,11 @@ export struct CustomHomepageSettingsScreen {
     this.coordinator.exportCustomHomepage(context, choice.id)
       .then((exported: boolean) => {
         if (exported) {
-          this.showToast(`已导出“${choice.title}”`);
+          this.showToast($r('app.string.settings_custom_home_exported', choice.title));
         }
       })
       .catch((error: Error) => {
-        this.showToast(`导出主页失败：${this.stringifyError(error)}`);
+        this.showToast($r('app.string.settings_custom_home_export_failed', this.stringifyError(error)));
       })
       .finally(() => {
         this.busy = false;
@@ -1420,18 +1421,18 @@ export struct CustomHomepageSettingsScreen {
     }
     this.busy = true;
     this.remoteHomepageUrlDialogController.close();
-    this.remoteHomepageProgressController.begin('正在准备主页', '正在后台打开网页');
+    this.remoteHomepageProgressController.begin($r('app.string.settings_custom_home_preparing'), $r('app.string.settings_custom_home_opening_page'));
     this.coordinator.addRemoteHomepage(validation.normalizedUrl)
       .then((result: CustomHomepageRemoteAddResult) => {
         this.applyRefreshedHomepageState(true);
-        this.remoteHomepageProgressController.update('正在准备主页', '正在生成预览图', 36);
+        this.remoteHomepageProgressController.update($r('app.string.settings_custom_home_preparing'), $r('app.string.settings_custom_home_making_preview'), 36);
         this.remoteHomepageWarmupPurpose = 'add';
         this.remoteHomepageWarmupTask = this.warmupCoordinator.buildTask(result.itemId, result.url);
       })
       .catch((error: Error) => {
         this.busy = false;
         this.remoteHomepageProgressController.complete();
-        this.showToast(`添加失败：${this.stringifyError(error)}`);
+        this.showToast($r('app.string.settings_custom_home_add_failed', this.stringifyError(error)));
       });
     return false;
   }
@@ -1445,8 +1446,8 @@ export struct CustomHomepageSettingsScreen {
     this.runSystemChromeAction(
       this.coordinator.updateSelectedHomepageSystemEntryButton(visible),
       previousState,
-      visible ? '已显示系统入口按钮' : '已隐藏系统入口按钮',
-      '更新系统入口按钮失败'
+      visible ? $r('app.string.settings_custom_home_entry_shown') : $r('app.string.settings_custom_home_entry_hidden'),
+      $r('app.string.settings_custom_home_entry_failed')
     );
   }
 
@@ -1459,8 +1460,8 @@ export struct CustomHomepageSettingsScreen {
     this.runSystemChromeAction(
       this.coordinator.updateSelectedHomepageSearchBar(visible),
       previousState,
-      visible ? '已在此主页显示系统搜索' : '已在此主页隐藏系统搜索',
-      '更新系统搜索失败'
+      visible ? $r('app.string.settings_custom_home_search_shown') : $r('app.string.settings_custom_home_search_hidden'),
+      $r('app.string.settings_custom_home_search_failed')
     );
   }
 
@@ -1474,8 +1475,8 @@ export struct CustomHomepageSettingsScreen {
     this.runSystemChromeAction(
       this.coordinator.updateSelectedHomepageHideToolbarOnScroll(enabled),
       previousState,
-      enabled ? '当前主页已启用滚动显示或隐藏' : '当前主页已关闭滚动显示或隐藏',
-      '更新滚动显示设置失败'
+      enabled ? $r('app.string.settings_custom_home_scroll_on') : $r('app.string.settings_custom_home_scroll_off'),
+      $r('app.string.settings_custom_home_scroll_failed')
     );
   }
 
@@ -1488,8 +1489,8 @@ export struct CustomHomepageSettingsScreen {
     this.runSystemChromeAction(
       this.coordinator.updateSelectedHomepageForceDarkMode(enabled),
       previousState,
-      enabled ? '网址主页强制深色已开启' : '网址主页将尊重网页原本外观',
-      '更新网址主页外观失败'
+      enabled ? $r('app.string.settings_custom_home_dark_on') : $r('app.string.settings_custom_home_dark_off'),
+      $r('app.string.settings_custom_home_dark_failed')
     );
   }
 
@@ -1501,10 +1502,10 @@ export struct CustomHomepageSettingsScreen {
     this.systemHomepageSelectionService.selectSystemHomepageStyle(style)
       .then(() => {
         this.refreshState();
-        this.showToast('已切换主页');
+        this.showToast($r('app.string.settings_custom_home_switched'));
       })
       .catch((error: Error) => {
-        this.showToast(`切换主页失败：${this.stringifyError(error)}`);
+        this.showToast($r('app.string.settings_custom_home_switch_failed', this.stringifyError(error)));
         this.refreshState();
       })
       .finally(() => {
@@ -1521,12 +1522,12 @@ export struct CustomHomepageSettingsScreen {
 
   private refreshRemoteHomepagePreviews(): void {
     if (this.busy || this.remoteHomepageWarmupTask !== undefined || this.remoteHomepageRefreshQueue.length > 0) {
-      this.showToast('预览图正在刷新，请稍候。');
+      this.showToast($r('app.string.settings_custom_home_preview_busy'));
       return;
     }
     const targets = this.viewModel.resolveRemoteHomepagePreviewRefreshTargets(this.state);
     if (targets.length <= 0) {
-      this.showToast('请先添加一个网址主页。');
+      this.showToast($r('app.string.settings_custom_home_need_url'));
       return;
     }
     this.busy = true;
@@ -1535,7 +1536,7 @@ export struct CustomHomepageSettingsScreen {
     this.remoteHomepageRefreshTotalCount = targets.length;
     this.remoteHomepageRefreshFinishedCount = 0;
     this.remoteHomepageRefreshSucceededCount = 0;
-    this.remoteHomepageProgressController.begin('正在刷新预览图', '正在后台打开网页');
+    this.remoteHomepageProgressController.begin($r('app.string.settings_custom_home_refreshing'), $r('app.string.settings_custom_home_opening_page'));
     this.startNextRemoteHomepageRefreshTask();
   }
 
@@ -1544,15 +1545,15 @@ export struct CustomHomepageSettingsScreen {
       return;
     }
     showCenteredAlertDialog({
-      title: '删除自定义主页',
-      message: `确定删除“${choice.title}”吗？删除后无法恢复。`,
+      title: $r('app.string.settings_custom_home_delete_title'),
+      message: $r('app.string.settings_custom_home_delete_message', choice.title),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_custom_home_cancel'),
         action: () => {}
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.settings_custom_home_delete'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.confirmRemoveCustomHomepage(choice.id);
@@ -1567,15 +1568,15 @@ export struct CustomHomepageSettingsScreen {
     }
     this.runAction(
       this.coordinator.removeCustomHomepage(itemId),
-      '已删除自定义主页',
-      '删除自定义主页失败'
+      $r('app.string.settings_custom_home_deleted'),
+      $r('app.string.settings_custom_home_delete_failed')
     );
   }
 
   private runAction(
     action: Promise<void>,
-    successMessage: string,
-    failurePrefix: string
+    successMessage: ResourceStr,
+    failureMessage: Resource
   ): void {
     this.busy = true;
     action
@@ -1587,7 +1588,7 @@ export struct CustomHomepageSettingsScreen {
         this.showToast(successMessage);
       })
       .catch((error: Error) => {
-        this.showToast(`${failurePrefix}：${this.stringifyError(error)}`);
+        this.showToast(resolveAppResourceText(failureMessage, this.stringifyError(error)));
         this.refreshState();
       })
       .finally(() => {
@@ -1598,8 +1599,8 @@ export struct CustomHomepageSettingsScreen {
   private runSystemChromeAction(
     action: Promise<void>,
     previousState: CustomHomepageSettingsViewState,
-    successMessage: string,
-    failurePrefix: string
+    successMessage: ResourceStr,
+    failureMessage: Resource
   ): void {
     this.systemChromeBusy = true;
     action
@@ -1611,7 +1612,7 @@ export struct CustomHomepageSettingsScreen {
       .catch((error: Error) => {
         this.state = previousState;
         this.selectedChoiceId = this.resolveSelectedChoiceId(previousState);
-        this.showToast(`${failurePrefix}：${this.stringifyError(error)}`);
+        this.showToast(resolveAppResourceText(failureMessage, this.stringifyError(error)));
         this.refreshState();
       })
       .finally(() => {
@@ -1623,8 +1624,8 @@ export struct CustomHomepageSettingsScreen {
     action: Promise<void>,
     previousState: CustomHomepageSettingsViewState,
     previousSelectedChoiceId: string,
-    successMessage: string,
-    failurePrefix: string,
+    successMessage: ResourceStr,
+    failureMessage: Resource,
     returnHomeAfterSuccess: boolean = false
   ): void {
     this.busy = true;
@@ -1643,7 +1644,7 @@ export struct CustomHomepageSettingsScreen {
         this.state = previousState;
         this.selectedChoiceId = previousSelectedChoiceId;
         this.bumpHomepageListRevision();
-        this.showToast(`${failurePrefix}：${this.stringifyError(error)}`);
+        this.showToast(resolveAppResourceText(failureMessage, this.stringifyError(error)));
         this.refreshState();
       })
       .finally(() => {
@@ -1736,14 +1737,14 @@ export struct CustomHomepageSettingsScreen {
       this.resetRemoteHomepageRefreshRun();
       this.busy = false;
       this.remoteHomepageProgressController.finish(
-        allSucceeded ? '预览图已刷新' : (partiallySucceeded ? '部分预览图已刷新' : '预览图刷新失败'),
+        allSucceeded ? $r('app.string.settings_custom_home_preview_done') : (partiallySucceeded ? $r('app.string.settings_custom_home_preview_partial') : $r('app.string.settings_custom_home_preview_failed')),
         allSucceeded
-          ? '所有网址主页的预览图已保存。'
+          ? $r('app.string.settings_custom_home_preview_saved_all')
           : (partiallySucceeded
-            ? `已刷新 ${succeededCount}/${totalCount} 个网址主页预览图。`
-            : '暂时无法刷新预览图，请稍后重试。'),
+            ? $r('app.string.settings_custom_home_preview_saved_partial', succeededCount, totalCount)
+            : $r('app.string.settings_custom_home_preview_retry')),
         () => {
-          this.showToast(allSucceeded ? '预览图已刷新' : (partiallySucceeded ? '部分预览图已刷新' : '预览图刷新失败'));
+          this.showToast(allSucceeded ? $r('app.string.settings_custom_home_preview_done') : (partiallySucceeded ? $r('app.string.settings_custom_home_preview_partial') : $r('app.string.settings_custom_home_preview_failed')));
         },
         false
       );
@@ -1751,7 +1752,7 @@ export struct CustomHomepageSettingsScreen {
     }
     this.busy = false;
     this.remoteHomepageProgressController.finish(
-      result.status === 'saved' ? '主页已准备好' : '主页已保存',
+      result.status === 'saved' ? $r('app.string.settings_custom_home_ready') : $r('app.string.settings_custom_home_saved'),
       result.message,
       () => {
         this.showToast(result.message);
@@ -1769,8 +1770,8 @@ export struct CustomHomepageSettingsScreen {
     const currentIndex = this.remoteHomepageRefreshFinishedCount + 1;
     const totalCount = Math.max(1, this.remoteHomepageRefreshTotalCount);
     this.remoteHomepageProgressController.update(
-      '正在刷新预览图',
-      `正在刷新第 ${currentIndex}/${totalCount} 个网址主页预览图`,
+      $r('app.string.settings_custom_home_refreshing'),
+      $r('app.string.settings_custom_home_refresh_progress', currentIndex, totalCount),
       Math.min(92, Math.round((this.remoteHomepageRefreshFinishedCount / totalCount) * 80) + 12)
     );
     this.remoteHomepageWarmupTask = this.warmupCoordinator.buildTask(target.id, target.url);
@@ -2010,7 +2011,7 @@ export struct CustomHomepageSettingsScreen {
       const title = record.tab.title.trim();
       items.push({
         key: record.id,
-        title: title.length > 0 ? title : (url.length > 0 ? url : '未命名标签页'),
+        title: title.length > 0 ? title : (url.length > 0 ? url : resolveAppResourceText($r('app.string.settings_custom_home_untitled_tab'))),
         subtitle: this.shortcutLogicService.extractDomainFromUrl(url),
         iconUri: this.resolveClosedRecordIconUri(record, url, siteIconService)
       });
@@ -2153,8 +2154,8 @@ export struct CustomHomepageSettingsScreen {
       this.coordinator.selectCustomHomepage(choice.id),
       previousState,
       previousSelectedChoiceId,
-      '已切换主页',
-      '切换主页失败',
+      $r('app.string.settings_custom_home_switched'),
+      $r('app.string.settings_custom_home_switch_failed'),
       false
     );
   }
@@ -2246,7 +2247,7 @@ export struct CustomHomepageSettingsScreen {
       })
       .catch((error: Error) => {
         this.homepageSettingsChrome = previous;
-        this.showToast(`更新主页设置失败：${this.stringifyError(error)}`);
+        this.showToast($r('app.string.settings_custom_home_update_failed', this.stringifyError(error)));
       })
       .finally(() => {
         this.systemChromeBusy = false;
@@ -2305,20 +2306,20 @@ export struct CustomHomepageSettingsScreen {
   private resolveFocusedChromeMessage(
     field: 'search' | 'entry' | 'dark' | 'scroll',
     value: boolean
-  ): string {
+  ): ResourceStr {
     if (field === 'search') {
-      return value ? '已在此主页显示系统搜索' : '已在此主页隐藏系统搜索';
+      return value ? $r('app.string.settings_custom_home_search_shown') : $r('app.string.settings_custom_home_search_hidden');
     }
     if (field === 'entry') {
-      return value ? '已显示系统入口按钮' : '已隐藏系统入口按钮';
+      return value ? $r('app.string.settings_custom_home_entry_shown') : $r('app.string.settings_custom_home_entry_hidden');
     }
     if (field === 'dark') {
-      return value ? '网址主页强制深色已开启' : '网址主页将尊重网页原本外观';
+      return value ? $r('app.string.settings_custom_home_dark_on') : $r('app.string.settings_custom_home_dark_off');
     }
-    return value ? '当前主页已启用滚动显示或隐藏' : '当前主页已关闭滚动显示或隐藏';
+    return value ? $r('app.string.settings_custom_home_scroll_on') : $r('app.string.settings_custom_home_scroll_off');
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

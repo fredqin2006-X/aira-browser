@@ -19,6 +19,8 @@ export struct HomeBackdropLayer {
   @Prop tintColor: ResourceColor = '#000000';
   @Prop tintOpacity: number = 0;
   @Prop playbackEnabled: boolean = false;
+  @Prop pageForeground: boolean = true;
+  @Prop resumeEpoch: number = 0;
 
   build() {
     Stack({ alignContent: Alignment.Center }) {
@@ -45,7 +47,9 @@ export struct HomeBackdropLayer {
       state: this.wallpaperState,
       darkModeActive: this.darkModeActive,
       themeBackgroundColor: this.themeBackgroundColor,
-      playbackEnabled: this.playbackEnabled
+      playbackEnabled: this.playbackEnabled,
+      pageForeground: this.pageForeground,
+      resumeEpoch: this.resumeEpoch
     })
     PrivateHomeWatermark({
       visible: this.privateModeVisible,

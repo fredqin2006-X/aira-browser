@@ -164,7 +164,7 @@ export struct SettingsCenterScreen {
         this.closeSettingsSheet();
       }
     },
-    showMessage: (message: string): void => {
+    showMessage: (message: ResourceStr): void => {
       this.showToast(message);
     },
     openSettings: (): void => {
@@ -707,7 +707,7 @@ export struct SettingsCenterScreen {
     };
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     this.getUIContext().getPromptAction().showToast({
       message: message,
       duration: 1800

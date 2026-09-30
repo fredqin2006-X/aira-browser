@@ -29,6 +29,9 @@ function load(relative) {
       if (!name.startsWith('.')) throw new Error(`Unexpected dependency: ${name}`);
       return load(path.relative(root, path.resolve(path.dirname(filename), `${name}.ets`)));
     },
+    // ArkTS resource references are resolved by the ArkUI runtime; the harness
+    // only needs the resource identity, never a localized value.
+    $r: (value) => ({ id: -1, params: [], value }),
     ListScroller: class {
       scrollToIndex() {}
       closeAllSwipeActions() {}

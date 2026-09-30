@@ -128,7 +128,7 @@ export struct HomeNativeSettingsContent {
   @Builder
   private buildWallpaperSection() {
     SettingsSection({
-      title: '主页外观',
+      title: $r('app.string.settings_home_appearance'),
       secondaryTextColor: this.storedSecondaryTextColor,
       titleLeftPadding: this.dialogContentInset()
     }) {
@@ -138,7 +138,7 @@ export struct HomeNativeSettingsContent {
       }) {
         if (this.showsLogoSettings()) {
           SettingsNavigationRow({
-            title: 'Logo设置',
+            title: $r('app.string.settings_home_logo_settings'),
             value: this.logoLabel,
             rowPosition: 'first',
             isEnabled: this.resolveControlEnabled(),
@@ -151,7 +151,7 @@ export struct HomeNativeSettingsContent {
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         }
         SettingsNavigationRow({
-          title: '壁纸设置',
+          title: $r('app.string.settings_home_wallpaper'),
           value: this.wallpaperLabel,
           rowPosition: this.showsLogoSettings() ? 'last' : 'single',
           isEnabled: this.resolveControlEnabled(),
@@ -177,7 +177,7 @@ export struct HomeNativeSettingsContent {
   @Builder
   private buildCenteredFavoritesSection() {
     SettingsSection({
-      title: '收藏设置',
+      title: $r('app.string.settings_home_favorites'),
       secondaryTextColor: this.storedSecondaryTextColor,
       titleLeftPadding: this.dialogContentInset()
     }) {
@@ -186,7 +186,7 @@ export struct HomeNativeSettingsContent {
         flat: this.dialogPresentation
       }) {
         SettingsSwitchRow({
-          title: '显示收藏',
+          title: $r('app.string.settings_home_show_favorites'),
           checked: this.showFavorites,
           rowPosition: 'first',
           isEnabled: this.resolveControlEnabled(),
@@ -196,7 +196,7 @@ export struct HomeNativeSettingsContent {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: '显示图标名称',
+          title: $r('app.string.settings_home_show_icon_names'),
           checked: this.showShortcutNames,
           rowPosition: 'middle',
           isEnabled: this.resolveDependentControlEnabled(this.showFavorites),
@@ -209,7 +209,7 @@ export struct HomeNativeSettingsContent {
       }
 
       SettingsFooterText({
-        text: '图标默认圆形，排列固定。',
+        text: $r('app.string.settings_home_favorites_round_note'),
         secondaryTextColor: this.storedSecondaryTextColor,
         horizontalPadding: this.dialogContentInset()
       })
@@ -219,7 +219,7 @@ export struct HomeNativeSettingsContent {
   @Builder
   private buildClassicFavoritesSection() {
     SettingsSection({
-      title: '收藏设置',
+      title: $r('app.string.settings_home_favorites'),
       secondaryTextColor: this.storedSecondaryTextColor,
       titleLeftPadding: this.dialogContentInset()
     }) {
@@ -228,7 +228,7 @@ export struct HomeNativeSettingsContent {
         flat: this.dialogPresentation
       }) {
         SettingsSwitchRow({
-          title: '显示收藏',
+          title: $r('app.string.settings_home_show_favorites'),
           checked: this.showFavorites,
           rowPosition: 'first',
           isEnabled: this.resolveControlEnabled(),
@@ -244,7 +244,7 @@ export struct HomeNativeSettingsContent {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: '收藏紧凑排列',
+          title: $r('app.string.settings_home_favorites_compact'),
           checked: this.compactFavorites,
           rowPosition: 'middle',
           isEnabled: this.resolveDependentControlEnabled(this.showFavorites),
@@ -255,7 +255,7 @@ export struct HomeNativeSettingsContent {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: '显示分区标题',
+          title: $r('app.string.settings_home_show_section_title'),
           checked: this.showFavoritesTitle,
           rowPosition: 'middle',
           isEnabled: this.resolveDependentControlEnabled(this.showFavorites),
@@ -267,7 +267,7 @@ export struct HomeNativeSettingsContent {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: '显示图标名称',
+          title: $r('app.string.settings_home_show_icon_names'),
           checked: this.showShortcutNames,
           rowPosition: 'middle',
           isEnabled: this.resolveDependentControlEnabled(this.showFavorites),
@@ -284,7 +284,7 @@ export struct HomeNativeSettingsContent {
       }
 
       SettingsFooterText({
-        text: '关闭分区标题后，收藏会保持展开。',
+        text: $r('app.string.settings_home_favorites_expand_note'),
         secondaryTextColor: this.storedSecondaryTextColor,
         horizontalPadding: this.dialogContentInset()
       })
@@ -295,7 +295,7 @@ export struct HomeNativeSettingsContent {
   private buildIconSizeSlider() {
     Column({ space: 12 }) {
       Row() {
-        Text('主页图标大小')
+        Text($r('app.string.settings_home_icon_size'))
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.storedPrimaryTextColor)
@@ -342,7 +342,7 @@ export struct HomeNativeSettingsContent {
   private buildIconRadiusSlider() {
     Column({ space: 12 }) {
       Row() {
-        Text('图标圆角')
+        Text($r('app.string.settings_icon_corner'))
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.storedPrimaryTextColor)
@@ -388,7 +388,7 @@ export struct HomeNativeSettingsContent {
   @Builder
   private buildRecentlyClosedSection() {
     SettingsSection({
-      title: '最近关闭',
+      title: $r('app.string.settings_home_recently_closed'),
       secondaryTextColor: this.storedSecondaryTextColor,
       titleLeftPadding: this.dialogContentInset()
     }) {
@@ -397,7 +397,7 @@ export struct HomeNativeSettingsContent {
         flat: this.dialogPresentation
       }) {
         SettingsSwitchRow({
-          title: '显示最近关闭',
+          title: $r('app.string.settings_home_show_recently_closed'),
           checked: this.showRecentlyClosed,
           rowPosition: 'first',
           isEnabled: this.resolveControlEnabled(),
@@ -413,7 +413,7 @@ export struct HomeNativeSettingsContent {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: '显示分区标题',
+          title: $r('app.string.settings_home_show_section_title'),
           checked: this.showRecentlyClosedTitle,
           rowPosition: 'middle',
           isEnabled: this.resolveDependentControlEnabled(this.showRecentlyClosed),
@@ -428,7 +428,7 @@ export struct HomeNativeSettingsContent {
       }
 
       SettingsFooterText({
-        text: '关闭后将清除已有记录，且不再保留新记录。',
+        text: $r('app.string.settings_home_recently_closed_clear_note'),
         secondaryTextColor: this.storedSecondaryTextColor,
         horizontalPadding: this.dialogContentInset()
       })
@@ -439,7 +439,7 @@ export struct HomeNativeSettingsContent {
   private buildRecentlyClosedLimitSlider() {
     Column({ space: 10 }) {
       Row() {
-        Text('显示数量')
+        Text($r('app.string.settings_display_count'))
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.storedPrimaryTextColor)
@@ -495,7 +495,7 @@ export struct HomeNativeSettingsContent {
   @Builder
   private buildSystemSearchSection() {
     SettingsSection({
-      title: '系统搜索',
+      title: $r('app.string.settings_home_system_search'),
       secondaryTextColor: this.storedSecondaryTextColor,
       titleLeftPadding: this.dialogContentInset()
     }) {
@@ -504,7 +504,7 @@ export struct HomeNativeSettingsContent {
         flat: this.dialogPresentation
       }) {
         SettingsSwitchRow({
-          title: '在主页显示系统搜索',
+          title: $r('app.string.settings_home_show_system_search'),
           checked: this.showSystemSearch,
           rowPosition: 'first',
           isEnabled: this.resolveControlEnabled(),
@@ -515,7 +515,7 @@ export struct HomeNativeSettingsContent {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: '滚动时显示或隐藏',
+          title: $r('app.string.settings_home_search_scroll'),
           checked: this.hideSystemSearchOnScroll,
           rowPosition: 'last',
           isEnabled: this.resolveDependentControlEnabled(this.showSystemSearch),
@@ -540,7 +540,7 @@ export struct HomeNativeSettingsContent {
           flat: this.dialogPresentation
         }) {
           SettingsSwitchRow({
-            title: '显示主页设置按钮',
+            title: $r('app.string.settings_home_show_settings_button'),
             checked: this.showSettingsButton,
             rowPosition: 'single',
             isEnabled: this.resolveControlEnabled(),

@@ -16,14 +16,15 @@ import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../common/config/AiraDist
 
 export interface HuaweiAccountInfoRowState {
   id: string;
-  title: string;
-  value: string;
+  title: ResourceStr;
+  value: ResourceStr;
 }
 
 export interface HuaweiAccountInfoViewState {
-  title: string;
-  subtitle: string;
-  recognitionInfoText: string;
+  title: ResourceStr;
+  subtitle: ResourceStr;
+  recognitionInfoText: ResourceStr;
+  showRecognitionInfo: boolean;
   avatarUri: string;
   recognitionBadge: AiraAccountRecognitionBadgeKind;
   activity: AiraActivityHeatmapViewState;
@@ -48,10 +49,10 @@ export class HuaweiAccountInfoViewModel {
       ? 'Community'
       : this.resolveMembershipLabel(membership);
     const recognitionBadge = this.membershipPresentationService.resolveRecognitionBadgeKind(membership);
-    const recognitionSubtitle = this.membershipPresentationService.resolveRecognitionSubtitle(membership);
-    const recognitionInfoText = this.membershipPresentationService.resolveRecognitionInfoText(membership);
+    const showRecognitionInfo = uid.length > 0 &&
+      this.membershipPresentationService.hasInsiderRecognition(membership);
     const rows: HuaweiAccountInfoRowState[] = [
-      { id: 'membership', title: '当前版本', value: membershipLabel }
+      { id: 'membership', title: $r('app.string.settings_account_version'), value: membershipLabel }
     ];
     const membershipExpiryRow = AIRA_DISTRIBUTION_CAPABILITY_OWNER.isCommunity()
       ? undefined
@@ -60,17 +61,36 @@ export class HuaweiAccountInfoViewModel {
       rows.push(membershipExpiryRow);
     }
     rows.push(
-      { id: 'displayName', title: '账号昵称', value: uid.length > 0 ? title : '未登录' },
-      { id: 'joinedAt', title: '加入 Aira 时间', value: this.formatJoinedAt(uid, membership.accountFirstSeenAt) },
-      { id: 'joinedDays', title: '已加入 Aira', value: this.formatJoinedDays(uid, membership.accountFirstSeenAt) },
-      { id: 'uid', title: '账号 ID', value: uid.length > 0 ? uid : '未登录' }
+      {
+        id: 'displayName',
+        title: $r('app.string.settings_account_nickname'),
+        value: uid.length > 0 ? title : $r('app.string.settings_account_signed_out')
+      },
+      {
+        id: 'joinedAt',
+        title: $r('app.string.settings_account_joined_at'),
+        value: this.formatJoinedAt(uid, membership.accountFirstSeenAt)
+      },
+      {
+        id: 'joinedDays',
+        title: $r('app.string.settings_account_joined'),
+        value: this.formatJoinedDays(uid, membership.accountFirstSeenAt)
+      },
+      {
+        id: 'uid',
+        title: $r('app.string.settings_account_id'),
+        value: uid.length > 0 ? uid : $r('app.string.settings_account_signed_out')
+      }
     );
     return {
-      title: uid.length > 0 ? title : '未登录',
+      title: uid.length > 0 ? title : $r('app.string.settings_account_signed_out'),
       subtitle: uid.length > 0
-        ? (recognitionSubtitle.length > 0 ? recognitionSubtitle : '华为账号已登录')
-        : '本地浏览功能已全部开启，登录后可使用账号与云服务',
-      recognitionInfoText: uid.length > 0 ? recognitionInfoText : '',
+        ? (showRecognitionInfo
+          ? $r('app.string.settings_account_insider_subtitle')
+          : $r('app.string.settings_account_signed_in'))
+        : $r('app.string.settings_account_signed_out_note'),
+      recognitionInfoText: showRecognitionInfo ? $r('app.string.settings_account_insider_info') : '',
+      showRecognitionInfo: showRecognitionInfo,
       avatarUri: identity.photoUrl,
       recognitionBadge: uid.length > 0 ? recognitionBadge : 'none',
       activity: this.activityHeatmapViewModel.buildState(activityTotals),
@@ -85,10 +105,10 @@ export class HuaweiAccountInfoViewModel {
     }
     return {
       id: 'membershipExpiry',
-      title: '会员有效期',
+      title: $r('app.string.settings_account_membership_expiry'),
       value: this.membershipPresentationService.isLongTermMember(membership)
-        ? '长期有效'
-        : `有效至 ${this.formatMembershipDate(membership.planExpiresAt)}`
+        ? $r('app.string.settings_account_long_term')
+        : $r('app.string.settings_account_valid_until', this.formatMembershipDate(membership.planExpiresAt))
     };
   }
 
@@ -100,24 +120,30 @@ export class HuaweiAccountInfoViewModel {
     return `${year}-${month}-${day}`;
   }
 
-  private resolveUidTitle(uid: string): string {
+  private resolveUidTitle(uid: string): ResourceStr {
     if (uid.length <= 0) {
-      return '华为账号';
+      return $r('app.string.settings_account_huawei');
     }
     const suffix = uid.length > 6 ? uid.slice(uid.length - 6) : uid;
-    return `华为账号 ${suffix}`;
+    return $r('app.string.settings_account_huawei_suffix', suffix);
   }
 
-  private resolveMembershipLabel(membership: AiraMembershipState): string {
-    return this.membershipPresentationService.resolveVersionLabel(membership);
+  private resolveMembershipLabel(membership: AiraMembershipState): ResourceStr {
+    if (this.membershipPresentationService.isLongTermMember(membership)) {
+      return $r('app.string.settings_account_long_term_member');
+    }
+    if (membership.plan === 'pro') {
+      return 'Aira Pro';
+    }
+    return 'Aira Club';
   }
 
-  private formatJoinedAt(uid: string, timestamp: number): string {
+  private formatJoinedAt(uid: string, timestamp: number): ResourceStr {
     if (uid.length <= 0) {
-      return '未登录';
+      return $r('app.string.settings_account_signed_out');
     }
     if (timestamp <= 0) {
-      return '待同步';
+      return $r('app.string.settings_account_pending_sync');
     }
     const date = new Date(timestamp);
     const year = date.getFullYear();
@@ -126,16 +152,16 @@ export class HuaweiAccountInfoViewModel {
     return `${year}-${month}-${day}`;
   }
 
-  private formatJoinedDays(uid: string, timestamp: number): string {
+  private formatJoinedDays(uid: string, timestamp: number): ResourceStr {
     if (uid.length <= 0) {
-      return '未登录';
+      return $r('app.string.settings_account_signed_out');
     }
     if (timestamp <= 0) {
-      return '待同步';
+      return $r('app.string.settings_account_pending_sync');
     }
     const elapsedMs = Math.max(0, Date.now() - timestamp);
     const days = Math.floor(elapsedMs / 86400000) + 1;
-    return `${days} 天`;
+    return $r('app.string.settings_account_joined_days', days);
   }
 
   private pad2(value: number): string {

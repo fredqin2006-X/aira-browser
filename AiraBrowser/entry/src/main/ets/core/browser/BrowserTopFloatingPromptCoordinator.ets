@@ -30,6 +30,7 @@ import {
 import { BrowserShellRouteCoordinator } from './BrowserShellRouteCoordinator';
 import { BrowserTabSwitchCoordinator } from './BrowserTabSwitchCoordinator';
 import { AiraRenderableIconId } from '../resources/GeneratedAiraIconCatalog';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { image } from '@kit.ImageKit';
 import {
   NovelTopPromptKind,
@@ -388,7 +389,7 @@ export class BrowserTopFloatingPromptCoordinator {
       visible: state.visible,
       key: this.buildOfflineSaveActionPromptKey(state),
       topOffsetVp: topOffsetVp,
-      title: state.message,
+      title: resolveAppResourceText(state.message),
       subtitle: this.resolveOfflineSaveActionPromptSubtitle(state),
       fallbackLabel: this.resolveOfflineSaveActionPromptFallbackLabel(state),
       iconUri: state.iconUri,
@@ -409,12 +410,12 @@ export class BrowserTopFloatingPromptCoordinator {
         key: state.key,
         kind: state.kind,
         topOffsetVp: topOffsetVp,
-        title: `已自动进入${modeLabel}`,
+        title: resolveAppResourceText($r('app.string.novel_prompt_auto_enter', modeLabel)),
         subtitle: bookTitle.length > 0 ? bookTitle : modeLabel,
         fallbackLabel: bookTitle.length > 0 ? bookTitle : modeLabel,
         iconUri: '',
         airaIconId: 'browser.toolbar.reader',
-        actionText: '返回原网页'
+        actionText: resolveAppResourceText($r('app.string.novel_action_back_to_page'))
       };
     }
     return {
@@ -422,12 +423,16 @@ export class BrowserTopFloatingPromptCoordinator {
       key: state.key,
       kind: state.kind,
       topOffsetVp: topOffsetVp,
-      title: '已加入书架',
-      subtitle: bookTitle.length > 0 ? bookTitle : `已收藏这本${resolveNovelContentLabel(state.contentKind)}`,
-      fallbackLabel: bookTitle.length > 0 ? bookTitle : `我的${resolveNovelContentLabel(state.contentKind)}书架`,
+      title: resolveAppResourceText($r('app.string.novel_prompt_added_to_bookshelf')),
+      subtitle: bookTitle.length > 0
+        ? bookTitle
+        : resolveAppResourceText($r('app.string.novel_prompt_saved_book', resolveNovelContentLabel(state.contentKind))),
+      fallbackLabel: bookTitle.length > 0
+        ? bookTitle
+        : resolveAppResourceText($r('app.string.novel_prompt_bookshelf', resolveNovelContentLabel(state.contentKind))),
       iconUri: '',
       airaIconId: 'browser.toolbar.bookshelf',
-      actionText: '查看'
+      actionText: resolveAppResourceText($r('app.string.novel_prompt_view'))
     };
   }
 
@@ -520,7 +525,9 @@ export class BrowserTopFloatingPromptCoordinator {
       return normalizedUrl;
     }
     const normalizedTitle = state.title.trim();
-    return normalizedTitle.length > 0 ? normalizedTitle : '已保存离线网页';
+    return normalizedTitle.length > 0
+      ? normalizedTitle
+      : resolveAppResourceText($r('app.string.offline_web_prompt_fallback'));
   }
 
   private resolveOfflineSaveActionPromptFallbackLabel(state: OfflinePageSaveSessionSnapshot): string {
@@ -529,11 +536,11 @@ export class BrowserTopFloatingPromptCoordinator {
       return normalizedTitle;
     }
     const normalizedUrl = state.url.trim();
-    return normalizedUrl.length > 0 ? normalizedUrl : state.message;
+    return normalizedUrl.length > 0 ? normalizedUrl : resolveAppResourceText(state.message);
   }
 
   private buildOfflineSaveActionPromptKey(state: OfflinePageSaveSessionSnapshot): string {
-    return `${state.message}:${state.url}:${state.title}:${state.iconUri}`;
+    return `${resolveAppResourceText(state.message)}:${state.url}:${state.title}:${state.iconUri}`;
   }
 
   private buildGestureOnboardingTopPromptState(

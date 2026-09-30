@@ -6,6 +6,7 @@ import {
   BrowserPrivateDownloadRecordPolicy,
   BrowserDownloadSettings
 } from '../../common/models/BrowserModels';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface DownloadSettingsOptionView<T> {
   value: T;
@@ -33,23 +34,25 @@ export interface DownloadSettingsSectionState {
   privateRecordOptions: DownloadSettingsOptionView<BrowserPrivateDownloadRecordPolicy>[];
 }
 
-const DOWNLOAD_AUTO_CLEAR_OPTIONS: DownloadSettingsOptionView<BrowserDownloadAutoClearPolicy>[] = [
+function buildDownloadAutoClearOptions(): DownloadSettingsOptionView<BrowserDownloadAutoClearPolicy>[] {
+  return [
   {
     value: 'manual',
-    label: '手动',
-    helperText: '保留所有记录'
+    label: resolveAppResourceText($r('app.string.settings_web_download_clear_manual')),
+    helperText: resolveAppResourceText($r('app.string.settings_web_download_clear_manual_hint'))
   },
   {
     value: 'clear_completed',
-    label: '仅清理已完成',
-    helperText: '完成后自动收起'
+    label: resolveAppResourceText($r('app.string.settings_web_download_clear_completed')),
+    helperText: resolveAppResourceText($r('app.string.settings_web_download_clear_completed_hint'))
   },
   {
     value: 'clear_completed_and_failed',
-    label: '清理已完成和失败',
-    helperText: '完成和失败后收起'
+    label: resolveAppResourceText($r('app.string.settings_web_download_clear_failed')),
+    helperText: resolveAppResourceText($r('app.string.settings_web_download_clear_failed_hint'))
   }
-];
+  ];
+}
 
 const HLS_SEGMENT_CONCURRENCY_OPTIONS: DownloadSettingsOptionView<BrowserHlsSegmentConcurrency>[] = [
   {
@@ -69,31 +72,35 @@ const HLS_SEGMENT_CONCURRENCY_OPTIONS: DownloadSettingsOptionView<BrowserHlsSegm
   }
 ];
 
-const PRIVATE_DOWNLOAD_FILE_OPTIONS: DownloadSettingsOptionView<BrowserPrivateDownloadFilePolicy>[] = [
+function buildPrivateDownloadFileOptions(): DownloadSettingsOptionView<BrowserPrivateDownloadFilePolicy>[] {
+  return [
   {
     value: 'prompt_for_location',
-    label: '下载前询问',
-    helperText: '下载前确认'
+    label: resolveAppResourceText($r('app.string.settings_web_download_ask')),
+    helperText: resolveAppResourceText($r('app.string.settings_web_download_private_ask_hint'))
   },
   {
     value: 'session_temp_only',
-    label: '仅保留临时文件',
-    helperText: '退出私密后清理'
+    label: resolveAppResourceText($r('app.string.settings_web_download_private_temp')),
+    helperText: resolveAppResourceText($r('app.string.settings_web_download_private_temp_hint'))
   }
-];
+  ];
+}
 
-const PRIVATE_DOWNLOAD_RECORD_OPTIONS: DownloadSettingsOptionView<BrowserPrivateDownloadRecordPolicy>[] = [
+function buildPrivateDownloadRecordOptions(): DownloadSettingsOptionView<BrowserPrivateDownloadRecordPolicy>[] {
+  return [
   {
     value: 'keep_until_window_close',
-    label: '关闭私密窗口后清除',
-    helperText: '仅本次私密会话保留'
+    label: resolveAppResourceText($r('app.string.settings_web_download_private_keep')),
+    helperText: resolveAppResourceText($r('app.string.settings_web_download_private_keep_hint'))
   },
   {
     value: 'clear_after_export',
-    label: '导出后立即清除',
-    helperText: '导出后移除记录'
+    label: resolveAppResourceText($r('app.string.settings_web_download_private_export')),
+    helperText: resolveAppResourceText($r('app.string.settings_web_download_private_export_hint'))
   }
-];
+  ];
+}
 
 export class DownloadSettingsViewModel {
   buildState(settings: BrowserDownloadSettings): DownloadSettingsSectionState {
@@ -111,10 +118,10 @@ export class DownloadSettingsViewModel {
       autoClearPolicy: settings.autoClearPolicy,
       privateFilePolicy: settings.privateFilePolicy,
       privateRecordPolicy: settings.privateRecordPolicy,
-      autoClearOptions: DOWNLOAD_AUTO_CLEAR_OPTIONS.slice(),
+      autoClearOptions: buildDownloadAutoClearOptions(),
       hlsSegmentConcurrencyOptions: HLS_SEGMENT_CONCURRENCY_OPTIONS.slice(),
-      privateFileOptions: PRIVATE_DOWNLOAD_FILE_OPTIONS.slice(),
-      privateRecordOptions: PRIVATE_DOWNLOAD_RECORD_OPTIONS.slice()
+      privateFileOptions: buildPrivateDownloadFileOptions(),
+      privateRecordOptions: buildPrivateDownloadRecordOptions()
     };
   }
 
@@ -137,30 +144,36 @@ export class DownloadSettingsViewModel {
   }
 
   private buildSummaryText(settings: BrowserDownloadSettings): string {
-    const askBeforeDownloadLabel = settings.askBeforeDownload ? '下载前询问' : '直接下载';
-    const networkLabel = settings.allowCellularDownloads ? '可用移动数据' : '仅 WLAN';
-    const resumeLabel = settings.autoResumeAfterRestart ? '启动后恢复' : '手动恢复';
+    const askBeforeDownloadLabel = resolveAppResourceText(settings.askBeforeDownload
+      ? $r('app.string.settings_web_download_ask')
+      : $r('app.string.settings_web_download_direct'));
+    const networkLabel = resolveAppResourceText(settings.allowCellularDownloads
+      ? $r('app.string.settings_web_download_cellular_allowed')
+      : $r('app.string.settings_web_download_wlan_only'));
+    const resumeLabel = resolveAppResourceText(settings.autoResumeAfterRestart
+      ? $r('app.string.settings_web_download_resume_on')
+      : $r('app.string.settings_web_download_resume_manual'));
     return `${this.getLocationLabel(settings)} · ${askBeforeDownloadLabel} · ${networkLabel} · ${resumeLabel}`;
   }
 
   private buildHelperText(settings: BrowserDownloadSettings): string {
     if (!settings.autoResumeAfterRestart) {
-      return '重启后不会自动继续未完成下载';
+      return resolveAppResourceText($r('app.string.settings_web_download_helper_no_resume'));
     }
     if (settings.askBeforeDownload) {
-      return '下载前先确认';
+      return resolveAppResourceText($r('app.string.settings_web_download_helper_ask'));
     }
     if (settings.autoClearPolicy === 'manual') {
-      return '记录保留到手动清理';
+      return resolveAppResourceText($r('app.string.settings_web_download_helper_manual_clear'));
     }
-    return '记录会按规则收起';
+    return resolveAppResourceText($r('app.string.settings_web_download_helper_auto_clear'));
   }
 
   private getLocationLabel(settings: BrowserDownloadSettings): string {
     if (settings.defaultLocation === 'custom' && settings.customLocationLabel.trim().length > 0) {
       return settings.customLocationLabel.trim();
     }
-    return '我的手机/Download/Aira';
+    return resolveAppResourceText($r('app.string.settings_web_download_system_location'));
   }
 
 }

@@ -23,34 +23,34 @@ export type SyncExperiencePreActiveStatusKind =
 
 interface SyncExperienceGoalDescriptor {
   id: AiraSyncProviderKind;
-  title: string;
-  description: string;
+  title: ResourceStr;
+  description: ResourceStr;
   requiresPro: boolean;
 }
 
 const SYNC_EXPERIENCE_GOALS: SyncExperienceGoalDescriptor[] = [
   {
     id: 'aira_cloud',
-    title: 'Aira 云同步',
-    description: '通过电脑上的 Aira-sync 扩展在手机、Windows 和 Mac 之间跨设备同步。',
+    title: $r('app.string.settings_sync_goal_cloud'),
+    description: $r('app.string.settings_sync_goal_cloud_desc'),
     requiresPro: true
   },
   {
     id: 'huawei_space',
-    title: '华为云空间',
-    description: '使用你自己的华为云空间，在华为设备上的 Aira 之间同步书签、历史记录、主页收藏、小说书架和常用设置；数据不经过 Aira 云服务器。',
+    title: $r('app.string.settings_sync_goal_huawei'),
+    description: $r('app.string.settings_sync_goal_huawei_desc'),
     requiresPro: false
   },
   {
     id: 'webdav',
-    title: 'WebDAV 同步',
-    description: '连接你自己的 WebDAV 服务，保存并同步书签、主页收藏、小说书架和常用设置。',
+    title: $r('app.string.settings_sync_goal_webdav'),
+    description: $r('app.string.settings_sync_goal_webdav_desc'),
     requiresPro: false
   },
   {
     id: 'self_hosted',
-    title: '私有化部署',
-    description: '连接你部署的 Aira 私有化服务器，在自己的设备之间同步书签、历史记录、主页收藏、小说书架和常用设置。',
+    title: $r('app.string.settings_pro_self_hosting'),
+    description: $r('app.string.settings_sync_goal_self_host_desc'),
     requiresPro: false
   }
 ];
@@ -73,13 +73,13 @@ function resolveDistributionSyncExperienceGoals(): SyncExperienceGoalDescriptor[
   return goals;
 }
 
-function resolveDistributionGoalTitle(goal: SyncExperienceGoalDescriptor): string {
+function resolveDistributionGoalTitle(goal: SyncExperienceGoalDescriptor): ResourceStr {
   if (AIRA_DISTRIBUTION_CAPABILITY_OWNER.isCommunity()) {
     if (goal.id === 'self_hosted') {
-      return '私有化部署';
+      return $r('app.string.settings_pro_self_hosting');
     }
     if (goal.id === 'webdav') {
-      return 'WebDAV 同步';
+      return $r('app.string.settings_sync_goal_webdav');
     }
   }
   return goal.title;
@@ -87,8 +87,8 @@ function resolveDistributionGoalTitle(goal: SyncExperienceGoalDescriptor): strin
 
 export interface SyncExperienceGoalOption {
   id: AiraSyncProviderKind;
-  title: string;
-  description: string;
+  title: ResourceStr;
+  description: ResourceStr;
   isSelected: boolean;
   requiresPro: boolean;
 }
@@ -104,14 +104,15 @@ export interface SyncExperienceViewState {
   historySupported: boolean;
   historyProviderLabel: string;
   statusKind: SyncExperienceStatusKind;
-  statusTitle: string;
-  statusMessage: string;
-  goalLabel: string;
-  lastSyncLabel: string;
+  statusTitle: ResourceStr;
+  statusMessage: ResourceStr;
+  statusDetail: ResourceStr;
+  goalLabel: ResourceStr;
+  lastSyncLabel: ResourceStr;
   enabledPersonalizationItemCount: number;
   canSyncNow: boolean;
   requiresAiraProAction: boolean;
-  additionalBackupSummary: string;
+  additionalBackupSummary: ResourceStr;
   huaweiSpaceBookmarkUpgradeRequired: boolean;
   airaCloudActive: boolean;
   huaweiSpaceActive: boolean;
@@ -149,16 +150,17 @@ export function createDefaultSyncExperienceViewState(): SyncExperienceViewState 
     historySupported: true,
     historyProviderLabel: AIRA_DISTRIBUTION_CAPABILITY_OWNER.isAvailable('aira_cloud') ? 'Aira 云' : '尚未选择',
     statusKind: 'setup',
-    statusTitle: '同步尚未开启',
-    statusMessage: '先选择同步内容，再选择希望数据出现在哪些设备上。',
-    goalLabel: '尚未选择',
-    lastSyncLabel: '尚未完成同步',
+    statusTitle: $r('app.string.settings_sync_not_started'),
+    statusMessage: $r('app.string.settings_sync_setup_message'),
+    statusDetail: '',
+    goalLabel: $r('app.string.settings_sync_unset'),
+    lastSyncLabel: $r('app.string.settings_sync_last_never'),
     enabledPersonalizationItemCount: personalizationItems.filter(
       (item: PersonalizationSyncItemState): boolean => item.enabled
     ).length,
     canSyncNow: false,
     requiresAiraProAction: false,
-    additionalBackupSummary: '未设置',
+    additionalBackupSummary: $r('app.string.settings_sync_backup_unset'),
     huaweiSpaceBookmarkUpgradeRequired: false,
     airaCloudActive: false,
     huaweiSpaceActive: false,
@@ -215,7 +217,8 @@ export class SyncExperienceViewModel {
         activeProvider,
         contentSelection
       ),
-      goalLabel: this.resolveGoalLabel(activeProvider, input.settings),
+      statusDetail: this.resolveStatusDetail(statusKind, input, activeProvider),
+      goalLabel: this.resolveGoalLabelResource(activeProvider, input.settings),
       lastSyncLabel: this.formatLastSyncLabel(Math.max(
         resolveAiraSyncActiveProviderLastSuccessAt(input.settings),
         input.personalizationConfig.lastSyncAt
@@ -231,6 +234,21 @@ export class SyncExperienceViewModel {
       goalOptions: this.buildGoalOptions(activeProvider, input.settings),
       personalizationItems: personalizationItems
     };
+  }
+
+  resolveGoalLabelResource(remoteKind: AiraSyncRemoteKind, settings?: AiraSyncSettings): ResourceStr {
+    if (remoteKind === 'none') {
+      return $r('app.string.settings_sync_unset');
+    }
+    if (remoteKind === 'webdav') {
+      const endpoint = settings?.webdav.endpoint.trim() ?? '';
+      if (endpoint.length <= 0) {
+        return $r('app.string.settings_sync_goal_webdav');
+      }
+      return this.webdavProviderCatalog.resolveProviderForEndpoint(endpoint).name;
+    }
+    const goal = SYNC_EXPERIENCE_GOALS.find((item: SyncExperienceGoalDescriptor) => item.id === remoteKind);
+    return goal !== undefined ? resolveDistributionGoalTitle(goal) : $r('app.string.settings_sync_unset');
   }
 
   resolveGoalLabel(remoteKind: AiraSyncRemoteKind, settings?: AiraSyncSettings): string {
@@ -308,23 +326,25 @@ export class SyncExperienceViewModel {
     return 'normal';
   }
 
-  private resolveStatusTitle(kind: SyncExperienceStatusKind, hasConfiguredSync: boolean): string {
+  private resolveStatusTitle(kind: SyncExperienceStatusKind, hasConfiguredSync: boolean): ResourceStr {
     if (kind === 'setup') {
-      return hasConfiguredSync ? '请选择同步内容' : '同步尚未开启';
+      return hasConfiguredSync
+        ? $r('app.string.settings_sync_choose_content')
+        : $r('app.string.settings_sync_not_started');
     }
     if (kind === 'attention') {
-      return '部分内容需要处理';
+      return $r('app.string.settings_sync_attention');
     }
     if (kind === 'paused') {
-      return '已暂停';
+      return $r('app.string.settings_sync_paused');
     }
     if (kind === 'syncing') {
-      return '正在同步';
+      return $r('app.string.settings_sync_syncing');
     }
     if (kind === 'initializing') {
-      return '正在初始化书签';
+      return $r('app.string.settings_sync_initializing_bookmarks');
     }
-    return '同步正常';
+    return $r('app.string.settings_sync_normal');
   }
 
   private resolveStatusMessage(
@@ -332,29 +352,29 @@ export class SyncExperienceViewModel {
     input: SyncExperienceViewModelInput,
     activeProvider: AiraSyncRemoteKind,
     contentSelection: SyncExperienceContentSelection
-  ): string {
+  ): ResourceStr {
     if (kind === 'setup') {
       if (activeProvider === 'none') {
-        return '先选择同步内容，再选择希望数据出现在哪些设备上。';
+        return $r('app.string.settings_sync_setup_message');
       }
       if (!contentSelection.bookmarkSelected && !contentSelection.personalizationSelected &&
         !contentSelection.historySelected) {
         if (activeProvider === 'webdav') {
-          return '同步方式仍然开启，请在下方选择书签、主页收藏、小说书架或常用设置。';
+          return $r('app.string.settings_sync_choose_webdav_content');
         }
-        return '同步方式仍然开启，请在下方选择书签、历史记录、主页收藏、小说书架或常用设置。';
+        return $r('app.string.settings_sync_choose_content_active');
       }
-      return '同步方式已保存，重新开启后会按当前内容选择继续同步。';
+      return $r('app.string.settings_sync_saved_resume');
     }
     if (kind === 'paused') {
-      return '本机和云端数据都已保留，重新开启后会安全恢复。';
+      return $r('app.string.settings_sync_paused_message');
     }
     if (kind === 'attention') {
       if (activeProvider === 'huawei_space' && input.huaweiSpaceBookmarkUpgradeRequired) {
-        return '华为云空间书签同步已升级，请重新开启书签同步。本机书签和其他同步内容不受影响。';
+        return $r('app.string.settings_sync_huawei_upgrade_status');
       }
       if (activeProvider === 'aira_cloud' && !input.airaCloudEligible) {
-        return 'Aira 云同步需要恢复 Aira Pro，或更改同步方式。';
+        return $r('app.string.settings_sync_pro_restore_status');
       }
       const bookmarkNeedsAttention = this.bookmarkNeedsAttention(input, activeProvider);
       const personalizationNeedsAttention = this.personalizationNeedsAttention(input, activeProvider);
@@ -363,34 +383,36 @@ export class SyncExperienceViewModel {
         activeProvider
       );
       if (bookmarkNeedsAttention && personalizationNeedsAttention) {
-        const bookmarkMessage = this.resolveBookmarkFailureMessage(input, activeProvider);
-        const message = `${bookmarkMessage} 主页收藏、小说书架或常用设置也暂时没有完成同步。`;
-        return systemUpdateGuidance.length > 0 ? `${message}${systemUpdateGuidance}` : message;
+        return systemUpdateGuidance.length > 0
+          ? $r('app.string.settings_sync_attention_both_update')
+          : $r('app.string.settings_sync_attention_both');
       }
       if (bookmarkNeedsAttention) {
-        return `${this.resolveBookmarkFailureMessage(input, activeProvider)} ` +
-          '主页收藏、小说书架和常用设置不受影响。';
+        return systemUpdateGuidance.length > 0
+          ? $r('app.string.settings_sync_attention_bookmarks_update')
+          : $r('app.string.settings_sync_attention_bookmarks');
       }
       if (personalizationNeedsAttention) {
-        const message = '主页收藏、小说书架或常用设置暂时没有完成同步，书签不受影响。';
-        return systemUpdateGuidance.length > 0 ? `${message}${systemUpdateGuidance}` : message;
+        return systemUpdateGuidance.length > 0
+          ? $r('app.string.settings_sync_attention_personalization_update')
+          : $r('app.string.settings_sync_attention_personalization');
       }
       if (this.hasAdditionalBackupAttention(input.settings)) {
-        return '一个或多个额外备份位置暂时没有完成，当前同步方式不受影响。';
+        return $r('app.string.settings_sync_attention_backup');
       }
-      return '部分内容暂时没有完成同步，可重试后继续。';
+      return $r('app.string.settings_sync_attention_generic');
     }
     if (kind === 'syncing') {
       return contentSelection.historySelected
-        ? '正在同步历史记录和已选择的其他内容。'
-        : '正在安全同步书签、主页收藏、小说书架和常用设置。';
+        ? $r('app.string.settings_sync_syncing_history')
+        : $r('app.string.settings_sync_syncing_safe');
     }
     if (kind === 'initializing') {
-      return '正在从华为云空间拉取并确认完整书签，完成后会自动保持同步。';
+      return $r('app.string.settings_sync_initializing_message');
     }
     return contentSelection.historySelected
-      ? '历史记录和已选择的其他内容会自动保持一致。'
-      : '书签、主页收藏、小说书架和常用设置会自动保持一致。';
+      ? $r('app.string.settings_sync_normal_history')
+      : $r('app.string.settings_sync_normal_bookmarks');
   }
 
   private resolveContentSelection(
@@ -464,28 +486,36 @@ export class SyncExperienceViewModel {
   private resolveGoalOptionTitle(
     goal: SyncExperienceGoalDescriptor,
     settings: AiraSyncSettings
-  ): string {
+  ): ResourceStr {
     if (goal.id === 'webdav' && AIRA_DISTRIBUTION_CAPABILITY_OWNER.isOfficial()) {
-      return this.resolveWebdavProviderLabel(settings);
+      const endpoint = settings.webdav.endpoint.trim();
+      if (endpoint.length <= 0) {
+        return $r('app.string.settings_sync_goal_webdav');
+      }
+      return this.webdavProviderCatalog.resolveProviderForEndpoint(endpoint).name;
     }
     return resolveDistributionGoalTitle(goal);
   }
 
-  private resolveAdditionalBackupSummary(settings: AiraSyncSettings): string {
+  private resolveAdditionalBackupSummary(settings: AiraSyncSettings): ResourceStr {
     const backupKinds = (settings.additionalBackupRemoteKinds ?? []).filter(
       (kind: AiraSyncProviderKind): boolean => kind === 'webdav'
     );
     if (backupKinds.length <= 0) {
-      return settings.remoteKind === 'webdav' ? '当前同步已是 WebDAV' : '未设置';
+      return settings.remoteKind === 'webdav'
+        ? $r('app.string.settings_sync_backup_is_webdav')
+        : $r('app.string.settings_sync_backup_unset');
     }
     if (settings.additionalBackupEnabled !== true) {
-      return 'WebDAV · 已暂停';
+      return $r('app.string.settings_sync_backup_paused');
     }
     const days = settings.additionalBackupIntervalDays === 1 || settings.additionalBackupIntervalDays === 3
       ? settings.additionalBackupIntervalDays
       : 7;
-    const intervalLabel = days === 1 ? '每天一次' : `每 ${days} 天一次`;
-    return `WebDAV · ${intervalLabel}`;
+    if (days === 1) {
+      return $r('app.string.settings_sync_backup_daily');
+    }
+    return $r('app.string.settings_sync_backup_interval', days);
   }
 
   private findRuntimeState(
@@ -508,12 +538,16 @@ export class SyncExperienceViewModel {
     return state !== undefined && this.isRuntimeUnhealthy(state.bookmark);
   }
 
-  private resolveBookmarkFailureMessage(
+  private resolveStatusDetail(
+    kind: SyncExperienceStatusKind,
     input: SyncExperienceViewModelInput,
     activeProvider: AiraSyncRemoteKind
-  ): string {
+  ): ResourceStr {
+    if (kind !== 'attention' || !this.bookmarkNeedsAttention(input, activeProvider)) {
+      return '';
+    }
     const state = this.findRuntimeState(input.settings, activeProvider);
-    return this.syncFailurePresentationService.buildBookmarkFailureMessage({
+    return this.syncFailurePresentationService.buildBookmarkFailureResource({
       remoteKind: activeProvider,
       operationName: '书签同步',
       failure: state === undefined ? undefined : this.resolveRuntimeBookmarkFailure(state.bookmark)
@@ -606,18 +640,18 @@ export class SyncExperienceViewModel {
     return remoteKind === 'webdav' || remoteKind === 'self_hosted';
   }
 
-  private formatLastSyncLabel(timestamp: number): string {
+  private formatLastSyncLabel(timestamp: number): ResourceStr {
     if (timestamp <= 0) {
-      return '尚未完成同步';
+      return $r('app.string.settings_sync_last_never');
     }
     const date = new Date(timestamp);
     const now = new Date();
     const time = `${this.padTwoDigits(date.getHours())}:${this.padTwoDigits(date.getMinutes())}`;
     if (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() &&
       date.getDate() === now.getDate()) {
-      return `今天 ${time}`;
+      return $r('app.string.settings_sync_last_today', time);
     }
-    return `${date.getMonth() + 1}月${date.getDate()}日 ${time}`;
+    return $r('app.string.settings_sync_last_date', date.getMonth() + 1, date.getDate(), time);
   }
 
   private padTwoDigits(value: number): string {

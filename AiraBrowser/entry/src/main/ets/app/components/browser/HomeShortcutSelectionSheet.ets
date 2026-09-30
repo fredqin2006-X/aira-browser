@@ -177,7 +177,7 @@ export struct HomeShortcutSelectionContent {
   private bookmarkNavigationStack: NavPathStack = new NavPathStack();
   private bookmarkRowsSourceByFolderId: Map<string, HomeShortcutBookmarkRowDataSource> = new Map();
   private bookmarkRowsByFolderId: Map<string, HomeShortcutBookmarkSelectionRow[]> = new Map();
-  private bookmarkTitleByFolderId: Map<string, string> = new Map();
+  private bookmarkTitleByFolderId: Map<string, ResourceStr> = new Map();
   private bookmarkNavigationSessionId: number = -1;
   private bookmarkNavigationActionGeneration: number = 0;
   private siteIconListPresenter: SiteIconListPresenter = new SiteIconListPresenter();
@@ -617,7 +617,7 @@ export struct HomeShortcutSelectionContent {
     return this.bookmarkRowsByFolderId.get(folderId) ?? [];
   }
 
-  private resolveBookmarkFolderTitle(folderId: string): string {
+  private resolveBookmarkFolderTitle(folderId: string): ResourceStr {
     return this.bookmarkTitleByFolderId.get(folderId) ?? '书签';
   }
 

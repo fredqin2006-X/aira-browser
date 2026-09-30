@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { HistorySiteAggregate, HistoryVisit } from '../../common/models/BrowserModels';
 import { HistoryFeature, HistoryManagementBoundary } from '../../features/history/HistoryFeature';
 import {
@@ -226,7 +227,7 @@ export class HistoryWorkspaceSessionCoordinator {
       this.snapshotState.message = '';
     } catch (error) {
       if (sequence === this.requestSequence) {
-        this.snapshotState.message = `加载更多历史记录失败：${this.stringifyError(error as Error)}`;
+        this.snapshotState.message = resolveAppResourceText($r('app.string.history_load_more_failed_detail', this.stringifyError(error as Error)));
       }
     }
     if (sequence === this.requestSequence) {
@@ -329,10 +330,10 @@ export class HistoryWorkspaceSessionCoordinator {
         this.managementBoundary
       );
       if (removed <= 0) {
-        message = '没有删除任何历史记录。';
+        message = resolveAppResourceText($r('app.string.history_none_deleted'));
       }
     } catch (error) {
-      message = `删除站点历史记录失败：${this.stringifyError(error as Error)}`;
+      message = resolveAppResourceText($r('app.string.history_delete_site_failed', this.stringifyError(error as Error)));
     }
     return this.finishMutation(message, false);
   }
@@ -348,7 +349,7 @@ export class HistoryWorkspaceSessionCoordinator {
       await this.historyFeature.clearVisitsForManagement(this.managementBoundary);
       cleared = true;
     } catch (error) {
-      message = `清除历史记录失败：${this.stringifyError(error as Error)}`;
+      message = resolveAppResourceText($r('app.string.history_clear_failed', this.stringifyError(error as Error)));
     }
     return this.finishMutation(message, cleared);
   }
@@ -429,7 +430,7 @@ export class HistoryWorkspaceSessionCoordinator {
       this.pruneSelection();
     } catch (error) {
       if (sequence === this.requestSequence) {
-        const readMessage = `加载历史记录失败：${this.stringifyError(error as Error)}`;
+        const readMessage = resolveAppResourceText($r('app.string.history_load_failed_detail', this.stringifyError(error as Error)));
         this.snapshotState.message = mutationMessage.length > 0 ? `${mutationMessage} ${readMessage}` : readMessage;
       }
     }
@@ -451,10 +452,10 @@ export class HistoryWorkspaceSessionCoordinator {
     try {
       const removed = await this.historyFeature.deleteVisitsByIdsForManagement(sourceIds, this.managementBoundary);
       if (removed <= 0) {
-        message = '没有删除任何历史记录。';
+        message = resolveAppResourceText($r('app.string.history_none_deleted'));
       }
     } catch (error) {
-      message = `删除历史记录失败：${this.stringifyError(error as Error)}`;
+      message = resolveAppResourceText($r('app.string.history_delete_failed_raw', this.stringifyError(error as Error)));
     }
     return this.finishMutation(message, false);
   }
@@ -536,7 +537,7 @@ export class HistoryWorkspaceSessionCoordinator {
   }
 
   private buildBoundaryMessage(): string {
-    return '当前会话无法读取常规历史记录。';
+    return resolveAppResourceText($r('app.string.history_session_unavailable'));
   }
 
   private mergeSites(existing: HistorySiteAggregate[], page: HistorySiteAggregate[]): HistorySiteAggregate[] {

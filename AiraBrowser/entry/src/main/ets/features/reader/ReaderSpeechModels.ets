@@ -4,7 +4,7 @@ export interface ReaderSpeechState {
   status: ReaderSpeechPlaybackStatus;
   currentChunkIndex: number;
   totalChunks: number;
-  message: string;
+  message: ResourceStr;
 }
 
 export interface ReaderSpeechVoiceSelection {
@@ -15,8 +15,8 @@ export interface ReaderSpeechVoiceSelection {
 }
 
 export interface ReaderSpeechVoiceOption extends ReaderSpeechVoiceSelection {
-  title: string;
-  helperText: string;
+  title: ResourceStr;
+  helperText: ResourceStr;
   gender: string;
   status: string;
   isAvailable: boolean;
@@ -46,8 +46,8 @@ export function shouldResetReaderSpeechStateOnStop(state: ReaderSpeechState): bo
 export function createDefaultReaderSpeechVoiceOption(): ReaderSpeechVoiceOption {
   return {
     id: buildReaderSpeechVoiceId('zh-CN', 0, 'interaction-broadcast'),
-    title: '系统默认音色',
-    helperText: '中文在线朗读',
+    title: $r('app.string.reader_voice_default'),
+    helperText: $r('app.string.reader_voice_default_helper'),
     language: 'zh-CN',
     person: 0,
     style: 'interaction-broadcast',

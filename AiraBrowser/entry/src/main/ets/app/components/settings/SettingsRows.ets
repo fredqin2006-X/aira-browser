@@ -10,6 +10,7 @@ import {
   BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY,
   BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY
 } from '../../../core/theme/BrowserThemeStorageKeys';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   AiraAccountRecognitionBadgeKind,
   AiraMembershipBadgeKind
@@ -67,7 +68,7 @@ export struct SettingsAccountRecognitionBadge {
 export struct SettingsInfoTooltipButton {
   @Prop tooltipIcon: Resource = $r('sys.symbol.info_circle');
   @Prop tooltipMessage: string = '';
-  @Prop tooltipAccessibilityLabel: string = '';
+  @Prop tooltipAccessibilityLabel: ResourceStr = '';
   @Prop tooltipIconColor: ResourceColor = '';
   @Prop tooltipBackgroundColor: ResourceColor = '';
   @Prop tooltipTextColor: ResourceColor = '';
@@ -86,7 +87,7 @@ export struct SettingsInfoTooltipButton {
     .buttonStyle(ButtonStyleMode.TEXTUAL)
     .stateEffect(true)
     .enabled(this.isEnabled)
-    .accessibilityText(this.tooltipAccessibilityLabel)
+    .accessibilityText(resolveAppResourceText(this.tooltipAccessibilityLabel))
     .onClick(() => {
       if (this.isEnabled && this.tooltipMessage.trim().length > 0) {
         this.tooltipVisible = !this.tooltipVisible;
@@ -935,7 +936,7 @@ export struct SettingsSwitchRow {
   @Prop pressedBackgroundColor: ResourceColor = '';
   @Prop titleActionIcon?: Resource = undefined;
   @Prop titlePopupText: string = '';
-  @Prop titleActionAccessibilityText: string = '';
+  @Prop titleActionAccessibilityText: ResourceStr = '';
   @Prop dragHandleIcon?: Resource = undefined;
   @Prop dragHandleAccessibilityText: string = '';
   @Prop dragHandleBackgroundColor?: ResourceColor = undefined;

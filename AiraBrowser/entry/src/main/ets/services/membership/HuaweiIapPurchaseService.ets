@@ -51,8 +51,8 @@ export type HuaweiIapAction =
 
 export interface HuaweiIapOperationResult {
   ok: boolean;
-  title: string;
-  message: string;
+  title: ResourceStr;
+  message: ResourceStr;
   action: HuaweiIapAction;
   silent?: boolean;
   purchaseData?: string;
@@ -106,7 +106,7 @@ export class HuaweiIapPurchaseService {
       oneTimeError = error as BusinessError;
     }
     if (subscriptionError !== undefined && oneTimeError !== undefined) {
-      throw new Error(this.resolveFailureMessage('query_products', subscriptionError));
+      throw new Error(this.formatErrorDetails(subscriptionError));
     }
     return subscriptionProducts.map((product) => this.buildProductView(product, this.resolvePlanForProduct(product.id).period))
       .concat(oneTimeProducts.map((product) => this.buildProductView(product, 'one_time')));
@@ -136,8 +136,8 @@ export class HuaweiIapPurchaseService {
         ok: true,
         title: oneTimeSelected ? '一次购支付完成' : '订阅购买完成',
         message: oneTimeSelected
-          ? '已收到华为 IAP 一次购结果，正在进行服务端验单。'
-          : '已收到华为 IAP 订阅购买结果，正在进行服务端验签。',
+          ? $r('app.string.settings_pro_iap_received_lifetime')
+          : $r('app.string.settings_pro_iap_received_subscription'),
         action: action,
         purchaseData: result.purchaseData,
         purchaseDataList: result.purchaseData === undefined || result.purchaseData.length <= 0
@@ -196,8 +196,8 @@ export class HuaweiIapPurchaseService {
       ok: true,
       title: purchaseDataList.length > 0 ? '已找到购买记录' : '没有找到购买记录',
       message: purchaseDataList.length > 0
-        ? '已读取华为 IAP 购买记录，正在进行服务端校验。'
-        : '当前华为账号没有返回 Aira Pro 购买记录。',
+        ? $r('app.string.settings_pro_iap_restore_found')
+        : $r('app.string.settings_pro_iap_restore_empty'),
       action: 'restore_purchase',
       purchaseCount: purchaseDataList.length,
       purchaseData: purchaseDataList[0] ?? '',
@@ -216,7 +216,7 @@ export class HuaweiIapPurchaseService {
       return {
         ok: true,
         title: '已打开订阅管理',
-        message: '已进入华为订阅管理页面。',
+        message: $r('app.string.settings_pro_iap_manage_opened'),
         action: 'manage_subscription'
       };
     } catch (error) {
@@ -285,7 +285,7 @@ export class HuaweiIapPurchaseService {
     return '当前设备暂不支持华为应用内支付，已有会员权益不受影响。';
   }
 
-  private buildIapUnavailableResult(action: HuaweiIapAction, title: string): HuaweiIapOperationResult {
+  private buildIapUnavailableResult(action: HuaweiIapAction, title: ResourceStr): HuaweiIapOperationResult {
     return {
       ok: false,
       title: title,
@@ -345,7 +345,7 @@ export class HuaweiIapPurchaseService {
 
   private buildFailureResult(
     action: HuaweiIapAction,
-    title: string,
+    title: ResourceStr,
     error: Error | BusinessError | Object
   ): HuaweiIapOperationResult {
     const businessError = error as BusinessError;
@@ -372,42 +372,46 @@ export class HuaweiIapPurchaseService {
     return error.code === 1001860000;
   }
 
-  private resolveFailureMessage(action: HuaweiIapAction, error: BusinessError): string {
+  private resolveFailureMessage(action: HuaweiIapAction, error: BusinessError): ResourceStr {
     const details = this.formatErrorDetails(error);
     if (error.code === 1001860057) {
-      return `当前安装包签名不满足 IAP 测试环境要求。${details}`;
+      return $r('app.string.settings_pro_iap_sign_mismatch', details);
     }
     if (error.code === 1001860058) {
-      return `当前华为账号不具备 IAP 测试资格，添加测试账号后等待 30 分钟到 1 小时再试。${details}`;
+      return $r('app.string.settings_pro_iap_test_account', details);
     }
     if (error.code === 1001860050) {
-      return `当前设备未登录华为账号，请先登录后再购买。${details}`;
+      return $r('app.string.settings_pro_iap_device_signed_out', details);
     }
     if (error.code === 1001860051) {
-      return `当前华为账号已经拥有这个商品，请点“恢复购买”同步 Aira Pro 权益。${details}`;
+      return $r('app.string.settings_pro_iap_already_owned', details);
     }
     if (error.code === 1001860003) {
-      return `AGC 中未找到 Aira Pro 商品，请确认 ${IAP_SUBSCRIPTION_PRODUCT_IDS.concat([AIRA_PRO_ONE_TIME_PRODUCT_ID]).join('、')} 的商品 ID、商品类型和上架状态。${details}`;
+      return $r(
+        'app.string.settings_pro_iap_product_missing',
+        IAP_SUBSCRIPTION_PRODUCT_IDS.concat([AIRA_PRO_ONE_TIME_PRODUCT_ID]).join(', '),
+        details
+      );
     }
     if (error.code === 1001860002) {
-      return `当前应用未被授权访问 IAP。请确认 AGC 当前 HarmonyOS 应用已开启应用内购买服务，商品建在同一个应用下，并已登记当前安装包真实签名指纹。${details}`;
+      return $r('app.string.settings_pro_iap_not_authorized', details);
     }
     if (action === 'purchase_pro_one_time') {
-      return `无法拉起 Aira 长期会员一次购。${details}`;
+      return $r('app.string.settings_pro_iap_lifetime_failed', details);
     }
     if (action === 'purchase_pro_monthly') {
-      return `无法拉起 Aira Pro 订阅购买。${details}`;
+      return $r('app.string.settings_pro_iap_subscription_failed', details);
     }
     if (action === 'query_products') {
-      return `无法查询 Aira Pro 商品。${details}`;
+      return $r('app.string.settings_pro_iap_query_failed', details);
     }
     if (action === 'restore_purchase') {
-      return `无法读取华为 IAP 购买记录。${details}`;
+      return $r('app.string.settings_pro_iap_restore_read_failed', details);
     }
     if (action === 'manage_subscription') {
-      return `无法打开华为订阅管理。${details}`;
+      return $r('app.string.settings_pro_iap_manage_failed', details);
     }
-    return `无法完成 IAP 操作。${details}`;
+    return $r('app.string.settings_pro_iap_failed', details);
   }
 
   private resolvePlanForProduct(productId: string): HuaweiIapProductPlan {
@@ -427,7 +431,7 @@ export class HuaweiIapPurchaseService {
     if (messageText.length > 0) {
       return messageText;
     }
-    return '未返回详细错误信息。';
+    return '';
   }
 
   private normalizeString(value: string | undefined): string {

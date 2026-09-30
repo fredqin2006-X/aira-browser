@@ -127,7 +127,7 @@ export struct CustomHomepageInfoSheet {
   @Builder
   private buildDescriptionCard() {
     Column({ space: 8 }) {
-      Text('开发者说明')
+      Text($r('app.string.settings_custom_home_dev_notes'))
         .width('100%')
         .fontSize(13)
         .fontWeight(FontWeight.Medium)

@@ -3,6 +3,7 @@ import {
   BrowserSitePrivacyRule
 } from '../../common/models/BrowserModels';
 import { SiteIdentityService } from './SiteIdentityService';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export type BrowserSitePrivacyRuleMode = 'default' | 'clear_on_close';
 
@@ -86,8 +87,10 @@ export class BrowserSitePrivacyRuleService {
 
   resolveRuleSummary(rule: BrowserSitePrivacyRule | undefined): string {
     if (rule === undefined) {
-      return '关闭';
+      return resolveAppResourceText($r('app.string.settings_site_customization_rule_off'));
     }
-    return rule.preserveCookiesOnClose ? '保留 Cookie' : '开启';
+    return rule.preserveCookiesOnClose
+      ? resolveAppResourceText($r('app.string.settings_site_customization_keep_cookies'))
+      : resolveAppResourceText($r('app.string.settings_site_customization_rule_on'));
   }
 }

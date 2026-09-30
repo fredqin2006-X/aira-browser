@@ -237,16 +237,16 @@ export struct BrowserLargeScreenOverflowFlyoutHost {
 
   @Builder
   private buildHistoryHeader() {
-    this.buildCommandRow('browser.shortcut.history', '打开历史记录', false, false, 'historyPage')
+    this.buildCommandRow('browser.shortcut.history', $r('app.string.settings_shortcuts_history'), false, false, 'historyPage')
   }
 
   @Builder
   private buildBookmarkHeader() {
     if (this.canAddBookmark) {
-      this.buildCommandRow('browser.toolbar.addBookmark', '添加书签', false, false, 'add')
+      this.buildCommandRow('browser.toolbar.addBookmark', $r('app.string.history_add_bookmark'), false, false, 'add')
     }
-    this.buildCommandRow('browser.shortcut.bookmarks', '显示书签栏', this.bookmarkBarChecked, false, 'bar')
-    this.buildCommandRow('bookmarks.folder', '进入书签管理', false, false, 'manager')
+    this.buildCommandRow('browser.shortcut.bookmarks', $r('app.string.settings_appearance_bookmark_bar'), this.bookmarkBarChecked, false, 'bar')
+    this.buildCommandRow('bookmarks.folder', $r('app.string.settings_shortcuts_bookmarks'), false, false, 'manager')
   }
 
   @Builder
@@ -325,7 +325,7 @@ export struct BrowserLargeScreenOverflowFlyoutHost {
   @Builder
   private buildCommandRow(
     iconId: AiraRenderableIconId,
-    label: string,
+    label: ResourceStr,
     selected: boolean,
     submenu: boolean,
     command: string

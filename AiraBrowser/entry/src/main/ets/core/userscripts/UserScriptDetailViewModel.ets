@@ -2,6 +2,7 @@ import { InstalledUserScriptState } from '../../features/userscripts/UserScriptM
 import { UserScriptRuntimeStateRecord } from '../../features/userscripts/UserScriptRuntimeStateModels';
 import { UserScriptValueRecord } from '../../features/userscripts/UserScriptValueModels';
 import { UserScriptMatchService } from '../../services/userscripts/UserScriptMatchService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface UserScriptDetailRowView {
   label: string;
@@ -37,12 +38,12 @@ export class UserScriptDetailViewModel {
   ): UserScriptDetailState {
     if (script === undefined) {
       return {
-        title: '脚本不存在',
-        subtitle: '可能已被删除',
+        title: resolveAppResourceText($r('app.string.user_script_detail_missing_title')),
+        subtitle: resolveAppResourceText($r('app.string.user_script_detail_missing_subtitle')),
         enabled: false,
         found: false,
-        statusTitle: '无法查看',
-        statusDescription: '返回脚本列表后刷新状态。',
+        statusTitle: resolveAppResourceText($r('app.string.user_script_detail_unavailable')),
+        statusDescription: resolveAppResourceText($r('app.string.user_script_detail_unavailable_hint')),
         metadataRows: [],
         runtimeRows: [],
         storageRows: [],
@@ -58,7 +59,9 @@ export class UserScriptDetailViewModel {
       subtitle: `${this.matchService.summarizeScope(script)} · ${script.version}`,
       enabled: script.enabled,
       found: true,
-      statusTitle: script.enabled ? '已启用' : '已关闭',
+      statusTitle: script.enabled
+        ? resolveAppResourceText($r('app.string.user_script_detail_enabled'))
+        : resolveAppResourceText($r('app.string.user_script_detail_disabled')),
       statusDescription: this.buildStatusDescription(script, runtimeState),
       metadataRows: this.buildMetadataRows(script),
       runtimeRows: this.buildRuntimeRows(runtimeState),
@@ -76,71 +79,109 @@ export class UserScriptDetailViewModel {
     runtimeState: UserScriptRuntimeStateRecord | undefined
   ): string {
     if (!script.enabled) {
-      return '脚本关闭后不会在匹配网页运行。';
+      return resolveAppResourceText($r('app.string.user_script_detail_disabled_hint'));
     }
     if (runtimeState === undefined || runtimeState.status === 'never_run') {
-      return '尚未记录运行结果，打开匹配网页后会更新。';
+      return resolveAppResourceText($r('app.string.user_script_detail_no_run_record'));
     }
     if (runtimeState.status === 'skipped') {
-      return `最近一次注入被跳过：${this.formatRuntimeReason(runtimeState.lastSkipReason)}`;
+      return resolveAppResourceText(
+        $r('app.string.user_script_detail_last_skipped'),
+        this.formatRuntimeReason(runtimeState.lastSkipReason)
+      );
     }
     if (runtimeState.lastBridgeRejectReason.length > 0) {
-      return `最近一次 native bridge 被拒绝：${this.formatRuntimeReason(runtimeState.lastBridgeRejectReason)}`;
+      return resolveAppResourceText(
+        $r('app.string.user_script_detail_last_bridge_rejected'),
+        this.formatRuntimeReason(runtimeState.lastBridgeRejectReason)
+      );
     }
     if (runtimeState.status === 'failed') {
-      return runtimeState.lastErrorMessage.length > 0 ? runtimeState.lastErrorMessage : '最近一次运行失败。';
+      return runtimeState.lastErrorMessage.length > 0
+        ? runtimeState.lastErrorMessage
+        : resolveAppResourceText($r('app.string.user_script_detail_last_failed'));
     }
     if (runtimeState.status === 'success') {
-      return `最近运行成功，累计运行 ${runtimeState.runCount} 次。`;
+      return resolveAppResourceText($r('app.string.user_script_detail_runs_succeeded'), runtimeState.runCount);
     }
-    return '最近一次注入被跳过。';
+    return resolveAppResourceText($r('app.string.user_script_detail_injection_skipped'));
   }
 
   private buildMetadataRows(script: InstalledUserScriptState): UserScriptDetailRowView[] {
     return [
-      { label: '名称', value: script.name },
-      { label: '版本', value: script.version },
-      { label: '命名空间', value: script.namespace.length > 0 ? script.namespace : '未声明' },
-      { label: '描述', value: script.description.length > 0 ? script.description : '未声明' },
-      { label: '作用范围', value: this.matchService.summarizeScope(script) },
-      { label: '排除规则', value: script.excludes.length > 0 ? script.excludes.join('\n') : '无' },
-      { label: '授权', value: script.grants.join(', ') },
-      { label: '运行时机', value: script.runAt },
-      { label: '来源', value: this.buildSourceUrl(script) }
+      { label: resolveAppResourceText($r('app.string.user_script_meta_name')), value: script.name },
+      { label: resolveAppResourceText($r('app.string.user_script_meta_version')), value: script.version },
+      {
+        label: resolveAppResourceText($r('app.string.user_script_meta_namespace')),
+        value: script.namespace.length > 0
+          ? script.namespace
+          : resolveAppResourceText($r('app.string.user_script_meta_unspecified'))
+      },
+      {
+        label: resolveAppResourceText($r('app.string.user_script_meta_description')),
+        value: script.description.length > 0
+          ? script.description
+          : resolveAppResourceText($r('app.string.user_script_meta_unspecified'))
+      },
+      { label: resolveAppResourceText($r('app.string.user_script_meta_scope')), value: this.matchService.summarizeScope(script) },
+      {
+        label: resolveAppResourceText($r('app.string.user_script_meta_excludes')),
+        value: script.excludes.length > 0
+          ? script.excludes.join('\n')
+          : resolveAppResourceText($r('app.string.user_script_meta_none'))
+      },
+      { label: resolveAppResourceText($r('app.string.user_script_meta_grants')), value: script.grants.join(', ') },
+      { label: resolveAppResourceText($r('app.string.user_script_meta_run_at')), value: script.runAt },
+      { label: resolveAppResourceText($r('app.string.user_script_meta_source')), value: this.buildSourceUrl(script) }
     ];
   }
 
   private buildRuntimeRows(runtimeState: UserScriptRuntimeStateRecord | undefined): UserScriptDetailRowView[] {
     if (runtimeState === undefined || runtimeState.status === 'never_run') {
       return [
-        { label: '状态', value: '尚未运行' },
-        { label: '最近匹配 URL', value: '无' },
-        { label: '最近注入时机', value: '无' },
-        { label: '最近 bridge 拒绝', value: '无' }
+        { label: resolveAppResourceText($r('app.string.user_script_runtime_status')), value: resolveAppResourceText($r('app.string.user_script_runtime_never_run')) },
+        { label: resolveAppResourceText($r('app.string.user_script_runtime_last_url')), value: resolveAppResourceText($r('app.string.user_script_meta_none')) },
+        { label: resolveAppResourceText($r('app.string.user_script_runtime_last_injection_phase')), value: resolveAppResourceText($r('app.string.user_script_meta_none')) },
+        { label: resolveAppResourceText($r('app.string.user_script_runtime_last_bridge_reject')), value: resolveAppResourceText($r('app.string.user_script_meta_none')) }
       ];
     }
     return [
-      { label: '状态', value: this.formatRuntimeStatus(runtimeState.status) },
-      { label: '最近匹配 URL', value: runtimeState.lastUrl.length > 0 ? runtimeState.lastUrl : '无' },
-      { label: '最近注入时机', value: this.formatInjectionPhase(runtimeState.lastInjectionPhase) },
-      { label: '运行次数', value: `${runtimeState.runCount}` },
-      { label: '失败次数', value: `${runtimeState.failureCount}` },
-      { label: '最近运行', value: this.formatTime(runtimeState.lastRunAt) },
-      { label: '最近成功', value: this.formatTime(runtimeState.lastSuccessAt) },
-      { label: '最近失败', value: this.formatTime(runtimeState.lastFailureAt) },
-      { label: '最近跳过原因', value: this.formatRuntimeReason(runtimeState.lastSkipReason) },
+      { label: resolveAppResourceText($r('app.string.user_script_runtime_status')), value: this.formatRuntimeStatus(runtimeState.status) },
       {
-        label: '最近 bridge 拒绝',
+        label: resolveAppResourceText($r('app.string.user_script_runtime_last_url')),
+        value: runtimeState.lastUrl.length > 0
+          ? runtimeState.lastUrl
+          : resolveAppResourceText($r('app.string.user_script_meta_none'))
+      },
+      { label: resolveAppResourceText($r('app.string.user_script_runtime_last_injection_phase')), value: this.formatInjectionPhase(runtimeState.lastInjectionPhase) },
+      { label: resolveAppResourceText($r('app.string.user_script_runtime_run_count')), value: `${runtimeState.runCount}` },
+      { label: resolveAppResourceText($r('app.string.user_script_runtime_failure_count')), value: `${runtimeState.failureCount}` },
+      { label: resolveAppResourceText($r('app.string.user_script_runtime_last_run')), value: this.formatTime(runtimeState.lastRunAt) },
+      { label: resolveAppResourceText($r('app.string.user_script_runtime_last_success')), value: this.formatTime(runtimeState.lastSuccessAt) },
+      { label: resolveAppResourceText($r('app.string.user_script_runtime_last_failure')), value: this.formatTime(runtimeState.lastFailureAt) },
+      { label: resolveAppResourceText($r('app.string.user_script_runtime_last_skip_reason')), value: this.formatRuntimeReason(runtimeState.lastSkipReason) },
+      {
+        label: resolveAppResourceText($r('app.string.user_script_runtime_last_bridge_reject')),
         value: this.buildBridgeRejectValue(runtimeState.lastBridgeCapability, runtimeState.lastBridgeRejectReason)
       },
-      { label: '错误信息', value: runtimeState.lastErrorMessage.length > 0 ? runtimeState.lastErrorMessage : '无' }
+      {
+        label: resolveAppResourceText($r('app.string.user_script_runtime_error_message')),
+        value: runtimeState.lastErrorMessage.length > 0
+          ? runtimeState.lastErrorMessage
+          : resolveAppResourceText($r('app.string.user_script_meta_none'))
+      }
     ];
   }
 
   private buildStorageRows(values: UserScriptValueRecord[]): UserScriptDetailRowView[] {
     return [
-      { label: '本地值数量', value: `${values.length}` },
-      { label: '键名', value: values.length > 0 ? values.map((record: UserScriptValueRecord) => record.key).join(', ') : '无' }
+      { label: resolveAppResourceText($r('app.string.user_script_storage_value_count')), value: `${values.length}` },
+      {
+        label: resolveAppResourceText($r('app.string.user_script_storage_keys')),
+        value: values.length > 0
+          ? values.map((record: UserScriptValueRecord) => record.key).join(', ')
+          : resolveAppResourceText($r('app.string.user_script_meta_none'))
+      }
     ];
   }
 
@@ -167,15 +208,15 @@ export class UserScriptDetailViewModel {
 
   private formatRuntimeStatus(status: string): string {
     if (status === 'success') {
-      return '最近成功';
+      return resolveAppResourceText($r('app.string.user_script_runtime_last_success'));
     }
     if (status === 'failed') {
-      return '最近失败';
+      return resolveAppResourceText($r('app.string.user_script_runtime_last_failure'));
     }
     if (status === 'skipped') {
-      return '最近跳过';
+      return resolveAppResourceText($r('app.string.user_script_runtime_last_skipped'));
     }
-    return '尚未运行';
+    return resolveAppResourceText($r('app.string.user_script_runtime_never_run'));
   }
 
   private formatInjectionPhase(value: string): string {
@@ -188,13 +229,14 @@ export class UserScriptDetailViewModel {
     if (value === 'main-menu' || value === 'tool-menu' || value === 'context-menu') {
       return value;
     }
-    return '未知';
+    return resolveAppResourceText($r('app.string.user_script_unknown'));
   }
 
   private buildBridgeRejectValue(capability: string, reason: string): string {
     const normalizedReason = this.formatRuntimeReason(reason);
-    if (normalizedReason === '无') {
-      return '无';
+    const noneLabel = resolveAppResourceText($r('app.string.user_script_meta_none'));
+    if (normalizedReason === noneLabel) {
+      return noneLabel;
     }
     if (capability.trim().length === 0) {
       return normalizedReason;
@@ -204,27 +246,28 @@ export class UserScriptDetailViewModel {
 
   private formatRuntimeReason(reason: string): string {
     const normalized = reason.trim();
+    const noneLabel = resolveAppResourceText($r('app.string.user_script_meta_none'));
     if (normalized.length === 0) {
-      return '无';
+      return noneLabel;
     }
     const labels: Record<string, string> = {
-      'private_mode': 'private_mode · 无痕/临时会话不注入脚本',
-      'missing_controller': 'missing_controller · Web 控制器不可用',
-      'grant-denied': 'grant-denied · 脚本未获得该 GM 能力授权',
-      'url-not-matched': 'url-not-matched · 当前网页不再匹配脚本规则',
-      'invalid-bridge-token': 'invalid-bridge-token · native bridge token 无效',
-      'missing-bridge-auth': 'missing-bridge-auth · bridge 鉴权参数缺失',
-      'missing-page-url': 'missing-page-url · 当前网页地址不可用',
-      'capability-mismatch': 'capability-mismatch · bridge 能力名不匹配',
-      'unsupported-capability': 'unsupported-capability · native bridge 不支持该能力',
-      'script-disabled': 'script-disabled · 脚本当前已关闭'
+      'private_mode': resolveAppResourceText($r('app.string.user_script_reason_private_mode')),
+      'missing_controller': resolveAppResourceText($r('app.string.user_script_reason_missing_controller')),
+      'grant-denied': resolveAppResourceText($r('app.string.user_script_reason_grant_denied')),
+      'url-not-matched': resolveAppResourceText($r('app.string.user_script_reason_url_not_matched')),
+      'invalid-bridge-token': resolveAppResourceText($r('app.string.user_script_reason_invalid_bridge_token')),
+      'missing-bridge-auth': resolveAppResourceText($r('app.string.user_script_reason_missing_bridge_auth')),
+      'missing-page-url': resolveAppResourceText($r('app.string.user_script_reason_missing_page_url')),
+      'capability-mismatch': resolveAppResourceText($r('app.string.user_script_reason_capability_mismatch')),
+      'unsupported-capability': resolveAppResourceText($r('app.string.user_script_reason_unsupported_capability')),
+      'script-disabled': resolveAppResourceText($r('app.string.user_script_reason_script_disabled'))
     };
     return labels[normalized] ?? normalized;
   }
 
   private formatTime(value: number): string {
     if (value <= 0) {
-      return '无';
+      return resolveAppResourceText($r('app.string.user_script_meta_none'));
     }
     return new Date(value).toLocaleString();
   }

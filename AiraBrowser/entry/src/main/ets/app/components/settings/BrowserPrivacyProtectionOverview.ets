@@ -11,6 +11,7 @@ import {
 } from '../../bootstrap/BrowserAppRuntime';
 import { SettingsGroupCard } from './SettingsLayout';
 import { SettingsDesktopGroup } from './SettingsDesktopRows';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 @Component
 export struct BrowserPrivacyProtectionOverview {
@@ -48,7 +49,7 @@ export struct BrowserPrivacyProtectionOverview {
   private buildOverviewContent() {
     Column({ space: 14 }) {
           Column({ space: 4 }) {
-            Text('近 7 天网页保护')
+            Text($r('app.string.settings_protection_last_7_days'))
               .width('100%')
               .fontSize(13)
               .fontWeight(FontWeight.Medium)
@@ -62,7 +63,7 @@ export struct BrowserPrivacyProtectionOverview {
                 .maxLines(1)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-              Text('次保护')
+              Text($r('app.string.settings_protection_count_suffix'))
                 .fontSize(13)
                 .fontColor(this.secondaryTextColor)
                 .maxLines(1)
@@ -132,7 +133,11 @@ export struct BrowserPrivacyProtectionOverview {
     .backgroundColor(index === this.state.selectedDayIndex ? this.pressedBackground :
       $r('sys.color.ohos_id_color_background_transparent'))
     .borderRadius(10)
-    .accessibilityText(`${day.detailLabel} ${day.totalActionCount} 次保护`)
+    .accessibilityText(resolveAppResourceText(
+      $r('app.string.settings_privacy_protection_overview_accessibility'),
+      day.detailLabel,
+      day.totalActionCount
+    ))
     .onClick((): void => {
       this.selectDay(index);
     })
@@ -141,7 +146,11 @@ export struct BrowserPrivacyProtectionOverview {
   @Builder
   private buildSelectedDayDetail() {
     Column({ space: 5 }) {
-      Text(`${this.state.selectedDay.detailLabel} · ${this.state.selectedDay.totalActionCount} 次`)
+      Text(resolveAppResourceText(
+        $r('app.string.settings_privacy_protection_overview_selected_day'),
+        this.state.selectedDay.detailLabel,
+        this.state.selectedDay.totalActionCount
+      ))
         .width('100%')
         .fontSize(this.desktopPresentation ? 13 : 14)
         .fontWeight(this.desktopPresentation ? FontWeight.Regular : FontWeight.Medium)
@@ -174,7 +183,10 @@ export struct BrowserPrivacyProtectionOverview {
         .backgroundColor(this.pressedBackground)
         .borderRadius(this.desktopPresentation ? 8 : 12)
 
-      Text(`防跟踪：${this.state.trackingModeLabel}`)
+      Text(resolveAppResourceText(
+        $r('app.string.settings_privacy_protection_overview_tracking'),
+        this.state.trackingModeLabel
+      ))
         .layoutWeight(1)
         .fontSize(12)
         .fontWeight(this.desktopPresentation ? FontWeight.Regular : FontWeight.Medium)

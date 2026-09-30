@@ -23,6 +23,7 @@ import {
   NovelBookshelfLayoutState,
   NovelBookshelfLayoutViewModel
 } from '../../../features/novel/NovelBookshelfLayoutViewModel';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { AiraIcon } from '../common/AiraIcon';
 import {
   BrowserDesktopContextMenu,
@@ -64,8 +65,8 @@ const NOVEL_BOOKSHELF_HEADER_TO_TABS_GAP: number = 12;
 const NOVEL_BOOKSHELF_TABS_HEIGHT: number = 36;
 const NOVEL_BOOKSHELF_TABS_TO_CONTENT_GAP: number = 16;
 const NOVEL_BOOKSHELF_CATEGORY_OPTIONS: SegmentedTabOption[] = [
-  { id: 'novel', title: '小说' },
-  { id: 'comic', title: '漫画' }
+  { id: 'novel', title: $r('app.string.bookshelf_novels') },
+  { id: 'comic', title: $r('app.string.bookshelf_comics') }
 ];
 
 type NovelBookshelfDesktopView = 'all' | 'novel' | 'comic' | 'recent';
@@ -123,7 +124,7 @@ export struct NovelBookshelfScreen {
   private buildPhonePage() {
     Column() {
       ManagementHdsScaffold({
-        title: '我的书架',
+        title: $r('app.string.bookshelf_title'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         primaryTextColor: this.storedPrimaryTextColor,
@@ -136,13 +137,13 @@ export struct NovelBookshelfScreen {
         }
       }) {
         if (!this.persistentAccessAllowed) {
-          this.buildStatus('隐私模式下不可用', '')
+          this.buildStatus($r('app.string.bookshelf_private_unavailable'), '')
         } else if (this.state.loading) {
-          this.buildStatus('正在加载书架', '')
-        } else if (this.state.errorMessage.length > 0) {
-          this.buildStatus('书架暂时不可用', this.state.errorMessage)
+          this.buildStatus($r('app.string.bookshelf_loading'), '')
+        } else if (this.hasUserMessage(this.state.errorMessage)) {
+          this.buildStatus($r('app.string.bookshelf_unavailable'), this.state.errorMessage)
         } else if (this.state.novels.length === 0 && this.state.comics.length === 0) {
-          this.buildStatus('暂无收藏', '')
+          this.buildStatus($r('app.string.bookshelf_empty'), '')
         } else {
           this.buildBookContent()
         }
@@ -160,9 +161,9 @@ export struct NovelBookshelfScreen {
   @Builder
   private buildDesktopWorkspace() {
     ManagementLargeScreenShell({
-      title: '我的书架',
+      title: $r('app.string.bookshelf_title'),
       badge: this.resolveDesktopBadge(),
-      searchPlaceholder: '搜索书架',
+      searchPlaceholder: $r('app.string.bookshelf_search_placeholder'),
       searchQuery: this.desktopQuery,
       contentRevision: this.desktopContentRevision,
       limitContentWidth: false,
@@ -180,9 +181,9 @@ export struct NovelBookshelfScreen {
 
   @Builder
   private buildDesktopSidebar() {
-    ManagementLargeScreenNavSection({ title: '书架' })
+    ManagementLargeScreenNavSection({ title: $r('app.string.bookshelf_section') })
     ManagementLargeScreenNavItem({
-      title: '全部',
+      title: $r('app.string.bookshelf_all'),
       count: `${this.state.novels.length + this.state.comics.length}`,
       selected: this.desktopView === 'all',
       iconId: 'browser.toolbar.bookshelf',
@@ -191,7 +192,7 @@ export struct NovelBookshelfScreen {
       }
     })
     ManagementLargeScreenNavItem({
-      title: '小说',
+      title: $r('app.string.bookshelf_novels'),
       count: `${this.state.novels.length}`,
       selected: this.desktopView === 'novel',
       iconId: 'browser.toolbar.reader',
@@ -200,7 +201,7 @@ export struct NovelBookshelfScreen {
       }
     })
     ManagementLargeScreenNavItem({
-      title: '漫画',
+      title: $r('app.string.bookshelf_comics'),
       count: `${this.state.comics.length}`,
       selected: this.desktopView === 'comic',
       iconId: 'browser.toolbar.reader',
@@ -209,7 +210,7 @@ export struct NovelBookshelfScreen {
       }
     })
     ManagementLargeScreenNavItem({
-      title: '最近阅读',
+      title: $r('app.string.bookshelf_recent'),
       count: `${this.state.novels.length + this.state.comics.length}`,
       selected: this.desktopView === 'recent',
       iconId: 'browser.shortcut.history',
@@ -223,13 +224,14 @@ export struct NovelBookshelfScreen {
   private buildDesktopContent() {
     Column() {
       if (!this.persistentAccessAllowed) {
-        this.buildStatus('隐私模式下不可用', '')
+        this.buildStatus($r('app.string.bookshelf_private_unavailable'), '')
       } else if (this.state.loading) {
-        this.buildStatus('正在加载书架', '')
-      } else if (this.state.errorMessage.length > 0) {
-        this.buildStatus('书架暂时不可用', this.state.errorMessage)
+        this.buildStatus($r('app.string.bookshelf_loading'), '')
+      } else if (this.hasUserMessage(this.state.errorMessage)) {
+        this.buildStatus($r('app.string.bookshelf_unavailable'), this.state.errorMessage)
       } else if (this.desktopBooks.length === 0) {
-        this.buildStatus(this.desktopQuery.trim().length > 0 ? '没有匹配的书' : '暂无收藏', '')
+        this.buildStatus(this.desktopQuery.trim().length > 0 ?
+          $r('app.string.bookshelf_no_match') : $r('app.string.bookshelf_empty'), '')
       } else {
         this.buildDesktopBookGrid()
       }
@@ -245,7 +247,7 @@ export struct NovelBookshelfScreen {
   }
 
   @Builder
-  private buildStatus(title: string, message: string) {
+  private buildStatus(title: ResourceStr, message: ResourceStr) {
     AppEmptyState({
       airaIconId: 'browser.toolbar.reader',
       title: title,
@@ -260,13 +262,13 @@ export struct NovelBookshelfScreen {
       Stack({ alignContent: Alignment.TopStart }) {
         if (this.selectedCategory === 'comic') {
           if (this.state.comics.length === 0) {
-            this.buildCategoryStatus('暂无漫画收藏')
+            this.buildCategoryStatus($r('app.string.bookshelf_empty_comics'))
           } else {
             this.buildBookGrid(this.state.comics)
           }
         } else {
           if (this.state.novels.length === 0) {
-            this.buildCategoryStatus('暂无小说收藏')
+            this.buildCategoryStatus($r('app.string.bookshelf_empty_novels'))
           } else {
             this.buildBookGrid(this.state.novels)
           }
@@ -347,7 +349,7 @@ export struct NovelBookshelfScreen {
   }
 
   @Builder
-  private buildCategoryStatus(title: string) {
+  private buildCategoryStatus(title: ResourceStr) {
     Column() {
       AppEmptyState({
         airaIconId: 'browser.toolbar.reader',
@@ -468,7 +470,7 @@ export struct NovelBookshelfScreen {
       .padding(0)
       .backgroundColor(Color.Transparent)
       .stateEffect(false)
-      .accessibilityText(`打开${book.title}`)
+      .accessibilityText($r('app.string.bookshelf_open_book', book.title))
       .gesture(
         GestureGroup(
           GestureMode.Exclusive,
@@ -504,7 +506,7 @@ export struct NovelBookshelfScreen {
     .padding(0)
     .backgroundColor(Color.Transparent)
     .stateEffect(true)
-    .accessibilityText(`打开${book.title}`)
+    .accessibilityText($r('app.string.bookshelf_open_book', book.title))
     .gesture(
       GestureGroup(
         GestureMode.Exclusive,
@@ -532,7 +534,7 @@ export struct NovelBookshelfScreen {
     BrowserDesktopContextMenu() {
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
-          label: '查看原网页',
+          label: $r('app.string.bookshelf_open_original'),
           onAction: (): void => {
             this.runAfterContextMenuDismiss((): void => {
               this.onOpenOriginalPage(book);
@@ -540,7 +542,7 @@ export struct NovelBookshelfScreen {
           }
         })
         BrowserDesktopContextMenuItem({
-          label: '分享',
+          label: $r('app.string.bookshelf_share'),
           onAction: (): void => {
             this.runAfterContextMenuDismiss((): void => {
               this.shareBook(book);
@@ -548,7 +550,7 @@ export struct NovelBookshelfScreen {
           }
         })
         BrowserDesktopContextMenuItem({
-          label: '复制链接',
+          label: $r('app.string.bookshelf_copy_link'),
           onAction: (): void => {
             this.runAfterContextMenuDismiss((): void => {
               this.copyBookLink(book);
@@ -558,7 +560,7 @@ export struct NovelBookshelfScreen {
       }
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
-          label: '移出书架',
+          label: $r('app.string.bookshelf_remove'),
           onAction: (): void => {
             this.runAfterContextMenuDismiss((): void => {
               this.confirmRemoveBook(book);
@@ -639,11 +641,16 @@ export struct NovelBookshelfScreen {
     });
   }
 
-  private resolveDesktopBadge(): string {
+  private resolveDesktopBadge(): ResourceStr {
     if (!this.persistentAccessAllowed || this.state.loading) {
       return '';
     }
-    return `${this.resolveDesktopBooks().length} 本`;
+    const count: number = this.resolveDesktopBooks().length;
+    return $r('app.plural.bookshelf_book_count', count, count);
+  }
+
+  private hasUserMessage(message: ResourceStr): boolean {
+    return typeof message !== 'string' || message.length > 0;
   }
 
   private resolveLayoutState(): NovelBookshelfLayoutState {
@@ -706,25 +713,25 @@ export struct NovelBookshelfScreen {
   @Builder
   private buildBookContextMenu(book: NovelBookshelfBook) {
     Menu() {
-      MenuItem({ content: '查看原网页' })
+      MenuItem({ content: $r('app.string.bookshelf_open_original') })
         .onClick((): void => {
           this.runAfterContextMenuDismiss((): void => {
             this.onOpenOriginalPage(book);
           });
         })
-      MenuItem({ content: '分享' })
+      MenuItem({ content: $r('app.string.bookshelf_share') })
         .onClick((): void => {
           this.runAfterContextMenuDismiss((): void => {
             this.shareBook(book);
           });
         })
-      MenuItem({ content: '复制链接' })
+      MenuItem({ content: $r('app.string.bookshelf_copy_link') })
         .onClick((): void => {
           this.runAfterContextMenuDismiss((): void => {
             this.copyBookLink(book);
           });
         })
-      MenuItem({ content: '移出书架' })
+      MenuItem({ content: $r('app.string.bookshelf_remove') })
         .onClick((): void => {
           this.runAfterContextMenuDismiss((): void => {
             this.confirmRemoveBook(book);
@@ -751,15 +758,15 @@ export struct NovelBookshelfScreen {
       title: book.title,
       url: book.detailUrl
     }).catch((_error: Error): void => {
-      this.showToast('分享失败，请稍后重试。');
+      this.showToast($r('app.string.bookshelf_share_failed'));
     });
   }
 
   private copyBookLink(book: NovelBookshelfBook): void {
     void this.clipboardService.copyText({
       value: book.detailUrl.trim(),
-      emptyMessage: '当前没有可复制的链接。',
-      successMessage: '链接已复制。'
+      emptyMessage: resolveAppResourceText($r('app.string.bookshelf_copy_empty')),
+      successMessage: resolveAppResourceText($r('app.string.bookshelf_copy_done'))
     }).then((result: BrowserClipboardCopyResult): void => {
       this.showToast(result.message);
     });
@@ -767,15 +774,15 @@ export struct NovelBookshelfScreen {
 
   private confirmRemoveBook(book: NovelBookshelfBook): void {
     showCenteredAlertDialog({
-      title: '移出书架',
-      message: `确定将“${book.title}”移出书架吗？`,
+      title: $r('app.string.bookshelf_remove'),
+      message: $r('app.string.bookshelf_remove_message', book.title),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.bookshelf_cancel'),
         action: (): void => {}
       },
       secondaryButton: {
-        value: '移出',
+        value: $r('app.string.bookshelf_remove_action'),
         fontColor: $r('app.color.permission_blocked'),
         action: (): void => {
           void this.removeBook(book);
@@ -800,7 +807,7 @@ export struct NovelBookshelfScreen {
     return this.getUIContext().getHostContext() as common.UIAbilityContext;
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

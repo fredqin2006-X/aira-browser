@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   BookmarkNode,
   BookmarkStorageScope
@@ -51,7 +52,7 @@ export function createEmptyBookmarkWorkspaceSnapshot(): BookmarkWorkspaceSnapsho
     query: '',
     routeUrl: '',
     currentFolderId: '',
-    currentFolderTitle: '书签',
+    currentFolderTitle: resolveAppResourceText($r('app.string.app_shortcut_bookmarks')),
     selectedNodeId: '',
     selectedNodeIds: [],
     selectionAnchorId: '',
@@ -112,7 +113,7 @@ export class BookmarkWorkspaceSessionCoordinator {
       this.snapshotState.message = '';
       this.rebuildPresentation();
     } catch (error) {
-      this.snapshotState.message = `加载书签失败：${this.stringifyError(error as Error)}`;
+      this.snapshotState.message = resolveAppResourceText($r('app.string.bookmark_load_failed', this.stringifyError(error as Error)));
     }
     this.snapshotState.loading = false;
     this.initialized = true;
@@ -142,7 +143,7 @@ export class BookmarkWorkspaceSessionCoordinator {
       this.snapshotState.message = '';
       this.rebuildPresentation();
     } catch (error) {
-      this.snapshotState.message = `刷新书签失败：${this.stringifyError(error as Error)}`;
+      this.snapshotState.message = resolveAppResourceText($r('app.string.bookmark_refresh_failed', this.stringifyError(error as Error)));
     }
     this.snapshotState.busy = false;
     this.publish();
@@ -255,7 +256,7 @@ export class BookmarkWorkspaceSessionCoordinator {
     if (normalizedTitle.length <= 0 || parentId.length <= 0 || this.snapshotState.busy) {
       return this.getSnapshot();
     }
-    return this.runMutation('新建文件夹失败', async (): Promise<void> => {
+    return this.runMutation($r('app.string.bookmark_create_failed_short'), async (): Promise<void> => {
       const created = await this.bookmarkManagementFeature.createNode({
         type: 'folder',
         title: normalizedTitle,
@@ -276,7 +277,7 @@ export class BookmarkWorkspaceSessionCoordinator {
       (node.type === 'bookmark' && normalizedUrl.length <= 0) || this.snapshotState.busy) {
       return this.getSnapshot();
     }
-    return this.runMutation('保存失败', async (): Promise<void> => {
+    return this.runMutation($r('app.string.bookmark_save_failed'), async (): Promise<void> => {
       await this.bookmarkManagementFeature.updateNode({
         id: node.id,
         title: normalizedTitle,
@@ -298,7 +299,7 @@ export class BookmarkWorkspaceSessionCoordinator {
     if (deletingIds.length <= 0 || this.snapshotState.busy) {
       return this.getSnapshot();
     }
-    return this.runMutation('删除失败', async (): Promise<void> => {
+    return this.runMutation($r('app.string.history_delete_failed'), async (): Promise<void> => {
       await this.bookmarkManagementFeature.deleteNodes(deletingIds);
       deletingIds.forEach((id: string): void => {
         this.expandedFolderIds.delete(id);
@@ -314,7 +315,7 @@ export class BookmarkWorkspaceSessionCoordinator {
       !this.canMoveNodesToFolder(movingIds, target.id) || this.snapshotState.busy) {
       return this.getSnapshot();
     }
-    return this.runMutation('移动失败', async (): Promise<void> => {
+    return this.runMutation($r('app.string.bookmark_move_failed'), async (): Promise<void> => {
       await this.bookmarkManagementFeature.moveSubtrees({
         nodeIds: movingIds,
         parentId: target.id,
@@ -330,7 +331,7 @@ export class BookmarkWorkspaceSessionCoordinator {
   }
 
   private async runMutation(
-    failureLabel: string,
+    failureLabel: ResourceStr,
     operation: () => Promise<void>
   ): Promise<BookmarkWorkspaceSnapshot> {
     this.snapshotState.busy = true;
@@ -340,7 +341,7 @@ export class BookmarkWorkspaceSessionCoordinator {
       this.snapshotState.message = '';
       this.rebuildPresentation();
     } catch (error) {
-      this.snapshotState.message = `${failureLabel}：${this.stringifyError(error as Error)}`;
+      this.snapshotState.message = resolveAppResourceText($r('app.string.ui_labeled_error', resolveAppResourceText(failureLabel), this.stringifyError(error as Error)));
     }
     this.snapshotState.busy = false;
     this.publish();
@@ -353,7 +354,7 @@ export class BookmarkWorkspaceSessionCoordinator {
       this.snapshotState.currentFolderId = this.bookmarkManagementFeature.getPrimaryFolderId() ?? '';
     }
     const resolvedFolder = this.bookmarkManagementFeature.findNodeById(this.snapshotState.currentFolderId);
-    this.snapshotState.currentFolderTitle = resolvedFolder?.title ?? '书签';
+    this.snapshotState.currentFolderTitle = resolvedFolder?.title ?? resolveAppResourceText($r('app.string.app_shortcut_bookmarks'));
     this.expandToFolder(this.snapshotState.currentFolderId);
     this.rebuildFolders();
     this.rebuildRows();

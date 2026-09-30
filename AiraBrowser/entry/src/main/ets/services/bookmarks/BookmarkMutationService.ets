@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   BookmarkImportBatchRecord,
   BookmarkImportBatchSummary,
@@ -27,7 +28,6 @@ import {
   resolveBookmarkScope,
   sanitizeBookmarkTitle
 } from '../../data/repositories/BookmarkRepositoryCore';
-const FALLBACK_IMPORT_FOLDER_TITLE = 'Aira 导入';
 
 export interface BookmarkUpdateNodeOperation {
   localCommit: Promise<BookmarkNode | undefined>;
@@ -105,7 +105,7 @@ export class BookmarkMutationService {
       const node = buildLocalBookmarkNode(
         createLocalBookmarkId('bookmark', 'regular'),
         'bookmark',
-        sanitizeBookmarkTitle(command.title, '新书签'),
+        sanitizeBookmarkTitle(command.title, resolveAppResourceText($r('app.string.bookmark_new_bookmark'))),
         parentId,
         nextPosition,
         now,
@@ -140,7 +140,7 @@ export class BookmarkMutationService {
 
   async moveSubtrees(command: BookmarkMoveSubtreesCommand): Promise<BookmarkNode[]> {
     if (command.nodeIds.some((id: string) => isBookmarkRootNodeId(id))) {
-      return Promise.reject(new Error('系统根节点不可移动。'));
+      return Promise.reject(new Error(resolveAppResourceText($r('app.string.bookmark_root_move_blocked'))));
     }
     const movedNodes = await this.repository.moveSubtrees(command);
     if (movedNodes.length > 0) {
@@ -173,14 +173,14 @@ export class BookmarkMutationService {
 
   async deleteNode(id: string): Promise<boolean> {
     if (isBookmarkRootNodeId(id)) {
-      return Promise.reject(new Error('系统根节点不可删除。'));
+      return Promise.reject(new Error(resolveAppResourceText($r('app.string.bookmark_root_delete_blocked'))));
     }
     return (await this.deleteNodes([id])) > 0;
   }
 
   async deleteNodes(ids: string[]): Promise<number> {
     if (ids.some((id: string) => isBookmarkRootNodeId(id))) {
-      throw new Error('系统根节点不可删除。');
+      throw new Error(resolveAppResourceText($r('app.string.bookmark_root_delete_blocked')));
     }
     const deletedCount = await this.repository.deleteNodes(ids);
     if (deletedCount > 0) {
@@ -241,7 +241,7 @@ export class BookmarkMutationService {
     }
     const root = this.repository.listRoots().find((item) => item.role === role);
     if (root === undefined) {
-      throw new Error('未找到目标根节点。');
+      throw new Error(resolveAppResourceText($r('app.string.bookmark_root_target_missing')));
     }
     const targetSiblings = this.repository.listChildren(root.nodeId).filter((item: BookmarkNode) => item.id !== nodeId);
     const moved = await this.repository.moveSubtree({
@@ -301,7 +301,11 @@ export class BookmarkMutationService {
           const otherRootId = this.resolveImportOtherRootId(scope);
           const folder = this.buildPendingImportNode(
             'folder',
-            this.buildUniqueFolderTitle(otherRootId, FALLBACK_IMPORT_FOLDER_TITLE, scope),
+            this.buildUniqueFolderTitle(
+              otherRootId,
+              resolveAppResourceText($r('app.string.bookmark_import_fallback_folder')),
+              scope
+            ),
             otherRootId,
             undefined,
             now,
@@ -508,7 +512,9 @@ export class BookmarkMutationService {
     return buildLocalBookmarkNode(
       createLocalBookmarkId(type, scope),
       type,
-      title.trim().length > 0 ? title.trim() : (type === 'folder' ? '新文件夹' : '新书签'),
+      title.trim().length > 0 ? title.trim() : (type === 'folder'
+        ? resolveAppResourceText($r('app.string.bookmark_new_folder'))
+        : resolveAppResourceText($r('app.string.bookmark_new_bookmark'))),
       parentId,
       this.resolveNextImportPosition(parentId, nextPositionByParent, scope),
       now,
@@ -548,16 +554,16 @@ export class BookmarkMutationService {
     skippedNodeCount: number
   ): string {
     const segments: string[] = [
-      `新增 ${importedFolderCount} 个文件夹`,
-      `新增 ${importedBookmarkCount} 个书签`
+      resolveAppResourceText($r('app.string.bookmark_import_added_folders', importedFolderCount)),
+      resolveAppResourceText($r('app.string.bookmark_import_added_bookmarks', importedBookmarkCount))
     ];
     if (duplicateCount > 0) {
-      segments.push(`跳过 ${duplicateCount} 个重复书签`);
+      segments.push(resolveAppResourceText($r('app.string.bookmark_import_skipped_duplicates', duplicateCount)));
     }
     if (skippedNodeCount > 0) {
-      segments.push(`跳过 ${skippedNodeCount} 个无效节点`);
+      segments.push(resolveAppResourceText($r('app.string.bookmark_import_skipped_invalid', skippedNodeCount)));
     }
-    return `导入完成，${segments.join('，')}。`;
+    return resolveAppResourceText($r('app.string.bookmark_import_summary', segments.join(resolveAppResourceText($r('app.string.ui_list_separator')))));
   }
 
   private async recordImportBatch(batch: BookmarkImportBatchRecord): Promise<void> {

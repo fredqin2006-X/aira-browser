@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@ohos/hypium';
+import { isAppString } from '../main/ets/core/resources/AppResourceText';
 import {
   BookmarkNode,
   BrowserAppearanceSettings,
@@ -108,9 +109,9 @@ export default function browserDesktopBookmarkBarMenuModelTest(): void {
       );
       expect(findItem(model.groups, 'bar_visibility_always')?.checked).assertTrue();
       expect(findItem(model.groups, 'bar_visibility_never')?.checked).assertFalse();
-      expect(findItem(model.groups, 'rename_node')?.label).assertEqual('重命名...');
-      expect(findItem(model.groups, 'add_bookmark')?.label).assertEqual('添加网页...');
-      expect(findItem(model.groups, 'add_folder')?.label).assertEqual('添加文件夹...');
+      expect(isAppString(findItem(model.groups, 'rename_node')?.label ?? '', $r('app.string.bookmark_bar_rename'))).assertTrue();
+      expect(isAppString(findItem(model.groups, 'add_bookmark')?.label ?? '', $r('app.string.bookmark_bar_add_page'))).assertTrue();
+      expect(isAppString(findItem(model.groups, 'add_folder')?.label ?? '', $r('app.string.bookmark_bar_add_folder'))).assertTrue();
       expect(findItem(model.groups, 'open_new_tab')).assertUndefined();
     });
 
@@ -129,10 +130,10 @@ export default function browserDesktopBookmarkBarMenuModelTest(): void {
           'open_manager,' +
           'bar_visibility_never,bar_visibility_always,bar_visibility_new_tab_only'
       );
-      expect(findItem(model.groups, 'open_new_tab')?.label).assertEqual('在新标签页中打开');
-      expect(findItem(model.groups, 'open_new_window')?.label).assertEqual('在新窗口中打开');
-      expect(findItem(model.groups, 'open_private_window')?.label).assertEqual('在隐私窗口中打开');
-      expect(findItem(model.groups, 'open_manager')?.label).assertEqual('打开书签管理器');
+      expect(isAppString(findItem(model.groups, 'open_new_tab')?.label ?? '', $r('app.string.history_open_new_tab'))).assertTrue();
+      expect(isAppString(findItem(model.groups, 'open_new_window')?.label ?? '', $r('app.string.bookmark_bar_open_new_window'))).assertTrue();
+      expect(isAppString(findItem(model.groups, 'open_private_window')?.label ?? '', $r('app.string.bookmark_bar_open_private'))).assertTrue();
+      expect(isAppString(findItem(model.groups, 'open_manager')?.label ?? '', $r('app.string.bookmark_bar_open_manager'))).assertTrue();
       expect(findItem(model.groups, 'bar_visibility_new_tab_only')?.checked).assertTrue();
       expect(findItem(model.groups, 'bar_visibility_never')?.checked).assertFalse();
       expect(findItem(model.groups, 'paste_node')?.enabled).assertFalse();

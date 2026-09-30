@@ -184,7 +184,7 @@ export struct SyncExperienceScreen {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '数据同步',
+        title: $r('app.string.settings_sync'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -267,7 +267,7 @@ export struct SyncExperienceScreen {
 
       Column() {
         SettingsActionButton({
-          title: '选择同步方式',
+          title: $r('app.string.settings_sync_choose_method'),
           variant: 'filled',
           isEnabled: !this.isPrivateSession && !this.isBusy,
           accentColor: this.storedAccentColor,
@@ -293,15 +293,15 @@ export struct SyncExperienceScreen {
     Column({ space: 12 }) {
       this.buildPreActiveIcon()
 
-      Text('暂时无法读取同步状态')
+      Text($r('app.string.settings_sync_load_failed_title'))
         .fontSize(this.desktopPresentation ? 15 : 17)
         .fontWeight(this.desktopPresentation ? FontWeight.Regular : FontWeight.Medium)
         .fontColor(this.storedPrimaryTextColor)
         .textAlign(TextAlign.Center)
 
       Text(this.preActiveStatusKind === 'huawei-load-failed'
-        ? '华为云空间同步设置可能已经保存，本机数据没有丢失。请重试确认当前状态。'
-        : '本机同步设置没有更改，请稍后重试。')
+        ? $r('app.string.settings_sync_load_failed_huawei')
+        : $r('app.string.settings_sync_load_failed_local'))
         .constraintSize({ maxWidth: 360 })
         .fontSize(13)
         .lineHeight(19)
@@ -310,7 +310,7 @@ export struct SyncExperienceScreen {
 
       Column() {
         SettingsActionButton({
-          title: '重试',
+          title: $r('app.string.settings_sync_retry'),
           variant: 'filled',
           isEnabled: !this.isPrivateSession && !this.isBusy,
           accentColor: this.storedAccentColor,
@@ -339,15 +339,17 @@ export struct SyncExperienceScreen {
         .height(32)
         .color(this.storedAccentColor)
 
-      Text(this.preActiveStatusKind === 'huawei-activating' ? '正在开启华为云空间同步' : '正在读取同步状态')
+      Text(this.preActiveStatusKind === 'huawei-activating'
+        ? $r('app.string.settings_sync_activating_huawei')
+        : $r('app.string.settings_sync_loading'))
         .fontSize(this.desktopPresentation ? 15 : 17)
         .fontWeight(this.desktopPresentation ? FontWeight.Regular : FontWeight.Medium)
         .fontColor(this.storedPrimaryTextColor)
         .textAlign(TextAlign.Center)
 
       Text(this.preActiveStatusKind === 'huawei-activating'
-        ? '正在保存同步设置，随后会在后台完成初始化；你可以随时离开此页面。'
-        : '请稍候')
+        ? $r('app.string.settings_sync_activating_note')
+        : $r('app.string.settings_sync_please_wait'))
         .constraintSize({ maxWidth: 360 })
         .fontSize(13)
         .lineHeight(19)
@@ -391,11 +393,21 @@ export struct SyncExperienceScreen {
       .borderRadius(18)
       .clip(true)
 
-      Text('云同步')
+      Text($r('app.string.settings_sync_cloud'))
         .fontSize(this.desktopPresentation ? 15 : 19)
         .fontWeight(this.desktopPresentation ? FontWeight.Medium : FontWeight.Medium)
         .fontColor(this.storedPrimaryTextColor)
         .textAlign(TextAlign.Center)
+
+      if (this.hasVisibleStatusDetail()) {
+        Text(this.state.statusDetail)
+          .width('100%')
+          .fontSize(13)
+          .lineHeight(19)
+          .fontColor(this.storedSecondaryTextColor)
+          .textAlign(TextAlign.Center)
+          .padding({ left: 12, right: 12 })
+      }
 
       Text(this.resolveCloudSyncDescription())
         .width('100%')
@@ -412,13 +424,13 @@ export struct SyncExperienceScreen {
 
   @Builder
   private buildSyncMethodSection() {
-    SettingsSection({ title: '同步设置', secondaryTextColor: this.storedSecondaryTextColor }) {
+    SettingsSection({ title: $r('app.string.settings_sync_settings'), secondaryTextColor: this.storedSecondaryTextColor }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsNavigationRow({
-          title: '同步方式',
+          title: $r('app.string.settings_sync_method'),
           desktopPresentation: this.desktopPresentation,
           value: this.state.goalLabel,
           icon: $r('sys.symbol.icloud_fill'),
@@ -436,9 +448,9 @@ export struct SyncExperienceScreen {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsNavigationRow({
-          title: '跨设备互联',
+          title: $r('app.string.settings_sync_cross_device'),
           desktopPresentation: this.desktopPresentation,
-          value: '查看教程',
+          value: $r('app.string.settings_sync_view_guide'),
           icon: $r('sys.symbol.link'),
           iconBackgroundColor: this.settingsIconBackgrounds.syncPageCrossDevice,
           iconColor: this.storedSettingsIconForegroundColor,
@@ -466,29 +478,29 @@ export struct SyncExperienceScreen {
   }
 
   /** How a content row describes itself; a paused master outranks the per-item switch. */
-  private resolveContentSwitchStatus(selected: boolean, unsupported: boolean): string {
+  private resolveContentSwitchStatus(selected: boolean, unsupported: boolean): ResourceStr {
     if (unsupported) {
-      return '当前方式不支持';
+      return $r('app.string.settings_sync_unsupported');
     }
     if (!this.state.masterEnabled) {
-      return '已暂停';
+      return $r('app.string.settings_sync_paused');
     }
-    return selected ? '已开启' : '未开启';
+    return selected ? $r('app.string.settings_sync_on') : $r('app.string.settings_sync_off');
   }
 
   @Builder
   private buildSyncContentSections() {
-    SettingsSection({ title: '同步内容', secondaryTextColor: this.storedSecondaryTextColor }) {
+    SettingsSection({ title: $r('app.string.settings_sync_content'), secondaryTextColor: this.storedSecondaryTextColor }) {
       Grid() {
         GridItem() {
           SyncContentSwitchCard({
             desktopPresentation: this.desktopPresentation,
-            title: '书签',
+            title: $r('app.string.settings_sync_bookmarks'),
             checked: this.state.bookmarkSelected,
             status: this.state.huaweiSpaceBookmarkUpgradeRequired
-              ? '需要重新开启'
+              ? $r('app.string.settings_sync_reenable')
               : (this.state.huaweiBookmarkInitializing
-                ? '初始化中'
+                ? $r('app.string.settings_sync_initializing')
                 : this.resolveContentSwitchStatus(this.state.bookmarkSelected, false)),
             icon: $r('sys.symbol.bookmark_fill'),
             iconBackgroundColor: this.settingsIconBackgrounds.bookmarks,
@@ -501,7 +513,7 @@ export struct SyncExperienceScreen {
         GridItem() {
           SyncContentSwitchCard({
             desktopPresentation: this.desktopPresentation,
-            title: '历史记录',
+            title: $r('app.string.settings_sync_history'),
             checked: this.state.historySupported && this.state.historySelected,
             status: this.resolveContentSwitchStatus(this.state.historySelected, !this.state.historySupported),
             airaIconId: 'browser.shortcut.history',
@@ -563,7 +575,7 @@ export struct SyncExperienceScreen {
           }
         }
       })
-      Text(`最近同步：${this.state.lastSyncLabel}`)
+      Text(this.state.lastSyncLabel)
         .width('100%')
         .fontSize(13)
         .fontColor(this.storedSecondaryTextColor)
@@ -574,13 +586,13 @@ export struct SyncExperienceScreen {
 
   @Builder
   private buildMoreSection() {
-    SettingsSection({ title: '更多', secondaryTextColor: this.storedSecondaryTextColor }) {
+    SettingsSection({ title: $r('app.string.settings_sync_more'), secondaryTextColor: this.storedSecondaryTextColor }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsNavigationRow({
-          title: '额外备份',
+          title: $r('app.string.settings_sync_extra_backup'),
           desktopPresentation: this.desktopPresentation,
           value: this.state.additionalBackupSummary,
           icon: $r('sys.symbol.externaldrive_fill'),
@@ -598,7 +610,7 @@ export struct SyncExperienceScreen {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsNavigationRow({
-          title: '高级设置',
+          title: $r('app.string.settings_sync_advanced'),
           desktopPresentation: this.desktopPresentation,
           value: '',
           icon: $r('sys.symbol.gearshape_fill'),
@@ -625,25 +637,32 @@ export struct SyncExperienceScreen {
     return rowCount * cardHeight + Math.max(0, rowCount - 1) * 12;
   }
 
-  private resolveCloudSyncDescription(): string {
-    if (!this.state.masterEnabled) {
-      return '云同步已暂停，可在高级设置中重新开启。';
-    }
-    return '在不同设备间自动保持书签、历史记录、主页收藏、小说书架和常用设置一致。';
+  private hasVisibleStatusDetail(): boolean {
+    return typeof this.state.statusDetail !== 'string' || this.state.statusDetail.length > 0;
   }
 
-  private resolveSyncContentFooter(): string {
+  private resolveCloudSyncDescription(): ResourceStr {
+    if (!this.state.masterEnabled) {
+      return $r('app.string.settings_sync_paused_desc');
+    }
+    if (this.state.statusKind === 'attention') {
+      return this.state.statusMessage;
+    }
+    return $r('app.string.settings_sync_desc');
+  }
+
+  private resolveSyncContentFooter(): ResourceStr {
     if (this.state.huaweiSpaceBookmarkUpgradeRequired) {
-      return '华为云空间书签同步已升级。重新开启后会在后台完成初始化，本机书签和其他同步内容不受影响。';
+      return $r('app.string.settings_sync_huawei_upgrade_footer');
     }
     if (this.state.huaweiBookmarkInitializing) {
-      return '正在从华为云空间拉取并确认完整书签，可离开此页面；稍后会自动重试，也可点“立即同步”。';
+      return $r('app.string.settings_sync_huawei_init_footer');
     }
     // A paused master does not erase the selection, so say what the rows below actually do.
     if (!this.state.masterEnabled) {
-      return '同步总开关已关闭，这里的选择会在重新开启后生效；关闭某项只会暂停该项同步，不会删除已有数据。';
+      return $r('app.string.settings_sync_master_off_footer');
     }
-    return '关闭某项只会暂停该项同步，不会删除本机或云端已有数据。';
+    return $r('app.string.settings_sync_item_footer');
   }
 
   @Builder
@@ -828,13 +847,15 @@ export struct SyncExperienceScreen {
     return this.personalizationViewModel.resolveItemIconBackgroundColor(id, this.settingsIconBackgrounds);
   }
 
-  private resolveImmediateActionLabel(): string {
+  private resolveImmediateActionLabel(): ResourceStr {
     if (this.isSyncing || this.state.statusKind === 'syncing') {
-      return '正在同步';
+      return $r('app.string.settings_sync_syncing');
     }
     if (this.state.requiresAiraProAction) {
-      return '恢复 Aira Pro';
+      return $r('app.string.settings_sync_restore_pro');
     }
-    return this.state.statusKind === 'attention' ? '重试' : '立即同步';
+    return this.state.statusKind === 'attention'
+      ? $r('app.string.settings_sync_retry')
+      : $r('app.string.settings_sync_now');
   }
 }

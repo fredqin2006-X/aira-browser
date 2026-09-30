@@ -21,11 +21,13 @@ import {
   BrowserToolbarInteractionActionState,
   BrowserToolbarSlotInteractionState
 } from './BrowserToolbarCustomizationViewModel';
+import { bottomPanelInteractionTitle } from './BrowserBottomPanelText';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface BrowserSplitToolbarButtonPresentation {
   slotId: BrowserSplitToolbarSlotId;
   actionId: string;
-  title: string;
+  title: ResourceStr;
   iconId: AiraRenderableIconId;
   usesTabBadge: boolean;
   enabled: boolean;
@@ -94,22 +96,24 @@ export class BrowserSplitToolbarCustomizationViewModel {
     const longPressAction = this.actions.presentInteractionAction(
       longPressActionId as BrowserToolbarInteractionActionId
     );
-    const sceneTitle = slot.scene === 'home' ? '主页' : '网页';
+    const sceneTitle = slot.scene === 'home' ?
+      $r('app.string.bottom_panel_scene_home') : $r('app.string.bottom_panel_scene_web');
     return {
       slotId,
       scene: slot.scene,
-      sheetTitle: `${sceneTitle} · ${tapAction.title}`,
+      sheetTitle: resolveAppResourceText($r('app.string.bottom_panel_split_sheet_title',
+        resolveAppResourceText(sceneTitle), resolveAppResourceText(tapAction.title))),
       tapLocked: slot.tapLocked,
       isProfileDefault: this.isSlotDefault(settings, slot, tapActionId, longPressActionId),
       tap: {
         kind: 'tap',
-        title: '单击',
+        title: bottomPanelInteractionTitle('tap'),
         action: tapAction,
         allowsNone: false
       },
       longPress: {
         kind: 'longPress',
-        title: '长按',
+        title: bottomPanelInteractionTitle('longPress'),
         action: longPressAction,
         allowsNone: true
       }

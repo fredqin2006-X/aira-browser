@@ -17,6 +17,8 @@ import { DesktopBookmarkClipboardSignal } from '../bookmarks/DesktopBookmarkClip
 import { BrowserConfirmationRequest } from './BrowserConfirmationSink';
 import { BrowserDesktopBookmarkBarNodeActionKind, BrowserDesktopBookmarkBarRootActionKind } from './BrowserDesktopBookmarkBarViewModel';
 import { setDesktopBookmarkBarVisibility } from './DesktopBookmarkBarVisibility';
+import { resolveAppResourceText } from '../resources/AppResourceText';
+import { resolveBookmarkNodeDisplayTitle } from '../resources/HistoryBookmarkDisplayText';
 
 export interface BrowserDesktopBookmarkBarActivePage {
   title: string;
@@ -28,15 +30,15 @@ export interface BrowserDesktopBookmarkBarFolderNameRequest {
   nodeId: string;
   parentId: string;
   initialTitle: string;
-  dialogTitle: string;
-  fieldPlaceholder: string;
+  dialogTitle: ResourceStr;
+  fieldPlaceholder: ResourceStr;
 }
 
 export interface BrowserDesktopBookmarkBarBookmarkEditorRequest {
   parentId: string;
   title: string;
   url: string;
-  dialogTitle: string;
+  dialogTitle: ResourceStr;
 }
 
 export interface BrowserDesktopBookmarkBarActionShell {
@@ -46,7 +48,7 @@ export interface BrowserDesktopBookmarkBarActionShell {
   presentBookmarkEditor: (request: BrowserDesktopBookmarkBarBookmarkEditorRequest) => void;
   confirmDelete: (request: BrowserConfirmationRequest) => void;
   copyText: (request: BrowserClipboardCopyTextRequest) => void;
-  showToast: (message: string) => void;
+  showToast: (message: ResourceStr) => void;
 }
 
 export interface BrowserDesktopBookmarkBarActionCoordinatorOptions {
@@ -111,7 +113,7 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
     void setDesktopBookmarkBarVisibility(this.options.preferencesRepository, visibility).then(
       (): void => {},
       (_error: Error): void => {
-        this.shell.showToast('书签栏设置保存失败，请稍后重试。');
+        this.shell.showToast($r('app.string.bookmark_bar_save_failed'));
       }
     );
   }
@@ -127,8 +129,8 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
         nodeId: '',
         parentId: rootId,
         initialTitle: '',
-        dialogTitle: '新建文件夹',
-        fieldPlaceholder: '文件夹名称'
+        dialogTitle: $r('app.string.bookmark_new_folder'),
+        fieldPlaceholder: $r('app.string.bookmark_folder_name')
       });
       return;
     }
@@ -137,7 +139,7 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
       parentId: rootId,
       title: page?.title ?? '',
       url: page?.url ?? '',
-      dialogTitle: `添加到「${this.resolveToolbarRootTitle(scope)}」`
+      dialogTitle: $r('app.string.bookmark_bar_add_to_named', this.resolveToolbarRootTitle(scope))
     });
   }
 
@@ -145,7 +147,7 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
   handleFolderNameSubmitted(request: BrowserDesktopBookmarkBarFolderNameRequest, title: string): void {
     const sanitized = title.trim();
     if (sanitized.length === 0) {
-      this.shell.showToast('名称不能为空。');
+      this.shell.showToast($r('app.string.bookmark_bar_name_required'));
       return;
     }
     void this.applyFolderName(request, sanitized);
@@ -155,7 +157,7 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
   handleBookmarkSubmitted(request: BrowserDesktopBookmarkBarBookmarkEditorRequest, title: string, url: string): void {
     const sanitizedUrl = url.trim();
     if (sanitizedUrl.length === 0) {
-      this.shell.showToast('请输入网址。');
+      this.shell.showToast($r('app.string.bookmark_url_required'));
       return;
     }
     void this.applyBookmark(request, title, sanitizedUrl);
@@ -168,7 +170,7 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
     try {
       if (request.nodeId.length > 0) {
         const updated = await this.mutationService.updateNode({ id: request.nodeId, title: title });
-        this.shell.showToast(updated === undefined ? '没有找到这个书签。' : '已重命名。');
+        this.shell.showToast(updated === undefined ? $r('app.string.bookmark_bar_missing') : $r('app.string.bookmark_bar_renamed'));
         return;
       }
       const scope = this.resolveScopeForParentId(request.parentId);
@@ -178,9 +180,9 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
         parentId: this.resolveWritableParentId(request.parentId, scope),
         scope: scope
       });
-      this.shell.showToast('已新建文件夹。');
+      this.shell.showToast($r('app.string.bookmark_bar_folder_created'));
     } catch (_error) {
-      this.shell.showToast('保存文件夹失败，请稍后重试。');
+      this.shell.showToast($r('app.string.bookmark_bar_folder_save_failed'));
     }
   }
 
@@ -198,9 +200,9 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
         parentId: this.resolveWritableParentId(request.parentId, scope),
         scope: scope
       });
-      this.shell.showToast('已添加网页。');
+      this.shell.showToast($r('app.string.bookmark_bar_page_added'));
     } catch (_error) {
-      this.shell.showToast('添加网页失败，请稍后重试。');
+      this.shell.showToast($r('app.string.bookmark_bar_page_add_failed'));
     }
   }
 
@@ -212,8 +214,8 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
       nodeId: node.id,
       parentId: node.parentId ?? '',
       initialTitle: node.title,
-      dialogTitle: '重命名',
-      fieldPlaceholder: '名称'
+      dialogTitle: $r('app.string.bookmark_bar_rename_title'),
+      fieldPlaceholder: $r('app.string.ui_name')
     });
   }
 
@@ -224,10 +226,10 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
     const scope = this.resolveNodeScope(node);
     const containedCount = node.type === 'folder' ? this.collectBookmarkUrls(node.id, scope).length : 0;
     this.shell.confirmDelete({
-      title: node.type === 'folder' ? '删除文件夹' : '删除书签',
+      title: node.type === 'folder' ? $r('app.string.bookmark_delete_folder') : $r('app.string.bookmark_delete_bookmark'),
       message: this.buildDeleteMessage(node, containedCount),
-      cancelLabel: '取消',
-      confirmLabel: '删除',
+      cancelLabel: $r('app.string.settings_account_cancel'),
+      confirmLabel: $r('app.string.settings_delete'),
       confirmTone: 'alert',
       onConfirm: (): void => {
         void this.applyDelete(node.id);
@@ -235,22 +237,22 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
     });
   }
 
-  private buildDeleteMessage(node: BookmarkNode, containedCount: number): string {
+  private buildDeleteMessage(node: BookmarkNode, containedCount: number): ResourceStr {
     if (node.type !== 'folder') {
-      return `确定删除「${node.title}」吗？此操作无法撤销。`;
+      return $r('app.string.bookmark_bar_delete_one', node.title);
     }
     if (containedCount > 0) {
-      return `确定删除文件夹「${node.title}」及其中 ${containedCount} 个书签吗？此操作无法撤销。`;
+      return $r('app.string.bookmark_bar_delete_folder_count', node.title, containedCount);
     }
-    return `确定删除文件夹「${node.title}」吗？此操作无法撤销。`;
+    return $r('app.string.bookmark_bar_delete_folder', node.title);
   }
 
   private async applyDelete(nodeId: string): Promise<void> {
     try {
       const deleted = await this.mutationService.deleteNode(nodeId);
-      this.shell.showToast(deleted ? '已删除。' : '没有找到这个书签。');
+      this.shell.showToast(deleted ? $r('app.string.bookmark_bar_deleted') : $r('app.string.bookmark_bar_missing'));
     } catch (_error) {
-      this.shell.showToast('删除失败，请稍后重试。');
+      this.shell.showToast($r('app.string.bookmark_bar_delete_failed'));
     }
   }
 
@@ -260,8 +262,8 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
       nodeId: '',
       parentId: parentId,
       initialTitle: '',
-      dialogTitle: '新建文件夹',
-      fieldPlaceholder: '文件夹名称'
+      dialogTitle: $r('app.string.bookmark_new_folder'),
+      fieldPlaceholder: $r('app.string.bookmark_folder_name')
     });
   }
 
@@ -272,7 +274,7 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
       parentId: parentId,
       title: page?.title ?? '',
       url: page?.url ?? '',
-      dialogTitle: `添加到「${this.resolveParentTitle(node, parentId)}」`
+      dialogTitle: $r('app.string.bookmark_bar_add_to_named', this.resolveParentTitle(node, parentId))
     });
   }
 
@@ -282,20 +284,20 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
     this.clipboard = { mode: mode, nodeIds: [node.id] };
     DesktopBookmarkClipboardSignal.publish(true);
     if (mode === 'cut') {
-      this.shell.showToast('已剪切，可在目标文件夹上右键粘贴。');
+      this.shell.showToast($r('app.string.bookmark_bar_cut_ready'));
       return;
     }
     this.shell.copyText({
       value: urls.join('\n'),
-      emptyMessage: node.type === 'folder' ? '这个文件夹里还没有网址。' : '这个书签没有可复制的网址。',
-      successMessage: urls.length > 1 ? `已复制 ${urls.length} 个网址。` : '网址已复制。'
+      emptyMessage: node.type === 'folder' ? $r('app.string.bookmark_bar_folder_no_url') : $r('app.string.bookmark_bar_no_url'),
+      successMessage: urls.length > 1 ? $r('app.string.bookmark_bar_copied_many', urls.length) : $r('app.string.bookmark_bar_copied')
     });
   }
 
   private async applyPaste(node: BookmarkNode): Promise<void> {
     const entry = this.clipboard;
     if (entry === undefined) {
-      this.shell.showToast('剪贴板里还没有书签。');
+      this.shell.showToast($r('app.string.bookmark_bar_clipboard_empty'));
       return;
     }
     const scope = this.resolveNodeScope(node);
@@ -303,7 +305,7 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
     for (let index = 0; index < entry.nodeIds.length; index += 1) {
       const sourceId = entry.nodeIds[index];
       if (sourceId === targetParentId || this.isDescendantOf(targetParentId, sourceId)) {
-        this.shell.showToast('不能粘贴到它自己的位置。');
+        this.shell.showToast($r('app.string.bookmark_bar_paste_self'));
         return;
       }
     }
@@ -313,9 +315,9 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
         ? await this.moveClipboardNodes(entry.nodeIds, targetParentId, scope)
         : await this.copyClipboardNodes(entry.nodeIds, targetParentId, scope);
       this.clearClipboard();
-      this.shell.showToast(entry.mode === 'cut' ? '已移动。' : `已粘贴 ${pasted} 项。`);
+      this.shell.showToast(entry.mode === 'cut' ? $r('app.string.bookmark_bar_moved') : $r('app.string.bookmark_bar_pasted', pasted));
     } catch (_error) {
-      this.shell.showToast('粘贴失败，请稍后重试。');
+      this.shell.showToast($r('app.string.bookmark_bar_paste_failed'));
     }
   }
 
@@ -397,13 +399,13 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
 
   private resolveParentTitle(node: BookmarkNode, parentId: string): string {
     if (node.type === 'folder') {
-      return node.title;
+      return resolveAppResourceText(resolveBookmarkNodeDisplayTitle(node.id, node.title));
     }
     const parent = this.options.repository.findNodeById(parentId);
-    if (parent === undefined || isBookmarkRootNodeId(parent.id)) {
-      return '书签栏';
+    if (parent === undefined) {
+      return resolveAppResourceText($r('app.string.bookmark_root_toolbar'));
     }
-    return parent.title;
+    return resolveAppResourceText(resolveBookmarkNodeDisplayTitle(parent.id, parent.title));
   }
 
   private resolveWritableParentId(parentId: string, scope: BookmarkStorageScope): string {
@@ -432,9 +434,9 @@ export class BrowserDesktopBookmarkBarActionCoordinator {
   }
 
   private resolveToolbarRootTitle(scope: BookmarkStorageScope): string {
-    const root = this.options.repository.findNodeById(this.resolveToolbarRootId(scope));
-    const title = (root?.title ?? '').trim();
-    return title.length > 0 ? title : '书签栏';
+    const rootId = this.resolveToolbarRootId(scope);
+    const root = this.options.repository.findNodeById(rootId);
+    return resolveAppResourceText(resolveBookmarkNodeDisplayTitle(rootId, (root?.title ?? '').trim()));
   }
 
   private isDescendantOf(candidateId: string, ancestorId: string): boolean {

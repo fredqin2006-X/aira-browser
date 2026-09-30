@@ -56,12 +56,12 @@ export struct BrowserTrackingProtectionSettingsContent {
 
   build() {
     Column({ space: 18 }) {
-      SettingsSection({ title: '防跟踪防护', secondaryTextColor: this.secondaryTextColor }) {
+      SettingsSection({ title: $r('app.string.settings_site_info_tracking_protection'), secondaryTextColor: this.secondaryTextColor }) {
         this.buildModeSurface()
         SettingsFooterText({ text: this.state.footerText, secondaryTextColor: this.secondaryTextColor })
       }
 
-      SettingsSection({ title: '当前策略', secondaryTextColor: this.secondaryTextColor }) {
+      SettingsSection({ title: $r('app.string.settings_privacy_protection_tracking_current'), secondaryTextColor: this.secondaryTextColor }) {
         this.buildPolicySurface()
         SettingsFooterText({ text: this.state.limitationText, secondaryTextColor: this.secondaryTextColor })
       }
@@ -144,20 +144,28 @@ export struct BrowserTrackingProtectionSettingsContent {
   @Builder
   private buildPolicyRows() {
     this.buildPolicyRow(
-      '网页客户端提示',
-      this.state.clientHintsRuntimeApplied ? (this.state.clientHintsEnabled ? '允许' : '已收紧') : '未完全生效',
+      $r('app.string.settings_privacy_protection_tracking_client_hints'),
+      this.state.clientHintsRuntimeApplied ? (this.state.clientHintsEnabled ?
+        $r('app.string.settings_site_capability_rule_allow') :
+        $r('app.string.settings_privacy_protection_tracking_tightened')) :
+        $r('app.string.settings_privacy_protection_tracking_not_applied'),
       'first'
     )
     this.buildPolicyDivider()
     this.buildPolicyRow(
-      '第三方 Cookie',
-      this.state.cookiePolicyRuntimeApplied ? (this.state.thirdPartyCookiesAllowed ? '允许' : '已拦截') : '未完全生效',
+      $r('app.string.settings_privacy_protection_tracking_cookie'),
+      this.state.cookiePolicyRuntimeApplied ? (this.state.thirdPartyCookiesAllowed ?
+        $r('app.string.settings_site_capability_rule_allow') :
+        $r('app.string.settings_privacy_protection_tracking_blocked')) :
+        $r('app.string.settings_privacy_protection_tracking_not_applied'),
       'middle'
     )
     this.buildPolicyDivider()
     this.buildPolicyRow(
-      '网页标识',
-      this.state.stableBrowserIdentityEnabled ? '保持一致' : '兼容模式',
+      $r('app.string.settings_privacy_protection_tracking_identity'),
+      this.state.stableBrowserIdentityEnabled ?
+        $r('app.string.settings_privacy_protection_tracking_consistent') :
+        $r('app.string.settings_privacy_protection_tracking_compatible'),
       'last'
     )
   }
@@ -191,11 +199,14 @@ export struct BrowserTrackingProtectionSettingsContent {
     }
     if (mode === 'enhanced') {
       showCenteredAlertDialog({
-        title: '开启增强反跟踪？',
-        message: '将收紧网页客户端提示并拦截第三方 Cookie。少数登录、支付或嵌入内容可能受影响；现有网页重新加载后完整生效。',
+        title: $r('app.string.settings_privacy_protection_tracking_enhanced_title'),
+        message: $r('app.string.settings_privacy_protection_tracking_enhanced_message'),
         autoCancel: true,
-        primaryButton: { value: '取消', action: (): void => {} },
-        secondaryButton: { value: '开启', action: (): void => this.persistMode(mode) }
+        primaryButton: { value: $r('app.string.settings_privacy_protection_dialog_cancel'), action: (): void => {} },
+        secondaryButton: {
+          value: $r('app.string.settings_site_customization_rule_on'),
+          action: (): void => this.persistMode(mode)
+        }
       });
       return;
     }

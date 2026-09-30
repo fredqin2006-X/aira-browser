@@ -3,6 +3,7 @@ import { AiraSyncSettings } from '../../common/models/AiraSyncModels';
 import { AiraMembershipState } from '../../common/models/MembershipModels';
 import { AiraCloudBookmarkV4BootstrapRecord } from '../../common/models/AiraCloudBookmarkV4BootstrapModels';
 import { BrowserBoundaryRouteState } from '../../common/utils/RouteParamUtils';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { LocalBackupSelection } from '../../features/backup/LocalBackupModels';
 import { LocalBackupCoordinator } from '../backup/LocalBackupCoordinator';
 import { AiraCloudBookmarkV4BootstrapStateStore } from '../../data/sync/AiraCloudBookmarkV4BootstrapStateStore';
@@ -119,7 +120,7 @@ export class AiraCloudBookmarkV4BootstrapRuntime {
       return;
     }
     if (exportOutcome.status === 'failed') {
-      this.publishFailure(uid, new Error(exportOutcome.message));
+      this.publishFailure(uid, new Error(resolveAppResourceText(exportOutcome.message)));
       this.bump();
       return;
     }

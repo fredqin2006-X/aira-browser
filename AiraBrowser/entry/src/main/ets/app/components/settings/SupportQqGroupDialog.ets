@@ -23,7 +23,7 @@ export struct SupportQqGroupDialog {
 
   build() {
     Column({ space: 16 }) {
-      Text('交流QQ群')
+      Text($r('app.string.settings_qq_group_title'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -49,7 +49,7 @@ export struct SupportQqGroupDialog {
         .borderRadius(24)
 
         Column({ space: 4 }) {
-          Text('QQ群号')
+          Text($r('app.string.settings_qq_group_number'))
             .fontSize(13)
             .fontColor(this.storedSecondaryTextColor)
             .maxLines(1)
@@ -69,7 +69,7 @@ export struct SupportQqGroupDialog {
 
       BrowserSheetActionButton({
         stacked: true,
-        label: '复制群号码',
+        label: $r('app.string.settings_about_copy_group'),
         emphasis: 'primary',
         accentColor: this.storedAccentColor,
         fillAvailableWidth: false,

@@ -15,7 +15,7 @@ export struct CustomHomepageRemoteUrlDialog {
 
   build() {
     Column({ space: 16 }) {
-      Text('添加网址主页')
+      Text($r('app.string.settings_custom_home_add_url'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -25,7 +25,7 @@ export struct CustomHomepageRemoteUrlDialog {
       SettingsTextField({
         text: this.urlDraft,
         placeholder: 'https://example.com',
-        helperText: '输入一个网页地址，它会作为主页候选项显示在列表里。',
+        helperText: $r('app.string.settings_custom_home_url_helper'),
         errorText: this.errorText,
         underlineStyle: true,
         controlBackgroundColor: this.controlBackgroundColor,
@@ -39,7 +39,7 @@ export struct CustomHomepageRemoteUrlDialog {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '添加',
+          label: $r('app.string.settings_custom_home_add'),
           emphasis: 'primary',
           stacked: true,
           accentColor: this.accentColor,
@@ -53,7 +53,7 @@ export struct CustomHomepageRemoteUrlDialog {
         })
 
         BrowserSheetActionButton({
-          label: '取消',
+          label: $r('app.string.settings_custom_home_cancel'),
           emphasis: 'ghost',
           stacked: true,
           buttonHeight: 44,

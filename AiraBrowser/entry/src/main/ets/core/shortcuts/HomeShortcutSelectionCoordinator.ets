@@ -52,7 +52,7 @@ export interface HomeShortcutSelectionState {
   scenarioId: string;
   activeTab: HomeShortcutSelectionTab;
   currentFolderId: string;
-  currentFolderTitle: string;
+  currentFolderTitle: ResourceStr;
   systemRows: HomeShortcutSystemSelectionRow[];
   bookmarkRows: HomeShortcutBookmarkSelectionRow[];
   busyKeys: string[];
@@ -73,7 +73,7 @@ export interface HomeShortcutSelectionShell {
   showMessage: (message: string) => void;
 }
 
-const HOME_SHORTCUT_SELECTION_ROOT_TITLE: string = '书签';
+const HOME_SHORTCUT_SELECTION_ROOT_TITLE: ResourceStr = $r('app.string.app_shortcut_bookmarks');
 
 export class HomeShortcutSelectionCoordinator {
   private readonly shell: HomeShortcutSelectionShell;

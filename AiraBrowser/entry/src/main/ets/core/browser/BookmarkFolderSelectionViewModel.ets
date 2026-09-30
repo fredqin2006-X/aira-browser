@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { BookmarkNode } from '../../common/models/BrowserModels';
 import { BOOKMARK_TOOLBAR_ROOT_ID } from '../../data/repositories/BookmarkRepositoryCore';
 import { BookmarksFeature } from '../../features/bookmarks/BookmarksFeature';
@@ -167,7 +168,7 @@ export class BookmarkFolderSelectionViewModel {
         parentId: parentId,
         childFolderCount: childFolderCount,
         bookmarkCount: bookmarkCount,
-        bookmarkCountText: `${bookmarkCount} 个书签`,
+        bookmarkCountText: resolveAppResourceText($r('app.string.bookmark_count', bookmarkCount)),
         depth: depth
       });
       this.appendFolderOptions(options, folderChildrenByParent, folderBookmarkCounts, folder.id, depth + 1);
@@ -205,7 +206,7 @@ export class BookmarkFolderSelectionViewModel {
         parentId: current.parentId,
         childFolderCount: childFolderCount,
         bookmarkCount: bookmarkCount,
-        bookmarkCountText: `${bookmarkCount} 个书签`,
+        bookmarkCountText: resolveAppResourceText($r('app.string.bookmark_count', bookmarkCount)),
         depth: current.depth
       });
       stack.push({

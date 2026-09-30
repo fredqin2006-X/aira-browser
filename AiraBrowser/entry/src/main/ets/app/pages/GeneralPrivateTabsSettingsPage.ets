@@ -81,7 +81,7 @@ struct GeneralPrivateTabsSettingsPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '私密标签页恢复',
+        title: $r('app.string.settings_privacy_restore_tabs'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -106,12 +106,12 @@ struct GeneralPrivateTabsSettingsPage {
   @Builder
   private buildAlwaysPrivateSection() {
     SettingsSection({
-      title: '模式默认值',
+      title: $r('app.string.settings_privacy_mode_default'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsSwitchRow({
-          title: '始终保持隐私模式',
+          title: $r('app.string.settings_always_private_title'),
           checked: this.state.alwaysUsePrivateMode,
           rowPosition: 'single',
           onChange: (checked: boolean) => {
@@ -120,7 +120,7 @@ struct GeneralPrivateTabsSettingsPage {
         })
       }
 
-      Text('开启后，每次重新启动 Aira 都会回到隐私模式；本次使用中仍可临时切换到普通模式。')
+      Text($r('app.string.settings_privacy_always_note'))
         .width('100%')
         .fontSize(12)
         .lineHeight(18)
@@ -132,12 +132,12 @@ struct GeneralPrivateTabsSettingsPage {
   @Builder
   private buildDataSection() {
     SettingsSection({
-      title: '关闭后清除',
+      title: $r('app.string.settings_site_customization_fragment_clear_on_close'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsSwitchRow({
-          title: '保留 Cookie',
+          title: $r('app.string.settings_site_customization_keep_cookies'),
           checked: this.state.preserveCookiesOnClose,
           rowPosition: 'single',
           onChange: (checked: boolean) => {
@@ -147,8 +147,8 @@ struct GeneralPrivateTabsSettingsPage {
       }
 
       Text(this.state.preserveCookiesOnClose
-        ? '关闭全部隐私标签页后会清除本次私密会话数据，但保留 Cookie 登录状态。'
-        : '关闭全部隐私标签页后会清除本次私密会话数据和 Cookie。')
+        ? $r('app.string.settings_privacy_cookies_kept')
+        : $r('app.string.settings_privacy_cookies_cleared'))
         .width('100%')
         .fontSize(12)
         .lineHeight(18)
@@ -160,13 +160,13 @@ struct GeneralPrivateTabsSettingsPage {
   @Builder
   private buildRestoreSection() {
     SettingsSection({
-      title: '恢复策略',
+      title: $r('app.string.settings_privacy_restore_section'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsOptionRow({
-          title: '关闭后不恢复',
-          helperText: '私密标签页关闭后不进入下次启动恢复',
+          title: $r('app.string.settings_privacy_never_restore'),
+          helperText: $r('app.string.settings_privacy_never_restore_detail'),
           rowPosition: 'first',
           isSelected: this.state.restorePolicy === 'never_restore',
           selectedIndicatorColor: this.storedAccentColor,
@@ -176,8 +176,8 @@ struct GeneralPrivateTabsSettingsPage {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsOptionRow({
-          title: '允许恢复',
-          helperText: '保留私密标签页会降低隐私边界，请谨慎开启',
+          title: $r('app.string.settings_privacy_allow_restore'),
+          helperText: $r('app.string.settings_privacy_allow_restore_detail'),
           rowPosition: 'last',
           isSelected: this.state.restorePolicy === 'restore_private_tabs',
           selectedIndicatorColor: this.storedAccentColor,

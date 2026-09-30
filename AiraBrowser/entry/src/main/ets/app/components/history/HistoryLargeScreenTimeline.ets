@@ -1,3 +1,4 @@
+import { localizeHistoryDayLabel } from '../../../core/resources/HistoryBookmarkDisplayText';
 import { image } from '@kit.ImageKit';
 import { HistoryDisplayVisit } from '../../../features/history/HistoryViewModel';
 import {
@@ -120,7 +121,7 @@ export struct HistoryLargeScreenTimeline {
 
   @Builder
   private buildDateHeader(group: HistoryTimelineGroup) {
-    Text(group.label)
+    Text(localizeHistoryDayLabel(group.label))
       .width('100%')
       .fontSize(RECORD_LIST_GROUP_TITLE_SIZE)
       .fontWeight(FontWeight.Medium)
@@ -162,7 +163,7 @@ export struct HistoryLargeScreenTimeline {
         .alignItems(HorizontalAlign.Start)
 
         if (visit.duplicateCount > 1) {
-          Text(`${visit.duplicateCount} 次`)
+          Text($r('app.string.history_duplicate_count', visit.duplicateCount))
             .fontSize(11)
             .fontColor(this.storedSecondaryTextColor)
             .padding({ left: 8, right: 8, top: 4, bottom: 4 })
@@ -183,7 +184,7 @@ export struct HistoryLargeScreenTimeline {
           .type(ButtonType.Circle)
           .buttonStyle(ButtonStyleMode.TEXTUAL)
           .backgroundColor(this.storedControlBackgroundColor)
-          .accessibilityText('删除历史记录')
+          .accessibilityText($r('app.string.history_delete_title'))
           .onClick((): void => {
             this.onDeleteVisit(visit);
           })
@@ -267,13 +268,13 @@ export struct HistoryLargeScreenTimeline {
     BrowserDesktopContextMenu() {
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
-          label: '打开',
+          label: $r('app.string.ui_open'),
           onAction: (): void => {
             this.onOpenVisit(visit, false);
           }
         })
         BrowserDesktopContextMenuItem({
-          label: '在新标签页中打开',
+          label: $r('app.string.history_open_new_tab'),
           onAction: (): void => {
             this.onOpenVisit(visit, true);
           }
@@ -282,7 +283,7 @@ export struct HistoryLargeScreenTimeline {
 
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
-          label: '复制链接',
+          label: $r('app.string.ui_copy_link'),
           onAction: (): void => {
             this.onCopyLink(visit);
           }
@@ -292,21 +293,21 @@ export struct HistoryLargeScreenTimeline {
       MenuItemGroup() {
         if (this.selectedVisitIds.length === 0) {
           BrowserDesktopContextMenuItem({
-            label: '多选',
+            label: $r('app.string.ui_multi_select'),
             onAction: (): void => {
               this.onSelectVisit(visit.id, 'replace');
             }
           })
         } else if (this.isSelected(visit.id)) {
           BrowserDesktopContextMenuItem({
-            label: '取消选择',
+            label: $r('app.string.history_deselect'),
             onAction: (): void => {
               this.onSelectVisit(visit.id, 'toggle');
             }
           })
         } else {
           BrowserDesktopContextMenuItem({
-            label: '添加到多选',
+            label: $r('app.string.history_add_selection'),
             onAction: (): void => {
               this.onSelectVisit(visit.id, 'toggle');
             }
@@ -317,14 +318,14 @@ export struct HistoryLargeScreenTimeline {
       MenuItemGroup() {
         if (this.selectedVisitIds.length > 1 && this.isSelected(visit.id)) {
           BrowserDesktopContextMenuItem({
-            label: `删除所选 ${this.selectedVisitIds.length} 项`,
+            label: $r('app.string.history_delete_selected', this.selectedVisitIds.length),
             onAction: (): void => {
               this.onDeleteSelection();
             }
           })
         } else {
           BrowserDesktopContextMenuItem({
-            label: '删除',
+            label: $r('app.string.settings_delete'),
             onAction: (): void => {
               this.onDeleteVisit(visit);
             }

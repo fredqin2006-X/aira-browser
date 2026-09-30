@@ -27,10 +27,10 @@ export interface SyncAdvancedRemoteSummaryOutcome {
 
 export interface SyncAdvancedMergeOutcome {
   result: AiraBookmarkMergeSyncResult;
-  completionTitle: string;
-  completionSubtitle: string;
-  dialogTitle: string;
-  message: string;
+  completionTitle: ResourceStr;
+  completionSubtitle: ResourceStr;
+  dialogTitle: ResourceStr;
+  message: ResourceStr;
 }
 
 export interface SyncAdvancedStatusOverview {
@@ -47,10 +47,11 @@ export type SyncProviderSelectionPresentationType =
 export interface SyncProviderSelectionPresentation {
   type: SyncProviderSelectionPresentationType;
   providerLabel: string;
-  completionTitle: string;
-  completionSubtitle: string;
-  dialogTitle: string;
-  message: string;
+  completionTitle: ResourceStr;
+  completionSubtitle: ResourceStr;
+  dialogTitle: ResourceStr;
+  message: ResourceStr;
+  messageLines?: ResourceStr[];
   membershipDecision?: EntitlementDecision;
 }
 
@@ -125,25 +126,28 @@ export class SyncExperienceAdvancedOperations {
     resolution: AiraBookmarkConflictResolution
   ): Promise<SyncAdvancedMergeOutcome> {
     const result = await this.syncService.resolveAiraBookmarkConflicts(remoteKind, resolution);
-    const label = this.resolveProviderShortLabel(remoteKind);
     const remoteWins = resolution === 'prefer-remote';
     if (result.blocked) {
       return {
         result: result,
-        completionTitle: '覆盖未完成',
-        completionSubtitle: '请先处理同步状态',
-        dialogTitle: '覆盖未完成',
+        completionTitle: $r('app.string.settings_sync_advanced_overwrite_incomplete'),
+        completionSubtitle: $r('app.string.settings_sync_advanced_handle_status'),
+        dialogTitle: $r('app.string.settings_sync_advanced_overwrite_incomplete'),
         message: result.summary
       };
     }
     return {
       result: result,
-      completionTitle: remoteWins ? `${label}已覆盖本机` : `本机已覆盖${label}`,
-      completionSubtitle: remoteWins ? `本机已按${label}数据更新` : `${label}已按本机数据更新`,
-      dialogTitle: '覆盖完成',
+      completionTitle: remoteWins
+        ? this.resolvePulledTitle(remoteKind)
+        : this.resolvePushedTitle(remoteKind),
+      completionSubtitle: remoteWins
+        ? this.resolveUpdatedFromRemote(remoteKind)
+        : this.resolveRemoteUpdatedFromLocal(remoteKind),
+      dialogTitle: $r('app.string.settings_sync_advanced_overwrite_done'),
       message: remoteWins
-        ? `本机书签已使用${label}的完整快照覆盖。`
-        : `本机完整书签快照已保存到${label}。`
+        ? this.resolveSnapshotFromRemote(remoteKind)
+        : this.resolveSnapshotToRemote(remoteKind)
     };
   }
 
@@ -181,9 +185,9 @@ export class SyncExperienceAdvancedOperations {
       return {
         type: 'blocked',
         providerLabel: outcome.providerLabel,
-        completionTitle: '切换未完成',
-        completionSubtitle: '请先处理同步冲突或重试',
-        dialogTitle: '切换未完成',
+        completionTitle: $r('app.string.settings_sync_advanced_switch_incomplete'),
+        completionSubtitle: $r('app.string.settings_sync_advanced_switch_retry'),
+        dialogTitle: $r('app.string.settings_sync_advanced_switch_incomplete'),
         message: outcome.message
       };
     }
@@ -191,9 +195,9 @@ export class SyncExperienceAdvancedOperations {
       return {
         type: 'selected',
         providerLabel: outcome.providerLabel,
-        completionTitle: '同步方式已更改',
-        completionSubtitle: `当前设备已改用${outcome.providerLabel}`,
-        dialogTitle: '切换完成',
+        completionTitle: $r('app.string.settings_sync_method_changed'),
+        completionSubtitle: this.resolveSwitchedSubtitle(outcome.remoteKind),
+        dialogTitle: $r('app.string.settings_sync_advanced_switch_done'),
         message: outcome.message
       };
     }
@@ -201,9 +205,9 @@ export class SyncExperienceAdvancedOperations {
       return {
         type: 'membership-required',
         providerLabel: outcome.providerLabel,
-        completionTitle: '切换失败',
-        completionSubtitle: '需要会员权限',
-        dialogTitle: '更改同步方式',
+        completionTitle: $r('app.string.settings_sync_advanced_switch_failed'),
+        completionSubtitle: $r('app.string.settings_sync_advanced_membership_required'),
+        dialogTitle: $r('app.string.settings_sync_advanced_change_method'),
         message: outcome.message,
         membershipDecision: outcome.membershipDecision
       };
@@ -211,9 +215,9 @@ export class SyncExperienceAdvancedOperations {
     return {
       type: 'failed',
       providerLabel: outcome.providerLabel,
-      completionTitle: '切换失败',
-      completionSubtitle: '请稍后再试',
-      dialogTitle: outcome.title.length > 0 ? outcome.title : '更改同步方式',
+      completionTitle: $r('app.string.settings_sync_advanced_switch_failed'),
+      completionSubtitle: $r('app.string.settings_sync_advanced_try_later'),
+      dialogTitle: outcome.title.length > 0 ? outcome.title : $r('app.string.settings_sync_advanced_change_method'),
       message: outcome.message
     };
   }
@@ -227,86 +231,156 @@ export class SyncExperienceAdvancedOperations {
     );
   }
 
-  private resolveMergeCompletionTitle(result: AiraBookmarkMergeSyncResult, remoteKind: AiraSyncRemoteKind): string {
+  private resolveMergeCompletionTitle(result: AiraBookmarkMergeSyncResult, remoteKind: AiraSyncRemoteKind): ResourceStr {
     if (remoteKind === 'huawei_space' && result.merged) {
-      return '已保存到同步库';
+      return $r('app.string.settings_sync_advanced_saved_library');
     }
-    return result.merged ? '同步完成' : '已经是最新';
+    return result.merged
+      ? $r('app.string.settings_sync_advanced_merge_done')
+      : $r('app.string.settings_sync_advanced_already_current');
   }
 
-  private resolveMergeCompletionSubtitle(result: AiraBookmarkMergeSyncResult, remoteKind: AiraSyncRemoteKind): string {
+  private resolveMergeCompletionSubtitle(result: AiraBookmarkMergeSyncResult, remoteKind: AiraSyncRemoteKind): ResourceStr {
     if (!result.merged) {
-      return '暂时没有新的变化';
+      return $r('app.string.settings_sync_advanced_no_changes');
     }
     if (remoteKind === 'huawei_space') {
-      return '系统云空间同步会继续在后台处理';
+      return $r('app.string.settings_sync_advanced_huawei_background');
     }
-    return '本机和云端已经保持一致';
+    return $r('app.string.settings_sync_advanced_consistent');
   }
 
-  private resolveMergeDialogTitle(result: AiraBookmarkMergeSyncResult, remoteKind: AiraSyncRemoteKind): string {
+  private resolveMergeDialogTitle(result: AiraBookmarkMergeSyncResult, remoteKind: AiraSyncRemoteKind): ResourceStr {
     if (!result.merged) {
-      return '无需同步';
+      return $r('app.string.settings_sync_advanced_no_sync_needed');
     }
-    return remoteKind === 'huawei_space' ? '已保存到同步库' : '同步成功';
+    return remoteKind === 'huawei_space'
+      ? $r('app.string.settings_sync_advanced_saved_library')
+      : $r('app.string.settings_sync_advanced_sync_success');
   }
 
-  private buildMergeResultMessage(result: AiraBookmarkMergeSyncResult, remoteKind: AiraSyncRemoteKind): string {
+  private buildMergeResultMessage(result: AiraBookmarkMergeSyncResult, remoteKind: AiraSyncRemoteKind): ResourceStr {
     if (remoteKind === 'huawei_space') {
       return this.simplifyHuaweiSpaceMergeSummary(result);
     }
     return this.simplifyMergeSummary(result);
   }
 
-  private resolveProviderShortLabel(remoteKind: AiraSyncRemoteKind): string {
+  private simplifyMergeSummary(result: AiraBookmarkMergeSyncResult): ResourceStr {
+    if (result.blocked) {
+      return result.conflictCount > 0
+        ? $r('app.string.settings_sync_advanced_conflicts', result.conflictCount)
+        : $r('app.string.settings_sync_advanced_confirm_continue');
+    }
+    if (!result.merged) {
+      return $r('app.string.settings_sync_advanced_already_match');
+    }
+    if (result.localChangeCount > 0 && result.remoteChangeCount > 0) {
+      return $r('app.string.settings_sync_advanced_merged');
+    }
+    if (result.localChangeCount > 0) {
+      return $r('app.string.settings_sync_advanced_saved_cloud');
+    }
+    if (result.remoteChangeCount > 0) {
+      return $r('app.string.settings_sync_advanced_applied_cloud');
+    }
+    return $r('app.string.settings_sync_advanced_bookmarks_done');
+  }
+
+  private simplifyHuaweiSpaceMergeSummary(result: AiraBookmarkMergeSyncResult): ResourceStr {
+    if (result.blocked) {
+      return result.conflictCount > 0
+        ? $r('app.string.settings_sync_advanced_huawei_conflicts', result.conflictCount)
+        : $r('app.string.settings_sync_advanced_confirm_continue');
+    }
+    if (!result.merged) {
+      return $r('app.string.settings_sync_advanced_huawei_no_changes');
+    }
+    if (result.localChangeCount > 0 && result.remoteChangeCount > 0) {
+      return $r('app.string.settings_sync_advanced_huawei_merged');
+    }
+    if (result.localChangeCount > 0) {
+      return $r('app.string.settings_sync_advanced_huawei_saved');
+    }
+    if (result.remoteChangeCount > 0) {
+      return $r('app.string.settings_sync_advanced_huawei_applied');
+    }
+    return $r('app.string.settings_sync_advanced_huawei_confirmed');
+  }
+
+  private resolvePulledTitle(remoteKind: AiraSyncRemoteKind): ResourceStr {
     if (remoteKind === 'aira_cloud') {
-      return 'Aira 云端';
+      return $r('app.string.settings_sync_advanced_pulled_cloud');
     }
     if (remoteKind === 'huawei_space') {
-      return '云空间';
+      return $r('app.string.settings_sync_advanced_pulled_huawei');
     }
-    return 'WebDAV';
+    return $r('app.string.settings_sync_advanced_pulled_webdav');
   }
 
-  private simplifyMergeSummary(result: AiraBookmarkMergeSyncResult): string {
-    if (result.blocked) {
-      return result.conflictCount > 0
-        ? `发现 ${result.conflictCount} 个书签在本机和云端都改过，请选择保留哪一边。`
-        : '同步需要你确认后才能继续。';
+  private resolvePushedTitle(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_pushed_cloud');
     }
-    if (!result.merged) {
-      return '本机和云端已经一致，没有需要同步的变化。';
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_pushed_huawei');
     }
-    if (result.localChangeCount > 0 && result.remoteChangeCount > 0) {
-      return '本机和云端的书签已合并完成。';
-    }
-    if (result.localChangeCount > 0) {
-      return '本机新增或修改的书签已保存到云端。';
-    }
-    if (result.remoteChangeCount > 0) {
-      return '云端新增或修改的书签已同步到本机。';
-    }
-    return '书签同步已完成。';
+    return $r('app.string.settings_sync_advanced_pushed_webdav');
   }
 
-  private simplifyHuaweiSpaceMergeSummary(result: AiraBookmarkMergeSyncResult): string {
-    if (result.blocked) {
-      return result.conflictCount > 0
-        ? `发现 ${result.conflictCount} 个书签在本机和同步库都改过，请选择保留哪一边。`
-        : '同步需要你确认后才能继续。';
+  private resolveUpdatedFromRemote(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_updated_from_cloud');
     }
-    if (!result.merged) {
-      return '本机和华为云空间同步库没有新的书签变化，系统云空间同步会继续在后台处理。';
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_updated_from_huawei');
     }
-    if (result.localChangeCount > 0 && result.remoteChangeCount > 0) {
-      return '本机和华为云空间同步库的书签已合并完成，等待系统云空间同步。';
+    return $r('app.string.settings_sync_advanced_updated_from_webdav');
+  }
+
+  private resolveRemoteUpdatedFromLocal(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_remote_updated_from_local_cloud');
     }
-    if (result.localChangeCount > 0) {
-      return '本机新增或修改的书签已保存到华为云空间同步库，等待系统云空间同步。';
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_remote_updated_from_local_huawei');
     }
-    if (result.remoteChangeCount > 0) {
-      return '华为云空间同步库中的书签已同步到本机。';
+    return $r('app.string.settings_sync_advanced_remote_updated_from_local_webdav');
+  }
+
+  private resolveSnapshotFromRemote(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_snapshot_from_cloud');
     }
-    return '华为云空间同步库已确认，系统云空间同步会继续在后台处理。';
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_snapshot_from_huawei');
+    }
+    return $r('app.string.settings_sync_advanced_snapshot_from_webdav');
+  }
+
+  private resolveSnapshotToRemote(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_snapshot_to_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_snapshot_to_huawei');
+    }
+    return $r('app.string.settings_sync_advanced_snapshot_to_webdav');
+  }
+
+  private resolveSwitchedSubtitle(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_switched_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_switched_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_switched_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_switched_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_switched_service');
   }
 }

@@ -31,6 +31,7 @@ import {
 } from '../../services/sync/AiraPersonalServerInstanceService';
 import { SyncExperienceActionOutcome } from '../../core/sync/SyncExperienceCoordinator';
 import { SyncSettingsRefreshSignal } from '../../core/sync/SyncSettingsRefreshSignal';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 @Entry
 @Component
@@ -52,7 +53,7 @@ struct SyncPersonalServerConfigPage {
   @State private instanceId: string = '';
   @State private isBusy: boolean = false;
   @State private isConfigured: boolean = false;
-  @State private statusText: string = '尚未连接';
+  @State private statusText: string = resolveAppResourceText($r('app.string.settings_sync_self_host_status_disconnected'));
 
   aboutToAppear(): void {
     const params = router.getParams() as Record<string, string | undefined> | undefined;
@@ -73,7 +74,7 @@ struct SyncPersonalServerConfigPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '私有化部署',
+        title: $r('app.string.settings_sync_self_host_title'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -94,8 +95,8 @@ struct SyncPersonalServerConfigPage {
             surfaceColor: this.storedSurfaceBackgroundColor
           }) {
             SettingsNavigationRow({
-              title: '查看私有化部署教程',
-              value: '看教程',
+              title: $r('app.string.settings_sync_self_host_view_guide'),
+              value: $r('app.string.settings_sync_self_host_view_guide_value'),
               airaIconId: 'settings.webdav',
               iconBackgroundColor: this.storedAccentColor,
               iconColor: this.storedOnPrimaryColor,
@@ -110,7 +111,7 @@ struct SyncPersonalServerConfigPage {
           }
 
           SyncFormField({
-            label: '服务器地址',
+            label: $r('app.string.settings_sync_self_host_server_address'),
             placeholder: 'https://sync.example.com',
             text: $baseUrl,
             inputType: InputType.URL,
@@ -119,8 +120,8 @@ struct SyncPersonalServerConfigPage {
           })
 
           SyncFormField({
-            label: '一次性配对码',
-            placeholder: '输入服务器生成的配对码',
+            label: $r('app.string.settings_sync_self_host_pairing_code'),
+            placeholder: $r('app.string.settings_sync_self_host_pairing_code_placeholder'),
             text: $pairingCode,
             secure: true,
             isEnabled: !this.isBusy,
@@ -128,14 +129,14 @@ struct SyncPersonalServerConfigPage {
           })
 
           SyncFormField({
-            label: '设备名称',
+            label: $r('app.string.settings_sync_self_host_device_name'),
             placeholder: 'Aira HarmonyOS',
             text: $deviceName,
             isEnabled: !this.isBusy,
             onChange: (_value: string) => {}
           })
 
-          Text('配对码只使用一次。设备凭据会保存在本机，不会发送华为账号令牌、会员信息或付款数据。公开访问服务器时请使用 HTTPS。')
+          Text($r('app.string.settings_sync_self_host_pairing_note'))
             .width('100%')
             .fontSize(13)
             .lineHeight(19)
@@ -143,7 +144,8 @@ struct SyncPersonalServerConfigPage {
             .padding({ left: 6, right: 6 })
 
           if (this.isConfigured) {
-            Text(`${this.statusText}\n实例：${this.instanceId}`)
+            Text(`${this.statusText}\n${resolveAppResourceText(
+              $r('app.string.settings_sync_self_host_instance'), this.instanceId)}`)
               .width('100%')
               .fontSize(13)
               .lineHeight(19)
@@ -151,7 +153,11 @@ struct SyncPersonalServerConfigPage {
               .padding({ left: 6, right: 6 })
           }
 
-          Button(this.isBusy ? '正在连接…' : (this.isConfigured ? '重新配对' : '连接并配对'))
+          Button(this.isBusy
+            ? $r('app.string.settings_sync_self_host_connecting')
+            : (this.isConfigured
+              ? $r('app.string.settings_sync_self_host_pair_again')
+              : $r('app.string.settings_sync_self_host_connect_and_pair')))
             .width('100%')
             .height(48)
             .type(ButtonType.Normal)
@@ -168,7 +174,7 @@ struct SyncPersonalServerConfigPage {
 
           if (this.isConfigured) {
             SettingsActionButton({
-              title: '断开本机连接',
+              title: $r('app.string.settings_sync_self_host_disconnect'),
               emphasis: 'danger',
               isEnabled: !this.isBusy,
               pressedBackgroundColor: this.storedPressedBackgroundColor,
@@ -210,7 +216,7 @@ struct SyncPersonalServerConfigPage {
       return;
     }
     this.isBusy = true;
-    this.statusText = '正在发现服务器并交换设备凭据';
+    this.statusText = resolveAppResourceText($r('app.string.settings_sync_self_host_status_connecting'));
     void this.pairAndPersist().finally((): void => {
       this.isBusy = false;
     });
@@ -237,26 +243,40 @@ struct SyncPersonalServerConfigPage {
         const outcome: SyncExperienceActionOutcome =
           await sharedSyncExperienceCoordinator.completeConfiguredGoal('self_hosted');
         if (outcome.type !== 'completed') {
-          throw new Error(outcome.message);
+          this.statusText = resolveAppResourceText($r('app.string.settings_sync_self_host_status_sync_incomplete'));
+          showCenteredAlertDialog({
+            title: outcome.title,
+            message: outcome.message,
+            autoCancel: true,
+            secondaryButton: { value: $r('app.string.settings_sync_self_host_got_it'), action: () => {} }
+          });
+          return;
         }
       }
       this.pairingCode = '';
       this.applyConfig(result.config);
-      this.statusText = this.activateExperienceAfterPair ? '已连接并开启同步' : '已连接';
+      this.statusText = this.activateExperienceAfterPair
+        ? resolveAppResourceText($r('app.string.settings_sync_self_host_status_connected_sync'))
+        : resolveAppResourceText($r('app.string.settings_sync_self_host_status_connected'));
       this.refreshSignal.bump();
       showCenteredAlertDialog({
-        title: '私有化部署已连接',
-        message: this.activateExperienceAfterPair ? '所选内容会通过这台私有化部署保持同步。' : '设备凭据已保存在本机。',
+        title: $r('app.string.settings_sync_self_host_connected_title'),
+        message: this.activateExperienceAfterPair
+          ? $r('app.string.settings_sync_self_host_connected_sync_message')
+          : $r('app.string.settings_sync_self_host_connected_credentials_message'),
         autoCancel: true,
-        secondaryButton: { value: '完成', action: () => { this.navigationCoordinator.back(); } }
+        secondaryButton: {
+          value: $r('app.string.settings_sync_self_host_done'),
+          action: () => { this.navigationCoordinator.back(); }
+        }
       });
     } catch (error) {
       this.statusText = this.stringifyError(error as Error);
       showCenteredAlertDialog({
-        title: '连接失败',
+        title: $r('app.string.settings_sync_self_host_connect_failed_title'),
         message: this.statusText,
         autoCancel: true,
-        secondaryButton: { value: '知道了', action: () => {} }
+        secondaryButton: { value: $r('app.string.settings_sync_self_host_got_it'), action: () => {} }
       });
     }
   }
@@ -266,16 +286,21 @@ struct SyncPersonalServerConfigPage {
     this.deviceName = config.deviceName.trim().length > 0 ? config.deviceName : 'Aira HarmonyOS';
     this.instanceId = config.instanceId;
     this.isConfigured = config.instanceId.trim().length > 0 && config.deviceToken.trim().length > 0;
-    this.statusText = this.isConfigured ? '已连接' : '尚未连接';
+    this.statusText = this.isConfigured
+      ? resolveAppResourceText($r('app.string.settings_sync_self_host_status_connected'))
+      : resolveAppResourceText($r('app.string.settings_sync_self_host_status_disconnected'));
   }
 
   private confirmDisconnect(): void {
     showCenteredAlertDialog({
-      title: '断开本机连接？',
-      message: '本机将删除私有化部署设备凭据并停止使用该实例同步。本机已有数据不会删除。',
+      title: $r('app.string.settings_sync_self_host_disconnect_confirm_title'),
+      message: $r('app.string.settings_sync_self_host_disconnect_confirm_message'),
       autoCancel: true,
-      primaryButton: { value: '取消', action: () => {} },
-      secondaryButton: { value: '断开', action: () => { this.disconnect(); } }
+      primaryButton: { value: $r('app.string.settings_sync_self_host_cancel'), action: () => {} },
+      secondaryButton: {
+        value: $r('app.string.settings_sync_self_host_disconnect_confirm'),
+        action: () => { this.disconnect(); }
+      }
     });
   }
 
@@ -291,10 +316,10 @@ struct SyncPersonalServerConfigPage {
       })
       .catch((error: Error): void => {
         showCenteredAlertDialog({
-          title: '未能断开',
+          title: $r('app.string.settings_sync_self_host_disconnect_failed_title'),
           message: this.stringifyError(error),
           autoCancel: true,
-          secondaryButton: { value: '知道了', action: () => {} }
+          secondaryButton: { value: $r('app.string.settings_sync_self_host_got_it'), action: () => {} }
         });
       })
       .finally((): void => {

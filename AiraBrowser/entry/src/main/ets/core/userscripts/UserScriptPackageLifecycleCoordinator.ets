@@ -37,6 +37,7 @@ import {
   UserScriptUpdateService
 } from '../../services/userscripts/UserScriptUpdateService';
 import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundaryService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface UserScriptPackageSourceInput {
   source: string;
@@ -169,7 +170,7 @@ export class UserScriptPackageLifecycleCoordinator {
     const installSource = resolveUserScriptPackageSource(state.installSource, state.sourceUrl);
     const parsed = this.parser.parse(state.source, installSource, state.sourceUrl);
     if (!parsed.valid || parsed.candidate === undefined) {
-      return this.fail(this.resolveParseError(parsed, '备份中的脚本格式不正确。'), parsed.warnings);
+      return this.fail(this.resolveParseError(parsed, resolveAppResourceText($r('app.string.user_script_backup_invalid'))), parsed.warnings);
     }
     const candidate = parsed.candidate;
     const existing = this.identityService.findDuplicateScript(candidate, this.repository.listScripts());
@@ -248,7 +249,7 @@ export class UserScriptPackageLifecycleCoordinator {
         // matches an installed script by identity, replace that script in place.
         const replacement = this.repository.findScript(preview.duplicate.scriptId);
         if (replacement === undefined) {
-          return this.fail('脚本不存在，无法保存。', preview.warnings);
+          return this.fail(resolveAppResourceText($r('app.string.user_script_save_missing_script')), preview.warnings);
         }
         return this.commitCandidate(preview.candidate, replacement, entitlementContext, preview.warnings, 0);
       }
@@ -256,7 +257,7 @@ export class UserScriptPackageLifecycleCoordinator {
         const existingScriptId = input.existingScriptId.trim();
         const existing = existingScriptId.length > 0 ? this.repository.findScript(existingScriptId) : undefined;
         if (existingScriptId.length > 0 && existing === undefined) {
-          return this.fail('脚本不存在，无法保存。', preview.warnings);
+          return this.fail(resolveAppResourceText($r('app.string.user_script_save_missing_script')), preview.warnings);
         }
         return this.commitCandidate(preview.candidate, existing, entitlementContext, preview.warnings, 0);
       }
@@ -278,7 +279,7 @@ export class UserScriptPackageLifecycleCoordinator {
     }
     const parsed = this.parser.parse(fetchResult.source, 'url', fetchResult.sourceUrl);
     if (!parsed.valid || parsed.candidate === undefined) {
-      return this.fail(this.resolveParseError(parsed, '脚本格式不正确。'), parsed.warnings);
+      return this.fail(this.resolveParseError(parsed, resolveAppResourceText($r('app.string.user_script_invalid_format'))), parsed.warnings);
     }
     const existing = this.findDirectInstallReplacement(parsed.candidate);
     return this.commitCandidate(parsed.candidate, existing, entitlementContext, parsed.warnings, 0);
@@ -422,7 +423,7 @@ export class UserScriptPackageLifecycleCoordinator {
     checkedAt: number
   ): Promise<UserScriptPackageCommitResult> {
     if (!this.canWriteDevicePreference(entitlementContext)) {
-      return this.fail('当前会话不可修改用户脚本配置。', warnings);
+      return this.fail(resolveAppResourceText($r('app.string.user_script_session_readonly')), warnings);
     }
     if (existing === undefined) {
       const decision = await this.membershipFeature.canUse(
@@ -490,7 +491,7 @@ export class UserScriptPackageLifecycleCoordinator {
 
   private ensureCanWriteDevicePreference(context: EntitlementContext): void {
     if (!this.canWriteDevicePreference(context)) {
-      throw new Error('当前会话不可修改用户脚本配置。');
+      throw new Error(resolveAppResourceText($r('app.string.user_script_session_readonly')));
     }
   }
 
@@ -510,12 +511,12 @@ export class UserScriptPackageLifecycleCoordinator {
     const script = this.repository.findScript(scriptId.trim());
     return {
       scriptId: script?.id ?? scriptId.trim(),
-      scriptName: script?.name ?? '用户脚本',
+      scriptName: script?.name ?? resolveAppResourceText($r('app.string.user_script_generic_name')),
       status: 'failed',
       previousVersion: script?.version ?? '',
       nextVersion: '',
       checkedAt: checkedAt,
-      message: '当前会话不可修改用户脚本配置。',
+      message: resolveAppResourceText($r('app.string.user_script_session_readonly')),
       warnings: []
     };
   }
@@ -546,7 +547,7 @@ export class UserScriptPackageLifecycleCoordinator {
     return {
       status: 'failed',
       warnings: parsed.warnings,
-      errorMessage: this.resolveParseError(parsed, '脚本格式不正确。')
+      errorMessage: this.resolveParseError(parsed, resolveAppResourceText($r('app.string.user_script_invalid_format')))
     };
   }
 
@@ -592,7 +593,7 @@ export class UserScriptPackageLifecycleCoordinator {
       previousVersion: '',
       nextVersion: '',
       checkedAt: checkedAt,
-      message: '脚本不存在。',
+      message: resolveAppResourceText($r('app.string.user_script_missing')),
       warnings: []
     };
   }

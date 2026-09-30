@@ -41,6 +41,7 @@ import {
   BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY
 } from '../../../core/theme/BrowserThemeStorageKeys';
 import { SettingsNavigationCoordinator } from '../../router/SettingsNavigationCoordinator';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { AppProxyProtocolSettingsHost } from './AppProxyProtocolSettingsHost';
 import { SettingsDesktopWorkspaceHeader } from './SettingsDesktopWorkspaceHeader';
 
@@ -117,7 +118,7 @@ export struct AppProxyProfileEditHost {
     Column() {
       if (this.desktopPresentation) {
         SettingsDesktopWorkspaceHeader({
-          title: this.profileId.length > 0 ? '代理设置' : '添加代理',
+          title: this.resolveEditorTitle(),
           showBackButton: true,
           primaryTextColor: this.storedPrimaryTextColor,
           iconColor: this.storedSecondaryTextColor,
@@ -129,7 +130,7 @@ export struct AppProxyProfileEditHost {
       }
 
       SettingsHdsScaffold({
-        title: this.profileId.length > 0 ? '代理设置' : '添加代理',
+        title: this.resolveEditorTitle(),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -175,9 +176,9 @@ export struct AppProxyProfileEditHost {
       Column({ space: 16 }) {
         SettingsTextField({
           desktopPresentation: this.desktopPresentation,
-          label: '代理名称',
+          label: $r('app.string.settings_app_proxy_field_name'),
           text: this.draft.name,
-          placeholder: '例如：公司代理 / 家里 NAS',
+          placeholder: $r('app.string.settings_app_proxy_field_name_placeholder'),
           maxLength: 80,
           isEnabled: !this.saving && !this.deleting,
           controlBackgroundColor: this.storedSurfaceBackgroundColor,
@@ -192,7 +193,7 @@ export struct AppProxyProfileEditHost {
           desktopPresentation: this.desktopPresentation
         }) {
         SettingsNavigationRow({
-          title: '代理协议',
+          title: $r('app.string.settings_app_proxy_field_protocol'),
           desktopPresentation: this.desktopPresentation,
             value: this.viewModel.resolveSchemeLabel(this.draft.scheme),
             rowPosition: 'single',
@@ -216,7 +217,7 @@ export struct AppProxyProfileEditHost {
       Column({ space: 16 }) {
         SettingsTextField({
           desktopPresentation: this.desktopPresentation,
-          label: '地址',
+          label: $r('app.string.settings_app_proxy_field_host'),
           text: this.draft.host,
           placeholder: 'proxy.example.com',
           inputType: InputType.URL,
@@ -231,7 +232,7 @@ export struct AppProxyProfileEditHost {
         })
         SettingsTextField({
           desktopPresentation: this.desktopPresentation,
-          label: '端口',
+          label: $r('app.string.settings_app_proxy_field_port'),
           text: this.draft.portText,
           placeholder: '7890',
           inputType: InputType.Number,
@@ -258,9 +259,9 @@ export struct AppProxyProfileEditHost {
       Column({ space: 16 }) {
         SettingsTextField({
           desktopPresentation: this.desktopPresentation,
-          label: '用户名',
+          label: $r('app.string.settings_app_proxy_field_username'),
           text: this.draft.username,
-          placeholder: '可选',
+          placeholder: $r('app.string.settings_app_proxy_field_optional'),
           maxLength: 180,
           isEnabled: !this.saving && !this.deleting,
           controlBackgroundColor: this.storedSurfaceBackgroundColor,
@@ -272,9 +273,9 @@ export struct AppProxyProfileEditHost {
         })
         SettingsTextField({
           desktopPresentation: this.desktopPresentation,
-          label: '密码',
+          label: $r('app.string.settings_app_proxy_field_password'),
           text: this.draft.password,
-          placeholder: '可选',
+          placeholder: $r('app.string.settings_app_proxy_field_optional'),
           secure: true,
           maxLength: 256,
           isEnabled: !this.saving && !this.deleting,
@@ -298,7 +299,7 @@ export struct AppProxyProfileEditHost {
     }) {
       SettingsTextField({
         desktopPresentation: this.desktopPresentation,
-        label: '不走代理的主机',
+        label: $r('app.string.settings_app_proxy_field_bypass'),
         text: this.draft.bypassHosts,
         placeholder: 'localhost,127.0.0.1,*.local',
         maxLength: 500,
@@ -311,7 +312,7 @@ export struct AppProxyProfileEditHost {
         }
       })
       SettingsFooterText({
-        text: '使用英文逗号分隔。',
+        text: $r('app.string.settings_app_proxy_field_bypass_footer'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -325,7 +326,7 @@ export struct AppProxyProfileEditHost {
     }) {
       Column({ space: 10 }) {
         SettingsActionButton({
-          title: this.saving ? '保存中...' : '保存代理',
+          title: this.saving ? $r('app.string.settings_app_proxy_saving') : $r('app.string.settings_app_proxy_save'),
           variant: 'filled',
           isEnabled: !this.saving && !this.deleting,
           accentColor: this.storedAccentColor,
@@ -336,7 +337,7 @@ export struct AppProxyProfileEditHost {
         })
         if (this.profileId.length > 0) {
           SettingsActionButton({
-            title: this.deleting ? '删除中...' : '删除代理',
+            title: this.deleting ? $r('app.string.settings_app_proxy_deleting') : $r('app.string.settings_app_proxy_delete'),
             emphasis: 'danger',
             isEnabled: !this.saving && !this.deleting,
             pressedBackgroundColor: this.storedPressedBackgroundColor,
@@ -348,6 +349,12 @@ export struct AppProxyProfileEditHost {
       }
       .width('100%')
     }
+  }
+
+  private resolveEditorTitle(): ResourceStr {
+    return this.profileId.length > 0
+      ? $r('app.string.settings_app_proxy_edit_title')
+      : $r('app.string.settings_app_proxy_add_title');
   }
 
   private refreshState(): void {
@@ -409,7 +416,7 @@ export struct AppProxyProfileEditHost {
       this.showToast(result.message);
       this.handleBack();
     } catch (_error) {
-      this.showToast('保存代理失败。');
+      this.showToast($r('app.string.proxy_sheet_save_failed'));
     } finally {
       this.saving = false;
     }
@@ -428,25 +435,27 @@ export struct AppProxyProfileEditHost {
         this.handleBack();
       }
     } catch (_error) {
-      this.showToast('删除代理失败。');
+      this.showToast($r('app.string.proxy_sheet_delete_failed'));
     } finally {
       this.deleting = false;
     }
   }
 
   private confirmDeleteProfile(): void {
-    const profileName = this.draft.name.trim().length > 0 ? this.draft.name.trim() : '这个代理';
+    const profileName = this.draft.name.trim().length > 0
+      ? this.draft.name.trim()
+      : resolveAppResourceText($r('app.string.settings_app_proxy_this_proxy'));
     showCenteredAlertDialog({
-      title: '删除代理',
-      message: `确定删除“${profileName}”吗？删除后不会再用于应用内代理。`,
+      title: $r('app.string.settings_app_proxy_delete_confirm_title'),
+      message: $r('app.string.settings_app_proxy_delete_confirm_message', profileName),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_app_proxy_delete_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.settings_app_proxy_delete_confirm'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           void this.deleteProfile();
@@ -505,7 +514,7 @@ export struct AppProxyProfileEditHost {
     };
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     promptAction.showToast({
       message: message,
       duration: 1800

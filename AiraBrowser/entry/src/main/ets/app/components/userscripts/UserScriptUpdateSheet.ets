@@ -73,7 +73,7 @@ export struct UserScriptUpdateSheet {
     BrowserImmersiveSheetLayout({
       footerVisible: this.availableCount() > 0,
             closeVisible: true,
-      closeAccessibilityLabel: '关闭脚本更新检查',
+      closeAccessibilityLabel: $r('app.string.user_script_close_update_check'),
       onClose: (): void => {
         this.onClose();
       },
@@ -129,7 +129,7 @@ export struct UserScriptUpdateSheet {
   @Builder
   private buildPhoneHeader() {
     BrowserFeatureSheetHeader({
-      title: '脚本更新检查',
+      title: $r('app.string.user_script_update_check_title'),
       titleColor: this.storedPrimaryTextColor
     })
   }
@@ -157,7 +157,7 @@ export struct UserScriptUpdateSheet {
   private buildLargeScreenLayout() {
     Column({ space: 18 }) {
       Column({ space: 6 }) {
-        Text('脚本更新检查')
+        Text($r('app.string.user_script_update_check_title'))
           .width('100%')
           .fontSize(DESKTOP_DIALOG_TITLE_FONT_SIZE_FP)
           .fontWeight(FontWeight.Bold)
@@ -184,7 +184,7 @@ export struct UserScriptUpdateSheet {
         }
 
         BrowserSheetActionButton({
-          label: '关闭',
+          label: $r('app.string.user_script_action_close'),
           emphasis: 'ghost',
           stacked: true,
           actionEnabled: !this.updating,
@@ -203,7 +203,9 @@ export struct UserScriptUpdateSheet {
   @Builder
   private buildUpdateButton() {
     BrowserSheetActionButton({
-      label: this.updating ? '正在更新…' : `更新 ${this.availableCount()} 个`,
+      label: this.updating
+        ? $r('app.string.user_script_updating')
+        : $r('app.string.user_script_update_count', this.availableCount()),
       emphasis: 'primary',
       stacked: true,
       actionEnabled: !this.checking && !this.updating,
@@ -262,7 +264,7 @@ export struct UserScriptUpdateSheet {
         .height(28)
         .color(this.storedAccentColor)
 
-      Text('正在检查脚本更新…')
+      Text($r('app.string.user_script_checking_updates'))
         .layoutWeight(1)
         .fontSize(16)
         .fontColor(this.storedPrimaryTextColor)
@@ -284,7 +286,7 @@ export struct UserScriptUpdateSheet {
         iconColor: this.storedSecondaryTextColor
       })
 
-      Text('没有可检查更新的脚本。')
+      Text($r('app.string.user_script_no_updatable_scripts'))
         .layoutWeight(1)
         .fontSize(16)
         .fontColor(this.storedPrimaryTextColor)
@@ -339,38 +341,38 @@ export struct UserScriptUpdateSheet {
     return this.results.filter((result: UserScriptUpdateResult) => result.status === 'failed').length;
   }
 
-  private buildSummary(): string {
+  private buildSummary(): ResourceStr {
     if (this.checking) {
-      return '正在读取远程元信息，完成后会列出每个脚本的结果。';
+      return $r('app.string.user_script_update_summary_reading');
     }
     if (this.updating) {
-      return '正在安装选中的新版本。';
+      return $r('app.string.user_script_update_summary_installing');
     }
     if (this.results.length <= 0) {
-      return '当前没有脚本提供可检查的更新地址。';
+      return $r('app.string.user_script_update_summary_none');
     }
     const available = this.availableCount();
     if (available > 0) {
-      return `发现 ${available} 个脚本有新版本，确认后再更新。`;
+      return $r('app.string.user_script_update_summary_available', available);
     }
     const failed = this.failedCount();
     if (failed > 0) {
-      return `检查完成，${failed} 个脚本检查失败。`;
+      return $r('app.string.user_script_update_summary_failed', failed);
     }
-    return '检查完成，脚本都已是最新版本。';
+    return $r('app.string.user_script_update_summary_all_latest');
   }
 
-  private statusLabel(result: UserScriptUpdateResult): string {
+  private statusLabel(result: UserScriptUpdateResult): ResourceStr {
     if (result.status === 'available') {
-      return '可更新';
+      return $r('app.string.user_script_status_available');
     }
     if (result.status === 'up-to-date') {
-      return '最新';
+      return $r('app.string.user_script_status_up_to_date');
     }
     if (result.status === 'failed') {
-      return '失败';
+      return $r('app.string.user_script_status_failed');
     }
-    return '不支持';
+    return $r('app.string.user_script_status_unsupported');
   }
 
   private resultMessage(result: UserScriptUpdateResult): string {

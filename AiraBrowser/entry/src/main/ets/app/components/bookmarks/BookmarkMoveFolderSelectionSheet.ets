@@ -73,13 +73,13 @@ export struct BookmarkMoveFolderSelectionSheet {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY) private storedPrimaryTextColor: string = '#111318';
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string = '#5F6875';
   @Prop options: BookmarkFolderOptionView[] = [];
-  @Prop message: string = '';
+  @Prop message: ResourceStr = '';
   @Prop isPreparing: boolean = false;
-  @Prop rootTitle: string = '移动书签';
-  @Prop preparingTitle: string = '正在准备文件夹';
-  @Prop rootEmptyTitle: string = '没有可移动到的文件夹';
-  @Prop leafEmptyTitle: string = '没有下级文件夹';
-  @Prop confirmLabel: string = '移动到这里';
+  @Prop rootTitle: ResourceStr = $r('app.string.bookmark_move_title');
+  @Prop preparingTitle: ResourceStr = $r('app.string.bookmark_preparing_folders');
+  @Prop rootEmptyTitle: ResourceStr = $r('app.string.bookmark_no_move_folder');
+  @Prop leafEmptyTitle: ResourceStr = $r('app.string.bookmark_no_child_folder');
+  @Prop confirmLabel: ResourceStr = $r('app.string.bookmark_move_here');
   @Prop showAddToHome: boolean = false;
   @Prop addToHome: boolean = false;
   @Prop layoutMode: 'phone' | 'large_screen' = 'phone';
@@ -217,7 +217,7 @@ export struct BookmarkMoveFolderSelectionSheet {
     });
   }
 
-  private resolveTitle(folderId: string): string {
+  private resolveTitle(folderId: string): ResourceStr {
     const folder = this.folderSelectionViewModel.findFolder(this.options, folderId);
     return folder === undefined ? this.rootTitle : folder.title;
   }
@@ -253,11 +253,11 @@ export struct BookmarkMoveFolderSelectionOverlay {
     }) {
       BookmarkMoveFolderSelectionSheet({
         layoutMode: this.layoutMode,
-        rootTitle: '添加书签',
-        preparingTitle: '正在准备文件夹',
-        rootEmptyTitle: '没有可保存书签的文件夹',
-        leafEmptyTitle: '没有下级文件夹',
-        confirmLabel: '添加到这里',
+        rootTitle: $r('app.string.history_add_bookmark'),
+        preparingTitle: $r('app.string.bookmark_preparing_folders'),
+        rootEmptyTitle: $r('app.string.bookmark_no_save_folder'),
+        leafEmptyTitle: $r('app.string.bookmark_no_child_folder'),
+        confirmLabel: $r('app.string.bookmark_add_here'),
         showAddToHome: this.snapshot.scope === 'regular',
         addToHome: this.snapshot.addToHome,
         isPreparing: this.snapshot.preparing,
@@ -283,12 +283,12 @@ export struct BookmarkMoveFolderSelectionOverlay {
 struct BookmarkMoveFolderDestinationContent {
   @Prop folderId: string = '';
   @Prop @Watch('scheduleReloadRows') options: BookmarkFolderOptionView[] = [];
-  @Prop message: string = '';
+  @Prop message: ResourceStr = '';
   @Prop @Watch('scheduleReloadRows') isPreparing: boolean = false;
-  @Prop preparingTitle: string = '正在准备文件夹';
-  @Prop rootEmptyTitle: string = '没有可移动到的文件夹';
-  @Prop leafEmptyTitle: string = '没有下级文件夹';
-  @Prop confirmLabel: string = '移动到这里';
+  @Prop preparingTitle: ResourceStr = $r('app.string.bookmark_preparing_folders');
+  @Prop rootEmptyTitle: ResourceStr = $r('app.string.bookmark_no_move_folder');
+  @Prop leafEmptyTitle: ResourceStr = $r('app.string.bookmark_no_child_folder');
+  @Prop confirmLabel: ResourceStr = $r('app.string.bookmark_move_here');
   @Prop showAddToHome: boolean = false;
   @Prop addToHome: boolean = false;
   @Prop pageBackgroundColor: ResourceColor = '#F6F8FB';
@@ -297,7 +297,7 @@ struct BookmarkMoveFolderDestinationContent {
   @Prop dividerColor: ResourceColor = '#E3E8EF';
   @Prop primaryTextColor: ResourceColor = '#111318';
   @Prop secondaryTextColor: ResourceColor = '#5F6875';
-  @Prop title: string = '移动书签';
+  @Prop title: ResourceStr = $r('app.string.bookmark_move_title');
   @Prop isRootDestination: boolean = true;
   folderSelectionViewModel: BookmarkFolderSelectionViewModel = new BookmarkFolderSelectionViewModel();
   private folderListDataSource: BookmarkListDataSource = new BookmarkListDataSource();
@@ -421,7 +421,7 @@ struct BookmarkMoveFolderDestinationContent {
       .backgroundColor(this.controlBackgroundColor)
       .borderRadius(RECORD_LIST_ROW_ICON_RADIUS)
 
-      Text('同时添加到主页')
+      Text($r('app.string.bookmark_also_home'))
         .layoutWeight(1)
         .fontSize(15)
         .fontWeight(FontWeight.Medium)
@@ -604,14 +604,14 @@ struct BookmarkMoveFolderDestinationContent {
     }
   }
 
-  private resolveFolderSubtitle(folderId: string): string {
+  private resolveFolderSubtitle(folderId: string): ResourceStr {
     const folder = this.folderSelectionViewModel.findFolder(this.options, folderId);
     if (folder === undefined) {
       return '';
     }
     return folder.childFolderCount > 0
-      ? `${folder.bookmarkCountText}，${folder.childFolderCount} 个文件夹`
-      : folder.bookmarkCountText;
+      ? $r('app.string.bookmark_folder_and_counts', folder.bookmarkCount, folder.childFolderCount)
+      : $r('app.string.bookmark_count', folder.bookmarkCount);
   }
 
   private hasFolderContent(folderId: string): boolean {

@@ -5,11 +5,11 @@ import {
 } from './SyncOperationProgressViewModel';
 
 export interface SyncOperationProgressUiState {
-  title: string;
-  subtitle: string;
+  title: ResourceStr;
+  subtitle: ResourceStr;
   progress: number;
   inProgress: boolean;
-  details: string;
+  details: ResourceStr;
   detailOpacity: number;
 }
 
@@ -18,7 +18,11 @@ export class SyncOperationProgressController {
   private isProgressDialogOpen: () => boolean;
   private openProgressDialog: () => void;
   private closeProgressDialog: () => void;
-  private showResultDialog: (title: string, subtitle: string) => void;
+  private showResultDialog: (title: ResourceStr, subtitle: ResourceStr) => void;
+  private resourceTips: ResourceStr[] = [];
+  private resourceTipIndex: number = 0;
+  private useResourceTips: boolean = false;
+  private activeTipKind: string = '';
   private progressViewModel: SyncOperationProgressViewModel = new SyncOperationProgressViewModel();
   private tipTimer: number = -1;
   private visualTimer: number = -1;
@@ -41,7 +45,7 @@ export class SyncOperationProgressController {
     isProgressDialogOpen: () => boolean,
     openProgressDialog: () => void,
     closeProgressDialog: () => void,
-    showResultDialog: (title: string, subtitle: string) => void
+    showResultDialog: (title: ResourceStr, subtitle: ResourceStr) => void
   ) {
     this.applyProgressState = applyProgressState;
     this.isProgressDialogOpen = isProgressDialogOpen;
@@ -50,8 +54,10 @@ export class SyncOperationProgressController {
     this.showResultDialog = showResultDialog;
   }
 
-  begin(title: string, subtitle: string): void {
+  begin(title: ResourceStr, subtitle: ResourceStr, tipKind: string = ''): void {
     this.stopTimers();
+    this.activeTipKind = tipKind;
+    this.useResourceTips = tipKind.length > 0 || typeof title !== 'string' || typeof subtitle !== 'string';
     this.targetProgress = SYNC_OPERATION_PROGRESS_TIMING.inProgressTarget;
     this.startTime = Date.now();
     this.applyState({
@@ -67,12 +73,14 @@ export class SyncOperationProgressController {
     this.openProgressDialog();
   }
 
-  update(title: string, subtitle: string, progress: number): void {
+  update(title: ResourceStr, subtitle: ResourceStr, progress: number): void {
     if (!this.isProgressDialogOpen()) {
       return;
     }
     this.targetProgress = Math.max(this.targetProgress, progress);
-    this.tipsState = this.progressViewModel.appendTip(this.tipsState, subtitle);
+    if (!this.useResourceTips && typeof subtitle === 'string') {
+      this.tipsState = this.progressViewModel.appendTip(this.tipsState, subtitle);
+    }
     this.applyState({
       title: title,
       subtitle: subtitle,
@@ -84,7 +92,7 @@ export class SyncOperationProgressController {
     this.showTip(subtitle);
   }
 
-  finish(title: string, subtitle: string, onComplete?: () => void, showResultDialog: boolean = true): void {
+  finish(title: ResourceStr, subtitle: ResourceStr, onComplete?: () => void, showResultDialog: boolean = true): void {
     if (!this.isProgressDialogOpen()) {
       if (showResultDialog) {
         this.showResultDialog(title, subtitle);
@@ -156,7 +164,7 @@ export class SyncOperationProgressController {
     this.closeProgressDialog();
   }
 
-  fail(title: string, subtitle: string): void {
+  fail(title: ResourceStr, subtitle: ResourceStr): void {
     if (!this.isProgressDialogOpen()) {
       return;
     }
@@ -177,12 +185,44 @@ export class SyncOperationProgressController {
     this.closeProgressDialog();
   }
 
-  private beginTips(title: string, firstTip: string): void {
-    this.tipsState = this.progressViewModel.buildInitialTips(title, firstTip);
-    this.showTip(this.tipsState.activeTip);
+  private beginTips(title: ResourceStr, firstTip: ResourceStr): void {
+    if (!this.useResourceTips && typeof title === 'string' && typeof firstTip === 'string') {
+      this.tipsState = this.progressViewModel.buildInitialTips(title, firstTip);
+      this.showTip(this.tipsState.activeTip);
+      this.tipTimer = setInterval(() => {
+        this.advanceTip();
+      }, SYNC_OPERATION_PROGRESS_TIMING.tipIntervalMs);
+      return;
+    }
+    this.resourceTips = this.buildResourceTips(firstTip);
+    this.resourceTipIndex = 0;
+    this.showTip(this.resourceTips.length > 0 ? this.resourceTips[0] : firstTip);
     this.tipTimer = setInterval(() => {
-      this.advanceTip();
+      this.advanceResourceTip();
     }, SYNC_OPERATION_PROGRESS_TIMING.tipIntervalMs);
+  }
+
+  private buildResourceTips(firstTip: ResourceStr): ResourceStr[] {
+    const tips: ResourceStr[] = [firstTip];
+    if (this.activeTipKind !== 'sync') {
+      return tips;
+    }
+    tips.push($r('app.string.settings_sync_tip_local'));
+    tips.push($r('app.string.settings_sync_tip_cloud_status'));
+    tips.push($r('app.string.settings_sync_tip_compare'));
+    tips.push($r('app.string.settings_sync_tip_protect'));
+    tips.push($r('app.string.settings_sync_tip_changes'));
+    tips.push($r('app.string.settings_sync_tip_records'));
+    tips.push($r('app.string.settings_sync_tip_wrap_up'));
+    return tips;
+  }
+
+  private advanceResourceTip(): void {
+    if (!this.state.inProgress || this.resourceTips.length === 0) {
+      return;
+    }
+    this.resourceTipIndex = (this.resourceTipIndex + 1) % this.resourceTips.length;
+    this.showTip(this.resourceTips[this.resourceTipIndex]);
   }
 
   private advanceTip(): void {
@@ -193,7 +233,7 @@ export class SyncOperationProgressController {
     this.showTip(this.tipsState.activeTip);
   }
 
-  private showTip(tip: string): void {
+  private showTip(tip: ResourceStr): void {
     this.applyState({
       title: this.state.title,
       subtitle: this.state.subtitle,
@@ -263,7 +303,12 @@ export class SyncOperationProgressController {
     this.applyProgressState(state);
   }
 
-  private resolveFinishingTip(title: string): string {
+  private resolveFinishingTip(title: ResourceStr): ResourceStr {
+    if (typeof title !== 'string') {
+      return this.activeTipKind === 'sync'
+        ? $r('app.string.settings_sync_finishing')
+        : $r('app.string.settings_sync_finishing_generic');
+    }
     if (title.indexOf('导入') >= 0) {
       return '正在完成导入';
     }

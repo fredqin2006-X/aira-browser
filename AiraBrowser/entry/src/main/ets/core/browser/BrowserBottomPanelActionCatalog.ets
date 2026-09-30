@@ -1,4 +1,8 @@
 import { AiraRenderableIconId } from '../resources/GeneratedAiraIconCatalog';
+import {
+  bottomPanelActionSubtitle,
+  bottomPanelActionTitle
+} from './BrowserBottomPanelText';
 
 export type BrowserBottomPanelActionId =
   'bookmark' |
@@ -52,39 +56,58 @@ export type BrowserBottomPanelSurface = 'web' | 'home' | 'tabs' | 'viewer' | 'of
 
 export interface BrowserBottomPanelActionCatalogEntry {
   id: BrowserBottomPanelActionId;
-  title: string;
-  subtitle: string;
+  title: ResourceStr;
+  subtitle: ResourceStr;
+  customizable: boolean;
+  surfaces: BrowserBottomPanelSurface[];
+}
+
+interface BrowserBottomPanelActionCatalogRecord {
+  id: BrowserBottomPanelActionId;
   customizable: boolean;
   surfaces: BrowserBottomPanelSurface[];
 }
 
 export class BrowserBottomPanelActionCatalog {
-  private static cachedEntries?: BrowserBottomPanelActionCatalogEntry[];
-  private static cachedEntriesById?: Map<BrowserBottomPanelActionId, BrowserBottomPanelActionCatalogEntry>;
+  private static cachedEntries?: BrowserBottomPanelActionCatalogRecord[];
+  private static cachedEntriesById?: Map<BrowserBottomPanelActionId, BrowserBottomPanelActionCatalogRecord>;
 
   static customizableActionIds(): BrowserBottomPanelActionId[] {
     return BrowserBottomPanelActionCatalog.entries()
-      .filter((entry: BrowserBottomPanelActionCatalogEntry) => entry.customizable)
-      .map((entry: BrowserBottomPanelActionCatalogEntry) => entry.id);
+      .filter((entry: BrowserBottomPanelActionCatalogRecord) => entry.customizable)
+      .map((entry: BrowserBottomPanelActionCatalogRecord) => entry.id);
   }
 
   static entry(actionId: BrowserBottomPanelActionId): BrowserBottomPanelActionCatalogEntry {
     const item = BrowserBottomPanelActionCatalog.resolveEntriesById().get(actionId);
-    return item ?? {
-      id: actionId,
-      title: '工具',
-      subtitle: '',
-      customizable: false,
-      surfaces: []
+    if (item === undefined) {
+      return {
+        id: actionId,
+        title: $r('app.string.bottom_panel_tool'),
+        subtitle: '',
+        customizable: false,
+        surfaces: []
+      };
+    }
+    return BrowserBottomPanelActionCatalog.toEntry(item);
+  }
+
+  static title(actionId: BrowserBottomPanelActionId): ResourceStr {
+    return bottomPanelActionTitle(actionId);
+  }
+
+  static subtitle(actionId: BrowserBottomPanelActionId): ResourceStr {
+    return bottomPanelActionSubtitle(actionId);
+  }
+
+  private static toEntry(item: BrowserBottomPanelActionCatalogRecord): BrowserBottomPanelActionCatalogEntry {
+    return {
+      id: item.id,
+      title: bottomPanelActionTitle(item.id),
+      subtitle: bottomPanelActionSubtitle(item.id),
+      customizable: item.customizable,
+      surfaces: item.surfaces
     };
-  }
-
-  static title(actionId: BrowserBottomPanelActionId): string {
-    return BrowserBottomPanelActionCatalog.entry(actionId).title;
-  }
-
-  static subtitle(actionId: BrowserBottomPanelActionId): string {
-    return BrowserBottomPanelActionCatalog.entry(actionId).subtitle;
   }
 
   static iconId(actionId: BrowserBottomPanelActionId | string): AiraRenderableIconId {
@@ -182,73 +205,73 @@ export class BrowserBottomPanelActionCatalog {
     }
   }
 
-  static entries(): BrowserBottomPanelActionCatalogEntry[] {
+  private static entries(): BrowserBottomPanelActionCatalogRecord[] {
     if (BrowserBottomPanelActionCatalog.cachedEntries === undefined) {
       BrowserBottomPanelActionCatalog.cachedEntries = BrowserBottomPanelActionCatalog.buildEntries();
     }
     return BrowserBottomPanelActionCatalog.cachedEntries;
   }
 
-  private static resolveEntriesById(): Map<BrowserBottomPanelActionId, BrowserBottomPanelActionCatalogEntry> {
+  private static resolveEntriesById(): Map<BrowserBottomPanelActionId, BrowserBottomPanelActionCatalogRecord> {
     if (BrowserBottomPanelActionCatalog.cachedEntriesById !== undefined) {
       return BrowserBottomPanelActionCatalog.cachedEntriesById;
     }
-    const result = new Map<BrowserBottomPanelActionId, BrowserBottomPanelActionCatalogEntry>();
-    BrowserBottomPanelActionCatalog.entries().forEach((entry: BrowserBottomPanelActionCatalogEntry) => {
+    const result = new Map<BrowserBottomPanelActionId, BrowserBottomPanelActionCatalogRecord>();
+    BrowserBottomPanelActionCatalog.entries().forEach((entry: BrowserBottomPanelActionCatalogRecord) => {
       result.set(entry.id, entry);
     });
     BrowserBottomPanelActionCatalog.cachedEntriesById = result;
     return result;
   }
 
-  private static buildEntries(): BrowserBottomPanelActionCatalogEntry[] {
+  private static buildEntries(): BrowserBottomPanelActionCatalogRecord[] {
     return [
-      { id: 'bookmark', title: '添加书签', subtitle: '当前网页', customizable: true, surfaces: ['web', 'reader'] },
-      { id: 'scanQr', title: '扫一扫', subtitle: '二维码', customizable: true, surfaces: ['web', 'home'] },
-      { id: 'copyLink', title: '复制链接', subtitle: 'URL', customizable: true, surfaces: ['web', 'offline', 'reader'] },
-      { id: 'share', title: '分享网页', subtitle: '系统分享', customizable: true, surfaces: ['web', 'offline', 'reader'] },
-      { id: 'sendToDesktop', title: '推送', subtitle: '打开当前页', customizable: true, surfaces: ['web'] },
-      { id: 'print', title: '打印网页', subtitle: '系统打印', customizable: true, surfaces: ['web'] },
-      { id: 'userAgent', title: '网站版本', subtitle: '当前站点', customizable: true, surfaces: ['web'] },
-      { id: 'textZoom', title: '网页文字大小', subtitle: '字号缩放', customizable: true, surfaces: ['web'] },
-      { id: 'fullScreenMode', title: '全屏模式', subtitle: '沉浸浏览', customizable: true, surfaces: ['web'] },
-      { id: 'manualElementHide', title: '标记广告', subtitle: '手动隐藏', customizable: true, surfaces: ['web'] },
-      { id: 'elementInspection', title: '审查元素', subtitle: '查看网页代码', customizable: true, surfaces: ['web'] },
-      { id: 'reader', title: '阅读模式', subtitle: '阅读视图', customizable: true, surfaces: ['web', 'offline'] },
-      { id: 'novel', title: '我的书架', subtitle: '收藏的小说', customizable: true, surfaces: ['web', 'home'] },
-      { id: 'translate', title: '翻译网页', subtitle: '网页翻译', customizable: true, surfaces: ['web'] },
-      { id: 'scripts', title: '用户脚本', subtitle: '脚本管理', customizable: true, surfaces: ['web', 'home'] },
-      { id: 'themeMode', title: '外观模式', subtitle: '明暗模式', customizable: true, surfaces: ['web'] },
-      { id: 'userAgentPreset', title: '网页标识', subtitle: '高级设置', customizable: false, surfaces: [] },
-      { id: 'screenOrientation', title: '屏幕方向', subtitle: '横竖屏', customizable: true, surfaces: ['web'] },
-      { id: 'addToDesktop', title: '安装网页', subtitle: '安装应用', customizable: true, surfaces: ['web'] },
-      { id: 'offline', title: '保存网页', subtitle: '离线保存', customizable: true, surfaces: ['web'] },
-      { id: 'video', title: '资源嗅探', subtitle: '媒体与文件', customizable: true, surfaces: ['web'] },
-      { id: 'siteInfo', title: '站点信息', subtitle: '安全与权限', customizable: true, surfaces: ['web'] },
-      { id: 'reportSite', title: '举报网站', subtitle: '反馈问题', customizable: true, surfaces: ['web'] },
-      { id: 'openBookmarks', title: '书签', subtitle: '收藏', customizable: true, surfaces: ['web', 'home', 'reader', 'offline'] },
-      { id: 'history', title: '历史记录', subtitle: '访问', customizable: true, surfaces: ['web', 'home'] },
-      { id: 'savedPages', title: '我的网页', subtitle: '离线管理', customizable: true, surfaces: ['web', 'home'] },
-      { id: 'downloads', title: '下载管理', subtitle: '下载记录', customizable: true, surfaces: ['web', 'home'] },
-      { id: 'settings', title: '设置', subtitle: '偏好', customizable: true, surfaces: ['web', 'home'] },
-      { id: 'appProxySettings', title: '代理设置', subtitle: '快速切换', customizable: true, surfaces: ['web', 'home'] },
-      { id: 'home', title: '主页', subtitle: '新标签', customizable: true, surfaces: ['web', 'home', 'tabs', 'viewer'] },
-      { id: 'find', title: '查找网页', subtitle: '页内文字', customizable: true, surfaces: ['web', 'offline', 'reader'] },
-      { id: 'openOriginal', title: '打开原网页', subtitle: '在线', customizable: false, surfaces: ['offline'] },
-      { id: 'details', title: '页面详情', subtitle: '信息', customizable: false, surfaces: ['offline'] },
-      { id: 'exportPage', title: '导出网页', subtitle: 'HTML', customizable: false, surfaces: ['offline'] },
-      { id: 'deletePage', title: '删除离线页面', subtitle: '删除', customizable: false, surfaces: ['offline'] },
-      { id: 'decreaseFont', title: '减小字号', subtitle: '字号', customizable: false, surfaces: ['reader'] },
-      { id: 'increaseFont', title: '增大字号', subtitle: '字号', customizable: false, surfaces: ['reader'] },
-      { id: 'theme', title: '切换主题', subtitle: '外观', customizable: false, surfaces: ['reader'] },
-      { id: 'readAloud', title: '朗读', subtitle: '语音', customizable: false, surfaces: ['reader'] },
-      { id: 'lineHeight', title: '切换行距', subtitle: '排版', customizable: false, surfaces: ['reader'] },
-      { id: 'pageWidth', title: '阅读区域宽度', subtitle: '版心', customizable: false, surfaces: ['reader'] },
-      { id: 'viewerInfo', title: '文件信息', subtitle: '只读查看', customizable: false, surfaces: ['viewer'] },
-      { id: 'newTab', title: '新建标签', subtitle: '普通', customizable: false, surfaces: ['tabs'] },
-      { id: 'newPrivateTab', title: '隐私模式', subtitle: '私密', customizable: true, surfaces: ['web', 'home', 'tabs'] },
-      { id: 'closeAllTabs', title: '关闭所有标签页', subtitle: '标签页', customizable: false, surfaces: ['tabs'] },
-      { id: 'clearHistory', title: '清除历史记录', subtitle: '历史', customizable: false, surfaces: ['tabs'] }
+      { id: 'bookmark', customizable: true, surfaces: ['web', 'reader'] },
+      { id: 'scanQr', customizable: true, surfaces: ['web', 'home'] },
+      { id: 'copyLink', customizable: true, surfaces: ['web', 'offline', 'reader'] },
+      { id: 'share', customizable: true, surfaces: ['web', 'offline', 'reader'] },
+      { id: 'sendToDesktop', customizable: true, surfaces: ['web'] },
+      { id: 'print', customizable: true, surfaces: ['web'] },
+      { id: 'userAgent', customizable: true, surfaces: ['web'] },
+      { id: 'textZoom', customizable: true, surfaces: ['web'] },
+      { id: 'fullScreenMode', customizable: true, surfaces: ['web'] },
+      { id: 'manualElementHide', customizable: true, surfaces: ['web'] },
+      { id: 'elementInspection', customizable: true, surfaces: ['web'] },
+      { id: 'reader', customizable: true, surfaces: ['web', 'offline'] },
+      { id: 'novel', customizable: true, surfaces: ['web', 'home'] },
+      { id: 'translate', customizable: true, surfaces: ['web'] },
+      { id: 'scripts', customizable: true, surfaces: ['web', 'home'] },
+      { id: 'themeMode', customizable: true, surfaces: ['web'] },
+      { id: 'userAgentPreset', customizable: false, surfaces: [] },
+      { id: 'screenOrientation', customizable: true, surfaces: ['web'] },
+      { id: 'addToDesktop', customizable: true, surfaces: ['web'] },
+      { id: 'offline', customizable: true, surfaces: ['web'] },
+      { id: 'video', customizable: true, surfaces: ['web'] },
+      { id: 'siteInfo', customizable: true, surfaces: ['web'] },
+      { id: 'reportSite', customizable: true, surfaces: ['web'] },
+      { id: 'openBookmarks', customizable: true, surfaces: ['web', 'home', 'reader', 'offline'] },
+      { id: 'history', customizable: true, surfaces: ['web', 'home'] },
+      { id: 'savedPages', customizable: true, surfaces: ['web', 'home'] },
+      { id: 'downloads', customizable: true, surfaces: ['web', 'home'] },
+      { id: 'settings', customizable: true, surfaces: ['web', 'home'] },
+      { id: 'appProxySettings', customizable: true, surfaces: ['web', 'home'] },
+      { id: 'home', customizable: true, surfaces: ['web', 'home', 'tabs', 'viewer'] },
+      { id: 'find', customizable: true, surfaces: ['web', 'offline', 'reader'] },
+      { id: 'openOriginal', customizable: false, surfaces: ['offline'] },
+      { id: 'details', customizable: false, surfaces: ['offline'] },
+      { id: 'exportPage', customizable: false, surfaces: ['offline'] },
+      { id: 'deletePage', customizable: false, surfaces: ['offline'] },
+      { id: 'decreaseFont', customizable: false, surfaces: ['reader'] },
+      { id: 'increaseFont', customizable: false, surfaces: ['reader'] },
+      { id: 'theme', customizable: false, surfaces: ['reader'] },
+      { id: 'readAloud', customizable: false, surfaces: ['reader'] },
+      { id: 'lineHeight', customizable: false, surfaces: ['reader'] },
+      { id: 'pageWidth', customizable: false, surfaces: ['reader'] },
+      { id: 'viewerInfo', customizable: false, surfaces: ['viewer'] },
+      { id: 'newTab', customizable: false, surfaces: ['tabs'] },
+      { id: 'newPrivateTab', customizable: true, surfaces: ['web', 'home', 'tabs'] },
+      { id: 'closeAllTabs', customizable: false, surfaces: ['tabs'] },
+      { id: 'clearHistory', customizable: false, surfaces: ['tabs'] }
     ];
   }
 }

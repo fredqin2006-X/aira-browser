@@ -3,6 +3,7 @@ import {
   BrowserDataScope
 } from '../../common/models/BrowserModels';
 import { BrowserProfileBoundaryService } from './BrowserProfileBoundaryService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface BrowserBookmarkScopeRouteParams {
   dataScope?: BrowserDataScope | string;
@@ -49,7 +50,9 @@ export class BrowserBookmarkScopeService {
   }
 
   buildTitle(baseTitle: string, scope: BookmarkStorageScope): string {
-    return scope === 'private' ? `隐私${baseTitle}` : baseTitle;
+    return scope === 'private'
+      ? resolveAppResourceText($r('app.string.bookmark_private_named', baseTitle))
+      : baseTitle;
   }
 
   isPrivateScope(scope: BookmarkStorageScope): boolean {

@@ -1,11 +1,11 @@
 export interface SettingsChangelogState {
-  title: string;
+  title: ResourceStr;
 }
 
 export class SettingsChangelogViewModel {
   buildState(): SettingsChangelogState {
     return {
-      title: '更新日志'
+      title: $r('app.string.settings_about_changelog')
     };
   }
 }

@@ -6,7 +6,7 @@ import { isBookmarkRootNodeId } from '../../data/repositories/BookmarkRepository
 
 export interface BookmarkRecordActionView {
   id: BookmarkRecordActionId;
-  title: string;
+  title: ResourceStr;
   role: 'normal' | 'destructive';
 }
 
@@ -36,34 +36,34 @@ export class BookmarkRecordActionViewModel {
         return [];
       }
       const actions: BookmarkRecordActionView[] = [
-        { id: 'edit_folder', title: '编辑文件夹', role: 'normal' },
-        { id: 'move', title: '移动', role: 'normal' }
+        { id: 'edit_folder', title: $r('app.string.bookmark_edit_folder'), role: 'normal' },
+        { id: 'move', title: $r('app.string.ui_move'), role: 'normal' }
       ];
       if (context.canSelect) {
-        actions.unshift({ id: 'enter_edit_mode', title: '多选', role: 'normal' });
+        actions.unshift({ id: 'enter_edit_mode', title: $r('app.string.ui_multi_select'), role: 'normal' });
       }
-      actions.push({ id: 'delete', title: '删除', role: 'destructive' });
+      actions.push({ id: 'delete', title: $r('app.string.settings_delete'), role: 'destructive' });
       return actions;
     }
 
     const actions: BookmarkRecordActionView[] = [
-      { id: 'share', title: '分享', role: 'normal' },
-      { id: 'open_current_tab', title: '打开', role: 'normal' },
-      { id: 'open_new_tab', title: '新标签页打开', role: 'normal' },
-      { id: 'open_background_tab', title: '后台打开', role: 'normal' },
-      { id: 'edit_bookmark', title: '编辑书签', role: 'normal' },
-      { id: 'move', title: '移动', role: 'normal' },
-      { id: 'delete', title: '删除', role: 'destructive' }
+      { id: 'share', title: $r('app.string.ui_share'), role: 'normal' },
+      { id: 'open_current_tab', title: $r('app.string.ui_open'), role: 'normal' },
+      { id: 'open_new_tab', title: $r('app.string.history_open_new_tab_short'), role: 'normal' },
+      { id: 'open_background_tab', title: $r('app.string.history_open_background'), role: 'normal' },
+      { id: 'edit_bookmark', title: $r('app.string.bookmark_edit_bookmark'), role: 'normal' },
+      { id: 'move', title: $r('app.string.ui_move'), role: 'normal' },
+      { id: 'delete', title: $r('app.string.settings_delete'), role: 'destructive' }
     ];
     if (context.scope === 'regular') {
       actions.unshift({
         id: context.isAddedToHome ? 'remove_from_home' : 'add_to_home',
-        title: context.isAddedToHome ? '从主页移除' : '添加到主页',
+        title: context.isAddedToHome ? $r('app.string.history_remove_home') : $r('app.string.history_add_home'),
         role: 'normal'
       });
     }
     if (context.canSelect) {
-      actions.unshift({ id: 'enter_edit_mode', title: '多选', role: 'normal' });
+      actions.unshift({ id: 'enter_edit_mode', title: $r('app.string.ui_multi_select'), role: 'normal' });
     }
     return actions;
   }

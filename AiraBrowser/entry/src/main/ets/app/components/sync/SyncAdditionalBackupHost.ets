@@ -59,6 +59,7 @@ import {
   SettingsSwitchRow
 } from '../settings/SettingsRows';
 import { SyncOperationProgressDialog } from './SyncOperationProgressDialog';
+import { SyncExperienceLinesDialog } from './SyncExperienceLinesDialog';
 import { SettingsDesktopWorkspaceHeader } from '../settings/SettingsDesktopWorkspaceHeader';
 import {
   BROWSER_IMMERSIVE_SHEET_HEADER_CONTENT_TOP_INSET,
@@ -73,15 +74,15 @@ import { applyDesktopDialogSheetChrome } from '../common/DesktopDialogSheetChrom
 
 interface SyncAdditionalBackupIntervalOption {
   days: AiraAdditionalBackupIntervalDays;
-  title: string;
+  title: ResourceStr;
 }
 
 const DEFAULT_ADDITIONAL_BACKUP_STATE: SyncAdditionalBackupViewState =
   createDefaultSyncAdditionalBackupViewState();
 const ADDITIONAL_BACKUP_INTERVAL_OPTIONS: SyncAdditionalBackupIntervalOption[] = [
-  { days: 1, title: '每天一次' },
-  { days: 3, title: '每 3 天一次' },
-  { days: 7, title: '每 7 天一次' }
+  { days: 1, title: $r('app.string.settings_sync_backup_every_day') },
+  { days: 3, title: $r('app.string.settings_sync_backup_every_days', 3) },
+  { days: 7, title: $r('app.string.settings_sync_backup_every_days', 7) }
 ];
 
 @Component
@@ -122,13 +123,38 @@ export struct SyncAdditionalBackupHost {
   @State private frequencySheetVisible: boolean = false;
   @State private sheetHeaderBlurRadius: number = 0;
   @State private sheetScrollOffset: number = 0;
-  @State private progressTitle: string = '';
-  @State private progressSubtitle: string = '';
+  @State private progressTitle: ResourceStr = '';
+  @State private progressSubtitle: ResourceStr = '';
   @State private progressValue: number = 0;
   @State private progressInProgress: boolean = false;
-  @State private progressDetailsText: string = '';
+  @State private progressDetailsText: ResourceStr = '';
   @State private progressDetailOpacity: number = 1;
+  @State private outcomeDialogTitle: ResourceStr = '';
+  @State private outcomeDialogLines: ResourceStr[] = [];
+  @State private outcomeDialogActionKind: string = 'confirm';
   private stateRevision: number = 0;
+  private outcomeLinesDialogOpen: boolean = false;
+  private outcomeLinesDialogController: CustomDialogController = new CustomDialogController({
+    builder: SyncExperienceLinesDialog({
+      title: $outcomeDialogTitle,
+      lines: $outcomeDialogLines,
+      actionKind: $outcomeDialogActionKind,
+      onDismiss: () => {
+        this.closeOutcomeLinesDialog();
+      }
+    }),
+    alignment: DialogAlignment.Center,
+    autoCancel: true,
+    customStyle: false,
+    backgroundColor: resolveCenteredDialogSurfaceColor(),
+    backgroundBlurStyle: BlurStyle.NONE,
+    cornerRadius: CENTERED_DIALOG_CORNER_RADIUS_VP,
+    width: resolveCenteredDialogControllerWidth('m'),
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      this.outcomeLinesDialogOpen = false;
+      dismissDialogAction.dismiss();
+    }
+  });
   private progressDialogOpen: boolean = false;
   private progressDialogController: CustomDialogController = new CustomDialogController({
     builder: SyncOperationProgressDialog({
@@ -168,7 +194,7 @@ export struct SyncAdditionalBackupHost {
     (): void => {
       this.closeProgressDialog();
     },
-    (title: string, subtitle: string): void => {
+    (title: ResourceStr, subtitle: ResourceStr): void => {
       this.showDialog(title, subtitle);
     }
   );
@@ -193,7 +219,7 @@ export struct SyncAdditionalBackupHost {
     Column() {
       if (this.desktopPresentation) {
         SettingsDesktopWorkspaceHeader({
-          title: '额外备份',
+          title: $r('app.string.settings_sync_extra_backup'),
           showBackButton: true,
           primaryTextColor: this.storedPrimaryTextColor,
           iconColor: this.storedSecondaryTextColor,
@@ -205,7 +231,7 @@ export struct SyncAdditionalBackupHost {
         this.buildContentScroll()
       } else {
         SettingsHdsScaffold({
-          title: '额外备份',
+          title: $r('app.string.settings_sync_extra_backup'),
           backIconKind: 'back',
           pageBackground: this.storedPageBackgroundColor,
           headerButtonBackground: this.storedPressedBackgroundColor,
@@ -245,13 +271,16 @@ export struct SyncAdditionalBackupHost {
 
   @Builder
   private buildOverviewContent() {
-    SettingsSection({ title: '备份设置', secondaryTextColor: this.storedSecondaryTextColor }) {
+    SettingsSection({
+      title: $r('app.string.settings_sync_backup_settings'),
+      secondaryTextColor: this.storedSecondaryTextColor
+    }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsSwitchRow({
-          title: '额外备份',
+          title: $r('app.string.settings_sync_extra_backup'),
           desktopPresentation: this.desktopPresentation,
           checked: this.state.enabled,
           icon: $r('sys.symbol.externaldrive_fill'),
@@ -269,7 +298,7 @@ export struct SyncAdditionalBackupHost {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsNavigationRow({
-          title: '备份频率',
+          title: $r('app.string.settings_sync_backup_frequency'),
           desktopPresentation: this.desktopPresentation,
           value: this.state.intervalLabel,
           icon: $r('sys.symbol.clock_fill'),
@@ -286,7 +315,7 @@ export struct SyncAdditionalBackupHost {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsNavigationRow({
-          title: '备份位置',
+          title: $r('app.string.settings_sync_backup_location'),
           desktopPresentation: this.desktopPresentation,
           value: this.state.providerSummary,
           icon: $r('sys.symbol.folder_fill'),
@@ -311,7 +340,9 @@ export struct SyncAdditionalBackupHost {
 
     Column({ space: 8 }) {
       SettingsActionButton({
-        title: this.isBusy ? '正在备份' : '立即备份',
+        title: this.isBusy
+          ? $r('app.string.settings_sync_backup_running')
+          : $r('app.string.settings_sync_backup_now'),
         variant: 'filled',
         isEnabled: this.state.canBackupNow && !this.isPrivateSession() && !this.isBusy,
         accentColor: this.storedAccentColor,
@@ -320,7 +351,7 @@ export struct SyncAdditionalBackupHost {
           this.backupNow();
         }
       })
-      Text(`上次备份：${this.state.lastBackupLabel}`)
+      Text(this.state.lastBackupLabel)
         .width('100%')
         .fontSize(13)
         .fontColor(this.storedSecondaryTextColor)
@@ -345,7 +376,7 @@ export struct SyncAdditionalBackupHost {
       }) {
         BrowserImmersiveSheetLayout({
           closeVisible: true,
-          closeAccessibilityLabel: '关闭',
+          closeAccessibilityLabel: $r('app.string.settings_sync_close'),
           onClose: (): void => {
             this.frequencySheetVisible = false;
           },
@@ -366,7 +397,7 @@ export struct SyncAdditionalBackupHost {
     // "class constructor cannot called without 'new'" if BrowserFeatureSheetHeader
     // is constructed directly inside a @BuilderParam arrow function.
     BrowserFeatureSheetHeader({
-      title: '备份频率'
+      title: $r('app.string.settings_sync_backup_frequency')
     })
   }
 
@@ -392,14 +423,14 @@ export struct SyncAdditionalBackupHost {
   @Builder
   private buildFrequencyCenteredContent() {
     Column({ space: 8 }) {
-      Text('备份频率')
+      Text($r('app.string.settings_sync_backup_frequency'))
         .width('100%')
         .fontSize(22)
         .lineHeight(29)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.storedPrimaryTextColor)
 
-      Text('选择额外备份自动执行的时间间隔。')
+      Text($r('app.string.settings_sync_backup_frequency_summary'))
         .width('100%')
         .fontSize(14)
         .lineHeight(20)
@@ -414,7 +445,7 @@ export struct SyncAdditionalBackupHost {
   private buildFrequencyPhoneScrollContent() {
     Scroll(this.sheetBlurScroller) {
       Column({ space: 12 }) {
-        Text('选择额外备份自动执行的时间间隔。')
+        Text($r('app.string.settings_sync_backup_frequency_summary'))
           .width('100%')
           .fontSize(14)
           .lineHeight(20)
@@ -523,7 +554,7 @@ export struct SyncAdditionalBackupHost {
           this.showOptionsRequiredDialog(outcome.title, outcome.message);
           return;
         }
-        this.showDialog(outcome.title, outcome.message);
+        this.presentBackupOutcome(outcome);
       })
       .finally(() => {
         this.isBusy = false;
@@ -543,7 +574,7 @@ export struct SyncAdditionalBackupHost {
           this.frequencySheetVisible = false;
           return;
         }
-        this.showDialog(outcome.title, outcome.message);
+        this.presentBackupOutcome(outcome);
       })
       .finally(() => {
         this.isBusy = false;
@@ -556,11 +587,17 @@ export struct SyncAdditionalBackupHost {
       return;
     }
     this.isBusy = true;
-    this.progressController.begin('正在备份', '正在保存书签、主页收藏、小说书架和常用设置的额外副本');
+    this.progressController.begin(
+      $r('app.string.settings_sync_backup_running'),
+      $r('app.string.settings_sync_backup_running_detail'),
+      'sync'
+    );
     sharedSyncExperienceCoordinator.runAdditionalBackupNow()
       .then((outcome: SyncAdditionalBackupActionOutcome) => {
         if (outcome.type === 'completed') {
-          this.progressController.finish(outcome.title, outcome.message, undefined, false);
+          this.progressController.finish(outcome.title, outcome.message, () => {
+            this.presentBackupLines(outcome);
+          }, false);
           return;
         }
         this.progressController.complete();
@@ -568,7 +605,7 @@ export struct SyncAdditionalBackupHost {
           this.showOptionsRequiredDialog(outcome.title, outcome.message);
           return;
         }
-        this.showDialog(outcome.title, outcome.message);
+        this.presentBackupOutcome(outcome);
       })
       .finally(() => {
         this.isBusy = false;
@@ -576,7 +613,7 @@ export struct SyncAdditionalBackupHost {
       });
   }
 
-  private showOptionsRequiredDialog(title: string, message: string): void {
+  private showOptionsRequiredDialog(title: ResourceStr, message: ResourceStr): void {
     if (!this.canConfigureWebdavBackup()) {
       this.showDialog(title, message);
       return;
@@ -585,9 +622,9 @@ export struct SyncAdditionalBackupHost {
       title: title,
       message: message,
       autoCancel: true,
-      primaryButton: { value: '稍后', action: () => {} },
+      primaryButton: { value: $r('app.string.settings_sync_later'), action: () => {} },
       secondaryButton: {
-        value: '设置 WebDAV',
+        value: $r('app.string.settings_sync_backup_configure'),
         action: () => {
           this.openWebdavBackupDestination();
         }
@@ -597,7 +634,10 @@ export struct SyncAdditionalBackupHost {
 
   private openWebdavBackupDestination(): void {
     if (!this.canConfigureWebdavBackup()) {
-      this.showDialog('无法设置额外备份', '当前同步方式已经是 WebDAV，无需再设额外备份。');
+      this.showDialog(
+        $r('app.string.settings_sync_backup_cannot_set'),
+        $r('app.string.settings_sync_backup_already_webdav')
+      );
       return;
     }
     this.navigationCoordinator.openSyncWebdavConfig(
@@ -618,11 +658,41 @@ export struct SyncAdditionalBackupHost {
     this.navigationCoordinator.back();
   }
 
-  private showDialog(title: string, message: string): void {
+  private presentBackupOutcome(outcome: SyncAdditionalBackupActionOutcome): void {
+    if (this.presentBackupLines(outcome)) {
+      return;
+    }
+    this.showDialog(outcome.title, outcome.message);
+  }
+
+  private presentBackupLines(outcome: SyncAdditionalBackupActionOutcome): boolean {
+    const lines = outcome.messageLines !== undefined ? outcome.messageLines : [];
+    if (lines.length <= 1) {
+      return false;
+    }
+    this.outcomeDialogTitle = outcome.title;
+    this.outcomeDialogLines = lines;
+    this.outcomeDialogActionKind = 'confirm';
+    if (!this.outcomeLinesDialogOpen) {
+      this.outcomeLinesDialogOpen = true;
+      this.outcomeLinesDialogController.open();
+    }
+    return true;
+  }
+
+  private closeOutcomeLinesDialog(): void {
+    if (!this.outcomeLinesDialogOpen) {
+      return;
+    }
+    this.outcomeLinesDialogOpen = false;
+    this.outcomeLinesDialogController.close();
+  }
+
+  private showDialog(title: ResourceStr, message: ResourceStr): void {
     showCenteredAlertDialog({
       title: title,
       message: message,
-      confirm: { value: '知道了', action: () => {} }
+      confirm: { value: $r('app.string.settings_pro_got_it'), action: () => {} }
     });
   }
 

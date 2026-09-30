@@ -21,7 +21,7 @@ export struct SiteControlsManualOriginDialog {
 
   build() {
     Column({ space: 16 }) {
-      Text('添加站点')
+      Text($r('app.string.settings_site_controls_add_site'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -31,7 +31,7 @@ export struct SiteControlsManualOriginDialog {
       SettingsTextField({
         text: this.addressDraft,
         placeholder: 'http://192.168.1.10:8080',
-        helperText: '输入域名、IP 或完整地址。非默认端口会作为独立站点。',
+        helperText: $r('app.string.settings_site_controls_manual_origin_helper'),
         errorText: this.errorText,
         underlineStyle: true,
         inputType: InputType.URL,
@@ -47,7 +47,7 @@ export struct SiteControlsManualOriginDialog {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '继续',
+          label: $r('app.string.settings_site_controls_continue'),
           emphasis: 'primary',
           stacked: true,
           accentColor: this.storedAccentColor,
@@ -61,7 +61,7 @@ export struct SiteControlsManualOriginDialog {
         })
 
         BrowserSheetActionButton({
-          label: '取消',
+          label: $r('app.string.settings_site_controls_cancel'),
           emphasis: 'ghost',
           stacked: true,
           buttonHeight: 44,

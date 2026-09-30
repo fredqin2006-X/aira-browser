@@ -54,7 +54,9 @@ export struct ManualElementHideHost {
     Column() {
       if (this.desktopPresentation && this.embedded) {
         SettingsDesktopWorkspaceHeader({
-          title: this.selectedHost.length > 0 ? this.selectedHost : '已清理页面元素',
+          title: this.selectedHost.length > 0
+            ? this.selectedHost
+            : $r('app.string.element_hide_settings_title'),
           showBackButton: true,
           primaryTextColor: this.theme.textPrimary,
           iconColor: this.theme.textSecondary,
@@ -172,7 +174,7 @@ export struct ManualElementHideHost {
         boundarySource: this.boundarySource
       }
     }).catch((_error: Error) => {
-      this.showToast('无法打开网站清理规则，请稍后再试。');
+      this.showToast($r('app.string.element_hide_open_rules_failed'));
     });
   }
 
@@ -181,7 +183,7 @@ export struct ManualElementHideHost {
     this.refreshList();
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     promptAction.showToast({
       message: message,
       duration: 1800

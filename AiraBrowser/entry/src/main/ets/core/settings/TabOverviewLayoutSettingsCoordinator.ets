@@ -5,7 +5,7 @@ import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundary
 
 export interface TabOverviewLayoutOptionState {
   style: BrowserTabsOverviewLayoutStyle;
-  title: string;
+  title: ResourceStr;
   isSelected: boolean;
 }
 

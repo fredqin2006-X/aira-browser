@@ -31,24 +31,24 @@ import { readBrowserBoundaryRouteState } from '../../common/utils/RouteParamUtil
 
 interface HistoryRetentionOption {
   id: string;
-  title: string;
+  title: ResourceStr;
   settings: HistoryRetentionSettings;
 }
 
 const HISTORY_RETENTION_OPTIONS: HistoryRetentionOption[] = [
   {
     id: 'off',
-    title: '不保存历史',
+    title: $r('app.string.settings_general_history_off'),
     settings: { enabled: false, maxAgeDays: 0, maxRows: 0 }
   },
   {
     id: '10000',
-    title: '90 天 / 10000 条',
+    title: $r('app.string.settings_general_history_count', 90, 10000),
     settings: { enabled: true, maxAgeDays: 90, maxRows: 10000 }
   },
   {
     id: '30_3000',
-    title: '30 天 / 3000 条',
+    title: $r('app.string.settings_general_history_count', 30, 3000),
     settings: { enabled: true, maxAgeDays: 30, maxRows: 3000 }
   }
 ];
@@ -81,7 +81,7 @@ struct GeneralHistoryRetentionSettingsPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '历史保留',
+        title: $r('app.string.settings_general_history_retention'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -104,7 +104,7 @@ struct GeneralHistoryRetentionSettingsPage {
   @Builder
   private buildSection() {
     SettingsSection({
-      title: '保留条数',
+      title: $r('app.string.settings_general_history_section'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
@@ -126,7 +126,7 @@ struct GeneralHistoryRetentionSettingsPage {
       }
 
       SettingsFooterText({
-        text: '仅影响常规历史记录，私密标签本来不写历史。',
+        text: $r('app.string.settings_general_history_footer'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }

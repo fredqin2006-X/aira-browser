@@ -15,8 +15,8 @@ export struct AppEmptyState {
   @Prop airaIconId: AiraRenderableIconId | undefined = undefined;
   @Prop showIcon: boolean = true;
   @Prop useCustomIcon: boolean = false;
-  @Prop title: string = '';
-  @Prop message: string = '';
+  @Prop title: ResourceStr = '';
+  @Prop message: ResourceStr = '';
   @Prop topPadding: number = 96;
   @Prop bottomPadding: number = 96;
   @Prop horizontalPadding: number = 24;
@@ -82,7 +82,7 @@ export struct AppEmptyState {
       }
     }
 
-    if (this.title.length > 0) {
+    if (this.hasText(this.title)) {
       Text(this.title)
         .width('100%')
         .fontSize(16)
@@ -95,7 +95,7 @@ export struct AppEmptyState {
         .textOverflow({ overflow: TextOverflow.Ellipsis })
     }
 
-    if (this.message.length > 0) {
+    if (this.hasText(this.message)) {
       Text(this.message)
         .width('100%')
         .fontSize(13)
@@ -105,6 +105,10 @@ export struct AppEmptyState {
         .animation({ duration: this.resolveForegroundTransitionDuration(), curve: Curve.EaseInOut })
         .textAlign(TextAlign.Center)
     }
+  }
+
+  private hasText(value: ResourceStr): boolean {
+    return typeof value !== 'string' || value.length > 0;
   }
 
   private resolvePrimaryTextColor(): ResourceColor {

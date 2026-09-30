@@ -1,5 +1,6 @@
 import promptAction from '@ohos.promptAction';
 import { showCenteredAlertDialog } from '../common/CenteredDialogSurface';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { ManualElementHideSiteRulesScreen } from './ManualElementHideSiteRulesScreen';
 import {
   ManualElementHideSettingsViewModel,
@@ -129,29 +130,29 @@ export struct ManualElementHideSiteRulesHost {
       .then((result: ManualElementHideSettingsMutationResult) => {
         this.refreshRules();
         if (!result.allowed) {
-          this.showToast('当前会话不可修改页面元素清理设置。');
+          this.showToast($r('app.string.element_hide_session_readonly'));
           return;
         }
         this.onRulesChanged();
       })
       .catch((_error: Error) => {
         this.refreshRules();
-        this.showToast('更新失败，请稍后再试。');
+        this.showToast($r('app.string.element_hide_update_failed'));
       });
   }
 
   private confirmDeleteRule(host: string, ruleId: string, selector: string): void {
     showCenteredAlertDialog({
-      title: '删除这条清理规则',
-      message: `删除后，这个元素在刷新或再次打开网页时会恢复显示。\n\n${selector}`,
+      title: resolveAppResourceText($r('app.string.element_hide_delete_rule_title')),
+      message: resolveAppResourceText($r('app.string.element_hide_delete_rule_message', selector)),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: resolveAppResourceText($r('app.string.element_hide_dialog_cancel')),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '删除',
+        value: resolveAppResourceText($r('app.string.element_hide_dialog_delete')),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.deleteRule(host, ruleId);
@@ -168,30 +169,32 @@ export struct ManualElementHideSiteRulesHost {
       .then((result: ManualElementHideSettingsMutationResult) => {
         this.refreshRules();
         if (!result.allowed) {
-          this.showToast('当前会话不可修改页面元素清理设置。');
+          this.showToast($r('app.string.element_hide_session_readonly'));
           return;
         }
         this.onRulesChanged();
-        this.showToast(result.changed ? '已删除这条清理规则。' : '没有找到这条清理规则。');
+        this.showToast(result.changed
+          ? $r('app.string.element_hide_deleted')
+          : $r('app.string.element_hide_rule_not_found'));
       })
       .catch((_error: Error) => {
         this.refreshRules();
-        this.showToast('删除失败，请稍后再试。');
+        this.showToast($r('app.string.element_hide_delete_failed'));
       });
   }
 
   private confirmClearSite(host: string): void {
     showCenteredAlertDialog({
-      title: '清除这个网站的规则',
-      message: `清除后，${host} 上被你隐藏的页面元素在刷新或再次打开时会恢复显示。`,
+      title: resolveAppResourceText($r('app.string.element_hide_clear_site_title')),
+      message: resolveAppResourceText($r('app.string.element_hide_clear_site_message', host)),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: resolveAppResourceText($r('app.string.element_hide_dialog_cancel')),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '清除',
+        value: resolveAppResourceText($r('app.string.element_hide_dialog_clear')),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.clearSite(host);
@@ -208,7 +211,7 @@ export struct ManualElementHideSiteRulesHost {
       .then((result: ManualElementHideSettingsMutationResult) => {
         if (!result.allowed) {
           this.refreshRules();
-          this.showToast('当前会话不可修改页面元素清理设置。');
+          this.showToast($r('app.string.element_hide_session_readonly'));
           return;
         }
         this.onRulesChanged();
@@ -217,15 +220,17 @@ export struct ManualElementHideSiteRulesHost {
         } else {
           this.refreshRules();
         }
-        this.showToast(result.changed ? '已清除这个网站的清理规则。' : '没有找到这个网站的清理规则。');
+        this.showToast(result.changed
+          ? $r('app.string.element_hide_cleared')
+          : $r('app.string.element_hide_site_not_found'));
       })
       .catch((_error: Error) => {
         this.refreshRules();
-        this.showToast('清除失败，请稍后再试。');
+        this.showToast($r('app.string.element_hide_clear_failed'));
       });
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     promptAction.showToast({
       message: message,
       duration: 1800

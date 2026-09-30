@@ -7,6 +7,7 @@ import {
 } from '../../../features/reader/ReaderModeModels';
 import { AiraRenderableIconId } from '../../../core/resources/GeneratedAiraIconCatalog';
 import { AiraIcon } from '../common/AiraIcon';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BROWSER_THEME_STORAGE_ACCENT_KEY
 } from '../../../core/theme/BrowserThemeStorageKeys';
@@ -101,7 +102,7 @@ export struct ReaderModeOverlay {
     Column() {
       if (this.state.loading) {
         this.buildLoading()
-      } else if (this.state.errorMessage.length > 0) {
+      } else if (`${this.state.errorMessage}`.length > 0) {
         this.buildError()
       } else {
         this.buildArticle()
@@ -114,14 +115,14 @@ export struct ReaderModeOverlay {
     if (this.readerChromeVisible) {
       ReadingExperienceChrome({
         title: '',
-        closeAccessibilityLabel: '退出阅读模式',
+        closeAccessibilityLabel: resolveAppResourceText($r('app.string.reader_exit_reading_mode')),
         visible: true,
         appearance: this.resolveReadingSurfaceAppearance(),
         topSafeInset: this.resolveTopSafeInset(),
         bottomSafeInset: this.resolveBottomSafeInset(),
         contextRowVisible: false,
         primaryActionIcon: 'reader.readAloud',
-        primaryActionLabel: '朗读',
+        primaryActionLabel: resolveAppResourceText($r('app.string.reader_read_aloud')),
         topActionsWidth: 68,
         onClose: (): void => {
           this.onAction({ type: 'close' });
@@ -170,10 +171,10 @@ export struct ReaderModeOverlay {
     Row({ space: 4 }) {
       this.buildIconButton('reader.find', (): void => {
         this.openSearchPanel();
-      }, 0, '查找正文')
+      }, 0, resolveAppResourceText($r('app.string.reader_find_in_article')))
       this.buildIconButton('reader.share', (): void => {
         this.onAction({ type: 'share' });
-      }, 0, '分享文章')
+      }, 0, resolveAppResourceText($r('app.string.reader_share_article')))
     }
     .width(68)
     .height(32)
@@ -185,7 +186,7 @@ export struct ReaderModeOverlay {
   private buildSearchBarContent() {
     Row({ space: 5 }) {
       Stack({ alignContent: Alignment.End }) {
-        TextInput({ placeholder: '查找正文', text: this.searchDraft })
+        TextInput({ placeholder: $r('app.string.reader_find_in_article'), text: this.searchDraft })
           .id(READER_SEARCH_INPUT_FOCUS_ID)
           .width('100%')
           .height(32)
@@ -229,13 +230,13 @@ export struct ReaderModeOverlay {
 
       this.buildIconButton('browser.toolbar.back', (): void => {
         this.onAction({ type: 'search_previous' });
-      }, 90, '上一个匹配项')
+      }, 90, resolveAppResourceText($r('app.string.reader_search_previous')))
       this.buildIconButton('browser.toolbar.back', (): void => {
         this.onAction({ type: 'search_next' });
-      }, -90, '下一个匹配项')
+      }, -90, resolveAppResourceText($r('app.string.reader_search_next')))
       this.buildIconButton('browser.toolbar.clearInput', (): void => {
         this.closeSearchPanel();
-      }, 0, '关闭查找')
+      }, 0, resolveAppResourceText($r('app.string.reader_search_close')))
     }
     .width('100%')
     .height(32)
@@ -291,7 +292,7 @@ export struct ReaderModeOverlay {
       pageNumberVisible: true,
       paragraphIndentVisible: false,
       continuationAvailable: false,
-      continuationLabel: '继续阅读',
+      continuationLabel: $r('app.string.reader_continue_reading'),
       contentTopInset: 0,
       contentBottomInset: 0
     };
@@ -346,7 +347,7 @@ export struct ReaderModeOverlay {
       LoadingProgress()
         .width(36)
         .height(36)
-      Text('正在整理正文...')
+      Text($r('app.string.reader_preparing_article'))
         .fontSize(15)
         .fontColor(this.resolveSecondaryTextColor())
     }
@@ -366,7 +367,7 @@ export struct ReaderModeOverlay {
         .fontSize(15)
         .fontColor(this.resolveTextColor())
         .textAlign(TextAlign.Center)
-      Button('返回网页')
+      Button($r('app.string.reader_back_to_page'))
         .onClick(() => {
           this.onAction({ type: 'close' });
         })

@@ -1,6 +1,7 @@
 import { BrowserWebLoadDataPayload } from '../browser/BrowserWebLoadCoordinator';
 import { OfflinePageOpenCoordinator } from './OfflinePageOpenCoordinator';
 import { parseSavedPageWebTabUrl } from './SavedPageWebTabUrl';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface SavedPageWebTabLoadResult {
   payload?: BrowserWebLoadDataPayload;
@@ -25,9 +26,13 @@ export class SavedPageWebTabLoadCoordinator {
     }
     const result = await this.openCoordinator.open(route.pageId, route.dataScope, route.privacyMode);
     if (!result.ok || result.record === undefined) {
+      const rawMessage = result.message;
+      const payloadMessage: ResourceStr = (typeof rawMessage === 'string' && rawMessage.length === 0)
+        ? $r('app.string.offline_open_failed')
+        : rawMessage;
       return {
         archiveUri: '',
-        payload: this.buildMessagePayload(url, result.message.length > 0 ? result.message : '离线页面打开失败')
+        payload: this.buildMessagePayload(url, payloadMessage)
       };
     }
     if (result.contentKind === 'web_archive' && result.html.trim().length === 0 && result.archiveUri.trim().length > 0) {
@@ -47,9 +52,11 @@ export class SavedPageWebTabLoadCoordinator {
     };
   }
 
-  private buildMessagePayload(url: string, message: string): BrowserWebLoadDataPayload {
+  private buildMessagePayload(url: string, message: ResourceStr): BrowserWebLoadDataPayload {
     return {
-      data: `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body><p>${this.escapeHtml(message)}</p></body></html>`,
+      data: `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body><p>${this.escapeHtml(resolveAppResourceText(
+        message
+      ))}</p></body></html>`,
       mimeType: 'text/html',
       encoding: 'UTF-8',
       baseUrl: url,

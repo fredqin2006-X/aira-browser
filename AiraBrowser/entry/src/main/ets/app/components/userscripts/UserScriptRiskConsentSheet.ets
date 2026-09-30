@@ -65,7 +65,7 @@ export struct UserScriptRiskConsentSheet {
     BrowserImmersiveSheetLayout({
       footerVisible: true,
             closeVisible: true,
-      closeAccessibilityLabel: '关闭用户脚本风险提示',
+      closeAccessibilityLabel: $r('app.string.user_script_close_risk'),
       onClose: (): void => {
         this.onDecline();
       },

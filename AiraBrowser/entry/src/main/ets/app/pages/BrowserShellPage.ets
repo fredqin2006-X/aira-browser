@@ -1905,7 +1905,7 @@ struct BrowserShellPage {
         this.browserTransientSurfaceCoordinator.dismiss('app_proxy_quick');
       }
     },
-    showMessage: (message: string): void => {
+    showMessage: (message: ResourceStr): void => {
       this.showNativeToast(message);
     },
     openSettings: (): void => {
@@ -2671,7 +2671,7 @@ struct BrowserShellPage {
       requestBrowserBack: (): void => {
         this.browserMainBackCoordinator.onBackPress(this.browserMainBackHost);
       },
-      showActionRejection: (message: string): void => this.showNativeToast(message)
+      showActionRejection: (message: ResourceStr): void => this.showNativeToast(message)
     });
   private splitToolbarCustomizationViewModel: BrowserSplitToolbarCustomizationViewModel =
     new BrowserSplitToolbarCustomizationViewModel();
@@ -2748,9 +2748,9 @@ struct BrowserShellPage {
       this.featureGateCoordinator.handleAction('dismiss');
     },
     (): void => {
-      this.showNativeToast('请先使用华为账号登录后再购买 Aira Pro。');
+      this.showNativeToast($r('app.string.settings_pro_login_required'));
     },
-    (message: string): void => {
+    (message: ResourceStr): void => {
       this.showNativeToast(message);
     }
   );
@@ -3450,7 +3450,7 @@ struct BrowserShellPage {
         this.browserHostedRuntimeSurfacePort.updateCurrentActiveConfigFromHost();
       }
     },
-    showStatusMessage: (message: string): void => this.showNativeToast(message)
+    showStatusMessage: (message: ResourceStr): void => this.showNativeToast(message)
   });
   private browserClipboardService: BrowserClipboardService = new BrowserClipboardService();
   private elementInspectionSessionShell: ElementInspectionSessionShell = {
@@ -3526,7 +3526,7 @@ struct BrowserShellPage {
     publishSessionSnapshot: (snapshot: OfflinePageSaveSessionSnapshot): void => {
       this.offlinePageSaveSessionSnapshot = snapshot;
     },
-    showToast: (message: string): void => this.showNativeToast(message),
+    showToast: (message: ResourceStr): void => this.showNativeToast(message),
     reportError: (message: string): void => {
       this.errorMessage = message;
     }
@@ -3855,7 +3855,7 @@ struct BrowserShellPage {
     openDialog: (): void => {
       this.desktopShortcutNameDialogController.open();
     },
-    showToast: (message: string): void => this.showNativeToast(message)
+    showToast: (message: ResourceStr): void => this.showNativeToast(message)
   };
   private webAppInstallCoordinator: WebAppInstallCoordinator = new WebAppInstallCoordinator(
     sharedMembershipFeature,
@@ -4192,7 +4192,7 @@ struct BrowserShellPage {
       this.browserNativeAlertDialogPresenter.confirm({
         title: state.title,
         message: state.message,
-        cancelLabel: '取消',
+        cancelLabel: $r('app.string.settings_site_info_cancel'),
         confirmLabel: state.confirmLabel,
         confirmTone: 'alert',
         onConfirm: () => {
@@ -4364,10 +4364,10 @@ struct BrowserShellPage {
     applySnapshot: (snapshot: BrowserBookmarkActionSessionSnapshot): void => {
       this.browserBookmarkActionSessionSnapshot = snapshot;
     },
-    showToast: (message: string): void => {
+    showToast: (message: ResourceStr): void => {
       this.showNativeToast(message);
     },
-    presentPersistentWriteBlocked: (helperText: string, _summaryLine: string): void => {
+    presentPersistentWriteBlocked: (helperText: ResourceStr, _summaryLine: string): void => {
       this.showNativeToast(helperText);
     },
     confirmRemove: (confirmation: BrowserBookmarkRemoveConfirmation): void => {
@@ -4645,7 +4645,7 @@ struct BrowserShellPage {
     }),
     resolveCreateOptions: (): BrowserCreateTabOptions => this.tabScopedEventContextCoordinator.resolveCurrentBoundary(),
     resolveAbilityContext: (): common.UIAbilityContext => this.getAbilityContext(),
-    showToast: (message: string): void => this.showNativeToast(message),
+    showToast: (message: ResourceStr): void => this.showNativeToast(message),
     publishHelper: (message: string): void => {
       this.helperMessage = message;
     },
@@ -5154,7 +5154,7 @@ struct BrowserShellPage {
         this.largeScreenWebZoomRevision += 1;
       }
     );
-  @State private bookmarkBarDialogTitle: string = '';
+  @State private bookmarkBarDialogTitle: ResourceStr = '';
   @State private bookmarkBarFolderTitle: string = '';
   @State private bookmarkBarLinkTitle: string = '';
   @State private bookmarkBarLinkUrl: string = '';
@@ -5181,7 +5181,7 @@ struct BrowserShellPage {
     builder: BookmarkManagerCreateFolderDialog({
       folderTitle: $bookmarkBarFolderTitle,
       dialogTitle: $bookmarkBarDialogTitle,
-      fieldPlaceholder: '文件夹名称',
+      fieldPlaceholder: $r('app.string.bookmark_folder_name'),
       confirm: (title: string): void => this.confirmBookmarkBarFolderName(title)
     }),
     customStyle: false,
@@ -5231,10 +5231,10 @@ struct BrowserShellPage {
     copyText: (request: BrowserClipboardCopyTextRequest): void => {
       void this.browserClipboardService.copyText(request).then(
         (result: BrowserClipboardCopyResult): void => this.showNativeToast(result.message),
-        (_error: Error): void => this.showNativeToast('复制失败，请稍后重试。')
+        (_error: Error): void => this.showNativeToast($r('app.string.ui_copy_failed'))
       );
     },
-    showToast: (message: string): void => {
+    showToast: (message: ResourceStr): void => {
       this.showNativeToast(message);
     }
   };
@@ -6021,6 +6021,8 @@ struct BrowserShellPage {
     createBrowserMediaResourceSessionSnapshot();
   @State @Watch('handleTabsOverviewBottomSafeAreaChange') showTabsSheet: boolean = false;
   @State private homeVideoPlaybackEnabled: boolean = true;
+  @State private homeWallpaperPageForeground: boolean = true;
+  @State private homeWallpaperResumeEpoch: number = 0;
   private homeWallpaperPlaybackGate: HomeWallpaperPlaybackGate = new HomeWallpaperPlaybackGate();
   @State tabsOverviewPresentationState: BrowserTabsOverviewSessionPresentationState =
     this.tabsOverviewSessionCoordinator.getPresentationState();
@@ -6751,8 +6753,11 @@ struct BrowserShellPage {
   }
 
   onPageShow(): void {
+    this.homeWallpaperPageForeground = true;
     this.homeWallpaperPlaybackGate.handlePageShow((enabled: boolean): void => {
       this.homeVideoPlaybackEnabled = enabled;
+    }, (epoch: number): void => {
+      this.homeWallpaperResumeEpoch = epoch;
     });
     this.browserPageForeground = true;
     this.browserWebTopImmersionSessionCoordinator.holdCoveredStatusBarForPageReturn();
@@ -6776,6 +6781,7 @@ struct BrowserShellPage {
   }
 
   onPageHide(): void {
+    this.homeWallpaperPageForeground = false;
     this.browserWebTopImmersionSessionCoordinator.cancelCoveredStatusBarHold();
     this.browserPageForeground = false;
     this.homeWallpaperPlaybackGate.handlePageHide((enabled: boolean): void => {
@@ -9681,6 +9687,8 @@ struct BrowserShellPage {
       }),
       contentPresentation: this.buildHomeSurfaceContentPresentationState(),
       playbackEnabled: this.resolveHomeWallpaperPlaybackEnabled(),
+      pageForeground: this.homeWallpaperPageForeground,
+      resumeEpoch: this.homeWallpaperResumeEpoch,
       onDismissSearchFocus: () => {
         this.collapseRootBottomPanelFromScrim();
       }
@@ -11883,14 +11891,16 @@ struct BrowserShellPage {
     });
   }
 
-  private showNativeToast(message: string): void {
+  private showNativeToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,
         duration: 1500
       });
     } catch (error) {
-      this.helperMessage = message;
+      if (typeof message === 'string') {
+        this.helperMessage = message;
+      }
     }
   }
 

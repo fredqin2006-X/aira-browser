@@ -15,6 +15,7 @@ import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundary
 import { BrowserSiteControlsRuntimeCoordinator } from '../browser/BrowserSiteControlsRuntimeCoordinator';
 import { BrowserTabScopedEventContextCoordinator } from '../browser/BrowserTabScopedEventContextCoordinator';
 import { FeatureGateCoordinator } from '../membership/FeatureGateCoordinator';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface ManualElementHideRuntimeApplyContext {
   tabId: string;
@@ -193,10 +194,13 @@ export class ManualElementHideRuntimeCoordinator {
     this.stopSelectionPolling();
     void this.manualElementHideService.cancelSelectionFromLifecyclePort(this.runtimeLifecyclePort)
       .then(() => {
-        this.shell.showToast('已取消标记广告。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.element_hide_cancelled')));
       })
       .catch((error: Error) => {
-        this.shell.publishError(`取消标记模式失败：${this.stringifyError(error)}`);
+        this.shell.publishError(resolveAppResourceText($r(
+          'app.string.element_hide_cancel_failed',
+          this.stringifyError(error)
+        )));
       });
   }
 
@@ -228,28 +232,33 @@ export class ManualElementHideRuntimeCoordinator {
       })
       .catch((error: Error) => {
         this.selectionNavigationPending = false;
-        this.shell.publishError(`调整广告选区失败：${this.stringifyError(error)}`);
+        this.shell.publishError(resolveAppResourceText($r(
+          'app.string.element_hide_resize_failed',
+          this.stringifyError(error)
+        )));
       });
   }
 
   private showSelectionNavigationFeedback(direction: 'parent' | 'child', reason: string): void {
     if (reason === 'no_selection') {
-      this.shell.showToast('请先点选一个广告元素。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.element_hide_select_first')));
       return;
     }
     if (reason === 'no_parent') {
-      this.shell.showToast('已到可安全标记的最外层。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.element_hide_outermost')));
       return;
     }
     if (reason === 'no_child') {
-      this.shell.showToast('当前广告元素没有可选子级。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.element_hide_no_child')));
       return;
     }
     if (reason === 'runtime_unavailable') {
-      this.shell.showToast('选区暂时不可调整，请重新进入标记模式。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.element_hide_selection_locked')));
       return;
     }
-    this.shell.showToast(direction === 'parent' ? '没有可扩大的父级选区。' : '没有可缩小的子级选区。');
+    this.shell.showToast(resolveAppResourceText(direction === 'parent'
+      ? $r('app.string.element_hide_no_parent_selection')
+      : $r('app.string.element_hide_no_child_selection')));
   }
 
   private finishSelectionSession(): void {
@@ -294,7 +303,7 @@ export class ManualElementHideRuntimeCoordinator {
   private async runStartSelectionSession(): Promise<void> {
     const initialFacts = this.shell.resolveFacts();
     if (!this.canStartSelectionForFacts(initialFacts)) {
-      this.shell.showToast('当前页面无法标记广告。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.element_hide_page_unsupported')));
       return;
     }
     const currentUsage = this.manualElementHideService.getTotalRuleCount();
@@ -315,16 +324,19 @@ export class ManualElementHideRuntimeCoordinator {
       const started = await this.manualElementHideService.startSelectionFromLifecyclePort(this.runtimeLifecyclePort);
       if (!started) {
         this.setSelectionPresentation(false, 0, '', facts.pageHost, false);
-        this.shell.showToast('当前页面无法进入标记模式。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.element_hide_mode_unavailable')));
         return;
       }
       this.setSelectionPresentation(true, 0, '', facts.pageHost, false);
       this.startSelectionPolling();
-      this.shell.showToast('点选想标记的广告内容。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.element_hide_mode_hint')));
     } catch (error) {
       this.setSelectionPresentation(false, 0, '', facts.pageHost, false);
-      this.shell.publishError(`进入标记模式失败：${this.stringifyError(error as Object)}`);
-      this.shell.showToast('标记模式启动失败。');
+      this.shell.publishError(resolveAppResourceText($r(
+        'app.string.element_hide_mode_failed',
+        this.stringifyError(error as Object)
+      )));
+      this.shell.showToast(resolveAppResourceText($r('app.string.element_hide_mode_start_failed')));
     }
   }
 
@@ -351,7 +363,7 @@ export class ManualElementHideRuntimeCoordinator {
       }
       if (!this.canWriteDevicePreference(this.shell.resolveFacts())) {
         this.setSelectionPresentation(true, selectedCount, selectedElementSelector, host, false);
-        this.shell.showToast('当前隐私策略不允许保存隐藏规则。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.element_hide_privacy_blocked')));
         return;
       }
       const result: ManualElementHideFinishResult =
@@ -366,18 +378,25 @@ export class ManualElementHideRuntimeCoordinator {
       this.setSelectionPresentation(false, 0, '', '', false);
       this.stopSelectionPolling();
       if (result.savedSelectorCount <= 0) {
-        this.shell.showToast('没有选择要隐藏的元素。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.element_hide_nothing_selected')));
         return;
       }
       void this.membershipFeature.recordUsage(AIRA_FEATURE_MANUAL_ELEMENT_HIDE, result.savedSelectorCount);
-      this.shell.showToast(`已为 ${host} 保存 ${result.totalRuleCount} 条隐藏规则。`);
+      this.shell.showToast(resolveAppResourceText($r(
+        'app.string.element_hide_saved',
+        host,
+        result.totalRuleCount
+      )));
     } catch (error) {
       const errorLike = error as ManualElementHideRuntimeErrorLike;
       this.setSelectionPresentation(true, selectedCount, selectedElementSelector, host, false);
-      this.shell.publishError(`保存隐藏规则失败：${this.stringifyError(error as Object)}`);
+      this.shell.publishError(resolveAppResourceText($r(
+        'app.string.element_hide_save_failed',
+        this.stringifyError(error as Object)
+      )));
       this.shell.showToast(typeof errorLike.message === 'string' && errorLike.message.length > 0
         ? errorLike.message
-        : '隐藏规则保存失败。');
+        : resolveAppResourceText($r('app.string.element_hide_save_failed_short')));
     }
   }
 

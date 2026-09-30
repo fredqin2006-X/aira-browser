@@ -24,11 +24,11 @@ import { BookmarkLocalOverviewCounts } from '../bookmarks/BookmarkLocalOverviewV
 import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../common/config/AiraDistributionCapabilityOwner';
 
 export interface SyncAdvancedStatusViewState {
-  providerText: string;
-  baselineText: string;
-  localText: string;
-  remoteText: string;
-  lastSyncText: string;
+  providerText: ResourceStr;
+  baselineText: ResourceStr;
+  localText: ResourceStr;
+  remoteText: ResourceStr;
+  lastSyncText: ResourceStr;
 }
 
 export interface SyncAdvancedProviderActionState {
@@ -43,11 +43,11 @@ export type SyncAdvancedProviderIdResolver = (remoteKind: AiraSyncRemoteKind) =>
 export class SyncAdvancedSettingsViewModel {
   buildPrivateStatus(): SyncAdvancedStatusViewState {
     return {
-      providerText: '私密会话',
-      baselineText: '不可用',
-      localText: '私密会话不读取',
-      remoteText: '不可用',
-      lastSyncText: '私密会话不读取'
+      providerText: $r('app.string.settings_sync_advanced_private'),
+      baselineText: $r('app.string.settings_sync_advanced_unavailable'),
+      localText: $r('app.string.settings_sync_advanced_private_skip'),
+      remoteText: $r('app.string.settings_sync_advanced_unavailable'),
+      lastSyncText: $r('app.string.settings_sync_advanced_private_skip')
     };
   }
 
@@ -62,7 +62,7 @@ export class SyncAdvancedSettingsViewModel {
       providerText: this.buildEnabledProviderSummary(enabledKinds),
       baselineText: this.buildBaselineSummary(baselines, enabledKinds, providerIdResolver),
       localText: localCounts === undefined
-        ? '正在读取...'
+        ? $r('app.string.settings_sync_advanced_reading')
         : this.formatBookmarkCounts(localCounts.bookmarkFolderCount, localCounts.bookmarkItemCount),
       remoteText: this.buildCachedRemoteSummary(settings, enabledKinds),
       lastSyncText: this.buildLastSyncSummary(settings, enabledKinds)
@@ -179,11 +179,20 @@ export class SyncAdvancedSettingsViewModel {
     return '远端';
   }
 
-  resolveProviderCheckActionLabel(remoteKind: AiraSyncRemoteKind): string {
-    if (remoteKind === 'huawei_space') {
-      return '检查华为云空间数据';
+  resolveProviderCheckActionLabel(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_check_cloud');
     }
-    return `检查${this.resolveProviderShortLabel(remoteKind)}数据`;
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_check_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_check_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_check_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_check_remote');
   }
 
   resolveProviderOperationTimeoutMs(remoteKind: AiraSyncRemoteKind): number {
@@ -192,8 +201,315 @@ export class SyncAdvancedSettingsViewModel {
       : SYNC_OPERATION_PROGRESS_TIMING.timeoutMs;
   }
 
-  resolveMergeActionLabel(): string {
-    return '立即合并同步';
+  resolveMergeActionLabel(): ResourceStr {
+    return $r('app.string.settings_sync_advanced_merge');
+  }
+
+  resolveProviderSectionTitle(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_goal_cloud');
+    }
+    return this.resolveProviderServiceResource(remoteKind);
+  }
+
+  resolveProviderServiceResource(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_goal_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_huawei_sync');
+    }
+    if (remoteKind === 'webdav') {
+      return 'WebDAV';
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_pro_self_hosting');
+    }
+    return $r('app.string.settings_sync_advanced_service');
+  }
+
+  resolvePushActionLabel(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_push_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_push_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_push_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_push_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_push_remote');
+  }
+
+  resolvePullActionLabel(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_pull_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_pull_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_pull_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_pull_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_pull_remote');
+  }
+
+  resolvePushConfirmTitle(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_push_confirm_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_push_confirm_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_push_confirm_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_push_confirm_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_push_confirm_remote');
+  }
+
+  resolvePullConfirmTitle(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_pull_confirm_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_pull_confirm_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_pull_confirm_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_pull_confirm_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_pull_confirm_remote');
+  }
+
+  resolvePushConfirmMessage(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_push_message_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_push_message_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_push_message_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_push_message_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_push_message_service');
+  }
+
+  resolvePullConfirmMessage(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_pull_message_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_pull_message_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_pull_message_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_pull_message_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_pull_message_service');
+  }
+
+  resolveReadingStatus(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_reading_status_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_reading_status_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_reading_status_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_reading_status_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_reading_status_remote');
+  }
+
+  resolveConnecting(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_connecting_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_connecting_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_connecting_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_connecting_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_connecting_remote');
+  }
+
+  resolveRefreshed(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_refreshed_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_refreshed_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_refreshed_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_refreshed_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_refreshed_remote');
+  }
+
+  resolveReadingData(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_reading_data_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_reading_data_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_reading_data_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_reading_data_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_reading_data_remote');
+  }
+
+  resolvePreparingSpace(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_preparing_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_preparing_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_preparing_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_preparing_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_preparing_remote');
+  }
+
+  resolveSavingBookmarks(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_saving_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_saving_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_saving_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_saving_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_saving_remote');
+  }
+
+  resolveSwitchActionLabel(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_switch_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_switch_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_switch_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_switch_confirm_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_switch_confirm_service');
+  }
+
+  resolveCurrentSwitchActionLabel(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_using_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_using_huawei');
+    }
+    return $r('app.string.settings_sync_advanced_using_webdav');
+  }
+
+  resolveSwitchConfirmTitle(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_switch_confirm_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_switch_confirm_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_switch_confirm_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_switch_confirm_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_switch_confirm_service');
+  }
+
+  resolveSwitchConfirmMessage(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_switch_message_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_switch_message_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_switch_message_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_switch_message_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_switch_message_service');
+  }
+
+  resolveMergingData(remoteKind: AiraSyncRemoteKind): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_merging_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_merging_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return $r('app.string.settings_sync_advanced_merging_webdav');
+    }
+    if (remoteKind === 'self_hosted') {
+      return $r('app.string.settings_sync_advanced_merging_self_host');
+    }
+    return $r('app.string.settings_sync_advanced_merging_service');
+  }
+
+  resolveMissingConfigurationMessage(
+    settings: AiraSyncSettings,
+    remoteKind: AiraSyncRemoteKind
+  ): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return $r('app.string.settings_sync_advanced_enable_cloud');
+    }
+    if (remoteKind === 'huawei_space') {
+      return $r('app.string.settings_sync_advanced_enable_huawei');
+    }
+    if (remoteKind === 'webdav') {
+      return settings.webdav.endpoint.trim().length > 0 && settings.webdav.username.trim().length > 0
+        ? $r('app.string.settings_sync_advanced_enable_saved_webdav')
+        : $r('app.string.settings_sync_advanced_fill_webdav');
+    }
+    return $r('app.string.settings_sync_advanced_enable_one');
   }
 
   updateRemoteSummaryText(summary: string): string {
@@ -252,21 +568,21 @@ export class SyncAdvancedSettingsViewModel {
     return false;
   }
 
-  private buildEnabledProviderSummary(enabledKinds: AiraSyncRemoteKind[]): string {
+  private buildEnabledProviderSummary(enabledKinds: AiraSyncRemoteKind[]): ResourceStr {
     if (enabledKinds.length <= 0) {
-      return '未启用';
+      return $r('app.string.settings_sync_advanced_disabled');
     }
-    return this.resolveProviderServiceName(enabledKinds[0]);
+    return this.resolveProviderServiceResource(enabledKinds[0]);
   }
 
-  private buildCachedRemoteSummary(settings: AiraSyncSettings, enabledKinds: AiraSyncRemoteKind[]): string {
+  private buildCachedRemoteSummary(settings: AiraSyncSettings, enabledKinds: AiraSyncRemoteKind[]): ResourceStr {
     if (enabledKinds.length <= 0) {
-      return '未启用';
+      return $r('app.string.settings_sync_advanced_disabled');
     }
     return this.resolveProviderCachedSummary(settings, enabledKinds[0]);
   }
 
-  private resolveProviderCachedSummary(settings: AiraSyncSettings, remoteKind: AiraSyncRemoteKind): string {
+  private resolveProviderCachedSummary(settings: AiraSyncSettings, remoteKind: AiraSyncRemoteKind): ResourceStr {
     const cache = remoteKind === 'aira_cloud'
       ? settings.huaweiCloud.remoteStatusCache
       : (remoteKind === 'huawei_space'
@@ -275,38 +591,61 @@ export class SyncAdvancedSettingsViewModel {
           ? settings.webdav.remoteStatusCache
           : (remoteKind === 'self_hosted' ? (settings.selfHosted?.remoteStatusCache ?? null) : null)));
     if (cache === null || cache.providerKey !== this.resolveRemoteStatusProviderKey(settings, remoteKind)) {
-      return '尚未检查';
+      return $r('app.string.settings_sync_advanced_not_checked');
     }
     return cache.summary;
   }
 
-  private formatBookmarkCounts(folderCount: number, itemCount: number): string {
-    return `${Math.max(0, folderCount)} 个文件夹，${Math.max(0, itemCount)} 个书签`;
+  private formatBookmarkCounts(folderCount: number, itemCount: number): ResourceStr {
+    return $r('app.string.settings_sync_advanced_counts', Math.max(0, folderCount), Math.max(0, itemCount));
   }
 
   private buildBaselineSummary(
     records: AiraSyncBaselineRecord[],
     enabledKinds: AiraSyncRemoteKind[],
     providerIdResolver: SyncAdvancedProviderIdResolver
-  ): string {
+  ): ResourceStr {
     if (enabledKinds.length <= 0) {
-      return '未启用';
+      return $r('app.string.settings_sync_advanced_disabled');
     }
-    const parts: string[] = [];
-    enabledKinds.forEach((remoteKind: AiraSyncRemoteKind) => {
-      const providerId = providerIdResolver(remoteKind);
-      const hasBaseline = records.some((record: AiraSyncBaselineRecord) => record.providerId === providerId);
-      parts.push(`${this.resolveProviderShortLabel(remoteKind)} ${hasBaseline ? '已建立' : '未建立'}`);
-    });
-    return parts.join(' / ');
+    const remoteKind = enabledKinds[0];
+    const providerId = providerIdResolver(remoteKind);
+    const hasBaseline = records.some((record: AiraSyncBaselineRecord) => record.providerId === providerId);
+    return this.resolveBaselineResource(remoteKind, hasBaseline);
   }
 
-  private buildLastSyncSummary(settings: AiraSyncSettings, enabledKinds: AiraSyncRemoteKind[]): string {
+  private resolveBaselineResource(remoteKind: AiraSyncRemoteKind, hasBaseline: boolean): ResourceStr {
+    if (remoteKind === 'aira_cloud') {
+      return hasBaseline
+        ? $r('app.string.settings_sync_advanced_baseline_cloud_ready')
+        : $r('app.string.settings_sync_advanced_baseline_cloud_missing');
+    }
+    if (remoteKind === 'huawei_space') {
+      return hasBaseline
+        ? $r('app.string.settings_sync_advanced_baseline_huawei_ready')
+        : $r('app.string.settings_sync_advanced_baseline_huawei_missing');
+    }
+    if (remoteKind === 'webdav') {
+      return hasBaseline
+        ? $r('app.string.settings_sync_advanced_baseline_webdav_ready')
+        : $r('app.string.settings_sync_advanced_baseline_webdav_missing');
+    }
+    if (remoteKind === 'self_hosted') {
+      return hasBaseline
+        ? $r('app.string.settings_sync_advanced_baseline_self_host_ready')
+        : $r('app.string.settings_sync_advanced_baseline_self_host_missing');
+    }
+    return hasBaseline
+      ? $r('app.string.settings_sync_advanced_baseline_remote_ready')
+      : $r('app.string.settings_sync_advanced_baseline_remote_missing');
+  }
+
+  private buildLastSyncSummary(settings: AiraSyncSettings, enabledKinds: AiraSyncRemoteKind[]): ResourceStr {
     if (enabledKinds.length <= 0) {
-      return '暂无';
+      return $r('app.string.settings_sync_advanced_none');
     }
     const timestamp = this.resolveProviderLastSuccessAt(settings, enabledKinds[0]);
-    return timestamp > 0 ? new Date(timestamp).toLocaleString() : '暂无';
+    return timestamp > 0 ? new Date(timestamp).toLocaleString() : $r('app.string.settings_sync_advanced_none');
   }
 
   private isRemoteKindEnabled(settings: AiraSyncSettings, remoteKind: AiraSyncRemoteKind): boolean {

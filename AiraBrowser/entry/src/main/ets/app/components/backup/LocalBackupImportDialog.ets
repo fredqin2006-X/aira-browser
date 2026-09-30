@@ -22,17 +22,20 @@ import {
   BrowserSheetActionButton,
   BrowserSheetIconButton
 } from '../browser/BrowserModalBottomSheet';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 export type LocalBackupImportPresentationKind = 'sheet' | 'dialog';
 
 function formatLocalBackupExportedAt(exportedAt: number): string {
-  return exportedAt > 0 ? new Date(exportedAt).toLocaleString() : '时间未知';
+  return exportedAt > 0
+    ? new Date(exportedAt).toLocaleString()
+    : resolveAppResourceText($r('app.string.settings_advanced_backup_time_unknown'));
 }
 
 function formatLocalBackupAppVersion(versionName: string, versionCode: number): string {
   return versionName.length > 0
     ? `${versionName} (${Math.max(0, Math.floor(versionCode))})`
-    : '版本未知';
+    : resolveAppResourceText($r('app.string.settings_advanced_backup_version_unknown'));
 }
 
 function buildLocalBackupImportSummary(
@@ -60,14 +63,14 @@ export struct LocalBackupImportProgressDialog {
         .height(40)
         .color(this.storedAccentColor)
 
-      Text('正在导入备份')
+      Text($r('app.string.settings_advanced_backup_import_progress_title'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.storedPrimaryTextColor)
         .textAlign(TextAlign.Center)
 
-      Text('正在恢复所选内容，请稍候。')
+      Text($r('app.string.settings_advanced_backup_import_progress_message'))
         .width('100%')
         .fontSize(14)
         .lineHeight(20)
@@ -122,7 +125,7 @@ export struct LocalBackupImportContent {
             .height(36)
 
           Column({ space: 4 }) {
-            Text('选择导入内容')
+            Text($r('app.string.settings_advanced_backup_import_dialog_title'))
               .width('100%')
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
@@ -146,7 +149,7 @@ export struct LocalBackupImportContent {
             icon: $r('sys.symbol.xmark'),
             iconSize: 18,
             buttonSize: 36,
-            accessibilityLabel: '关闭',
+            accessibilityLabel: $r('app.string.settings_advanced_backup_close'),
             onAction: (): void => {
               this.onCancel();
             }
@@ -158,7 +161,7 @@ export struct LocalBackupImportContent {
 
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsSwitchRow({
-          title: this.buildSectionLabel('书签', this.bookmarksCount),
+          title: this.buildSectionLabel($r('app.string.settings_advanced_backup_export_bookmarks'), this.bookmarksCount),
           checked: this.bookmarks,
           rowPosition: 'first',
           isEnabled: !this.isBusy && this.bookmarksAvailable,
@@ -168,7 +171,7 @@ export struct LocalBackupImportContent {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: this.buildSectionLabel('历史记录', this.historyCount),
+          title: this.buildSectionLabel($r('app.string.settings_advanced_backup_export_history'), this.historyCount),
           checked: this.history,
           rowPosition: 'middle',
           isEnabled: !this.isBusy && this.historyAvailable,
@@ -178,7 +181,7 @@ export struct LocalBackupImportContent {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: this.buildSectionLabel('常用设置', this.personalizationCount),
+          title: this.buildSectionLabel($r('app.string.settings_advanced_backup_export_personalization'), this.personalizationCount),
           checked: this.personalization,
           rowPosition: 'middle',
           isEnabled: !this.isBusy && this.personalizationAvailable,
@@ -188,7 +191,7 @@ export struct LocalBackupImportContent {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: this.buildSectionLabel('用户脚本', this.userScriptsCount),
+          title: this.buildSectionLabel($r('app.string.settings_advanced_backup_export_user_scripts'), this.userScriptsCount),
           checked: this.userScripts,
           rowPosition: 'middle',
           isEnabled: !this.isBusy && this.userScriptsAvailable,
@@ -199,7 +202,7 @@ export struct LocalBackupImportContent {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: this.buildSectionLabel('脚本数据', this.userScriptValuesCount),
+          title: this.buildSectionLabel($r('app.string.settings_advanced_backup_export_user_script_values'), this.userScriptValuesCount),
           checked: this.userScriptValues,
           rowPosition: 'last',
           isEnabled: !this.isBusy && this.userScriptValuesAvailable && this.userScripts,
@@ -212,13 +215,13 @@ export struct LocalBackupImportContent {
       if (this.presentationKind === 'sheet') {
         SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
           SettingsStaticValueRow({
-            title: '备份时间',
+            title: $r('app.string.settings_advanced_backup_backup_time'),
             value: formatLocalBackupExportedAt(this.exportedAt),
             rowPosition: 'first'
           })
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
           SettingsStaticValueRow({
-            title: '应用版本',
+            title: $r('app.string.settings_advanced_backup_app_version'),
             value: formatLocalBackupAppVersion(this.versionName, this.versionCode),
             rowPosition: 'last'
           })
@@ -227,7 +230,9 @@ export struct LocalBackupImportContent {
 
       BrowserSheetActionButton({
         stacked: true,
-        label: this.isBusy ? '正在导入' : '导入',
+        label: this.isBusy
+          ? $r('app.string.settings_advanced_backup_importing')
+          : $r('app.string.settings_advanced_backup_import_action'),
         emphasis: 'primary',
         actionEnabled: !this.isBusy && this.hasAnySelection(),
         accentColor: this.storedAccentColor,
@@ -253,8 +258,8 @@ export struct LocalBackupImportContent {
     return this.bookmarks || this.history || this.personalization || this.userScripts || this.userScriptValues;
   }
 
-  private buildSectionLabel(label: string, count: number): string {
-    return `${label}（${Math.max(0, Math.floor(count))}）`;
+  private buildSectionLabel(label: ResourceStr, count: number): string {
+    return `${resolveAppResourceText(label)}（${Math.max(0, Math.floor(count))}）`;
   }
 }
 

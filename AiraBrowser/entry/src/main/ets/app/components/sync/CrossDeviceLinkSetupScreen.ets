@@ -10,7 +10,8 @@ import {
 } from '../../../core/theme/BrowserThemeStorageKeys';
 import {
   CrossDeviceLinkProviderKind,
-  buildCrossDeviceLinkSteps
+  buildCrossDeviceLinkSteps,
+  localizeCrossDeviceLinkCopy
 } from '../../../core/sync/CrossDeviceLinkViewModel';
 import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../../common/config/AiraDistributionCapabilityOwner';
 import {
@@ -52,10 +53,9 @@ const BROWSER_BRAND_ICON_SIZE: number = 26;
 const STEP_ROW_HORIZONTAL_PADDING: number = 16;
 const STEP_ROW_VERTICAL_PADDING: number = 14;
 
-const LOCKED_PAGE_TOAST: string = '访问密码已复制，粘贴即可';
 
 /**
- * The install and pairing recipe, one level below 跨设备互联 so the overview stays a
+ * The install and pairing recipe, one level below 与电脑互联 so the overview stays a
  * status page. The mode arrives through the route, so this surface needs no sync state
  * of its own, and the page it lives in stays a shell.
  */
@@ -109,7 +109,7 @@ export struct CrossDeviceLinkSetupScreen {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '互联教程',
+        title: $r('app.string.settings_link_tutorial'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -141,7 +141,10 @@ export struct CrossDeviceLinkSetupScreen {
 
   @Builder
   private buildStepsSection() {
-    SettingsSection({ title: '连接步骤', secondaryTextColor: this.storedSecondaryTextColor }) {
+    SettingsSection({
+      title: $r('app.string.settings_link_steps_section'),
+      secondaryTextColor: this.storedSecondaryTextColor
+    }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor
       }) {
@@ -177,7 +180,7 @@ export struct CrossDeviceLinkSetupScreen {
         .width(STEP_BADGE_SIZE)
         .height(STEP_BADGE_SIZE)
 
-        Text(title)
+        Text(localizeCrossDeviceLinkCopy(title))
           .layoutWeight(1)
           .fontSize(15)
           .fontColor(this.storedPrimaryTextColor)
@@ -198,7 +201,10 @@ export struct CrossDeviceLinkSetupScreen {
 
   @Builder
   private buildInstallSection() {
-    SettingsSection({ title: '安装 Aira-sync', secondaryTextColor: this.storedSecondaryTextColor }) {
+    SettingsSection({
+      title: $r('app.string.settings_link_install_section'),
+      secondaryTextColor: this.storedSecondaryTextColor
+    }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor
       }) {
@@ -207,8 +213,8 @@ export struct CrossDeviceLinkSetupScreen {
             SettingsGroupDivider({ dividerColor: this.storedDividerColor })
           }
           SettingsNavigationRow({
-            title: entry.title,
-            value: resolveSyncDesktopExtensionEntryActionLabel(entry),
+            title: localizeCrossDeviceLinkCopy(entry.title),
+            value: localizeCrossDeviceLinkCopy(resolveSyncDesktopExtensionEntryActionLabel(entry)),
             useCustomLeading: this.isBrowserBrandEntry(entry.id),
             airaIconId: this.isBrowserBrandEntry(entry.id)
               ? undefined
@@ -233,7 +239,7 @@ export struct CrossDeviceLinkSetupScreen {
         }, (entry: SyncDesktopExtensionEntry): string => entry.id)
       }
 
-      Text('手机上装不了电脑浏览器的扩展：把链接发到电脑，在电脑上安装。')
+      Text($r('app.string.settings_link_install_note'))
         .width('100%')
         .fontSize(13)
         .lineHeight(19)
@@ -323,15 +329,19 @@ export struct CrossDeviceLinkSetupScreen {
       this.openLockedPage(entry);
       return;
     }
+    if (entry.url.length === 0) {
+      this.showToast($r('app.string.settings_link_copy_empty'));
+      return;
+    }
     void this.clipboardService.copyText({
       value: entry.url,
-      emptyMessage: '链接暂时不可用',
-      successMessage: '已复制，粘贴到电脑浏览器里打开',
-      failureMessage: '复制失败，请稍后重试。'
+      emptyMessage: ' ',
+      successMessage: ' ',
+      failureMessage: ' '
     }).catch((): undefined => undefined).then((result): void => {
-      if (result !== undefined) {
-        this.showToast(result.message);
-      }
+      this.showToast(result !== undefined && result.ok
+        ? $r('app.string.settings_link_copied')
+        : $r('app.string.settings_account_copy_failed'));
     });
   }
 
@@ -346,11 +356,13 @@ export struct CrossDeviceLinkSetupScreen {
     }
     void this.clipboardService.copyText({
       value: entry.password,
-      emptyMessage: '访问密码暂时不可用',
-      successMessage: LOCKED_PAGE_TOAST,
-      failureMessage: '访问密码复制失败，请稍后重试。'
+      emptyMessage: ' ',
+      successMessage: ' ',
+      failureMessage: ' '
     }).catch((): undefined => undefined).then((result): void => {
-      this.showToast(result !== undefined ? result.message : LOCKED_PAGE_TOAST);
+      this.showToast(result !== undefined && result.ok
+        ? $r('app.string.settings_link_password_copied')
+        : $r('app.string.settings_link_password_failed'));
       this.openUrlInBrowser(entry.url);
     });
   }
@@ -368,7 +380,7 @@ export struct CrossDeviceLinkSetupScreen {
     this.navigationCoordinator.openBrowserUrlFromGuide(url, this.boundary);
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     this.getUIContext().getPromptAction().showToast({
       message: message,
       duration: 1800

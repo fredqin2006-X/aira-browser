@@ -7,6 +7,7 @@ import {
   SettingsCenterState
 } from './SettingsCenterViewModel';
 import { AiraRenderableIconId } from '../resources/GeneratedAiraIconCatalog';
+import { localizeSettingsSearchTargetCopy } from './SettingsExperimentsCopy';
 import {
   SettingsDestinationPanelKind,
   SettingsDestinationCatalog,
@@ -18,9 +19,9 @@ import {
 export interface SettingsCenterSearchResultState {
   id: string;
   destination: SettingsCenterDestination;
-  title: string;
+  title: ResourceStr;
   isAvailable: boolean;
-  unavailableReason: string;
+  unavailableReason: ResourceStr;
   icon?: Resource;
   imageIcon?: Resource;
   airaIconId?: AiraRenderableIconId;
@@ -28,7 +29,7 @@ export interface SettingsCenterSearchResultState {
 
 export interface SettingsCenterSearchGroupState {
   id: string;
-  title: string;
+  title: ResourceStr;
   rows: SettingsCenterSearchResultState[];
 }
 
@@ -451,7 +452,7 @@ export class SettingsDestinationNavigationOwner {
       candidates.push(new SettingsSearchCandidate({
         id: match.target.id,
         destination: match.target.destination,
-        title: match.target.title,
+        title: localizeSettingsSearchTargetCopy(match.target.title),
         isAvailable: sourceRow.isEnabled,
         unavailableReason: unavailableReason,
         icon: presentationRow.icon,
@@ -479,7 +480,7 @@ export class SettingsDestinationNavigationOwner {
       isActive: true,
       groups: rows.length > 0 ? [{
         id: 'settings_search_results',
-        title: '搜索结果',
+        title: $r('app.string.settings_search_results'),
         rows: rows
       }] : [],
       resultCount: rows.length

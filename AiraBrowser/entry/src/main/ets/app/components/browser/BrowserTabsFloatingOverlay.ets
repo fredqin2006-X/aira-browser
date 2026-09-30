@@ -60,6 +60,10 @@ import {
   BrowserTabsOverviewStackLayoutPolicy
 } from '../../../core/browser/tabsOverview/BrowserTabsOverviewStackLayoutPolicy';
 import {
+  BrowserTabsOverviewStyleEntryPolicy,
+  BrowserTabsOverviewStyleEntryProfile
+} from '../../../core/browser/tabsOverview/BrowserTabsOverviewStyleEntryPolicy';
+import {
   BrowserTabsOverviewSelectionDisplacement,
   BrowserTabsOverviewSelectionDisplacementCoordinator
 } from '../../../core/browser/tabsOverview/BrowserTabsOverviewSelectionDisplacementCoordinator';
@@ -305,6 +309,8 @@ export struct BrowserTabsFloatingOverlay {
   private sectionPolicy: BrowserTabsOverviewSectionPolicy = new BrowserTabsOverviewSectionPolicy();
   private swipeDismissPolicy: BrowserTabsOverviewSwipeDismissPolicy =
     new BrowserTabsOverviewSwipeDismissPolicy();
+  private styleEntryPolicy: BrowserTabsOverviewStyleEntryPolicy =
+    new BrowserTabsOverviewStyleEntryPolicy();
   private stackLayoutPolicy: BrowserTabsOverviewStackLayoutPolicy =
     new BrowserTabsOverviewStackLayoutPolicy();
   private deckMotion: BrowserTabsOverviewStackMotion = new BrowserTabsOverviewStackMotion();
@@ -617,6 +623,17 @@ export struct BrowserTabsFloatingOverlay {
 
   @Builder
   private buildSharedSnapshotOverlay(inDeck: boolean = false) {
+    // List clip fade is a different node from the card shrink. Sharing one builder is what let
+    // the list opacity isolate the card morph and paint the thumbnail over the still-shrinking page.
+    if (!inDeck && this.resolvePaintedStyleEntryProfile().fadesCoveringSnapshot) {
+      this.buildListClipSnapshotOverlay()
+    } else {
+      this.buildCoveringSnapshotOverlay(inDeck)
+    }
+  }
+
+  @Builder
+  private buildCoveringSnapshotOverlay(inDeck: boolean) {
     BrowserTabsSharedSnapshotOverlay({
       state: this.entrySharedSnapshotState,
       imagePixelMap: this.entrySharedSnapshotState.imagePixelMap,
@@ -633,9 +650,33 @@ export struct BrowserTabsFloatingOverlay {
       onSnapshotTap: (tabId: string) => {
         this.onEntrySharedSnapshotTap(tabId);
       },
-      imageBlurExtra: this.isListLayout() ? this.listEntryImageBlur : 0
+      imageBlurExtra: 0
     })
+    .zIndex(inDeck ? 0 : FLOATING_TABS_SHARED_SNAPSHOT_Z_INDEX)
+  }
+
+  @Builder
+  private buildListClipSnapshotOverlay() {
+    BrowserTabsSharedSnapshotOverlay({
+      state: this.entrySharedSnapshotState,
+      imagePixelMap: this.entrySharedSnapshotState.imagePixelMap,
+      snapshotBackgroundColor: this.entrySharedSnapshotBackgroundColor,
+      snapshotLayerZIndex: FLOATING_TABS_SHARED_SNAPSHOT_Z_INDEX,
+      snapshotDecorationLayerZIndex: FLOATING_TABS_SHARED_SNAPSHOT_DECORATION_Z_INDEX,
+      viewportLeft: this.resolveRootLeft(),
+      viewportTop: this.resolveRootTop(),
+      onSnapshotRectChange: (rect: BrowserTabsOverlayRect) => {
+        this.onEntrySharedSnapshotRectChange(rect);
+      },
+      onSnapshotTap: (tabId: string) => {
+        this.onEntrySharedSnapshotTap(tabId);
+      },
+      imageBlurExtra: this.listEntryImageBlur
+    })
+    // Opacity isolates this node. The z-index has to sit on the same node, or the row paints
+    // over the page while the window is still cropping down.
     .opacity(this.resolveListEntrySnapshotOpacity())
+    .zIndex(FLOATING_TABS_SHARED_SNAPSHOT_Z_INDEX)
   }
 
   @Builder
@@ -655,7 +696,8 @@ export struct BrowserTabsFloatingOverlay {
   }
 
   private shouldShowListEntrySurface(): boolean {
-    if (!this.isListLayout() || this.exiting || this.closeAllExitActive) {
+    if (!this.resolvePaintedStyleEntryProfile().paintsEntrySurface ||
+      this.exiting || this.closeAllExitActive) {
       return false;
     }
     const state = this.entrySharedSnapshotState;
@@ -1351,7 +1393,7 @@ export struct BrowserTabsFloatingOverlay {
   }
 
   private isCoveredListEntryRow(tabId: string): boolean {
-    return this.isListLayout() &&
+    return this.resolvePaintedStyleEntryProfile().fadesCoveringSnapshot &&
       (this.isMorphCoveredTab(tabId) || this.listEntryCrossfadeTabId === tabId);
   }
 
@@ -1360,7 +1402,8 @@ export struct BrowserTabsFloatingOverlay {
    * title at full opacity for that click frame.
    */
   private shouldHoldListEntryChrome(tabId: string): boolean {
-    if (!this.isListLayout() || this.exiting || this.closeAllExitActive) {
+    if (!this.resolvePaintedStyleEntryProfile().fadesCoveringSnapshot ||
+      this.exiting || this.closeAllExitActive) {
       return false;
     }
     if (this.listEntryCrossfadeTabId === tabId) {
@@ -1435,7 +1478,8 @@ export struct BrowserTabsFloatingOverlay {
   }
 
   private shouldArmListEntryCrossfade(): boolean {
-    if (!this.isListLayout() || this.exiting || this.closeAllExitActive) {
+    if (!this.resolvePaintedStyleEntryProfile().fadesCoveringSnapshot ||
+      this.exiting || this.closeAllExitActive) {
       return false;
     }
     const state = this.entrySharedSnapshotState;
@@ -1522,11 +1566,12 @@ export struct BrowserTabsFloatingOverlay {
   }
 
   private resolveListEntrySnapshotOpacity(): number {
+    // Only the list builder calls this. A card style must never reach it.
+    if (!this.resolvePaintedStyleEntryProfile().fadesCoveringSnapshot) {
+      return 1;
+    }
     if (this.listEntrySnapshotSuppressed) {
       return 0;
-    }
-    if (!this.isListLayout()) {
-      return 1;
     }
     if (this.entrySharedSnapshotState.direction === 'enter' &&
       this.entrySharedSnapshotState.phase !== 'idle') {
@@ -2345,7 +2390,7 @@ export struct BrowserTabsFloatingOverlay {
    * own draw order. The exit morph grows back out to the page and stays above every card.
    */
   private isStackEntryMorph(): boolean {
-    return (this.isStackLayout() || this.storedTabsOverviewLayoutStyle === 'stack') &&
+    return this.paintsMorphInDeck() &&
       this.entrySharedSnapshotMounted &&
       this.entrySharedSnapshotState.direction === 'enter';
   }
@@ -2363,7 +2408,7 @@ export struct BrowserTabsFloatingOverlay {
    * it, so the morph holds a stacking slot that belongs to no other card.
    */
   private resolveDeckEntryMorphSlot(): number {
-    if (!this.isStackLayout() && this.storedTabsOverviewLayoutStyle !== 'stack') {
+    if (!this.paintsMorphInDeck()) {
       return -1;
     }
     const coveredTabId = this.resolveMorphCoveredTabId();
@@ -2549,6 +2594,19 @@ export struct BrowserTabsFloatingOverlay {
    * The stacked deck. Every deck-only behaviour is gated on this instead of on a "not grid" test, so
    * the large card strip can share the overlay without inheriting the deck's geometry.
    */
+  private resolvePaintedStyleEntryProfile(): BrowserTabsOverviewStyleEntryProfile {
+    return this.styleEntryPolicy.resolve(this.layoutState.layoutStyle);
+  }
+
+  /**
+   * The deck morph has to know it is a deck before the first layout pass rewrites layoutStyle.
+   * Either the painted style or the stored style is enough; a list profile can never say deck.
+   */
+  private paintsMorphInDeck(): boolean {
+    return this.styleEntryPolicy.resolve(this.layoutState.layoutStyle).morphHost === 'deck' ||
+      this.styleEntryPolicy.resolve(this.storedTabsOverviewLayoutStyle).morphHost === 'deck';
+  }
+
   private isStackLayout(): boolean {
     return this.layoutState.layoutStyle === 'stack';
   }

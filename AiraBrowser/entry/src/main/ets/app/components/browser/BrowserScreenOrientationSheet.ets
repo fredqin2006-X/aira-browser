@@ -63,7 +63,7 @@ export struct BrowserScreenOrientationSheet {
       if (this.layoutMode === 'phone') {
         BrowserImmersiveSheetLayout({
           closeVisible: true,
-          closeAccessibilityLabel: '关闭屏幕方向',
+          closeAccessibilityLabel: $r('app.string.settings_screen_orientation_close'),
           onClose: (): void => {
             this.onClose();
           },
@@ -83,7 +83,7 @@ export struct BrowserScreenOrientationSheet {
   @Builder
   private buildHeader() {
     BrowserFeatureSheetHeader({
-      title: '屏幕方向',
+      title: $r('app.string.settings_screen_orientation_title'),
       titleColor: this.storedPrimaryTextColor
     })
   }

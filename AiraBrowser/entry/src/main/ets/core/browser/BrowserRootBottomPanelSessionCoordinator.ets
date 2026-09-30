@@ -29,6 +29,16 @@ import {
 } from './BrowserBottomPanelActionEnablement';
 import { BrowserHomeActionAvailabilityCoordinator } from './BrowserHomeActionAvailabilityCoordinator';
 import {
+  bottomPanelActionUnavailable,
+  bottomPanelHideSearchContinue,
+  bottomPanelNewTabUnavailable,
+  bottomPanelReleaseHide,
+  bottomPanelReleasePrompt,
+  bottomPanelToolbarUnavailable,
+  resourceStrKey,
+  resourceStrPresent
+} from './BrowserBottomPanelText';
+import {
   BrowserBottomPanelActionSnapshot,
   BrowserBottomPanelActionTarget,
   BrowserBottomPanelActionTargetInput
@@ -275,7 +285,7 @@ export type BrowserBottomPanelBackdropSurface = 'home' | 'web';
 
 export interface BrowserRootBottomPanelGesturePresentation {
   intent: BrowserRootBottomPanelGestureIntent;
-  text: string;
+  text: ResourceStr;
   armed: boolean;
   progress: number;
 }
@@ -342,8 +352,11 @@ export interface BrowserBottomPanelHostState {
 
 const BROWSER_ROOT_BOTTOM_PANEL_GESTURE_ACTIVE_OFFSET_Y: number = 8;
 const BROWSER_ROOT_BOTTOM_PANEL_HIDE_SEARCH_MIN_OFFSET_Y: number = 30;
-const BROWSER_ROOT_BOTTOM_PANEL_HIDE_SEARCH_CONTINUE_TEXT: string = '继续下滑隐藏';
-const BROWSER_ROOT_BOTTOM_PANEL_HIDE_SEARCH_RELEASE_TEXT: string = '松手隐藏';
+
+function sameGesturePrompt(left: ResourceStr, right: ResourceStr): boolean {
+  return resourceStrKey(left) === resourceStrKey(right);
+}
+
 const BROWSER_BOTTOM_PANEL_HOST_Z_INDEX: number = 198;
 const BROWSER_ROOT_BOTTOM_PANEL_LOG_DOMAIN: number = 0x0000;
 const BROWSER_ROOT_BOTTOM_PANEL_LOG_TAG: string = 'RootBottomPanel';
@@ -487,7 +500,7 @@ export interface BrowserRootBottomPanelShellActionEffect {
 
 export interface BrowserRootBottomPanelActionRejectionEffect {
   kind: 'action_rejection';
-  message: string;
+  message: ResourceStr;
 }
 
 export type BrowserRootBottomPanelShellEffect =
@@ -514,13 +527,13 @@ export interface BrowserRootBottomPanelActionApplication {
   resolveBookmarkActionAvailability(): boolean;
   setWebProtectionFeedbackPhoneChromeCompact(compact: boolean): void;
   resolveToolbarSlotActions(): BrowserToolbarSlotActionState[];
-  resolveThemeModeActionTitleForMode(mode: BrowserThemeMode): string;
+  resolveThemeModeActionTitleForMode(mode: BrowserThemeMode): ResourceStr;
 }
 
 export type BrowserRootBottomPanelActionApplicationResolver = () => BrowserRootBottomPanelActionApplication;
 
 export interface BrowserRootBottomPanelActionTapTransition {
-  rejectionMessage?: string;
+  rejectionMessage?: ResourceStr;
 }
 
 export interface BrowserRootBottomPanelSettledTransition {
@@ -1486,7 +1499,7 @@ export class BrowserRootBottomPanelSessionCoordinator {
     return this.resolveActionApplication().resolveBookmarkActionAvailability();
   }
 
-  resolveThemeModeActionTitleForMode(mode: BrowserThemeMode): string {
+  resolveThemeModeActionTitleForMode(mode: BrowserThemeMode): ResourceStr {
     return this.resolveActionApplication().resolveThemeModeActionTitleForMode(mode);
   }
 
@@ -1754,12 +1767,12 @@ export class BrowserRootBottomPanelSessionCoordinator {
       this.performGestureFeedback();
     }
     const coreRejection = this.resolveCoreToolbarActionRejection(interaction.action, snapshot);
-    if (coreRejection.length > 0) {
+    if (resourceStrPresent(coreRejection)) {
       this.presentActionRejection(coreRejection);
       return { rejectionMessage: coreRejection };
     }
     const panelRejection = this.resolvePanelToolbarActionRejection(interaction.action, snapshot);
-    if (panelRejection.length > 0) {
+    if (resourceStrPresent(panelRejection)) {
       this.presentActionRejection(panelRejection);
       return { rejectionMessage: panelRejection };
     }
@@ -1781,7 +1794,7 @@ export class BrowserRootBottomPanelSessionCoordinator {
     }
   }
 
-  private presentActionRejection(message: string): void {
+  private presentActionRejection(message: ResourceStr): void {
     this.sink.applyShellEffect({
       kind: 'action_rejection',
       message: message
@@ -2181,7 +2194,7 @@ export class BrowserRootBottomPanelSessionCoordinator {
   private commitPresentationSnapshot(snapshot: BrowserRootBottomPanelPresentationState): void {
     const current = this.presentationSnapshot;
     if (current.gesturePrompt.intent === snapshot.gesturePrompt.intent &&
-      current.gesturePrompt.text === snapshot.gesturePrompt.text &&
+      sameGesturePrompt(current.gesturePrompt.text, snapshot.gesturePrompt.text) &&
       current.gesturePrompt.armed === snapshot.gesturePrompt.armed &&
       current.gesturePrompt.progress === snapshot.gesturePrompt.progress &&
       current.returnHomeGestureActive === snapshot.returnHomeGestureActive &&
@@ -2231,8 +2244,7 @@ export class BrowserRootBottomPanelSessionCoordinator {
       const armed = this.isHideSearchRelease(input.offsetY);
       return {
         intent: 'hide_search',
-        text: armed ? BROWSER_ROOT_BOTTOM_PANEL_HIDE_SEARCH_RELEASE_TEXT :
-          BROWSER_ROOT_BOTTOM_PANEL_HIDE_SEARCH_CONTINUE_TEXT,
+        text: armed ? bottomPanelReleaseHide() : bottomPanelHideSearchContinue(),
         armed,
         progress: this.resolveGestureProgress(
           input.offsetY,
@@ -2335,35 +2347,25 @@ export class BrowserRootBottomPanelSessionCoordinator {
       .find((slot: BrowserToolbarSlotActionState): boolean => slot.id === slotId)?.swipeUp?.action;
   }
 
-  private resolveSwipeReleasePrompt(action: BrowserToolbarInteractionActionState): string {
-    if (action.id === 'webBack') return '松手返回';
-    if (action.id === 'webForward') return '松手前进';
-    if (action.id === 'bottomChromeMenu') return '松手展开工具栏';
-    if (action.id === 'webReload') return '松手刷新';
-    if (action.id === 'openTabs') return '松手打开标签页';
-    if (action.id === 'newTab') return '松手新建标签页';
-    if (action.id === 'home') return '松手关闭并回主页';
-    const directVerbActionIds: string[] = [
-      'bookmark', 'scanQr', 'copyLink', 'share', 'sendToDesktop', 'print', 'translate', 'find'
-    ];
-    return directVerbActionIds.includes(action.id) ? `松手${action.title}` : `松手打开${action.title}`;
+  private resolveSwipeReleasePrompt(action: BrowserToolbarInteractionActionState): ResourceStr {
+    return bottomPanelReleasePrompt(action.id);
   }
 
   private resolveCoreToolbarActionRejection(
     action: BrowserToolbarInteractionActionState,
     snapshot: BrowserRootBottomPanelSessionSnapshot
-  ): string {
+  ): ResourceStr {
     if (action.dispatchKind !== 'header') {
       return '';
     }
     if (action.id === 'webBack' || action.id === 'webForward') {
-      return snapshot.isWebMode ? '' : `当前页面无法${action.title}。`;
+      return snapshot.isWebMode ? '' : bottomPanelActionUnavailable();
     }
     if (action.id === 'bottomChromeMenu') {
-      return snapshot.panelExpansionEnabled ? '' : '当前页面无法展开工具栏。';
+      return snapshot.panelExpansionEnabled ? '' : bottomPanelToolbarUnavailable();
     }
     if (action.id === 'newTab') {
-      return snapshot.isHomeMode || snapshot.isWebMode ? '' : '当前页面无法新建标签页。';
+      return snapshot.isHomeMode || snapshot.isWebMode ? '' : bottomPanelNewTabUnavailable();
     }
     const semanticState: BrowserRootBottomPanelSemanticState = {
       scene: snapshot.isHomeMode ? 'home' : (snapshot.isWebMode ? 'web' : 'inactive'),
@@ -2379,13 +2381,13 @@ export class BrowserRootBottomPanelSessionCoordinator {
     if (headerAction?.enabled === true) {
       return '';
     }
-    return `当前页面无法${action.title}。`;
+    return bottomPanelActionUnavailable();
   }
 
   private resolvePanelToolbarActionRejection(
     action: BrowserToolbarInteractionActionState,
     snapshot: BrowserRootBottomPanelSessionSnapshot
-  ): string {
+  ): ResourceStr {
     if (action.dispatchKind !== 'panel' || !snapshot.isWebMode) {
       return '';
     }
@@ -2395,7 +2397,8 @@ export class BrowserRootBottomPanelSessionCoordinator {
     if (enablement.enabled) {
       return '';
     }
-    return enablement.disabledMessage.length > 0 ? enablement.disabledMessage : `当前页面无法${action.title}。`;
+    return resourceStrPresent(enablement.disabledMessage) ?
+      enablement.disabledMessage : bottomPanelActionUnavailable();
   }
 
   private buildToolbarActionEnablement(
@@ -2425,7 +2428,7 @@ export class BrowserRootBottomPanelSessionCoordinator {
         result[action.id] = semanticState.effectiveWeb ?
           this.resolveActionApplication().resolveToolbarActionEnablement(action.id as BrowserBottomPanelActionId) : {
             enabled: false,
-            disabledMessage: `当前页面无法${action.title}。`
+            disabledMessage: bottomPanelActionUnavailable()
           };
       });
     });

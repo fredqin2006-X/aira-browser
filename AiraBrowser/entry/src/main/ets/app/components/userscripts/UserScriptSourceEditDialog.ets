@@ -29,7 +29,7 @@ export struct UserScriptSourceEditDialog {
   build() {
     Column({ space: 0 }) {
       BrowserLargeScreenModalHeader({
-        title: '编辑或粘贴源码',
+        title: $r('app.string.user_script_edit_source'),
         dialogMode: true,
         onClose: (): void => {
           this.onClose();
@@ -77,7 +77,7 @@ export struct UserScriptSourceEditDialog {
 
       Row() {
         BrowserSheetActionButton({
-          label: '完成',
+          label: $r('app.string.user_script_action_done'),
           emphasis: 'primary',
           accentColor: this.storedAccentColor,
           fillAvailableWidth: false,

@@ -2,7 +2,7 @@ import { BrowserBottomPanelActionId } from './BrowserBottomPanelActionCatalog';
 
 export interface BrowserBottomPanelActionEnablement {
   enabled: boolean;
-  disabledMessage: string;
+  disabledMessage: ResourceStr;
 }
 
 export type BrowserBottomPanelActionEnablementById =
@@ -12,7 +12,7 @@ export function resolveBrowserBottomPanelActionEnablement(
   enablementById: BrowserBottomPanelActionEnablementById,
   actionId: BrowserBottomPanelActionId,
   fallbackEnabled: boolean = true,
-  fallbackDisabledMessage: string = ''
+  fallbackDisabledMessage: ResourceStr = ''
 ): BrowserBottomPanelActionEnablement {
   return enablementById[actionId] ?? {
     enabled: fallbackEnabled,

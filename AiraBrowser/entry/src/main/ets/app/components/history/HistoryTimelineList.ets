@@ -1,5 +1,11 @@
+import { localizeHistoryDayLabel } from '../../../core/resources/HistoryBookmarkDisplayText';
 import { image } from '@kit.ImageKit';
 import { HistoryDisplayVisit } from '../../../features/history/HistoryViewModel';
+import {
+  HistoryVisitContextAction,
+  HistoryVisitContextActionId,
+  historyVisitContextAction
+} from '../../../features/history/HistoryVisitContextAction';
 import {
   HistoryTimelineDataSource,
   HistoryTimelineGroup
@@ -71,8 +77,8 @@ export struct HistoryTimelineList {
   onUpdatePressedVisit: (visitId: string, type: TouchType) => void = (_visitId: string, _type: TouchType) => {};
   onToggleVisitSelection: (visitId: string) => void = (_visitId: string) => {};
   onSetVisitSelected: (visitId: string, selected: boolean) => void = (_visitId: string, _selected: boolean) => {};
-  onContextAction: (visit: HistoryDisplayVisit, title: string) => void =
-    (_visit: HistoryDisplayVisit, _title: string) => {};
+  onContextAction: (visit: HistoryDisplayVisit, actionId: HistoryVisitContextActionId) => void =
+    (_visit: HistoryDisplayVisit, _actionId: HistoryVisitContextActionId) => {};
   onIconLoadError: (
     target: SiteIconListTarget,
     currentUri: string,
@@ -164,7 +170,7 @@ export struct HistoryTimelineList {
 
   @Builder
   private buildDateHeader(group: HistoryTimelineGroup) {
-    Text(group.label)
+    Text(localizeHistoryDayLabel(group.label))
       .width('100%')
       .fontSize(RECORD_LIST_GROUP_TITLE_SIZE)
       .fontWeight(FontWeight.Medium)
@@ -226,8 +232,8 @@ export struct HistoryTimelineList {
       onSelectedChange: (isSelected: boolean) => {
         this.onSetVisitSelected(visit.id, isSelected);
       },
-      onContextAction: (title: string) => {
-        this.onContextAction(visit, title);
+      onContextAction: (actionId: HistoryVisitContextActionId) => {
+        this.onContextAction(visit, actionId);
       }
     })
       .reuseId('history_timeline_visit')
@@ -249,7 +255,7 @@ export struct HistoryTimelineList {
       .buttonStyle(ButtonStyleMode.NORMAL)
       .backgroundColor($r('app.color.permission_blocked'))
       .stateEffect(true)
-      .accessibilityText('删除历史记录')
+      .accessibilityText($r('app.string.history_delete_title'))
       .onClick(() => {
         this.onDeleteVisit(visit);
       })
@@ -371,7 +377,8 @@ struct HistoryTimelineRecordRow {
   onMenuAppear: () => void = () => {};
   onMenuDisappear: () => void = () => {};
   onSelectedChange: (selected: boolean) => void = (_selected: boolean) => {};
-  onContextAction: (title: string) => void = (_title: string) => {};
+  onContextAction: (actionId: HistoryVisitContextActionId) => void =
+    (_actionId: HistoryVisitContextActionId) => {};
   onIconLoadError: (iconUri: string, sourceRevision: number) => void =
     (_iconUri: string, _sourceRevision: number) => {};
 
@@ -399,7 +406,7 @@ struct HistoryTimelineRecordRow {
     this.onMenuAppear = params.onMenuAppear as () => void;
     this.onMenuDisappear = params.onMenuDisappear as () => void;
     this.onSelectedChange = params.onSelectedChange as (selected: boolean) => void;
-    this.onContextAction = params.onContextAction as (title: string) => void;
+    this.onContextAction = params.onContextAction as (actionId: HistoryVisitContextActionId) => void;
     this.onIconLoadError = params.onIconLoadError as (iconUri: string, sourceRevision: number) => void;
   }
 
@@ -498,33 +505,33 @@ struct HistoryTimelineRecordRow {
 
   @Builder
   private buildMenuItems() {
-    ForEach(this.resolveContextActions(), (item: string) => {
-      MenuItem({ content: item })
+    ForEach(this.resolveContextActions(), (item: HistoryVisitContextAction) => {
+      MenuItem({ content: item.label })
         .onClick(() => {
-          this.onContextAction(item);
+          this.onContextAction(item.id);
         })
-    }, (item: string) => item)
+    }, (item: HistoryVisitContextAction) => item.id)
   }
 
-  private resolveContextActions(): string[] {
-    const actions: string[] = [];
+  private resolveContextActions(): HistoryVisitContextAction[] {
+    const actions: HistoryVisitContextAction[] = [];
     if (this.allowMultiSelect) {
-      actions.push('多选');
+      actions.push(historyVisitContextAction('multi_select'));
     }
     actions.push(
-      this.addedToHome ? '从主页移除' : '添加到主页',
-      this.bookmarked ? '取消书签' : '添加书签',
-      '分享',
-      '复制链接',
-      '详情',
-      '打开',
-      '新标签页打开',
-      '后台打开'
+      historyVisitContextAction(this.addedToHome ? 'remove_from_home' : 'add_to_home'),
+      historyVisitContextAction(this.bookmarked ? 'remove_bookmark' : 'add_bookmark'),
+      historyVisitContextAction('share'),
+      historyVisitContextAction('copy_link'),
+      historyVisitContextAction('details'),
+      historyVisitContextAction('open'),
+      historyVisitContextAction('open_new_tab'),
+      historyVisitContextAction('open_background')
     );
     if (this.host.length > 0) {
-      actions.push('删除该站点记录');
+      actions.push(historyVisitContextAction('delete_site'));
     }
-    actions.push('删除');
+    actions.push(historyVisitContextAction('delete'));
     return actions;
   }
 }

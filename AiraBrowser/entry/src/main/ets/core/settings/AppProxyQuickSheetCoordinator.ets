@@ -2,7 +2,8 @@ import { AppProxyProfileListItemState } from './AppProxySettingsViewModel';
 import { BrowserDataBoundaryInput } from '../../common/models/BrowserModels';
 import {
   AppProxySettingsCoordinator,
-  AppProxySettingsCoordinatorState
+  AppProxySettingsCoordinatorState,
+  hasAppProxyUserMessage
 } from './AppProxySettingsCoordinator';
 
 export interface AppProxyQuickSheetState {
@@ -23,7 +24,7 @@ export interface AppProxyQuickSheetAction {
 export interface AppProxyQuickSheetShell {
   publishState: (state: AppProxyQuickSheetState) => void;
   setSurfaceVisible: (visible: boolean) => void;
-  showMessage: (message: string) => void;
+  showMessage: (message: ResourceStr) => void;
   openSettings: () => void;
   refreshConsumers?: () => void;
 }
@@ -168,7 +169,7 @@ export class AppProxyQuickSheetCoordinator {
 
   private applyMutationResult(
     coordinatorState: AppProxySettingsCoordinatorState,
-    message: string,
+    message: ResourceStr,
     success: boolean,
     fallbackToolbarActive: boolean,
     runGeneration: number
@@ -176,7 +177,7 @@ export class AppProxyQuickSheetCoordinator {
     if (runGeneration !== this.surfaceGeneration) {
       this.refresh();
       this.shell.refreshConsumers?.();
-      if (message.length > 0) {
+      if (hasAppProxyUserMessage(message)) {
         this.shell.showMessage(message);
       }
       return;
@@ -189,7 +190,7 @@ export class AppProxyQuickSheetCoordinator {
       toolbarActive
     ));
     this.shell.refreshConsumers?.();
-    if (message.length > 0) {
+    if (hasAppProxyUserMessage(message)) {
       this.shell.showMessage(message);
     }
   }

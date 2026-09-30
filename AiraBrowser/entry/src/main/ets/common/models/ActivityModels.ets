@@ -39,8 +39,8 @@ export interface AiraActivityHeatmapCellState {
   level: number;
   isToday: boolean;
   isFuture: boolean;
-  tooltipText: string;
-  accessibilityText: string;
+  tooltipText: ResourceStr;
+  accessibilityText: Resource;
 }
 
 export interface AiraActivityHeatmapViewState {

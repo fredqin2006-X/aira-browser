@@ -9,6 +9,7 @@ import { OfflinePageRepository } from '../../data/offline/OfflinePageRepository'
 import { OfflinePageHtmlSanitizerService } from '../../services/offline/OfflinePageHtmlSanitizerService';
 import { BrowserPrivacyEffectPolicyService } from '../../services/privacy/BrowserPrivacyEffectPolicyService';
 import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundaryService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface OfflinePageOpenCoordinatorOptions {
   repository: OfflinePageRepository;
@@ -41,8 +42,8 @@ export class OfflinePageOpenCoordinator {
       loading: true,
       canOpen: false,
       pageId: pageId,
-      title: '离线页面',
-      siteName: '离线副本',
+      title: resolveAppResourceText($r('app.string.offline_page_title')),
+      siteName: resolveAppResourceText($r('app.string.offline_page_site')),
       host: '',
       originalUrl: '',
       savedAt: 0,
@@ -55,17 +56,17 @@ export class OfflinePageOpenCoordinator {
       html: '',
       archiveUri: '',
       contentKind: 'html',
-      message: '正在打开离线页面...'
+      message: $r('app.string.offline_open_loading')
     };
   }
 
-  buildFailureState(pageId: string, message: string): OfflinePageViewerState {
+  buildFailureState(pageId: string, message: ResourceStr): OfflinePageViewerState {
     return {
       loading: false,
       canOpen: false,
       pageId: pageId,
-      title: '离线页面',
-      siteName: '离线副本',
+      title: resolveAppResourceText($r('app.string.offline_page_title')),
+      siteName: resolveAppResourceText($r('app.string.offline_page_site')),
       host: '',
       originalUrl: '',
       savedAt: 0,
@@ -93,17 +94,17 @@ export class OfflinePageOpenCoordinator {
       targetIsClear: true
     });
     if (decision.outcome !== 'allow') {
-      return this.buildFailure('当前隐私策略不允许读取已保存页面');
+      return this.buildFailure($r('app.string.offline_list_blocked'));
     }
     const normalizedId = pageId.trim();
     if (normalizedId.length === 0) {
-      return this.buildFailure('未找到离线页面');
+      return this.buildFailure($r('app.string.offline_open_missing'));
     }
     try {
       await this.repository.initialize();
       const record = await this.repository.findById(normalizedId);
       if (record === undefined) {
-        return this.buildFailure('离线页面不存在');
+        return this.buildFailure($r('app.string.offline_page_not_found'));
       }
       const manifest = await this.readManifest(record.manifestPath);
       if (manifest?.contentKind === 'web_archive') {
@@ -122,7 +123,7 @@ export class OfflinePageOpenCoordinator {
           }
         }
         if (!await this.fileStore.textFileAvailable(record.snapshotPath)) {
-          return this.buildFailure('离线归档文件不存在');
+          return this.buildFailure($r('app.string.offline_open_archive_missing'));
         }
         return {
           ok: true,
@@ -135,7 +136,7 @@ export class OfflinePageOpenCoordinator {
       }
       const html = await this.fileStore.readText(record.snapshotPath);
       if (html.trim().length === 0) {
-        return this.buildFailure('离线正文文件为空');
+        return this.buildFailure($r('app.string.offline_open_content_empty'));
       }
       return {
         ok: true,
@@ -146,7 +147,7 @@ export class OfflinePageOpenCoordinator {
         contentKind: 'html'
       };
     } catch (_error) {
-      return this.buildFailure('离线页面打开失败');
+      return this.buildFailure($r('app.string.offline_open_failed'));
     }
   }
 
@@ -193,7 +194,7 @@ export class OfflinePageOpenCoordinator {
     return `${normalizedPath.substring(0, index)}/${fileName}`;
   }
 
-  private buildFailure(message: string): OfflinePageOpenResult {
+  private buildFailure(message: ResourceStr): OfflinePageOpenResult {
     return {
       ok: false,
       message: message,

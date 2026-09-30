@@ -5,6 +5,7 @@ import {
   BrowserExperimentSettings
 } from '../../common/models/BrowserModels';
 import { DEFAULT_BROWSER_APP_PROXY_SETTINGS } from '../../data/preferences/PreferencesRepository';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface AppProxyProfileDraft {
   id: string;
@@ -19,13 +20,13 @@ export interface AppProxyProfileDraft {
 
 export interface AppProxySettingsValidationResult {
   valid: boolean;
-  message: string;
+  message: ResourceStr;
 }
 
 export interface AppProxyProfileListItemState {
   id: string;
   title: string;
-  summary: string;
+  summary: ResourceStr;
   isActive: boolean;
   canSelect: boolean;
 }
@@ -33,10 +34,10 @@ export interface AppProxyProfileListItemState {
 export interface AppProxySettingsPageState {
   globalEnabled: boolean;
   activeProfileName: string;
-  activeSummary: string;
+  activeSummary: ResourceStr;
   hasProfiles: boolean;
   profileItems: AppProxyProfileListItemState[];
-  helperText: string;
+  helperText: ResourceStr;
 }
 
 interface AppProxyProfileDraftPatch {
@@ -66,13 +67,15 @@ export class AppProxySettingsViewModel {
     }
     return {
       globalEnabled: settings.appProxyEnabled,
-      activeProfileName: activeProfile?.name ?? '未选择代理',
-      activeSummary: activeProfile !== undefined ? this.buildProfileSummary(activeProfile) : '关闭',
+      activeProfileName: activeProfile?.name ?? resolveAppResourceText($r('app.string.settings_app_proxy_none_selected')),
+      activeSummary: activeProfile !== undefined
+        ? this.buildProfileSummary(activeProfile)
+        : $r('app.string.settings_app_proxy_off_value'),
       hasProfiles: settings.appProxyProfiles.length > 0,
       profileItems: profileItems,
       helperText: settings.appProxyProfiles.length > 0
-        ? '点击条目只是选择代理配置；只有打开总开关后，当前选择才会应用到网页请求。右侧按钮进入详细设置。'
-        : '还没有已保存的代理，先添加一个代理配置。'
+        ? $r('app.string.settings_app_proxy_list_helper')
+        : $r('app.string.settings_app_proxy_list_empty_helper')
     };
   }
 
@@ -236,50 +239,50 @@ export class AppProxySettingsViewModel {
 
   validate(draft: AppProxyProfileDraft): AppProxySettingsValidationResult {
     if (draft.name.trim().length <= 0) {
-      return { valid: false, message: '请输入代理名称。' };
+      return { valid: false, message: $r('app.string.settings_app_proxy_validation_name') };
     }
     if (draft.host.trim().length === 0) {
-      return { valid: false, message: '请填写服务器地址。' };
+      return { valid: false, message: $r('app.string.settings_app_proxy_validation_host') };
     }
     const port = this.parsePort(draft.portText);
     if (port <= 0 || port > 65535) {
-      return { valid: false, message: '端口需要在 1-65535 之间。' };
+      return { valid: false, message: $r('app.string.settings_app_proxy_validation_port') };
     }
     return { valid: true, message: '' };
   }
 
-  buildSummary(settings: BrowserExperimentSettings): string {
+  buildSummary(settings: BrowserExperimentSettings): ResourceStr {
     const activeProfile = this.resolveActiveProfile(settings);
     if (activeProfile === undefined) {
-      return '关闭';
+      return $r('app.string.settings_app_proxy_off_value');
     }
     if (!settings.appProxyEnabled) {
-      return `${activeProfile.name} · 已关闭`;
+      return $r('app.string.settings_app_proxy_summary_off', activeProfile.name);
     }
     if (activeProfile.settings.host.trim().length === 0 || activeProfile.settings.port <= 0) {
-      return `${activeProfile.name} · 待配置`;
+      return $r('app.string.settings_app_proxy_summary_pending', activeProfile.name);
     }
     const scheme = activeProfile.settings.scheme === 'socks5' ? 'socks' : activeProfile.settings.scheme;
     return `${activeProfile.name} · ${scheme}://${activeProfile.settings.host}:${activeProfile.settings.port}`;
   }
 
-  buildProfileSummary(profile: BrowserAppProxyProfile): string {
+  buildProfileSummary(profile: BrowserAppProxyProfile): ResourceStr {
     if (profile.settings.host.trim().length === 0 || profile.settings.port <= 0) {
-      return '待配置';
+      return $r('app.string.settings_app_proxy_pending_value');
     }
     const scheme = profile.settings.scheme === 'socks5' ? 'socks' : profile.settings.scheme;
     return `${scheme}://${profile.settings.host}:${profile.settings.port}`;
   }
 
-  buildCapabilityNote(settings: BrowserExperimentSettings): string {
+  buildCapabilityNote(settings: BrowserExperimentSettings): ResourceStr {
     const activeProfile = this.resolveActiveProfile(settings);
     if (activeProfile === undefined) {
-      return '还没有已保存的代理。';
+      return $r('app.string.settings_app_proxy_note_empty');
     }
     if (!settings.appProxyEnabled) {
-      return `当前选中 ${activeProfile.name}，打开总开关后会应用到 ArkWeb。`;
+      return $r('app.string.settings_app_proxy_note_off', activeProfile.name);
     }
-    return `当前选中 ${activeProfile.name}，开启总开关后会应用到 ArkWeb；用户名和密码会用于匹配的代理认证请求。`;
+    return $r('app.string.settings_app_proxy_note_on', activeProfile.name);
   }
 
   resolveSchemeLabel(scheme: BrowserAppProxyScheme): string {

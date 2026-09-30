@@ -17,6 +17,7 @@ import { BookmarkFolderIcon } from './BookmarkFolderIcon';
 import { SiteIconView } from '../common/SiteIconView';
 import { CENTERED_DIALOG_SYSTEM_SURFACE_MODIFIER } from '../common/CenteredDialogSurface';
 import { BrowserSheetActionButton } from '../browser/BrowserModalBottomSheet';
+import { hasAppResourceText } from '../../../core/resources/AppResourceText';
 
 const BOOKMARK_EDIT_ICON_TARGET_ID: string = 'bookmark-edit-node-dialog';
 
@@ -28,8 +29,8 @@ export struct BookmarkManagerCreateFolderDialog {
   controller?: CustomDialogController;
   @Link folderTitle: string;
   /** Shared by "new folder" and "rename" flows; callers override the copy. */
-  @Prop dialogTitle: string = '新建文件夹';
-  @Prop fieldPlaceholder: string = '文件夹名称';
+  @Prop dialogTitle: ResourceStr = $r('app.string.bookmark_new_folder');
+  @Prop fieldPlaceholder: ResourceStr = $r('app.string.bookmark_folder_name');
   confirm: (title: string) => void = (_title: string) => {};
 
   build() {
@@ -57,7 +58,7 @@ export struct BookmarkManagerCreateFolderDialog {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '确定',
+          label: $r('app.string.ui_ok'),
           emphasis: 'primary',
           stacked: true,
           buttonHeight: 44,
@@ -69,7 +70,7 @@ export struct BookmarkManagerCreateFolderDialog {
         })
 
         BrowserSheetActionButton({
-          label: '取消',
+          label: $r('app.string.settings_account_cancel'),
           emphasis: 'ghost',
           stacked: true,
           buttonHeight: 44,
@@ -98,7 +99,7 @@ export struct BookmarkManagerEditNodeDialog {
   @Link nodeType: string;
   @Link iconPath: string;
   /** Callers that add instead of edit override the heading; empty keeps the edit wording. */
-  @Prop dialogTitleOverride: string = '';
+  @Prop dialogTitleOverride: ResourceStr = '';
   confirm: () => void = () => {};
   @State private iconStates: SiteIconListRenderState[] = [];
   private iconTargetUrl: string = '';
@@ -129,7 +130,7 @@ export struct BookmarkManagerEditNodeDialog {
         .fontColor(this.storedPrimaryTextColor)
         .textAlign(TextAlign.Center)
 
-      TextInput({ text: this.nodeTitle, placeholder: '名称' })
+      TextInput({ text: this.nodeTitle, placeholder: $r('app.string.ui_name') })
         .width('100%')
         .height(44)
         .fontSize(15)
@@ -144,7 +145,7 @@ export struct BookmarkManagerEditNodeDialog {
         })
 
       if (this.nodeType === 'bookmark') {
-        TextInput({ text: this.nodeUrl, placeholder: '网址' })
+        TextInput({ text: this.nodeUrl, placeholder: $r('app.string.ui_url') })
           .width('100%')
           .height(44)
           .fontSize(15)
@@ -161,7 +162,7 @@ export struct BookmarkManagerEditNodeDialog {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '保存',
+          label: $r('app.string.ui_save'),
           emphasis: 'primary',
           stacked: true,
           buttonHeight: 44,
@@ -173,7 +174,7 @@ export struct BookmarkManagerEditNodeDialog {
         })
 
         BrowserSheetActionButton({
-          label: '取消',
+          label: $r('app.string.settings_account_cancel'),
           emphasis: 'ghost',
           stacked: true,
           buttonHeight: 44,
@@ -231,11 +232,13 @@ export struct BookmarkManagerEditNodeDialog {
     })
   }
 
-  private resolveDialogTitle(): string {
-    if (this.dialogTitleOverride.length > 0) {
+  private resolveDialogTitle(): ResourceStr {
+    if (hasAppResourceText(this.dialogTitleOverride)) {
       return this.dialogTitleOverride;
     }
-    return this.nodeType === 'folder' ? '编辑文件夹' : '编辑书签';
+    return this.nodeType === 'folder'
+      ? $r('app.string.bookmark_edit_folder')
+      : $r('app.string.bookmark_edit_bookmark');
   }
 
   private resolveIcon(): void {

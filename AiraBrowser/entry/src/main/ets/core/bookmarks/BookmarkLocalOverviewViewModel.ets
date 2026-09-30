@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { AiraBookmarkOverview } from '../../common/models/AiraSyncModels';
 import {
   AiraLocalBookmarkOverviewCacheRepository,
@@ -17,7 +18,7 @@ export class BookmarkLocalOverviewViewModel {
   private currentCountsPromise?: Promise<BookmarkLocalOverviewCounts>;
 
   formatSummary(folderCount: number, itemCount: number): string {
-    return `${Math.max(0, Math.floor(folderCount))} 个文件夹，${Math.max(0, Math.floor(itemCount))} 个书签`;
+    return resolveAppResourceText($r('app.string.bookmark_overview', Math.max(0, Math.floor(folderCount)), Math.max(0, Math.floor(itemCount))));
   }
 
   formatSnapshot(snapshot: AiraLocalBookmarkOverviewCacheSnapshot): string {

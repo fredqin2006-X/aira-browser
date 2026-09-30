@@ -27,14 +27,14 @@ interface PersonalizationSyncItemPresentationDescriptor {
 
 export interface PersonalizationSyncItemState {
   id: PersonalizationSyncContentId;
-  title: string;
-  summary: string;
+  title: ResourceStr;
+  summary: ResourceStr;
   enabled: boolean;
 }
 
 export interface PersonalizationSyncSettingsState {
-  title: string;
-  summary: string;
+  title: ResourceStr;
+  summary: ResourceStr;
   items: PersonalizationSyncItemState[];
 }
 
@@ -44,37 +44,37 @@ export class PersonalizationSyncSettingsViewModel {
     novelBookshelfEnabled: boolean = true
   ): PersonalizationSyncSettingsState {
     return {
-      title: '主页收藏、小说书架、活动和常用设置',
-      summary: '选择需要在设备之间保持一致的主页收藏、小说书架、活动热力图和常用设置。',
+      title: $r('app.string.settings_sync_personalization_title'),
+      summary: $r('app.string.settings_sync_personalization_summary'),
       items: [
         {
           id: 'home_shortcuts',
-          title: '主页收藏',
-          summary: '同步主页收藏项目和排序',
+          title: $r('app.string.settings_sync_home_favorites'),
+          summary: $r('app.string.settings_sync_home_favorites_summary'),
           enabled: this.resolveEnabled(config, 'home_shortcuts')
         },
         {
           id: 'core_preferences',
-          title: '核心偏好',
-          summary: '同步主题和常用偏好',
+          title: $r('app.string.settings_sync_core_prefs'),
+          summary: $r('app.string.settings_sync_core_prefs_summary'),
           enabled: this.resolveEnabled(config, 'core_preferences')
         },
         {
           id: 'activity_heatmap',
-          title: '活动热力图',
-          summary: '同步每日活动统计',
+          title: $r('app.string.settings_sync_activity'),
+          summary: $r('app.string.settings_sync_activity_summary'),
           enabled: this.resolveEnabled(config, 'activity_heatmap')
         },
         {
           id: 'search',
-          title: '搜索',
-          summary: '同步搜索引擎和建议',
+          title: $r('app.string.settings_sync_search'),
+          summary: $r('app.string.settings_sync_search_summary'),
           enabled: this.resolveEnabled(config, 'search')
         },
         {
           id: 'novel_bookshelf',
-          title: '小说书架',
-          summary: '同步已收藏小说的链接、书籍信息和阅读进度',
+          title: $r('app.string.settings_sync_bookshelf'),
+          summary: $r('app.string.settings_sync_bookshelf_summary'),
           enabled: novelBookshelfEnabled
         }
       ]

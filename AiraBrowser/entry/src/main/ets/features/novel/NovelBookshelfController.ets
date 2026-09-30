@@ -15,7 +15,7 @@ const NOVEL_BOOKSHELF_LOG_TAG: string = 'AiraNovelShelf';
 
 export interface NovelBookshelfRemovalResult {
   success: boolean;
-  message: string;
+  message: ResourceStr;
   state: NovelBookshelfState;
 }
 
@@ -62,7 +62,7 @@ export class NovelBookshelfController {
         loading: false,
         novels: [],
         comics: [],
-        errorMessage: '书架加载失败，请稍后再试。'
+        errorMessage: $r('app.string.bookshelf_load_failed')
       };
     }
   }
@@ -81,7 +81,7 @@ export class NovelBookshelfController {
       await this.repository.removeFromBookshelf(detailUrl);
       return {
         success: true,
-        message: '已移出书架。',
+        message: $r('app.string.bookshelf_removed'),
         state: await this.load()
       };
     } catch (error) {
@@ -94,7 +94,7 @@ export class NovelBookshelfController {
       );
       return {
         success: false,
-        message: '移出书架失败，请稍后再试。',
+        message: $r('app.string.bookshelf_remove_failed'),
         state: await this.load()
       };
     }

@@ -391,7 +391,7 @@ export struct BrowserImmersiveSheetLayout {
   @Prop footerBottomPadding: number = BROWSER_SHEET_IMMERSIVE_BOTTOM_PADDING;
   @Prop footerVisible: boolean = false;
   @Prop closeVisible: boolean = false;
-  @Prop closeAccessibilityLabel: string = '关闭';
+  @Prop closeAccessibilityLabel: ResourceStr = '关闭';
   onClose: () => void = () => {};
   @BuilderParam scrollContent: () => void = this.emptyContent;
   @BuilderParam header: () => void = this.emptyContent;
@@ -469,7 +469,7 @@ export struct BrowserSheetActionButton {
   @StorageProp(BROWSER_THEME_STORAGE_PRESSED_BACKGROUND_KEY) private storedPressedBackgroundColor: string = '#DDE4EC';
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY) private storedPrimaryTextColor: string = '#111318';
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string = '#5F6875';
-  @Prop label: string = '';
+  @Prop label: ResourceStr = '';
   /** Ghost rests as label text only, but keeps a full button and fills it while pressed. */
   @Prop emphasis: 'primary' | 'secondary' | 'destructive' | 'ghost' = 'secondary';
   @Prop actionEnabled: boolean = true;
@@ -656,7 +656,7 @@ export struct BrowserSheetIconButton {
   @Prop iconColor: ResourceColor = '';
   @Prop buttonSize: number = 36;
   @Prop actionEnabled: boolean = true;
-  @Prop accessibilityLabel: string = '';
+  @Prop accessibilityLabel: ResourceStr = '';
   /**
    * Opt-in immersive light-sense backplate. Off by default because this button is shared by
    * many sheets and overlays; the settings sheet header is the surface that opted in.
@@ -680,36 +680,68 @@ export struct BrowserSheetIconButton {
         tintColor: resolveFloatingGlassMaterialTintForMode(this.storedResolvedThemeMode),
         hostMaterialActive: this.shouldUseHdsMaterial()
       }) {
-        Button() {
-          if (this.airaIconId !== undefined) {
-            AiraIcon({
-              airaIconId: this.airaIconId,
-              iconSize: this.iconSize,
-              iconColor: this.resolveIconColor()
-            })
-          } else {
-            SymbolGlyph(this.icon)
-              .fontSize(this.iconSize)
-              .fontWeight(FontWeight.Bold)
-              .fontColor([this.resolveIconColor()])
-          }
+        if (typeof this.accessibilityLabel === 'string') {
+          this.buildIconAction(this.accessibilityLabel)
+        } else {
+          this.buildIconActionResource(this.accessibilityLabel)
         }
-        .width('100%')
-        .height('100%')
-        .type(ButtonType.Normal)
-        .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
-        .borderRadius(this.buttonSize / 2)
-        .stateEffect(this.actionEnabled)
-        .enabled(this.actionEnabled)
-        .accessibilityText(this.accessibilityLabel)
-        .onClick(() => {
-          this.onAction();
-        })
       }
     }
     .width(this.buttonSize)
     .height(this.buttonSize)
     .opacity(this.actionEnabled ? 1 : 0.42)
+  }
+
+  @Builder
+  private buildIconGlyph() {
+    if (this.airaIconId !== undefined) {
+      AiraIcon({
+        airaIconId: this.airaIconId,
+        iconSize: this.iconSize,
+        iconColor: this.resolveIconColor()
+      })
+    } else {
+      SymbolGlyph(this.icon)
+        .fontSize(this.iconSize)
+        .fontWeight(FontWeight.Bold)
+        .fontColor([this.resolveIconColor()])
+    }
+  }
+
+  @Builder
+  private buildIconAction(label: string) {
+    Button() {
+      this.buildIconGlyph()
+    }
+    .width('100%')
+    .height('100%')
+    .type(ButtonType.Normal)
+    .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
+    .borderRadius(this.buttonSize / 2)
+    .stateEffect(this.actionEnabled)
+    .enabled(this.actionEnabled)
+    .accessibilityText(label)
+    .onClick(() => {
+      this.onAction();
+    })
+  }
+
+  @Builder
+  private buildIconActionResource(label: Resource) {
+    Button() {
+      this.buildIconGlyph()
+    }
+    .width('100%')
+    .height('100%')
+    .type(ButtonType.Normal)
+    .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
+    .borderRadius(this.buttonSize / 2)
+    .stateEffect(this.actionEnabled)
+    .enabled(this.actionEnabled)
+    .accessibilityText(label)
+    .onClick(() => {
+      this.onAction();
+    })
   }
 
   private resolveIconColor(): ResourceColor {
@@ -727,10 +759,10 @@ export struct BrowserSheetIconButton {
 @Component
 export struct BrowserFeatureSheetHeader {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY) private storedPrimaryTextColor: string = '#111318';
-  @Prop title: string = '';
+  @Prop title: ResourceStr = '';
   @Prop titleColor: ResourceColor = '';
   @Prop showLeadingButton: boolean = false;
-  @Prop leadingAccessibilityLabel: string = '返回';
+  @Prop leadingAccessibilityLabel: ResourceStr = $r('app.string.settings_sync_back');
   @Prop trailingVisible: boolean = false;
   @BuilderParam trailing: () => void = this.emptyContent;
   onLeadingAction: () => void = () => {};

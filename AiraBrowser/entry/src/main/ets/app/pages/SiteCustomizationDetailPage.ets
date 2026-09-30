@@ -218,20 +218,20 @@ struct SiteCustomizationDetailPage {
 
   private confirmResetSite(): void {
     showCenteredAlertDialog({
-      title: '重置当前站点',
+      title: $r('app.string.settings_site_customization_reset_site'),
       message: this.state.hasUnreadableEntry
-        ? '将删除无法读取的站点设置记录。之后可以重新配置当前站点。'
+        ? $r('app.string.settings_site_customization_reset_unreadable_message')
         : this.isSiteControlsMode()
-        ? '将清除这个站点的 JavaScript、设备权限和打开应用规则。'
-        : '将清除这个站点的网页标识、JavaScript、关闭后清除、打开应用和权限自定义规则。',
+        ? $r('app.string.settings_site_customization_reset_permissions_message')
+        : $r('app.string.settings_site_customization_reset_all_message'),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_site_controls_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '重置',
+        value: $r('app.string.settings_site_customization_reset_confirm'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.resetSite();

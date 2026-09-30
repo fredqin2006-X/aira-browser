@@ -65,11 +65,11 @@ done
 # dependent capability is reached by jumping to the owner that already implements it.
 require_pattern "${VIEW_MODEL_REL}" "class CrossDeviceLinkViewModel" \
   "the page state must have one builder."
-# 数据同步 and 跨设备互联 are two separate channels: this page owns the cross-device switch
+# 数据同步 and 与电脑互联 are two separate channels: this page owns the cross-device switch
 # (tab handoff and page push) and only links to the sync owner for data sync. It must never
 # carry a second data-sync master switch, or pausing bookmarks would look like it also
 # stopped devices from talking.
-require_pattern "${VIEW_MODEL_REL}" "LINK_SWITCH_TITLE: string = '跨设备互联'" \
+require_pattern "${VIEW_MODEL_REL}" "LINK_SWITCH_TITLE: string = '与电脑互联'" \
   "the page's own switch must be the cross-device link, not data sync."
 require_pattern "${VIEW_MODEL_REL}" "linkEnabled: facts.linkEnabled" \
   "the link switch must come from the presence owner, not the sync owner."
@@ -315,7 +315,7 @@ require_pattern "${TEST_REL}" "always lists this phone as the current device" \
 
 # The PC shell embeds it as a settings pane like 同步; phone and touch two-pane keep the
 # routed page, so a large-screen click never opens a bare full-window page.
-require_pattern "${DESTINATIONS_REL}" "target\\('cross_device_link', 'cross_device_link', 'cross_device_link', '跨设备互联'" \
+require_pattern "${DESTINATIONS_REL}" "target\\('cross_device_link', 'cross_device_link', 'cross_device_link', '与电脑互联'" \
   "the settings catalog must register the first-level destination."
 require_pattern "${DESTINATIONS_REL}" "true, true, 'desktop_embedded'\\)" \
   "the destination must embed on the PC shell and route only where there is no pane."
@@ -348,39 +348,76 @@ require_pattern "${TEST_REL}" "desktopLinkAvailable = false" \
 require_pattern "${TEST_REL}" "describes online computers by their browser alone" \
   "the test must pin that a device row carries no status readout."
 
-# The header names the person, not the page: phone on the left, account in the middle,
-# computers on the right, and the connectors only light up against a live desktop.
+# The page opens on the orbit graphic, not the old phone-account-computer header.
+# Account identity stays on the view model; the header itself is Aira at the center of
+# three full rings, with the other browser marks sitting on those rings.
+ORBIT_LAYOUT_REL="${ETS_DIR}/core/sync/CrossDeviceLinkOrbitLayout.ets"
+require_pattern "${ORBIT_LAYOUT_REL}" "CROSS_DEVICE_LINK_ORBIT_RADII: number\[\] = DESIGN_ORBIT_RADII" \
+  "the header must keep the three reviewed rings."
+require_pattern "${ORBIT_LAYOUT_REL}" "kind: 'brave', angleDegrees: 0, orbitIndex: 2" \
+  "the outer ring must carry a mark on the vertical axis above the logo."
+require_pattern "${SCREEN_REL}" "buildCrossDeviceLinkOrbitLayout" \
+  "the page header must be the orbit layout, not a hand-placed row."
+require_pattern "${SCREEN_REL}" "app.media.aira_logo_brand" \
+  "the ring center must be the Aira logo."
+require_pattern "${SCREEN_REL}" "BlendMode.DST_IN" \
+  "the lower half of the rings must fade out instead of being clipped."
+require_pattern "${SCREEN_REL}" "crossDeviceLinkOrbitPageFadeColor\\(this.storedPageBackgroundColor" \
+  "the top fade must use the live page background, so light and dark do not share one wash."
+require_pattern "${ORBIT_LAYOUT_REL}" "export function crossDeviceLinkOrbitPageFadeColor" \
+  "the page-background fade color must stay a pure function."
+require_pattern "${TEST_REL}" "crossDeviceLinkOrbitPageFadeColor\\('#F2F3F5'" \
+  "light mode must fade into its own page background."
+require_pattern "${TEST_REL}" "crossDeviceLinkOrbitPageFadeColor\\('#101010'" \
+  "dark mode must fade into its own page background, not the light one."
+require_pattern "${SCREEN_REL}" "ORBIT_RING_COLOR_DARK" \
+  "dark mode must not keep the light-mode ring color."
+require_pattern "${SCREEN_REL}" "resolveOrbitCoverHeight" \
+  "the orbit must stay a background so scrolling content can cover it."
+require_pattern "${ORBIT_LAYOUT_REL}" "export function resolveCrossDeviceLinkOrbitCoverHeight" \
+  "the list must rest under the logo, not at the bottom of the faded rings."
+require_pattern "${ORBIT_LAYOUT_REL}" "export function resolveCrossDeviceLinkOrbitScrollOpacity" \
+  "scrolling up must fade the illustration, not leave it at full strength."
+require_pattern "${SCREEN_REL}" "noteOrbitScrollOffset" \
+  "the illustration opacity must follow the page scroll."
+require_pattern "${SCREEN_REL}" "HitTestMode.BLOCK_DESCENDANTS" \
+  "the orbit decoration must not take the touch, or the page cannot scroll."
+require_pattern "${ORBIT_LAYOUT_REL}" "export function crossDeviceLinkOrbitSpinAngle" \
+  "marks must keep revolving on their rings, with no entrance sweep."
+require_pattern "${SCREEN_REL}" "startOrbitSpin" \
+  "the page must keep the marks revolving while it is open."
+reject_pattern "${SCREEN_REL}" "startOrbitIntro" \
+  "the entrance sweep must not come back."
+require_pattern "${SCREEN_REL}" "centerX: layout.centerX" \
+  "icons must rotate around the logo center so they stay on their ring."
+reject_pattern "${SCREEN_REL}" "#C9CEEA|#7C86A8" \
+  "the rings must stay neutral, without the old tinted line color."
+reject_pattern "${SCREEN_REL}" "buildAccountHeader|buildConnector|PEER_COMPUTER_GLYPH" \
+  "the phone-account-computer header must not come back."
 require_pattern "${VIEW_MODEL_REL}" "account: CrossDeviceLinkAccountFact" \
-  "the header identity must come from the host's account fact."
+  "account identity must still come from the host's account fact."
 require_pattern "${VIEW_MODEL_REL}" "SIGNED_OUT_TITLE: string = '未登录'" \
-  "a header without an account must say so instead of naming one."
+  "a missing account must stay labelled instead of inventing a name."
 require_pattern "${VIEW_MODEL_REL}" "ACCOUNT_ID_PREFIX: string = '账号 ID '" \
   "the account id must be labelled, not shown as a bare string."
 require_pattern "${VIEW_MODEL_REL}" "onlineComputerCount: facts.devices.length" \
-  "the computer side must follow the presence owner's own list."
+  "the online computers must follow the presence owner's own list."
 require_pattern "${HOST_REL}" "resolveAiraHuaweiAccountIdentity" \
-  "the header identity must come from the sync owner's settings."
-# The page's own chrome uses the app's Operational font icons, never the system symbol set:
-# its own phone and its paired computer each have a semantic id. The help glyph is gone
-# with the header action, so only the two header peers remain.
+  "account identity must come from the sync owner's settings."
 require_pattern "${SCREEN_REL}" "LOCAL_DEVICE_GLYPH: AiraRenderableIconId = 'crossDeviceLink.localDevice'" \
-  "the phone side of the header must be the app's own device font icon."
-require_pattern "${SCREEN_REL}" "PEER_COMPUTER_GLYPH: AiraRenderableIconId = 'crossDeviceLink.peerComputer'" \
-  "the computer side of the header must be the app's own computer font icon."
+  "this phone's row must keep the app's own device font icon."
 reject_pattern "${SCREEN_REL}" "HELP_GLYPH|crossDeviceLink\.help" \
   "the removed header help action must not linger as a glyph constant."
-reject_pattern "${SCREEN_REL}" "sys\\.symbol\\.doc_text_fill" \
+reject_pattern "${SCREEN_REL}" "sys\.symbol\.doc_text_fill" \
   "the link page must not fall back to the system document glyph."
-reject_pattern "${SCREEN_REL}" "sys\\.symbol\\.phone_fill|sys\\.symbol\\.desktop_fill" \
-  "the header peers must not fall back to the system device glyphs."
+reject_pattern "${SCREEN_REL}" "sys\.symbol\.phone_fill|sys\.symbol\.desktop_fill" \
+  "device rows must not fall back to the system device glyphs."
 require_pattern "${CATALOG_REL}" "crossDeviceLink.localDevice" \
   "the catalog must own the page's device glyph."
 require_pattern "${CATALOG_REL}" "crossDeviceLink.peerComputer" \
-  "the catalog must own the page's computer glyph."
-require_pattern "${SCREEN_REL}" "this\\.buildConnector\\(this\\.isComputerOnline\\(\\)\\)" \
-  "only the computer connector may follow the online state."
+  "the catalog must keep the computer glyph."
 reject_pattern "${SCREEN_REL}" "connectionTitle|connectionMessage" \
-  "the old connection block must not come back beside the account header."
+  "the old connection block must not come back."
 
 # The tabs-overview cross-device segment stays on that section. Sign-in, Pro, a closed
 # link, and an empty device list are empty pages inside it, not a jump to the Pro page.
@@ -392,7 +429,7 @@ require_pattern "${EMPTY_PRESENTATION_REL}" "登录后查看跨设备标签页" 
   "the signed-out empty page must stay in the cross-device section."
 require_pattern "${EMPTY_PRESENTATION_REL}" "跨设备标签页需要 Aira Pro" \
   "a non-Pro account must see the Pro empty page instead of being routed away."
-require_pattern "${EMPTY_PRESENTATION_REL}" "跨设备互联未开启" \
+require_pattern "${EMPTY_PRESENTATION_REL}" "与电脑互联未开启" \
   "a closed link must have its own empty page."
 require_pattern "${EMPTY_PRESENTATION_REL}" "当前没有在线电脑" \
   "no online computer must stay an empty page, not a route."
@@ -443,6 +480,36 @@ bind_sheet_count="$(grep -c '\.bindSheet(' "${REPO_ROOT}/${HOST_REL}" || true)"
 if [ "${bind_sheet_count}" -ne 3 ]; then
   fail "CrossDeviceLinkHost must bind each sheet on its own node, found ${bind_sheet_count}."
 fi
+GUIDE_COORDINATOR_REL="${ETS_DIR}/core/onboarding/CrossDeviceLinkGuideCoordinator.ets"
+GUIDE_SHEET_REL="${ETS_DIR}/app/components/onboarding/CrossDeviceLinkGuideSheet.ets"
+GUIDE_OVERLAY_REL="${ETS_DIR}/app/components/onboarding/CrossDeviceLinkGuideOverlay.ets"
+require_pattern "${GUIDE_COORDINATOR_REL}" "primaryAction: last [?] 'open_guide' : 'next'" \
+  "only the last lesson step opens the interconnect guide; the first step stays next."
+require_pattern "${GUIDE_COORDINATOR_REL}" "CROSS_DEVICE_LINK_GUIDE_NEXT_TITLE: string = '下一个'" \
+  "the first lesson step must keep the next button."
+require_pattern "${GUIDE_COORDINATOR_REL}" "CROSS_DEVICE_LINK_GUIDE_OPEN_TITLE: string = '查看互联教程'" \
+  "the second lesson step's primary button opens the interconnect guide."
+require_pattern "${HOST_REL}" "openInterconnectGuide" \
+  "the link page opens the existing interconnect guide from the lesson."
+require_pattern "${HOST_REL}" "handlePageEntered" \
+  "the lesson presents when the link page is entered."
+require_pattern "${PAGE_REL}" "onBackPress" \
+  "back closes the lesson instead of leaving the page while it is up."
+require_pattern "${GUIDE_SHEET_REL}" "page_push_guide.mp4" \
+  "the first lesson clip must be a rawfile literal."
+require_pattern "${GUIDE_SHEET_REL}" "device_tabs_guide.mp4" \
+  "the second lesson clip must be a rawfile literal."
+require_pattern "${GUIDE_OVERLAY_REL}" "height: SheetSize.LARGE" \
+  "the lesson is the tallest bottom sheet, not a floating card."
+require_pattern "${GUIDE_OVERLAY_REL}" "preferType: SheetType.BOTTOM" \
+  "the lesson sheet starts as a bottom sheet."
+for guide_asset in page_push_guide.mp4 device_tabs_guide.mp4 page_push_guide_poster.jpg device_tabs_guide_poster.jpg; do
+  if [ ! -f "${REPO_ROOT}/AiraBrowser/entry/src/main/resources/rawfile/${guide_asset}" ]; then
+    fail "missing cross-device lesson asset ${guide_asset}"
+  fi
+done
+reject_pattern "${VIEW_MODEL_REL}" "open_guide|查看互联教程" \
+  "the lesson must not become a fact of the link page view model."
 
 if [ "${failures}" -gt 0 ]; then
   exit 1

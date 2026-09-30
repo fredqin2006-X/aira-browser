@@ -43,18 +43,18 @@ export struct BrowserWebSecuritySettingsContent {
 
   build() {
     Column({ space: 16 }) {
-      SettingsSection({ title: '网页安全', secondaryTextColor: this.secondaryTextColor }) {
-        this.buildSwitchSurface('始终优先使用 HTTPS', this.state.httpsFirstEnabled, 'https_first')
+      SettingsSection({ title: $r('app.string.settings_privacy_protection_web_security'), secondaryTextColor: this.secondaryTextColor }) {
+        this.buildSwitchSurface($r('app.string.settings_privacy_protection_https_first'), this.state.httpsFirstEnabled, 'https_first')
         SettingsFooterText({
-          text: '优先使用安全连接；网站不支持时再使用 HTTP。',
+          text: $r('app.string.settings_privacy_protection_https_first_footer'),
           secondaryTextColor: this.secondaryTextColor
         })
       }
 
       SettingsSection({ secondaryTextColor: this.secondaryTextColor }) {
-        this.buildSwitchSurface('网站安全提醒', this.state.safeBrowsingEnabled, 'safe_browsing')
+        this.buildSwitchSurface($r('app.string.settings_privacy_protection_safe_browsing'), this.state.safeBrowsingEnabled, 'safe_browsing')
         SettingsFooterText({
-          text: '开启后，Aira 会借助华为安全检测识别可疑网站，并在页面顶部提醒你。为完成检测，你访问的网址会发送给华为。',
+          text: $r('app.string.settings_privacy_protection_safe_browsing_footer'),
           secondaryTextColor: this.secondaryTextColor
         })
       }
@@ -62,7 +62,7 @@ export struct BrowserWebSecuritySettingsContent {
       SettingsSection({ secondaryTextColor: this.secondaryTextColor }) {
         this.buildJavaScriptSurface()
         SettingsFooterText({
-          text: '网站通常需要 JavaScript 才能正常登录、支付或播放视频；你可以为特定网站设置例外。',
+          text: $r('app.string.settings_privacy_protection_javascript_footer'),
           secondaryTextColor: this.secondaryTextColor
         })
       }
@@ -111,7 +111,7 @@ export struct BrowserWebSecuritySettingsContent {
     if (this.desktopPresentation) {
       SettingsDesktopGroup({ surfaceColor: this.surfaceBackground }) {
         SettingsDesktopSwitchRow({
-          title: '允许 JavaScript',
+          title: $r('app.string.settings_privacy_protection_javascript'),
           checked: this.state.javaScriptEnabled,
           isEnabled: this.state.canEditSettings && !this.isSaving(),
           primaryTextColor: this.primaryTextColor,
@@ -124,7 +124,7 @@ export struct BrowserWebSecuritySettingsContent {
         })
         SettingsDesktopDivider({ dividerColor: this.dividerColor })
         SettingsDesktopNavigationRow({
-          title: 'JavaScript 网站例外',
+          title: $r('app.string.settings_privacy_protection_javascript_exceptions'),
           value: this.resolveJavaScriptExceptionCount(),
           isEnabled: this.state.canEditSettings && !this.isSaving(),
           primaryTextColor: this.primaryTextColor,
@@ -139,7 +139,7 @@ export struct BrowserWebSecuritySettingsContent {
     } else {
       SettingsGroupCard({ surfaceColor: this.surfaceBackground }) {
         SettingsSwitchRow({
-          title: '允许 JavaScript',
+          title: $r('app.string.settings_privacy_protection_javascript'),
           checked: this.state.javaScriptEnabled,
           rowPosition: 'first',
           isEnabled: this.state.canEditSettings && !this.isSaving(),
@@ -152,7 +152,7 @@ export struct BrowserWebSecuritySettingsContent {
         })
         SettingsGroupDivider({ dividerColor: this.dividerColor })
         SettingsNavigationRow({
-          title: 'JavaScript 网站例外',
+          title: $r('app.string.settings_privacy_protection_javascript_exceptions'),
           value: this.resolveJavaScriptExceptionCount(),
           rowPosition: 'last',
           isEnabled: this.state.canEditSettings && !this.isSaving(),
@@ -175,9 +175,9 @@ export struct BrowserWebSecuritySettingsContent {
     this.persistSetting(settingId as BrowserWebSecuritySettingId, enabled);
   }
 
-  private resolveJavaScriptExceptionCount(): string {
+  private resolveJavaScriptExceptionCount(): ResourceStr {
     return this.state.javaScriptSiteExceptionCount > 0
-      ? `${this.state.javaScriptSiteExceptionCount} 个网站`
+      ? $r('app.string.settings_privacy_protection_javascript_count', this.state.javaScriptSiteExceptionCount)
       : '';
   }
 
@@ -191,12 +191,12 @@ export struct BrowserWebSecuritySettingsContent {
       return;
     }
     showCenteredAlertDialog({
-      title: '关闭 JavaScript？',
-      message: '大多数网站依赖 JavaScript。关闭后，登录、支付、视频和交互内容可能无法正常使用。',
+      title: $r('app.string.settings_privacy_protection_javascript_off_title'),
+      message: $r('app.string.settings_privacy_protection_javascript_off_message'),
       autoCancel: true,
-      primaryButton: { value: '取消', action: (): void => {} },
+      primaryButton: { value: $r('app.string.settings_privacy_protection_dialog_cancel'), action: (): void => {} },
       secondaryButton: {
-        value: '仍要关闭',
+        value: $r('app.string.settings_privacy_protection_javascript_off_confirm'),
         action: (): void => this.persistSetting('javascript', false)
       }
     });

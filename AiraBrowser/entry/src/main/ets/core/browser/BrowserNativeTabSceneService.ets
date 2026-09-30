@@ -1,5 +1,6 @@
 import urlUtils from '@ohos.url';
 import { BookmarkStorageScope } from '../../common/models/BrowserModels';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { SettingsCenterDestination } from '../settings/SettingsCenterViewModel';
 
 export type BrowserNativeTabScene =
@@ -41,6 +42,11 @@ export interface SettingsNativeTabRouteState {
 export interface BrowserNativeTabOpenRequest {
   scene: BrowserNativeTabScene;
   settingsDestination?: SettingsCenterDestination;
+}
+
+function resolveLocalizedNativeTabTitle(resource: Resource, fallback: string): string {
+  const resolved = resolveAppResourceText(resource);
+  return resolved.length > 0 ? resolved : fallback;
 }
 
 /**
@@ -131,11 +137,11 @@ export class BrowserNativeTabSceneService {
       case 'user_scripts':
         return USER_SCRIPTS_NATIVE_TAB_TITLE;
       case 'app_proxy':
-        return APP_PROXY_NATIVE_TAB_TITLE;
+        return resolveLocalizedNativeTabTitle($r('app.string.settings_app_proxy'), APP_PROXY_NATIVE_TAB_TITLE);
       case 'saved_pages':
         return SAVED_PAGES_NATIVE_TAB_TITLE;
       case 'bookshelf':
-        return BOOKSHELF_NATIVE_TAB_TITLE;
+        return resolveLocalizedNativeTabTitle($r('app.string.bookshelf_title'), BOOKSHELF_NATIVE_TAB_TITLE);
       default:
         return undefined;
     }

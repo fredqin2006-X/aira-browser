@@ -1,3 +1,4 @@
+import { localizeHistoryHost } from '../../../core/resources/HistoryBookmarkDisplayText';
 import { image } from '@kit.ImageKit';
 import { HistorySiteGroup } from '../../../features/history/HistoryViewModel';
 import { SiteIconListRenderState, SiteIconListTarget } from '../../../core/siteicons/SiteIconListPresenter';
@@ -107,14 +108,14 @@ export struct HistoryLargeScreenSites {
         })
 
         Column({ space: 3 }) {
-          Text(site.host)
+          Text(localizeHistoryHost(site.host))
             .width('100%')
             .fontSize(RECORD_LIST_ROW_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.storedPrimaryTextColor)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
-          Text(`${site.visitCount} 次访问 · ${site.uniqueUrlCount} 个页面 · 最近 ${site.latestTitle}`)
+          Text($r('app.string.history_visit_summary', site.visitCount, site.uniqueUrlCount, site.latestTitle))
             .width('100%')
             .fontSize(RECORD_LIST_ROW_SUBTITLE_SIZE)
             .fontColor(this.storedSecondaryTextColor)
@@ -153,17 +154,17 @@ export struct HistoryLargeScreenSites {
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
           menuWidthVp: BROWSER_DESKTOP_MENU_WIDE_WIDTH_VP,
-          label: '查看此站点的记录',
+          label: $r('app.string.history_view_site'),
           onAction: (): void => this.onOpenSite(site)
         })
         BrowserDesktopContextMenuItem({
           menuWidthVp: BROWSER_DESKTOP_MENU_WIDE_WIDTH_VP,
-          label: '打开最近访问页面',
+          label: $r('app.string.history_open_recent'),
           onAction: (): void => this.onOpenLatest(site, false)
         })
         BrowserDesktopContextMenuItem({
           menuWidthVp: BROWSER_DESKTOP_MENU_WIDE_WIDTH_VP,
-          label: '在新标签页中打开最近访问页面',
+          label: $r('app.string.history_open_recent_new_tab'),
           onAction: (): void => this.onOpenLatest(site, true)
         })
       }
@@ -171,7 +172,7 @@ export struct HistoryLargeScreenSites {
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
           menuWidthVp: BROWSER_DESKTOP_MENU_WIDE_WIDTH_VP,
-          label: '复制最近访问链接',
+          label: $r('app.string.history_copy_recent'),
           onAction: (): void => this.onCopyLink(site)
         })
       }
@@ -179,7 +180,7 @@ export struct HistoryLargeScreenSites {
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
           menuWidthVp: BROWSER_DESKTOP_MENU_WIDE_WIDTH_VP,
-          label: '删除此站点的历史记录',
+          label: $r('app.string.history_delete_site'),
           onAction: (): void => this.onDeleteSite(site)
         })
       }

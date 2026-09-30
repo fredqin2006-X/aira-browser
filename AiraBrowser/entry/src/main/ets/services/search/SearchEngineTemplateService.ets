@@ -7,6 +7,7 @@ import {
   SearchEngineResultPageShape
 } from '../../common/models/BrowserModels';
 import { looksLikeUrl, normalizeUrl } from '../../common/utils/UrlUtils';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export interface SearchEngineTemplateValidationResult {
   valid: boolean;
@@ -28,17 +29,17 @@ export class SearchEngineTemplateService {
   validateTemplate(template: string): SearchEngineTemplateValidationResult {
     const normalizedTemplate = this.normalizeTemplate(template);
     if (normalizedTemplate.length === 0) {
-      return this.buildInvalidResult(normalizedTemplate, '请输入搜索 URL。');
+      return this.buildInvalidResult(normalizedTemplate, resolveAppResourceText($r('app.string.settings_search_engine_url_required')));
     }
     if (!normalizedTemplate.includes(SEARCH_TERMS_PLACEHOLDER)) {
-      return this.buildInvalidResult(normalizedTemplate, '搜索 URL 需要包含 {searchTerms}。');
+      return this.buildInvalidResult(normalizedTemplate, resolveAppResourceText($r('app.string.settings_search_engine_url_needs_placeholder')));
     }
     if (this.countPlaceholder(normalizedTemplate) !== 1) {
-      return this.buildInvalidResult(normalizedTemplate, '搜索 URL 只能包含一个 {searchTerms}。');
+      return this.buildInvalidResult(normalizedTemplate, resolveAppResourceText($r('app.string.settings_search_engine_url_one_placeholder')));
     }
     const probeUrl = normalizedTemplate.replace(SEARCH_TERMS_PLACEHOLDER, 'aira');
     if (!this.isHttpUrl(probeUrl)) {
-      return this.buildInvalidResult(normalizedTemplate, '请输入 http 或 https 开头的完整 URL。');
+      return this.buildInvalidResult(normalizedTemplate, resolveAppResourceText($r('app.string.settings_search_engine_url_scheme')));
     }
     return {
       valid: true,

@@ -38,6 +38,7 @@ import {
   VideoCompatibilityProfileCatalog
 } from '../../../services/media/VideoCompatibilityProfileCatalog';
 import { WEB_VIDEO_ACTION_TOOLBAR_PROTOCOL } from '../../../services/video/WebVideoRuntimeProtocol';
+import { resolveAppResourceText } from '../../resources/AppResourceText';
 
 const ARKWEB_MEDIA_LOG_DOMAIN: number = 0x0000;
 const ARKWEB_MEDIA_LOG_TAG: string = 'ArkWebMediaAssistant';
@@ -432,11 +433,11 @@ export class BrowserArkWebMediaTakeoverCoordinator {
     if (action.type === 'download') {
       const session = this.resolveActiveWebLiveSession();
       if (session === undefined) {
-        host.showToast('当前网页视频会话已经失效。');
+        host.showToast(resolveAppResourceText($r('app.string.media_resource_toast_session_expired')));
         return;
       }
       if (this.activeDownloadInteraction !== undefined) {
-        host.showToast('正在处理当前视频下载。');
+        host.showToast(resolveAppResourceText($r('app.string.media_resource_toast_handling_download')));
         return;
       }
       void this.requestAssistantDownload(session, host);
@@ -788,22 +789,31 @@ export class BrowserArkWebMediaTakeoverCoordinator {
   beginLaunch(tabId: string, webLiveRouteEnabled: boolean): BrowserArkWebMediaLaunchPlan {
     const normalizedTabId = tabId.trim();
     if (this.launchInFlightByTab.get(normalizedTabId) === true) {
-      return this.buildRejectedLaunch('launch_in_flight', '正在准备接管，请稍候。');
+      return this.buildRejectedLaunch(
+        'launch_in_flight',
+        resolveAppResourceText($r('app.string.media_resource_takeover_preparing'))
+      );
     }
     const session = this.resolveActiveSession(normalizedTabId);
     if (session === undefined || session.playbackState !== 'playing') {
-      return this.buildRejectedLaunch('session_missing', 'ArkWeb 当前没有识别到正在播放的视频。');
+      return this.buildRejectedLaunch(
+        'session_missing',
+        resolveAppResourceText($r('app.string.media_resource_takeover_no_playing_video'))
+      );
     }
     const liveTarget = this.buildWebLiveTarget(normalizedTabId, session);
     if (liveTarget === undefined || !this.isWebLiveRouteEligible(normalizedTabId, session, webLiveRouteEnabled)) {
       return this.buildRejectedLaunch(
         'web_live_unavailable',
-        '已识别到网页视频，但当前页面没有提供可控制的真实视频会话。'
+        resolveAppResourceText($r('app.string.media_resource_takeover_no_real_session'))
       );
     }
     const launchLease = this.createLaunchLease(normalizedTabId, session, liveTarget);
     if (launchLease === undefined) {
-      return this.buildRejectedLaunch('launch_authority_unavailable', '网页视频会话已经变化，请重新播放后再试。');
+      return this.buildRejectedLaunch(
+        'launch_authority_unavailable',
+        resolveAppResourceText($r('app.string.media_resource_takeover_session_changed'))
+      );
     }
     this.launchInFlightByTab.set(normalizedTabId, true);
     this.launchLeaseByTab.set(normalizedTabId, launchLease);
@@ -861,7 +871,8 @@ export class BrowserArkWebMediaTakeoverCoordinator {
         }
         host.invalidatePresentation();
         host.showToast(freshReachability.userVisibleMessage.length > 0 ?
-          freshReachability.userVisibleMessage : '网页视频会话已经变化，请重新播放后再试。');
+          freshReachability.userVisibleMessage
+          : resolveAppResourceText($r('app.string.media_resource_takeover_session_changed')));
         return { plan: plan, started: false, webResult: freshReachability };
       }
       if (!this.publishLaunchReachability(plan, evidenceCapture, 'reachable')) {
@@ -931,7 +942,7 @@ export class BrowserArkWebMediaTakeoverCoordinator {
         !this.sessionMatchesLiveTarget(session, plan.liveTarget) || session.playbackState === 'ended' ||
         !this.runtimeLifecyclePort.isActiveWebTab(input.activeTabId)) {
         await this.restoreWebLivePresentation(input.activeTabId, plan.liveTarget);
-        host.showToast('网页视频所在标签页已经变化，已取消接管。');
+        host.showToast(resolveAppResourceText($r('app.string.media_resource_takeover_tab_changed')));
         return { plan: plan, started: false, webResult: presentationResult };
       }
       let fullscreenStarted = false;
@@ -955,7 +966,8 @@ export class BrowserArkWebMediaTakeoverCoordinator {
           host.exitWebLiveFullscreen(input.activeTabId);
         }
         host.showToast(fullscreenStarted ?
-          '网页视频所在标签页已经切换，已取消接管。' : '当前页面不能进入视频接管全屏。');
+          resolveAppResourceText($r('app.string.media_resource_takeover_tab_switched'))
+          : resolveAppResourceText($r('app.string.media_resource_takeover_fullscreen_blocked')));
         return { plan: plan, started: false, webResult: presentationResult };
       }
       this.activateWebLiveAssistant(
@@ -1289,7 +1301,7 @@ export class BrowserArkWebMediaTakeoverCoordinator {
     const session = this.resolveActiveWebLiveSession();
     const target = this.activeWebLiveTarget;
     if (session === undefined || target === undefined) {
-      host.showToast('当前网页视频会话已经失效。');
+      host.showToast(resolveAppResourceText($r('app.string.media_resource_toast_session_expired')));
       return false;
     }
     const capture = this.runtimeEvidencePublisher?.capture(this.activeWebLiveTabId);
@@ -1338,7 +1350,7 @@ export class BrowserArkWebMediaTakeoverCoordinator {
     const session = this.resolveActiveWebLiveSession();
     const metadata = this.metadataByTabId.get(this.activeWebLiveTabId);
     if (session === undefined || metadata === undefined) {
-      host.showToast('当前网页视频会话已经失效。');
+      host.showToast(resolveAppResourceText($r('app.string.media_resource_toast_session_expired')));
       return;
     }
     const sessionKey = this.activeWebLiveSessionId;
@@ -1347,11 +1359,11 @@ export class BrowserArkWebMediaTakeoverCoordinator {
       session.playbackTargetId
     );
     if (resolvedCastMedia?.reason === 'missing_target') {
-      host.showToast('当前网页视频会话已经失效。');
+      host.showToast(resolveAppResourceText($r('app.string.media_resource_toast_session_expired')));
       return;
     }
     if (resolvedCastMedia?.reason === 'ambiguous_resource') {
-      host.showToast('当前视频匹配到多个投放地址，暂时无法确定要投放哪一个。');
+      host.showToast(resolveAppResourceText($r('app.string.media_resource_cast_multiple_targets')));
       return;
     }
     if (resolvedCastMedia?.reason === 'web_context_required') {
@@ -1361,15 +1373,15 @@ export class BrowserArkWebMediaTakeoverCoordinator {
         'cast_media_rejected reason=%{public}s',
         'web_context_required'
       );
-      host.showToast('当前视频依赖网页登录或鉴权信息，投放设备无法直接读取。');
+      host.showToast(resolveAppResourceText($r('app.string.media_resource_cast_auth_required')));
       return;
     }
     if (resolvedCastMedia?.reason === 'unsupported_resource') {
-      host.showToast('当前视频资源需要网页环境或使用了不支持的格式，暂时无法投放。');
+      host.showToast(resolveAppResourceText($r('app.string.media_resource_cast_unsupported')));
       return;
     }
     if (resolvedCastMedia?.reason === 'ready' && resolvedCastMedia.mediaUri === undefined) {
-      host.showToast('当前视频没有可供投放设备直接读取的地址。');
+      host.showToast(resolveAppResourceText($r('app.string.media_resource_cast_no_address')));
       return;
     }
     const resolvedMediaReady = resolvedCastMedia?.reason === 'ready' &&
@@ -1381,7 +1393,7 @@ export class BrowserArkWebMediaTakeoverCoordinator {
         'cast_media_rejected reason=%{public}s',
         metadata.requestContextReason
       );
-      host.showToast('当前视频依赖网页登录或鉴权信息，投放设备无法直接读取。');
+      host.showToast(resolveAppResourceText($r('app.string.media_resource_cast_auth_required')));
       return;
     }
     const item: VideoAssistantCastMediaItem = {
@@ -1446,13 +1458,13 @@ export class BrowserArkWebMediaTakeoverCoordinator {
   ): Promise<void> {
     const interaction = this.beginDownloadInteraction(session);
     if (interaction === undefined) {
-      host.showToast('当前网页视频会话已经失效。');
+      host.showToast(resolveAppResourceText($r('app.string.media_resource_toast_session_expired')));
       return;
     }
     try {
       await host.requestDownload(interaction.tabId, interaction.playbackTargetId);
     } catch (_error) {
-      host.showToast('当前视频下载请求失败。');
+      host.showToast(resolveAppResourceText($r('app.string.media_resource_download_failed')));
     } finally {
       try {
         await this.refreshDownloadInteractionEvidence(interaction);
@@ -1574,7 +1586,7 @@ export class BrowserArkWebMediaTakeoverCoordinator {
     try {
       await host.applyOrientation(orientation, 'assistant_video_manual_rotate');
     } catch (_error) {
-      host.showToast('视频方向切换失败。');
+      host.showToast(resolveAppResourceText($r('app.string.media_resource_orientation_failed')));
     } finally {
       if (requestId === this.webLiveOrientationRequestId) {
         this.webLiveOrientationInFlight = false;
@@ -1748,7 +1760,7 @@ export class BrowserArkWebMediaTakeoverCoordinator {
   ): boolean {
     if (result.errorCode > 0) {
       let changed = this.setActiveWebLiveLoadingReason('');
-      changed = this.setActiveWebLiveErrorMessage('视频播放失败。') || changed;
+      changed = this.setActiveWebLiveErrorMessage(resolveAppResourceText($r('app.string.media_resource_playback_failed'))) || changed;
       return changed;
     }
     let changed = this.setActiveWebLiveErrorMessage('');
@@ -1785,7 +1797,7 @@ export class BrowserArkWebMediaTakeoverCoordinator {
     }
     if (eventName === 'error') {
       let changed = this.setActiveWebLiveLoadingReason('');
-      changed = this.setActiveWebLiveErrorMessage('视频播放失败。') || changed;
+      changed = this.setActiveWebLiveErrorMessage(resolveAppResourceText($r('app.string.media_resource_playback_failed'))) || changed;
       return changed;
     }
     if (eventName === 'pause' || eventName === 'ended' || eventName === 'emptied' || eventName === 'abort') {
@@ -1860,7 +1872,7 @@ export class BrowserArkWebMediaTakeoverCoordinator {
       item: {
         id: 'web-live:' + session.sessionId,
         tabId: this.activeWebLiveTabId,
-        title: metadata?.pageTitle ?? '网页视频',
+        title: metadata?.pageTitle ?? resolveAppResourceText($r('app.string.media_resource_web_video_title')),
         pageUrl: metadata?.pageUrl ?? '',
         url: this.activeWebLiveTarget?.source ?? '',
         posterUrl: metadata?.posterUrl ?? '',

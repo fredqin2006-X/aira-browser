@@ -1,4 +1,5 @@
 import { KeyCode } from '@kit.InputKit';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { BookmarkNode, BookmarkStorageScope } from '../../../common/models/BrowserModels';
 import { sharedBookmarkRepository } from '../../bootstrap/BrowserAppRuntime';
 import {
@@ -118,7 +119,7 @@ struct BrowserLargeScreenBookmarkFolderCascade {
       Scroll() {
         Column() {
           if (this.columnItems(parentKey).length === 0) {
-            Text('此文件夹是空的')
+            Text($r('app.string.bookmark_bar_empty_folder'))
               .width('100%')
               .constraintSize({ minHeight: BROWSER_DESKTOP_MENU_ITEM_HEIGHT_VP })
               .padding({
@@ -203,7 +204,7 @@ struct BrowserLargeScreenBookmarkFolderCascade {
     .borderRadius(BROWSER_DESKTOP_MENU_ITEM_CORNER_RADIUS_VP)
     .clip(true)
     .hoverEffect(HoverEffect.None)
-    .accessibilityText(node.type === 'folder' ? `文件夹 ${node.title}` : node.title)
+    .accessibilityText(resolveAppResourceText(node.type === 'folder' ? $r('app.string.bookmark_bar_folder_a11y', node.title) : node.title))
     .onHover((hovered: boolean): void => {
       this.hoveredId = hovered ? node.id : (this.hoveredId === node.id ? '' : this.hoveredId);
       if (!hovered) {
@@ -429,7 +430,7 @@ struct BrowserLargeScreenBookmarkBarEntry {
     .buttonStyle(ButtonStyleMode.TEXTUAL)
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
     .stateEffect(true)
-    .accessibilityText(this.node.type === 'folder' ? `文件夹 ${this.node.title}` : this.node.title)
+    .accessibilityText(resolveAppResourceText(this.node.type === 'folder' ? $r('app.string.bookmark_bar_folder_a11y', this.node.title) : this.node.title))
     .onTouch((event: TouchEvent): void => {
       if (event.type === TouchType.Down) {
         this.touchDownAtMs = Date.now();
@@ -608,7 +609,7 @@ export struct BrowserLargeScreenBookmarkBar {
     .type(ButtonType.Circle)
     .buttonStyle(ButtonStyleMode.TEXTUAL)
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
-    .accessibilityText('打开书签管理')
+    .accessibilityText($r('app.string.bookmark_bar_open_manager_short'))
     .onTouch((event: TouchEvent): void => {
       if (event.type === TouchType.Down) {
         this.managerTouchDownAtMs = Date.now();
@@ -671,7 +672,7 @@ export struct BrowserLargeScreenBookmarkBar {
     .type(ButtonType.Circle)
     .buttonStyle(ButtonStyleMode.TEXTUAL)
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
-    .accessibilityText('更多书签')
+    .accessibilityText($r('app.string.bookmark_bar_more'))
     .onClick((): void => {
       this.overflowMenuOpen = true;
     })
@@ -717,7 +718,7 @@ export struct BrowserLargeScreenBookmarkBar {
   @Builder
   private buildManagerContextMenu() {
     BrowserDesktopContextMenu() {
-      BrowserDesktopContextMenuItem({ label: '打开书签管理器', onAction: (): void => this.onAction({ kind: 'open_bookmarks' }) })
+      BrowserDesktopContextMenuItem({ label: $r('app.string.bookmark_bar_open_manager'), onAction: (): void => this.onAction({ kind: 'open_bookmarks' }) })
     }
   }
 
@@ -850,7 +851,7 @@ export struct BrowserLargeScreenBookmarkBar {
 
   private resolveFallbackLabel(node: BookmarkNode): string {
     const title = node.title.trim();
-    return title.length > 0 ? title.substring(0, 1).toUpperCase() : '书';
+    return title.length > 0 ? title.substring(0, 1).toUpperCase() : resolveAppResourceText($r('app.string.bookmark_fallback_glyph'));
   }
 
   private handleKeyEvent(event: KeyEvent): boolean {

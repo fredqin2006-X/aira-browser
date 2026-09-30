@@ -61,7 +61,7 @@ struct GeneralTabAutoCloseSettingsPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '自动关闭标签页',
+        title: $r('app.string.settings_general_tab_auto_close'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -84,7 +84,7 @@ struct GeneralTabAutoCloseSettingsPage {
   @Builder
   private buildSection() {
     SettingsSection({
-      title: '常规标签页',
+      title: $r('app.string.settings_general_tab_section'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {

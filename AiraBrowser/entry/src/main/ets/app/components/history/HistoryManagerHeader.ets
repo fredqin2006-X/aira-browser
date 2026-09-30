@@ -14,8 +14,8 @@ const HISTORY_VIEW_MODE_BAR_HEIGHT: number = 36;
 const HISTORY_VIEW_MODE_BAR_HORIZONTAL_PADDING: number = 16;
 
 const HISTORY_VIEW_MODE_OPTIONS: SegmentedTabOption[] = [
-  { id: 'timeline', title: '时间线' },
-  { id: 'sites', title: '站点' }
+  { id: 'timeline', title: $r('app.string.history_timeline') },
+  { id: 'sites', title: $r('app.string.history_sites') }
 ];
 
 @Component

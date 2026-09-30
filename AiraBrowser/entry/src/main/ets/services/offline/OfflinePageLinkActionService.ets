@@ -7,7 +7,7 @@ import { BrowserPrivacyEffectPolicyService } from '../privacy/BrowserPrivacyEffe
 
 export interface OfflinePageLinkActionResult {
   ok: boolean;
-  message: string;
+  message: ResourceStr;
 }
 
 export class OfflinePageLinkActionService {
@@ -22,14 +22,14 @@ export class OfflinePageLinkActionService {
     if (!this.isManagementShareAllowed(dataScope, privacyMode)) {
       return {
         ok: false,
-        message: '当前隐私策略不允许复制离线页面链接'
+        message: $r('app.string.offline_copy_blocked')
       };
     }
     const normalizedUrl = url.trim();
     if (normalizedUrl.length === 0) {
       return {
         ok: false,
-        message: '原网页链接不可用'
+        message: $r('app.string.offline_original_link_unavailable')
       };
     }
 
@@ -38,12 +38,12 @@ export class OfflinePageLinkActionService {
       await pasteboard.getSystemPasteboard().setData(data);
       return {
         ok: true,
-        message: '已复制链接'
+        message: $r('app.string.offline_copy_done')
       };
     } catch (_error) {
       return {
         ok: false,
-        message: '复制失败，请稍后重试'
+        message: $r('app.string.offline_copy_failed')
       };
     }
   }
@@ -58,14 +58,14 @@ export class OfflinePageLinkActionService {
     if (!this.isManagementShareAllowed(dataScope, privacyMode)) {
       return {
         ok: false,
-        message: '当前隐私策略不允许分享离线页面链接'
+        message: $r('app.string.offline_share_blocked')
       };
     }
     const normalizedUrl = url.trim();
     if (normalizedUrl.length === 0) {
       return {
         ok: false,
-        message: '原网页链接不可用'
+        message: $r('app.string.offline_original_link_unavailable')
       };
     }
 
@@ -74,19 +74,19 @@ export class OfflinePageLinkActionService {
       await this.showSharePanel(context, normalizedTitle, normalizedUrl);
       return {
         ok: true,
-        message: '已打开分享面板'
+        message: $r('app.string.offline_share_opened')
       };
     } catch (_error) {
       const copyResult = await this.copyOriginalUrl(normalizedUrl, dataScope, privacyMode);
       if (copyResult.ok) {
         return {
           ok: true,
-          message: '已复制链接，可手动分享'
+          message: $r('app.string.offline_share_copied')
         };
       }
       return {
         ok: false,
-        message: '分享失败，请稍后重试'
+        message: $r('app.string.offline_share_failed')
       };
     }
   }

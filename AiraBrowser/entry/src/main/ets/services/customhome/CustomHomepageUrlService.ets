@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { looksLikeUrl, normalizeUrl } from '../../common/utils/UrlUtils';
 
 export interface CustomHomepageUrlValidationResult {
@@ -21,21 +22,21 @@ export class CustomHomepageUrlService {
   validateRemoteHomepageUrl(rawValue: string): CustomHomepageUrlValidationResult {
     const normalizedInput = rawValue.trim();
     if (normalizedInput.length === 0) {
-      return this.buildInvalidResult('请输入主页网址。');
+      return this.buildInvalidResult(resolveAppResourceText($r('app.string.settings_custom_home_url_empty')));
     }
     if (this.hasWhitespace(normalizedInput)) {
-      return this.buildInvalidResult('网址中不能包含空格。');
+      return this.buildInvalidResult(resolveAppResourceText($r('app.string.settings_custom_home_url_space')));
     }
     if (!looksLikeUrl(normalizedInput)) {
-      return this.buildInvalidResult('请输入有效的网址。');
+      return this.buildInvalidResult(resolveAppResourceText($r('app.string.settings_custom_home_url_invalid')));
     }
     const normalizedUrl = normalizeUrl(normalizedInput).trim();
     const lowerUrl = normalizedUrl.toLowerCase();
     if (!lowerUrl.startsWith('http://') && !lowerUrl.startsWith('https://')) {
-      return this.buildInvalidResult('主页网址仅支持 http 或 https。');
+      return this.buildInvalidResult(resolveAppResourceText($r('app.string.settings_custom_home_url_scheme')));
     }
     if (!this.hasValidHttpHost(normalizedUrl)) {
-      return this.buildInvalidResult('请输入有效的网址。');
+      return this.buildInvalidResult(resolveAppResourceText($r('app.string.settings_custom_home_url_invalid')));
     }
     return {
       valid: true,

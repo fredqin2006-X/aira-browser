@@ -6,6 +6,7 @@ import {
   UserScriptParsedUrlParts,
   UserScriptUrlCompatibilityService
 } from './UserScriptUrlCompatibilityService';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export class UserScriptMatchService {
   private compatibilityService: UserScriptUrlCompatibilityService = new UserScriptUrlCompatibilityService();
@@ -44,14 +45,14 @@ export class UserScriptMatchService {
     if (positiveRules.length > 0) {
       return this.summarizeRules(positiveRules);
     }
-    return '无站点';
+    return resolveAppResourceText($r('app.string.user_script_scope_none'));
   }
 
   private summarizeRules(rules: string[]): string {
     if (rules.length === 1) {
       return rules[0];
     }
-    return `${rules.length} 个站点规则`;
+    return resolveAppResourceText($r('app.string.user_script_scope_rule_count'), `${rules.length}`);
   }
 
   private matchesAny(rules: string[], target: UserScriptParsedUrlParts, includeMode: boolean): boolean {

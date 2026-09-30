@@ -8,6 +8,15 @@ import {
   canEnableCrossDeviceLinkSwitch
 } from '../main/ets/core/sync/CrossDeviceLinkViewModel';
 import { resolveCrossDeviceBrowserIconKind } from '../main/ets/core/sync/CrossDeviceBrowserIcon';
+import {
+  buildCrossDeviceLinkOrbitLayout,
+  capCrossDeviceLinkOrbitStageWidth,
+  crossDeviceLinkOrbitPageFadeColor,
+  crossDeviceLinkOrbitSpinAngle,
+  CrossDeviceLinkOrbitMarkPlacement,
+  resolveCrossDeviceLinkOrbitCoverHeight,
+  resolveCrossDeviceLinkOrbitScrollOpacity
+} from '../main/ets/core/sync/CrossDeviceLinkOrbitLayout';
 
 function buildDevice(deviceId: string, platform: string, browserName: string, tabCount: number,
   ageMs: number): CrossDeviceLinkDeviceFact {
@@ -54,7 +63,7 @@ export default function crossDeviceLinkViewModelTest(): void {
       // The page owns the link switch; data sync is only a jump to its owner.
       expect(state.linkEnabled).assertTrue();
       expect(state.linkSwitchEnabled).assertTrue();
-      expect(state.linkSwitchTitle).assertEqual('跨设备互联');
+      expect(state.linkSwitchTitle).assertEqual('与电脑互联');
       expect(state.syncSettingsValue).assertEqual('Aira 云');
       expect(state.addDeviceTitle).assertEqual('添加设备');
       expect(state.addDeviceDetail.length > 0).assertTrue();
@@ -310,6 +319,89 @@ export default function crossDeviceLinkViewModelTest(): void {
 
       facts.localDevice = { deviceName: '', platform: '', browserName: '' };
       expect(buildState(facts).localDeviceRow.title).assertEqual('本机');
+    });
+  });
+
+  describe('CrossDeviceLinkOrbitLayout', () => {
+    it('keeps every browser mark on its ring, centered on the Aira logo', 0, () => {
+      const layout = buildCrossDeviceLinkOrbitLayout(390);
+      expect(layout.orbits.length).assertEqual(3);
+      expect(layout.marks.length).assertEqual(7);
+      layout.marks.forEach((mark: CrossDeviceLinkOrbitMarkPlacement) => {
+        const distance = Math.hypot(mark.x - layout.centerX, mark.y - layout.centerY);
+        expect(Math.abs(distance - mark.orbitRadius) < 0.01).assertTrue();
+      });
+      const brave = layout.marks.filter((mark: CrossDeviceLinkOrbitMarkPlacement): boolean => mark.kind === 'brave')[0];
+      expect(Math.abs(brave.x - layout.centerX) < 0.01).assertTrue();
+      expect(brave.y < layout.centerY).assertTrue();
+      expect(layout.topFadeHold > 0 && layout.topFadeHold < layout.topFadeEnd).assertTrue();
+      expect(layout.topFadeEnd < layout.fadeHold).assertTrue();
+      expect(layout.logoSize < 100).assertTrue();
+      expect(layout.fadeHold < layout.fadeEnd && layout.fadeEnd < 1).assertTrue();
+      expect(layout.stageHeight > layout.centerY + layout.orbits[2] * 0.5).assertTrue();
+    });
+
+    it('scales the same drawing down and never past the reviewed width', 0, () => {
+      expect(capCrossDeviceLinkOrbitStageWidth(640)).assertEqual(390);
+      expect(capCrossDeviceLinkOrbitStageWidth(320)).assertEqual(320);
+      const layout = buildCrossDeviceLinkOrbitLayout(320);
+      const chrome = layout.marks.filter((mark: CrossDeviceLinkOrbitMarkPlacement): boolean => mark.kind === 'chrome')[0];
+      const distance = Math.hypot(chrome.x - layout.centerX, chrome.y - layout.centerY);
+      expect(Math.abs(distance - chrome.orbitRadius) < 0.01).assertTrue();
+      expect(Math.abs(layout.centerX - 160) < 0.01).assertTrue();
+    });
+
+    it('starts the marks apart instead of packed at the top', 0, () => {
+      const layout = buildCrossDeviceLinkOrbitLayout(390);
+      let closest = 1000;
+      for (let i = 0; i < layout.marks.length; i++) {
+        for (let j = i + 1; j < layout.marks.length; j++) {
+          const distance = Math.hypot(
+            layout.marks[i].x - layout.marks[j].x,
+            layout.marks[i].y - layout.marks[j].y
+          );
+          if (distance < closest) {
+            closest = distance;
+          }
+        }
+      }
+      expect(closest > 80).assertTrue();
+    });
+
+    it('starts on the reviewed pose and lets the inner ring lead', 0, () => {
+      expect(crossDeviceLinkOrbitSpinAngle(0, 0)).assertEqual(0);
+      expect(crossDeviceLinkOrbitSpinAngle(1, 0)).assertEqual(0);
+      expect(crossDeviceLinkOrbitSpinAngle(2, 0)).assertEqual(0);
+      const inner = crossDeviceLinkOrbitSpinAngle(0, 1000);
+      const middle = crossDeviceLinkOrbitSpinAngle(1, 1000);
+      const outer = crossDeviceLinkOrbitSpinAngle(2, 1000);
+      expect(inner > middle).assertTrue();
+      expect(middle > outer).assertTrue();
+      expect(inner < 360).assertTrue();
+    });
+
+    it('rests the list over the logo lower edge instead of under a gap', 0, () => {
+      const layout = buildCrossDeviceLinkOrbitLayout(390);
+      const coverHeight = resolveCrossDeviceLinkOrbitCoverHeight(layout);
+      const logoBottom = layout.centerY + layout.logoSize / 2;
+      expect(coverHeight < logoBottom).assertTrue();
+      expect(coverHeight > layout.centerY).assertTrue();
+    });
+
+    it('fades the top into that mode\'s own page background', 0, () => {
+      expect(crossDeviceLinkOrbitPageFadeColor('#F2F3F5', 'FF')).assertEqual('#FFF2F3F5');
+      expect(crossDeviceLinkOrbitPageFadeColor('#F2F3F5', '00')).assertEqual('#00F2F3F5');
+      expect(crossDeviceLinkOrbitPageFadeColor('#101010', 'FF')).assertEqual('#FF101010');
+      expect(crossDeviceLinkOrbitPageFadeColor('#101010', '00')).assertEqual('#00101010');
+      expect(crossDeviceLinkOrbitPageFadeColor('#FFF2F3F5', '00')).assertEqual('#00F2F3F5');
+    });
+
+    it('fades the illustration out as the list scrolls up over it', 0, () => {
+      expect(resolveCrossDeviceLinkOrbitScrollOpacity(0, 200)).assertEqual(1);
+      expect(resolveCrossDeviceLinkOrbitScrollOpacity(-12, 200)).assertEqual(1);
+      expect(resolveCrossDeviceLinkOrbitScrollOpacity(100, 200)).assertEqual(0.5);
+      expect(resolveCrossDeviceLinkOrbitScrollOpacity(200, 200)).assertEqual(0);
+      expect(resolveCrossDeviceLinkOrbitScrollOpacity(260, 200)).assertEqual(0);
     });
   });
 }

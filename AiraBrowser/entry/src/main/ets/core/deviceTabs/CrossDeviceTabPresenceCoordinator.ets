@@ -130,7 +130,7 @@ export class CrossDeviceTabPresenceCoordinator {
           false,
           localDevice.deviceName,
           [],
-          unavailable ? '跨设备互联不可用' : '请先连接私有化部署',
+          unavailable ? '与电脑互联不可用' : '请先连接私有化部署',
           buildCrossDeviceTabsEmptyPresentation('connect_personal_server', unavailable ? 'unavailable' : 'community')
         );
       }

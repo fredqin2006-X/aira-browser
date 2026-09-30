@@ -48,6 +48,7 @@ import {
   resolveCurrentSiteUrl
 } from './AddressDisplayFormatter';
 import { BrowserFingerprintPrivacyPolicyService } from '../../services/privacy/BrowserFingerprintPrivacyPolicyService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 const PROTECTION_DEBUG_DOMAIN: number = 0x0000;
 const PROTECTION_DEBUG_TAG: string = 'ProtectionCountDiag';
@@ -76,7 +77,7 @@ interface BrowserSiteControlsDataState {
 interface BrowserSiteControlsProtectionState {
   capabilitySupported: boolean;
   availabilityState: BrowserAdBlockProtectionAvailabilityState;
-  summary: string;
+  summary: ResourceStr;
   siteToggleEnabled: boolean;
   siteEnabled: boolean;
   blockedCount: number;
@@ -84,7 +85,7 @@ interface BrowserSiteControlsProtectionState {
   linkCleaningCount: number;
   elementHidingCount: number;
   privacyCoverageState: BrowserAdBlockPrivacyCoverageState;
-  privacyCoverageSummary: string;
+  privacyCoverageSummary: ResourceStr;
 }
 
 export class BrowserSiteControlsSessionState {
@@ -102,8 +103,8 @@ export class BrowserSiteControlsSessionState {
     loading: false, cookieCount: 0, storageUsageBytes: 0, storageOrigin: ''
   };
   certificate: SiteCertificatePresentationState = {
-    summary: '正在读取证书信息...',
-    detailStatus: '正在读取证书信息...',
+    summary: $r('app.string.settings_site_certificate_loading'),
+    detailStatus: $r('app.string.settings_site_certificate_loading'),
     subject: '',
     issuer: '',
     validFrom: '',
@@ -115,7 +116,7 @@ export class BrowserSiteControlsSessionState {
   protection: BrowserSiteControlsProtectionState = {
     capabilitySupported: true,
     availabilityState: 'capability_unavailable',
-    summary: '正在读取保护状态...',
+    summary: $r('app.string.settings_site_info_loading_protection'),
     siteToggleEnabled: false,
     siteEnabled: true,
     blockedCount: 0,
@@ -123,7 +124,7 @@ export class BrowserSiteControlsSessionState {
     linkCleaningCount: 0,
     elementHidingCount: 0,
     privacyCoverageState: 'preparing',
-    privacyCoverageSummary: '正在读取隐私规则状态'
+    privacyCoverageSummary: $r('app.string.settings_site_info_loading_privacy_rules')
   };
 
 }
@@ -147,16 +148,16 @@ export interface BrowserSiteControlsApplicationSnapshot {
   session: BrowserSiteControlsSessionState;
   isSecureSite: boolean;
   isPrivateMode: boolean;
-  connectionTitle: string;
+  connectionTitle: ResourceStr;
   siteHost: string;
-  siteDataSummary: string;
+  siteDataSummary: ResourceStr;
   siteCookieCount: number;
   canClearCurrentSiteStorage: boolean;
   siteGuardianDays: number;
-  certificateChainText: string;
+  certificateChainText: ResourceStr;
   webProtectionFeedback: BrowserWebProtectionFeedbackPresentation;
   trackingProtectionEnhanced: boolean;
-  trackingProtectionSummary: string;
+  trackingProtectionSummary: ResourceStr;
   todayProtectionActionCount: number;
   sevenDayProtectionActionCount: number;
 }
@@ -222,16 +223,16 @@ export const DEFAULT_BROWSER_SITE_CONTROLS_APPLICATION_SNAPSHOT: BrowserSiteCont
   session: new BrowserSiteControlsSessionState(),
   isSecureSite: false,
   isPrivateMode: false,
-  connectionTitle: '站点信息',
+  connectionTitle: $r('app.string.settings_site_info_title'),
   siteHost: '',
-  siteDataSummary: 'Cookie 0 个 · 存储 0 B',
+  siteDataSummary: $r('app.string.settings_site_info_data_summary', 0, '0 B'),
   siteCookieCount: 0,
   canClearCurrentSiteStorage: false,
   siteGuardianDays: 0,
   certificateChainText: '',
   webProtectionFeedback: EMPTY_BROWSER_WEB_PROTECTION_FEEDBACK_PRESENTATION,
   trackingProtectionEnhanced: false,
-  trackingProtectionSummary: '标准',
+  trackingProtectionSummary: $r('app.string.settings_site_info_fingerprint_standard'),
   todayProtectionActionCount: 0,
   sevenDayProtectionActionCount: 0
 };
@@ -672,17 +673,19 @@ export class BrowserSiteControlsRuntimeCoordinator {
     }
   }
 
-  private resolveCertificateChainText(): string {
+  private resolveCertificateChainText(): ResourceStr {
     return this.certificateService.buildChainDetailText(this.sessionState.certificate.chainCount);
   }
 
-  private resolveSiteDataSummary(): string {
+  private resolveSiteDataSummary(): ResourceStr {
     if (this.sessionState.data.loading) {
-      return '读取中';
+      return $r('app.string.settings_site_info_data_loading');
     }
-    return `Cookie ${this.sessionState.data.cookieCount} 个 · 存储 ${
+    return $r(
+      'app.string.settings_site_info_data_summary',
+      this.sessionState.data.cookieCount,
       this.siteInteractionLogicService.formatBytes(this.sessionState.data.storageUsageBytes)
-    }`;
+    );
   }
 
   private buildClearCurrentSiteDataDialogState(
@@ -721,7 +724,10 @@ export class BrowserSiteControlsRuntimeCoordinator {
     const savedDraft = this.sessionState.savedPermissionDraft;
     const origin = draft.origin.length > 0 ? draft.origin : currentOrigin;
     if (origin.length === 0) {
-      this.applicationShell.presentMessage('toast', '当前页面没有可管理的站点权限。');
+      this.applicationShell.presentMessage(
+        'toast',
+        resolveAppResourceText($r('app.string.settings_site_info_no_manageable_permissions'))
+      );
       return;
     }
     if (!this.siteInteractionLogicService.hasDraftChanged(draft, savedDraft)) {
@@ -742,8 +748,8 @@ export class BrowserSiteControlsRuntimeCoordinator {
           this.applicationShell.presentMessage(
             'toast',
             permissionResult.settingsRequired
-              ? '系统剪贴板权限未开启，请在系统设置中允许后重试。'
-              : '需要允许系统剪贴板权限，网页才能读取并粘贴内容。'
+              ? resolveAppResourceText($r('app.string.settings_site_info_clipboard_system_permission_off'))
+              : resolveAppResourceText($r('app.string.settings_site_info_clipboard_permission_required'))
           );
           return;
         }
@@ -769,7 +775,10 @@ export class BrowserSiteControlsRuntimeCoordinator {
         );
       }
       const appliesToCurrentSite = this.siteInteractionLogicService.isSamePermissionSite(origin, currentOrigin);
-      this.applicationShell.presentMessage('toast', '权限设置已保存。');
+      this.applicationShell.presentMessage(
+        'toast',
+        resolveAppResourceText($r('app.string.settings_site_info_permission_saved'))
+      );
       if (appliesToCurrentSite && clipboardChanged) {
         this.hostedRuntimeSurfacePort.updateCurrentActiveConfigFromHost();
       }
@@ -778,8 +787,17 @@ export class BrowserSiteControlsRuntimeCoordinator {
       }
       this.closeApplicationSurfaceInternal(false);
     } catch (error) {
-      this.applicationShell.presentMessage('error', `权限保存失败：${JSON.stringify(error)}`);
-      this.applicationShell.presentMessage('toast', '权限保存失败，请稍后重试。');
+      this.applicationShell.presentMessage(
+        'error',
+        resolveAppResourceText(
+          $r('app.string.settings_site_info_permission_save_error'),
+          JSON.stringify(error)
+        )
+      );
+      this.applicationShell.presentMessage(
+        'toast',
+        resolveAppResourceText($r('app.string.settings_site_info_permission_save_failed'))
+      );
     }
   }
 
@@ -818,7 +836,13 @@ export class BrowserSiteControlsRuntimeCoordinator {
     }).catch((error: Error) => {
       this.sessionState.data = this.createEmptyDataState(false);
       this.publishApplicationSnapshot();
-      this.applicationShell.presentMessage('error', `读取站点数据失败：${JSON.stringify(error)}`);
+      this.applicationShell.presentMessage(
+        'error',
+        resolveAppResourceText(
+          $r('app.string.settings_site_info_data_read_error'),
+          JSON.stringify(error)
+        )
+      );
     });
   }
 
@@ -841,12 +865,15 @@ export class BrowserSiteControlsRuntimeCoordinator {
     if (context.dataScope === 'session_ephemeral') {
       this.applicationShell.presentMessage(
         'toast',
-        '系统当前不支持按站点清除私密存储，请前往“隐私防护”清除本次私密数据。'
+        resolveAppResourceText($r('app.string.settings_site_info_private_clear_unsupported'))
       );
       return;
     }
     if (this.sessionState.data.storageOrigin.length === 0) {
-      this.applicationShell.presentMessage('toast', '当前站点没有可按站点清除的本地存储。');
+      this.applicationShell.presentMessage(
+        'toast',
+        resolveAppResourceText($r('app.string.settings_site_info_no_clearable_storage'))
+      );
       return;
     }
     this.applicationShell.presentClearSiteDataDialog(
@@ -874,7 +901,9 @@ export class BrowserSiteControlsRuntimeCoordinator {
     this.reloadActive('site_data_clear_current');
     this.applicationShell.presentMessage(
       'toast',
-      result.hasError ? '部分数据清除失败，请稍后重试。' : result.message
+      result.hasError
+        ? resolveAppResourceText($r('app.string.settings_site_info_partial_clear_failed'))
+        : result.message
     );
   }
 
@@ -898,7 +927,10 @@ export class BrowserSiteControlsRuntimeCoordinator {
       this.reloadActive('site_protection_toggle');
       this.applicationShell.presentMessage('toast', result.toast);
     } catch (_error) {
-      this.applicationShell.presentMessage('toast', '本站网页内容过滤保存失败');
+      this.applicationShell.presentMessage(
+        'toast',
+        resolveAppResourceText($r('app.string.settings_site_info_protection_save_failed'))
+      );
     }
   }
 

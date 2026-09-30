@@ -15,8 +15,8 @@ import { resolveFloatingGlassMaterialTintForMode } from '../common/FloatingGlass
 
 export const HISTORY_LARGE_SCREEN_SEARCH_FOCUS_KEY: string = 'history-large-screen-search';
 const HISTORY_VIEW_MODE_OPTIONS: SegmentedTabOption[] = [
-  { id: 'timeline', title: '时间线' },
-  { id: 'sites', title: '按站点' }
+  { id: 'timeline', title: $r('app.string.history_timeline') },
+  { id: 'sites', title: $r('app.string.history_by_site') }
 ];
 
 @Component
@@ -91,7 +91,7 @@ export struct HistoryLargeScreenHeader {
   private buildTitleRow() {
     Row({ space: 10 }) {
       Column({ space: 2 }) {
-        Text(this.site.length > 0 ? this.site : '历史记录')
+        Text(this.site.length > 0 ? this.site : $r('app.string.app_shortcut_history'))
           .width('100%')
           .fontSize(22)
           .fontWeight(FontWeight.Bold)
@@ -100,11 +100,11 @@ export struct HistoryLargeScreenHeader {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
 
         if (this.site.length > 0) {
-          Text('站点历史记录')
+          Text($r('app.string.history_site_history'))
             .fontSize(12)
             .fontColor(this.storedSecondaryTextColor)
         } else if (this.selectedCount > 0) {
-          Text(this.privateMode ? `常规历史 · 已选择 ${this.selectedCount} 项` : `已选择 ${this.selectedCount} 项`)
+          Text(this.privateMode ? $r('app.string.history_regular_selected', this.selectedCount) : $r('app.string.history_selected', this.selectedCount))
             .fontSize(12)
             .fontColor(this.storedSecondaryTextColor)
         }
@@ -113,7 +113,7 @@ export struct HistoryLargeScreenHeader {
       .alignItems(HorizontalAlign.Start)
 
       if (this.privateMode && this.selectedCount === 0) {
-        Text('常规历史')
+        Text($r('app.string.history_regular'))
           .fontSize(12)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.storedAccentColor)
@@ -121,7 +121,7 @@ export struct HistoryLargeScreenHeader {
           .backgroundColor(this.storedControlBackgroundColor)
           .borderRadius(10)
       } else if (this.selectedCount > 0) {
-        Button('打开')
+        Button($r('app.string.ui_open'))
           .height(36)
           .fontSize(13)
           .fontColor(this.storedPrimaryTextColor)
@@ -134,7 +134,7 @@ export struct HistoryLargeScreenHeader {
             this.onOpenSelection();
           })
 
-        Button('删除')
+        Button($r('app.string.settings_delete'))
           .height(36)
           .fontSize(13)
           .fontColor(this.storedPrimaryTextColor)
@@ -147,7 +147,7 @@ export struct HistoryLargeScreenHeader {
             this.onDeleteSelection();
           })
 
-        Button('完成')
+        Button($r('app.string.ui_done'))
           .height(36)
           .fontSize(13)
           .fontColor(this.storedAccentColor)
@@ -160,7 +160,7 @@ export struct HistoryLargeScreenHeader {
           })
       } else {
         if (!this.loading) {
-          Text(`${this.visitCount} 项`)
+          Text($r('app.string.history_item_count', this.visitCount))
             .fontSize(12)
             .fontColor(this.storedSecondaryTextColor)
         }
@@ -172,7 +172,7 @@ export struct HistoryLargeScreenHeader {
               iconSize: 15,
               iconColor: this.storedSecondaryTextColor
             })
-            Text('清除')
+            Text($r('app.string.ui_clear'))
               .fontSize(13)
               .fontColor(this.storedSecondaryTextColor)
           }
@@ -219,7 +219,7 @@ export struct HistoryLargeScreenHeader {
           iconColor: this.storedSecondaryTextColor
         })
 
-        TextInput({ text: this.query, placeholder: '搜索历史记录' })
+        TextInput({ text: this.query, placeholder: $r('app.string.history_search') })
           .key(HISTORY_LARGE_SCREEN_SEARCH_FOCUS_KEY)
           .layoutWeight(1)
           .height(36)
@@ -245,7 +245,7 @@ export struct HistoryLargeScreenHeader {
           .type(ButtonType.Circle)
           .buttonStyle(ButtonStyleMode.TEXTUAL)
           .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
-          .accessibilityText('清除搜索')
+          .accessibilityText($r('app.string.history_clear_search_short'))
           .onClick((): void => {
             this.onQueryChange('');
           })

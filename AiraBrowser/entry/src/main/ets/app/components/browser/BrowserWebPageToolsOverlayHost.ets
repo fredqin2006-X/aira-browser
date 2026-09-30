@@ -168,17 +168,17 @@ export struct BrowserWebPageToolsLargeScreenOverlayHost {
     }
   }
 
-  private resolveDialogTitle(): string {
+  private resolveDialogTitle(): ResourceStr {
     if (this.sheetType === 'desktopSiteMode') {
-      return '网站版本';
+      return $r('app.string.site_version_title');
     }
     if (this.sheetType === 'userAgentPreset') {
-      return '网页标识';
+      return $r('app.string.site_version_preset_title');
     }
     if (this.sheetType === 'screenOrientation') {
-      return '屏幕方向';
+      return $r('app.string.settings_screen_orientation_title');
     }
-    return '站点信息';
+    return $r('app.string.settings_site_info_title');
   }
 
   private resolveDesktopDialogTier(): DesktopDialogTier {

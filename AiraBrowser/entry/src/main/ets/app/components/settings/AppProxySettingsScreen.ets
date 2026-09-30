@@ -116,7 +116,7 @@ export struct AppProxySettingsScreen {
     Column() {
       if (this.settingsWorkspacePresentation) {
         SettingsDesktopWorkspaceHeader({
-          title: '应用内代理',
+          title: $r('app.string.settings_app_proxy'),
           showBackButton: true,
           primaryTextColor: this.storedPrimaryTextColor,
           iconColor: this.storedSecondaryTextColor,
@@ -128,7 +128,7 @@ export struct AppProxySettingsScreen {
       }
 
       SettingsHdsScaffold({
-        title: '应用内代理',
+        title: $r('app.string.settings_app_proxy'),
         backIconKind: 'back',
         showBackButton: this.presentationMode !== 'native_tab',
         showTitleBar: !this.settingsWorkspacePresentation,
@@ -170,7 +170,7 @@ export struct AppProxySettingsScreen {
   @Builder
   private buildGlobalSwitchSection() {
     SettingsSection({
-      title: '总开关',
+      title: $r('app.string.settings_app_proxy_master'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({
@@ -178,7 +178,7 @@ export struct AppProxySettingsScreen {
         desktopPresentation: this.settingsWorkspacePresentation
       }) {
         SettingsSwitchRow({
-          title: '启用应用内代理',
+          title: $r('app.string.settings_app_proxy_enable'),
           desktopPresentation: this.settingsWorkspacePresentation,
           checked: this.pageState.globalEnabled,
           rowPosition: 'single',
@@ -188,7 +188,7 @@ export struct AppProxySettingsScreen {
         })
       }
       SettingsFooterText({
-        text: '关闭时，只会记住你选中的代理配置，不会应用到网页请求。',
+        text: $r('app.string.settings_app_proxy_off_note'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -197,7 +197,7 @@ export struct AppProxySettingsScreen {
   @Builder
   private buildCurrentProfileSection() {
     SettingsSection({
-      title: '当前选择',
+      title: $r('app.string.settings_app_proxy_current'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({
@@ -205,14 +205,14 @@ export struct AppProxySettingsScreen {
         desktopPresentation: this.settingsWorkspacePresentation
       }) {
         SettingsStaticValueRow({
-          title: '代理配置',
+          title: $r('app.string.settings_app_proxy_profile'),
           desktopPresentation: this.settingsWorkspacePresentation,
           value: this.pageState.activeProfileName,
           rowPosition: 'first'
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsStaticValueRow({
-          title: '代理地址',
+          title: $r('app.string.settings_app_proxy_address'),
           desktopPresentation: this.settingsWorkspacePresentation,
           value: this.pageState.activeSummary,
           rowPosition: 'last'
@@ -224,7 +224,7 @@ export struct AppProxySettingsScreen {
   @Builder
   private buildAddProxyButton() {
     SettingsActionButton({
-      title: '添加代理',
+      title: $r('app.string.settings_app_proxy_add'),
       variant: 'filled',
       accentColor: this.storedAccentColor,
       pressedBackgroundColor: this.storedPressedBackgroundColor,
@@ -237,7 +237,7 @@ export struct AppProxySettingsScreen {
   @Builder
   private buildProfilesSection() {
     SettingsSection({
-      title: '已保存的代理',
+      title: $r('app.string.settings_app_proxy_saved'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       if (this.pageState.profileItems.length <= 0) {
@@ -246,9 +246,9 @@ export struct AppProxySettingsScreen {
           desktopPresentation: this.settingsWorkspacePresentation
         }) {
           SettingsNavigationRow({
-            title: '暂无代理',
+            title: $r('app.string.settings_app_proxy_empty'),
             desktopPresentation: this.settingsWorkspacePresentation,
-            value: '去添加',
+            value: $r('app.string.settings_app_proxy_add_action'),
             rowPosition: 'single',
             onAction: () => {
               this.openProfileEdit('');
@@ -356,7 +356,7 @@ export struct AppProxySettingsScreen {
 
   private applyMutationResult(result: AppProxySettingsMutationResult): void {
     this.applyCoordinatorState(result.state);
-    if (result.message.length > 0) {
+    if (typeof result.message !== 'string' || result.message.length > 0) {
       this.showToast(result.message);
     }
   }
@@ -366,7 +366,7 @@ export struct AppProxySettingsScreen {
     this.pageState = state.pageState;
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     promptAction.showToast({
       message: message,
       duration: 1800

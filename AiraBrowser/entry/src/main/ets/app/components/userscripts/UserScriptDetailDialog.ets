@@ -12,6 +12,7 @@ import {
 import { BrowserLargeScreenModalHeader } from '../browser/BrowserLargeScreenModalHeader';
 import { BrowserSheetActionButton } from '../browser/BrowserModalBottomSheet';
 import { CENTERED_DIALOG_SYSTEM_TALL_SURFACE_MODIFIER } from '../common/CenteredDialogSurface';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 @CustomDialog
 export struct UserScriptDetailDialog {
@@ -40,9 +41,9 @@ export struct UserScriptDetailDialog {
       Scroll() {
         Column({ space: 18 }) {
           this.buildStatusBlock()
-          this.buildRowsSection('元数据', this.state.metadataRows)
-          this.buildRowsSection('运行诊断', this.state.runtimeRows)
-          this.buildRowsSection('脚本存储', this.state.storageRows)
+          this.buildRowsSection(resolveAppResourceText($r('app.string.user_script_section_metadata')), this.state.metadataRows)
+          this.buildRowsSection(resolveAppResourceText($r('app.string.user_script_section_runtime')), this.state.runtimeRows)
+          this.buildRowsSection(resolveAppResourceText($r('app.string.user_script_section_storage')), this.state.storageRows)
           this.buildSourceSection()
         }
         .width('100%')
@@ -57,7 +58,7 @@ export struct UserScriptDetailDialog {
       if (this.state.found) {
         Row() {
           BrowserSheetActionButton({
-            label: '删除脚本',
+            label: $r('app.string.user_script_delete'),
             emphasis: 'destructive',
             fillAvailableWidth: false,
             buttonWidth: 120,
@@ -180,7 +181,7 @@ export struct UserScriptDetailDialog {
   private buildSourceSection() {
     if (this.state.sourcePreview.length > 0) {
       Column({ space: 8 }) {
-        Text('源码预览')
+        Text($r('app.string.user_script_section_source_preview'))
           .width('100%')
           .fontSize(13)
           .fontColor(this.storedSecondaryTextColor)
@@ -199,9 +200,9 @@ export struct UserScriptDetailDialog {
     }
   }
 
-  private resolveTitle(): string {
+  private resolveTitle(): ResourceStr {
     if (!this.state.found || this.state.title.length === 0) {
-      return '脚本详情';
+      return $r('app.string.user_script_detail_title');
     }
     return this.state.title;
   }

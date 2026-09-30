@@ -1,4 +1,5 @@
 import { Permissions } from '@kit.AbilityKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   ExternalNavigationAppOpenPolicy,
   SitePermissionKind,
@@ -62,9 +63,9 @@ export class SiteCapabilityCatalogService {
       return {
         id: 'camera',
         group: 'device_permission',
-        title: '摄像头',
-        objectLabel: '摄像头',
-        summaryLabel: '摄像头',
+        title: resolveAppResourceText($r('app.string.settings_site_capability_camera')),
+        objectLabel: resolveAppResourceText($r('app.string.settings_site_capability_camera')),
+        summaryLabel: resolveAppResourceText($r('app.string.settings_site_capability_camera')),
         canSetDefault: true,
         canSetSiteRule: true,
         requiresSystemPermission: true
@@ -74,9 +75,9 @@ export class SiteCapabilityCatalogService {
       return {
         id: 'microphone',
         group: 'device_permission',
-        title: '麦克风',
-        objectLabel: '麦克风',
-        summaryLabel: '麦克风',
+        title: resolveAppResourceText($r('app.string.settings_site_capability_microphone')),
+        objectLabel: resolveAppResourceText($r('app.string.settings_site_capability_microphone')),
+        summaryLabel: resolveAppResourceText($r('app.string.settings_site_capability_microphone')),
         canSetDefault: true,
         canSetSiteRule: true,
         requiresSystemPermission: true
@@ -86,9 +87,9 @@ export class SiteCapabilityCatalogService {
       return {
         id: 'location',
         group: 'device_permission',
-        title: '位置信息',
-        objectLabel: '位置',
-        summaryLabel: '定位',
+        title: resolveAppResourceText($r('app.string.settings_site_capability_location')),
+        objectLabel: resolveAppResourceText($r('app.string.settings_site_capability_location_object')),
+        summaryLabel: resolveAppResourceText($r('app.string.settings_site_capability_location_summary')),
         canSetDefault: true,
         canSetSiteRule: true,
         requiresSystemPermission: true
@@ -98,9 +99,9 @@ export class SiteCapabilityCatalogService {
       return {
         id: 'clipboard',
         group: 'device_permission',
-        title: '剪贴板',
-        objectLabel: '剪贴板',
-        summaryLabel: '剪贴板',
+        title: resolveAppResourceText($r('app.string.settings_site_capability_clipboard')),
+        objectLabel: resolveAppResourceText($r('app.string.settings_site_capability_clipboard')),
+        summaryLabel: resolveAppResourceText($r('app.string.settings_site_capability_clipboard')),
         canSetDefault: true,
         canSetSiteRule: true,
         requiresSystemPermission: true
@@ -109,9 +110,9 @@ export class SiteCapabilityCatalogService {
     return {
       id: 'sensor',
       group: 'device_permission',
-      title: '传感器',
-      objectLabel: '传感器',
-      summaryLabel: '传感器',
+      title: resolveAppResourceText($r('app.string.settings_site_capability_sensor')),
+      objectLabel: resolveAppResourceText($r('app.string.settings_site_capability_sensor')),
+      summaryLabel: resolveAppResourceText($r('app.string.settings_site_capability_sensor')),
       canSetDefault: true,
       canSetSiteRule: true,
       requiresSystemPermission: true
@@ -122,9 +123,9 @@ export class SiteCapabilityCatalogService {
     return {
       id: 'open_app',
       group: 'navigation_policy',
-      title: '打开应用',
-      objectLabel: '外部应用',
-      summaryLabel: '打开应用',
+      title: resolveAppResourceText($r('app.string.settings_site_capability_open_app')),
+      objectLabel: resolveAppResourceText($r('app.string.settings_site_capability_open_app_object')),
+      summaryLabel: resolveAppResourceText($r('app.string.settings_site_capability_open_app')),
       canSetDefault: true,
       canSetSiteRule: true,
       requiresSystemPermission: false
@@ -151,27 +152,29 @@ export class SiteCapabilityCatalogService {
   }
 
   getPermissionKindsLabel(kinds: SitePermissionKind[]): string {
-    return kinds.map((kind: SitePermissionKind) => this.getPermissionTitle(kind)).join('和');
+    return kinds
+      .map((kind: SitePermissionKind) => this.getPermissionTitle(kind))
+      .join(resolveAppResourceText($r('app.string.settings_site_capability_kinds_join')));
   }
 
   getPermissionRuleLabel(rule: SitePermissionRule): string {
     if (rule === 'allow') {
-      return '允许';
+      return resolveAppResourceText($r('app.string.settings_site_capability_rule_allow'));
     }
     if (rule === 'block') {
-      return '阻止';
+      return resolveAppResourceText($r('app.string.settings_site_capability_rule_block'));
     }
-    return '询问';
+    return resolveAppResourceText($r('app.string.settings_site_capability_rule_ask'));
   }
 
   getPermissionRuleDescription(kind: SitePermissionKind, rule: SitePermissionRule): string {
     if (rule === 'allow') {
-      return '已允许此站点使用';
+      return resolveAppResourceText($r('app.string.settings_site_capability_rule_desc_allow'));
     }
     if (rule === 'block') {
-      return '已阻止此站点使用';
+      return resolveAppResourceText($r('app.string.settings_site_capability_rule_desc_block'));
     }
-    return '每次访问前询问';
+    return resolveAppResourceText($r('app.string.settings_site_capability_rule_desc_ask'));
   }
 
   buildSitePermissionOptions(kind: SitePermissionKind): SitePermissionRuleOption[] {
@@ -179,18 +182,21 @@ export class SiteCapabilityCatalogService {
     return [
       {
         value: 'ask',
-        label: '询问',
-        helperText: `网站请求${objectLabel}时先询问`
+        label: resolveAppResourceText($r('app.string.settings_site_capability_rule_ask')),
+        helperText: resolveAppResourceText(
+          $r('app.string.settings_site_capability_option_ask_helper'), objectLabel)
       },
       {
         value: 'allow',
-        label: '允许',
-        helperText: `允许此站点使用${objectLabel}`
+        label: resolveAppResourceText($r('app.string.settings_site_capability_rule_allow')),
+        helperText: resolveAppResourceText(
+          $r('app.string.settings_site_capability_option_allow_helper'), objectLabel)
       },
       {
         value: 'block',
-        label: '阻止',
-        helperText: `阻止此站点使用${objectLabel}`
+        label: resolveAppResourceText($r('app.string.settings_site_capability_rule_block')),
+        helperText: resolveAppResourceText(
+          $r('app.string.settings_site_capability_option_block_helper'), objectLabel)
       }
     ];
   }
@@ -199,18 +205,18 @@ export class SiteCapabilityCatalogService {
     return [
       {
         value: 'ask',
-        label: '询问',
-        helperText: '每次请求都确认'
+        label: resolveAppResourceText($r('app.string.settings_site_capability_rule_ask')),
+        helperText: resolveAppResourceText($r('app.string.settings_site_capability_default_ask_helper'))
       },
       {
         value: 'allow',
-        label: '允许',
-        helperText: '默认允许'
+        label: resolveAppResourceText($r('app.string.settings_site_capability_rule_allow')),
+        helperText: resolveAppResourceText($r('app.string.settings_site_capability_default_allow_helper'))
       },
       {
         value: 'block',
-        label: '阻止',
-        helperText: '默认阻止'
+        label: resolveAppResourceText($r('app.string.settings_site_capability_rule_block')),
+        helperText: resolveAppResourceText($r('app.string.settings_site_capability_default_block_helper'))
       }
     ];
   }
@@ -219,30 +225,30 @@ export class SiteCapabilityCatalogService {
     return [
       {
         value: 'ask',
-        label: '跟随默认',
-        helperText: '使用全局外部应用打开策略'
+        label: resolveAppResourceText($r('app.string.settings_site_capability_external_follow_default')),
+        helperText: resolveAppResourceText($r('app.string.settings_site_capability_external_follow_default_helper'))
       },
       {
         value: 'allow',
-        label: '允许',
-        helperText: '用户触发时允许打开外部应用'
+        label: resolveAppResourceText($r('app.string.settings_site_capability_rule_allow')),
+        helperText: resolveAppResourceText($r('app.string.settings_site_capability_external_allow_helper'))
       },
       {
         value: 'block',
-        label: '阻止',
-        helperText: '阻止此站点打开外部应用'
+        label: resolveAppResourceText($r('app.string.settings_site_capability_rule_block')),
+        helperText: resolveAppResourceText($r('app.string.settings_site_capability_external_block_helper'))
       }
     ];
   }
 
   getExternalNavigationPolicyLabel(policy: ExternalNavigationAppOpenPolicy): string {
     if (policy === 'allow') {
-      return '允许';
+      return resolveAppResourceText($r('app.string.settings_site_capability_rule_allow'));
     }
     if (policy === 'block') {
-      return '阻止';
+      return resolveAppResourceText($r('app.string.settings_site_capability_rule_block'));
     }
-    return '询问';
+    return resolveAppResourceText($r('app.string.settings_site_capability_rule_ask'));
   }
 
   resolveSitePermissionKinds(resources: string[]): SitePermissionKind[] {

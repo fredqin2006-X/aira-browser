@@ -170,9 +170,9 @@ const ACCOUNT_TARGETS: SettingsDestinationCatalogTarget[] = [
     ['WebDAV', '华为云'], ['书签同步', '同步方式', '远端', '恢复同步']),
   // Phone and touch two-pane keep the routed page, but the PC shell embeds it as a
   // settings pane like 同步, so it no longer opens a bare full-window page there.
-  target('cross_device_link', 'cross_device_link', 'cross_device_link', '跨设备互联',
+  target('cross_device_link', 'cross_device_link', 'cross_device_link', '与电脑互联',
     AIRA_DISTRIBUTION_CAPABILITY_OWNER.isCommunity() ? '同步与备份' : '账号与同步', 'root', '', '',
-    ['Aira-sync 扩展', 'Aira-sync 插件', '跨设备'], ['电脑', '浏览器插件', '扩展', '接力', '跨设备标签页', '跨设备互联'],
+    ['Aira-sync 扩展', 'Aira-sync 插件', '跨设备'], ['电脑', '浏览器插件', '扩展', '接力', '跨设备标签页', '与电脑互联'],
     true, true, 'desktop_embedded')
 ];
 

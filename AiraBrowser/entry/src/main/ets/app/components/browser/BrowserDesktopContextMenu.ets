@@ -105,7 +105,7 @@ export struct BrowserDesktopContextMenuItem {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY)
   private storedSecondaryTextColor: string = DEFAULT_THEME_PALETTE.light.textSecondary;
   @Prop menuWidthVp: number = BROWSER_DESKTOP_MENU_WIDTH_VP;
-  @Prop label: string = '';
+  @Prop label: ResourceStr = '';
   @Prop shortcut: string = '';
   @Prop itemEnabled: boolean = true;
   @Prop checked: boolean = false;

@@ -22,7 +22,7 @@ struct CookieManagementPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: 'Cookie 管理',
+        title: $r('app.string.settings_privacy_protection_cookie_management'),
         backIconKind: 'back',
         pageBackground: this.theme.pageBackground,
         headerButtonBackground: this.theme.pressedBackground,

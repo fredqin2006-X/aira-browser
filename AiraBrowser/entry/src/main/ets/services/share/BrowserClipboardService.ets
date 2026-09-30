@@ -1,4 +1,5 @@
 import { pasteboard } from '@kit.BasicServicesKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export interface BrowserClipboardCopyResult {
   ok: boolean;
@@ -7,9 +8,9 @@ export interface BrowserClipboardCopyResult {
 
 export interface BrowserClipboardCopyTextRequest {
   value: string;
-  emptyMessage: string;
-  successMessage: string;
-  failureMessage?: string;
+  emptyMessage: ResourceStr;
+  successMessage: ResourceStr;
+  failureMessage?: ResourceStr;
 }
 
 export interface BrowserClipboardReadTextResult {
@@ -28,7 +29,7 @@ export class BrowserClipboardService {
     if (request.value.length === 0) {
       return {
         ok: false,
-        message: request.emptyMessage
+        message: resolveAppResourceText(request.emptyMessage)
       };
     }
 
@@ -37,12 +38,12 @@ export class BrowserClipboardService {
       await pasteboard.getSystemPasteboard().setData(data);
       return {
         ok: true,
-        message: request.successMessage
+        message: resolveAppResourceText(request.successMessage)
       };
     } catch (_error) {
       return {
         ok: false,
-        message: request.failureMessage ?? '复制失败，请稍后重试。'
+        message: resolveAppResourceText(request.failureMessage ?? $r('app.string.ui_copy_failed'))
       };
     }
   }

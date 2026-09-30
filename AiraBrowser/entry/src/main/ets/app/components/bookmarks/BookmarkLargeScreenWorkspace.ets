@@ -1,3 +1,5 @@
+import { hasAppResourceText, resolveAppResourceText } from '../../../core/resources/AppResourceText';
+import { resolveBookmarkNodeDisplayTitle } from '../../../core/resources/HistoryBookmarkDisplayText';
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
 import {
   resolveCenteredDialogControllerWidth,
@@ -171,7 +173,7 @@ export struct BookmarkLargeScreenWorkspace {
     ManagementLargeScreenShell({
       title: this.resolveWorkspaceTitle(),
       badge: this.resolveWorkspaceBadge(),
-      searchPlaceholder: '搜索书签',
+      searchPlaceholder: $r('app.string.bookmark_search'),
       searchQuery: this.snapshot.query,
       searchFocusKey: BOOKMARK_WORKSPACE_SEARCH_FOCUS_KEY,
       showSearch: this.shouldShowFullSearch(),
@@ -215,21 +217,21 @@ export struct BookmarkLargeScreenWorkspace {
   private buildToolbarActions() {
     if (this.selectionMode) {
       ManagementLargeScreenTextButton({
-        label: '全选',
+        label: $r('app.string.ui_select_all'),
         isEnabled: !this.snapshot.busy && this.hasSelectableRows(),
         onAction: (): void => {
           this.snapshot = this.coordinator.selectAllRows();
         }
       })
       ManagementLargeScreenTextButton({
-        label: '删除',
+        label: $r('app.string.settings_delete'),
         isEnabled: !this.snapshot.busy && this.snapshot.selectedNodeIds.length > 0,
         onAction: (): void => {
           this.confirmDeleteSelection();
         }
       })
       ManagementLargeScreenTextButton({
-        label: '完成',
+        label: $r('app.string.ui_done'),
         onAction: (): void => {
           this.exitSelectionMode();
         }
@@ -238,7 +240,7 @@ export struct BookmarkLargeScreenWorkspace {
     if (!this.shouldShowFullSearch()) {
       ManagementLargeScreenIconButton({
         iconId: 'settings.search',
-        label: '搜索书签',
+        label: $r('app.string.bookmark_search'),
         onAction: (): void => {
           this.compactSearchVisible = true;
           this.focusSearchInput();
@@ -249,7 +251,7 @@ export struct BookmarkLargeScreenWorkspace {
     ManagementLargeScreenActionGroup() {
       ManagementLargeScreenIconButton({
         iconId: 'browser.tabs.add',
-        label: '新建文件夹',
+        label: $r('app.string.bookmark_new_folder'),
         grouped: true,
         isEnabled: this.snapshot.currentFolderId.length > 0 && !this.snapshot.busy,
         onAction: (): void => {
@@ -273,22 +275,22 @@ export struct BookmarkLargeScreenWorkspace {
     .stateEffect(false)
     .backgroundColor(this.storedControlBackgroundColor)
     .borderRadius(9)
-    .accessibilityText('书签操作')
+    .accessibilityText($r('app.string.bookmark_actions'))
     .bindMenu([
       {
-        value: '多项选择',
+        value: $r('app.string.bookmark_multi_select_label'),
         action: (): void => {
           this.enterSelectionMode();
         }
       },
       {
-        value: '导入书签',
+        value: $r('app.string.bookmark_import_action'),
         action: (): void => {
           void this.importBookmarkHtml();
         }
       },
       {
-        value: '导出书签',
+        value: $r('app.string.bookmark_export_action'),
         action: (): void => {
           void this.exportBookmarkHtml();
         }
@@ -299,7 +301,7 @@ export struct BookmarkLargeScreenWorkspace {
 
   @Builder
   private buildFolderTree() {
-    ManagementLargeScreenNavSection({ title: '书签' })
+    ManagementLargeScreenNavSection({ title: $r('app.string.app_shortcut_bookmarks') })
     Column({ space: 3 }) {
       ForEach(this.snapshot.folders, (folder: BookmarkWorkspaceFolderRow) => {
         this.buildFolderRow(folder)
@@ -331,7 +333,7 @@ export struct BookmarkLargeScreenWorkspace {
         .type(ButtonType.Circle)
         .buttonStyle(ButtonStyleMode.TEXTUAL)
         .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
-        .accessibilityText(folder.expanded ? '折叠文件夹' : '展开文件夹')
+        .accessibilityText(folder.expanded ? $r('app.string.bookmark_collapse_folder') : $r('app.string.bookmark_expand_folder'))
         .onClick((): void => {
           this.suppressNextFolderRowClick = true;
           this.snapshot = this.coordinator.toggleFolder(folder.id);
@@ -395,7 +397,7 @@ export struct BookmarkLargeScreenWorkspace {
   @Builder
   private buildRecordWorkspace() {
     Column({ space: 0 }) {
-      if (this.snapshot.message.length > 0) {
+      if (hasAppResourceText(this.snapshot.message)) {
         Text(this.snapshot.message)
           .width('100%')
           .fontSize(13)
@@ -421,7 +423,7 @@ export struct BookmarkLargeScreenWorkspace {
             iconSize: 30,
             iconColor: this.storedSecondaryTextColor
           })
-          Text(this.snapshot.query.length > 0 ? '没有匹配的书签' : '这个文件夹是空的')
+          Text(this.snapshot.query.length > 0 ? $r('app.string.bookmark_no_match') : $r('app.string.bookmark_folder_empty'))
             .fontSize(14)
             .fontColor(this.storedSecondaryTextColor)
         }
@@ -466,7 +468,7 @@ export struct BookmarkLargeScreenWorkspace {
         this.buildRecordLeading(node)
 
         Column({ space: 3 }) {
-          Text(node.title)
+          Text(resolveBookmarkNodeDisplayTitle(node.id, node.title))
             .width('100%')
             .fontSize(14)
             .fontWeight(FontWeight.Medium)
@@ -474,7 +476,7 @@ export struct BookmarkLargeScreenWorkspace {
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-          Text(node.type === 'folder' ? '文件夹' : (node.url ?? ''))
+          Text(node.type === 'folder' ? $r('app.string.bookmark_drag_folder') : (node.url ?? ''))
             .width('100%')
             .fontSize(12)
             .fontColor(this.storedSecondaryTextColor)
@@ -536,7 +538,7 @@ export struct BookmarkLargeScreenWorkspace {
         this.snapshot = this.coordinator.selectNode(node.id, 'replace');
       }
       this.draggingNodeIds = this.snapshot.selectedNodeIds.slice();
-      this.draggingTitle = this.draggingNodeIds.length > 1 ? `${this.draggingNodeIds.length} 个项目` : node.title;
+      this.draggingTitle = this.draggingNodeIds.length > 1 ? resolveAppResourceText($r('app.string.bookmark_drag_count', this.draggingNodeIds.length)) : node.title;
       return {
         builder: (): void => {
           this.buildDragPreview();
@@ -621,7 +623,7 @@ export struct BookmarkLargeScreenWorkspace {
       MenuItemGroup() {
         if (node.type === 'folder') {
           BrowserDesktopContextMenuItem({
-            label: '打开文件夹',
+            label: $r('app.string.bookmark_open_folder'),
             shortcut: 'Enter',
             onAction: (): void => {
               this.snapshot = this.coordinator.selectFolder(node.id);
@@ -629,14 +631,14 @@ export struct BookmarkLargeScreenWorkspace {
           })
         } else {
           BrowserDesktopContextMenuItem({
-            label: '打开',
+            label: $r('app.string.ui_open'),
             shortcut: 'Enter',
             onAction: (): void => {
               this.openNode(node, false);
             }
           })
           BrowserDesktopContextMenuItem({
-            label: '在新标签页中打开',
+            label: $r('app.string.history_open_new_tab'),
             onAction: (): void => {
               this.openNode(node, true);
             }
@@ -647,7 +649,7 @@ export struct BookmarkLargeScreenWorkspace {
       if (!this.selectionMode && this.snapshot.selectedNodeIds.length <= 1 && !isBookmarkRootNodeId(node.id)) {
         MenuItemGroup() {
           BrowserDesktopContextMenuItem({
-            label: '编辑',
+            label: $r('app.string.ui_edit'),
             shortcut: 'F2',
             onAction: (): void => {
               this.beginEditingNode(node);
@@ -660,7 +662,7 @@ export struct BookmarkLargeScreenWorkspace {
         MenuItemGroup() {
           if (!this.selectionMode) {
             BrowserDesktopContextMenuItem({
-              label: '多选',
+              label: $r('app.string.ui_multi_select'),
               onAction: (): void => {
                 this.enterSelectionMode();
                 this.snapshot = this.coordinator.selectNode(node.id, 'replace');
@@ -668,14 +670,14 @@ export struct BookmarkLargeScreenWorkspace {
             })
           } else if (this.snapshot.selectedNodeIds.includes(node.id)) {
             BrowserDesktopContextMenuItem({
-              label: '取消选择',
+              label: $r('app.string.history_deselect'),
               onAction: (): void => {
                 this.snapshot = this.coordinator.selectNode(node.id, 'toggle');
               }
             })
           } else {
             BrowserDesktopContextMenuItem({
-              label: '添加到多选',
+              label: $r('app.string.history_add_selection'),
               onAction: (): void => {
                 this.snapshot = this.coordinator.selectNode(node.id, 'toggle');
               }
@@ -687,7 +689,7 @@ export struct BookmarkLargeScreenWorkspace {
       if (this.snapshot.selectedNodeIds.length > 1) {
         MenuItemGroup() {
           BrowserDesktopContextMenuItem({
-            label: `删除所选 ${this.snapshot.selectedNodeIds.length} 项`,
+            label: $r('app.string.bookmark_delete_selected', this.snapshot.selectedNodeIds.length),
             shortcut: 'Delete',
             onAction: (): void => {
               this.confirmDeleteSelection();
@@ -697,7 +699,7 @@ export struct BookmarkLargeScreenWorkspace {
       } else if (!isBookmarkRootNodeId(node.id)) {
         MenuItemGroup() {
           BrowserDesktopContextMenuItem({
-            label: '删除',
+            label: $r('app.string.settings_delete'),
             shortcut: 'Delete',
             onAction: (): void => {
               this.confirmDeleteNode(node);
@@ -751,7 +753,7 @@ export struct BookmarkLargeScreenWorkspace {
         this.coordinator.authorizeNavigation();
         this.onOpenBookmark(url, node.title, openInNewTab);
       } catch (error) {
-        this.showMessageDialog('无法打开', this.stringifyError(error as Error));
+        this.showMessageDialog($r('app.string.history_cannot_open'), this.stringifyError(error as Error));
       }
     }
   }
@@ -775,17 +777,17 @@ export struct BookmarkLargeScreenWorkspace {
 
   private confirmDeleteNode(node: BookmarkNode): void {
     showCenteredAlertDialog({
-      title: node.type === 'folder' ? '删除文件夹' : '删除书签',
+      title: node.type === 'folder' ? $r('app.string.bookmark_delete_folder') : $r('app.string.bookmark_delete_bookmark'),
       message: node.type === 'folder'
-        ? `确定删除“${node.title}”吗？文件夹内的书签也会一起删除。`
-        : `确定删除“${node.title}”吗？`,
+        ? $r('app.string.bookmark_delete_folder_confirm', node.title)
+        : $r('app.string.bookmark_delete_one_confirm', node.title),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: (): void => {}
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.settings_delete'),
         fontColor: $r('app.color.permission_blocked'),
         action: (): void => {
           void this.deleteNode(node.id);
@@ -852,13 +854,13 @@ export struct BookmarkLargeScreenWorkspace {
     this.showMessageDialog(result.title, result.message);
   }
 
-  private showMessageDialog(title: string, message: string): void {
+  private showMessageDialog(title: ResourceStr, message: ResourceStr): void {
     showCenteredAlertDialog({
       title: title,
       message: message,
       autoCancel: true,
       confirm: {
-        value: '知道了',
+        value: $r('app.string.settings_pro_got_it'),
         action: (): void => {}
       }
     });
@@ -946,24 +948,24 @@ export struct BookmarkLargeScreenWorkspace {
     return this.snapshot.rows.some((node: BookmarkNode): boolean => !isBookmarkRootNodeId(node.id));
   }
 
-  private resolveWorkspaceTitle(): string {
+  private resolveWorkspaceTitle(): ResourceStr {
     if (this.selectionMode) {
-      return `已选择 ${this.snapshot.selectedNodeIds.length} 项`;
+      return $r('app.string.bookmark_selected', this.snapshot.selectedNodeIds.length);
     }
     if (this.snapshot.query.length > 0) {
-      return '搜索结果';
+      return $r('app.string.settings_search_results');
     }
-    return this.snapshot.currentFolderTitle.length > 0 ? this.snapshot.currentFolderTitle : '书签';
+    return this.snapshot.currentFolderTitle.length > 0 ? resolveBookmarkNodeDisplayTitle(this.snapshot.currentFolderId, this.snapshot.currentFolderTitle) : $r('app.string.app_shortcut_bookmarks');
   }
 
-  private resolveWorkspaceBadge(): string {
+  private resolveWorkspaceBadge(): ResourceStr {
     if (this.selectionMode) {
       return '';
     }
     if (this.privateMode) {
-      return '私密';
+      return $r('app.string.settings_private_badge');
     }
-    return `${this.snapshot.rows.length} 项`;
+    return $r('app.string.bookmark_item_count', this.snapshot.rows.length);
   }
 
   private focusSearchInput(): void {
@@ -1030,17 +1032,17 @@ export struct BookmarkLargeScreenWorkspace {
       return;
     }
     showCenteredAlertDialog({
-      title: selectedCount > 1 ? '删除所选项目' : '删除项目',
+      title: selectedCount > 1 ? $r('app.string.bookmark_delete_selected_title') : $r('app.string.bookmark_delete_item_title'),
       message: selectedCount > 1
-        ? `确定删除所选的 ${selectedCount} 项吗？文件夹内的书签也会一起删除。`
-        : '确定删除所选项目吗？文件夹内的书签也会一起删除。',
+        ? $r('app.string.bookmark_delete_selected_confirm', selectedCount)
+        : $r('app.string.bookmark_delete_selected_generic'),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: (): void => {}
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.settings_delete'),
         fontColor: $r('app.color.permission_blocked'),
         action: (): void => {
           void this.deleteSelectedNodes();
@@ -1068,6 +1070,6 @@ export struct BookmarkLargeScreenWorkspace {
 
   private resolveBookmarkFallback(node: BookmarkNode): string {
     const title = node.title.trim();
-    return title.length > 0 ? title.substring(0, 1).toUpperCase() : '书';
+    return title.length > 0 ? title.substring(0, 1).toUpperCase() : resolveAppResourceText($r('app.string.bookmark_fallback_glyph'));
   }
 }

@@ -6,8 +6,8 @@ import { BookmarkManagementFeature } from '../../features/bookmarks/BookmarkMana
 export interface BookmarkHtmlTransferApplicationResult {
   completed: boolean;
   cancelled: boolean;
-  title: string;
-  message: string;
+  title: ResourceStr;
+  message: ResourceStr;
 }
 
 /** Platform boundary for bookmark HTML picker and file IO. */
@@ -20,82 +20,44 @@ export class BookmarkHtmlTransferApplicationService {
 
   async importHtml(context: common.UIAbilityContext): Promise<BookmarkHtmlTransferApplicationResult> {
     try {
-      const uri = await this.pickOpenUri(context);
+      const uri = await pickBookmarkOpenUri(context);
       if (uri.length <= 0) {
-        return this.cancelledResult('已取消导入');
+        return this.cancelledResult($r('app.string.bookmark_import_cancelled'));
       }
-      const payload = await this.readTextFromUri(uri);
+      const payload = await readBookmarkTextFromUri(uri);
       const result = await this.bookmarkManagementFeature.applyHtmlImport(payload);
       return {
         completed: true,
         cancelled: false,
-        title: '导入成功',
+        title: $r('app.string.history_import_success'),
         message: result.summary
       };
     } catch (error) {
-      return this.failureResult('导入失败', error as Error);
+      return this.failureResult($r('app.string.history_import_failed'), error as Error);
     }
   }
 
   async exportHtml(context: common.UIAbilityContext): Promise<BookmarkHtmlTransferApplicationResult> {
     try {
-      const uri = await this.pickSaveUri(context, `aira-bookmarks-${this.resolveFileTimestamp()}.html`);
+      const uri = await pickBookmarkSaveUri(context, `aira-bookmarks-${resolveBookmarkFileTimestamp()}.html`);
       if (uri.length <= 0) {
-        return this.cancelledResult('已取消导出');
+        return this.cancelledResult($r('app.string.bookmark_export_cancelled'));
       }
       await this.bookmarkManagementFeature.refresh();
       const payload = this.bookmarkManagementFeature.buildHtmlExport();
-      await this.writeTextToUri(uri, payload);
+      await writeBookmarkTextToUri(uri, payload);
       return {
         completed: true,
         cancelled: false,
-        title: '导出成功',
-        message: '书签已导出为浏览器通用 HTML 文件。'
+        title: $r('app.string.history_export_success'),
+        message: $r('app.string.bookmark_export_done')
       };
     } catch (error) {
-      return this.failureResult('导出失败', error as Error);
+      return this.failureResult($r('app.string.history_export_failed'), error as Error);
     }
   }
 
-  private async pickOpenUri(context: common.UIAbilityContext): Promise<string> {
-    const documentPicker = new picker.DocumentViewPicker(context);
-    const uris = await documentPicker.select({
-      maxSelectNumber: 1,
-      fileSuffixFilters: ['.html', '.htm']
-    });
-    return uris.length > 0 ? uris[0] : '';
-  }
-
-  private async pickSaveUri(context: common.UIAbilityContext, fileName: string): Promise<string> {
-    const documentPicker = new picker.DocumentViewPicker(context);
-    const uris = await documentPicker.save({
-      newFileNames: [fileName],
-      fileSuffixChoices: ['HTML|.html']
-    });
-    return uris.length > 0 ? uris[0] : '';
-  }
-
-  private async readTextFromUri(uri: string): Promise<string> {
-    return readBookmarkTextFromUri(uri);
-  }
-
-  private async writeTextToUri(uri: string, payload: string): Promise<void> {
-    const file = await fileIo.open(uri, fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.TRUNC);
-    try {
-      await fileIo.write(file.fd, payload);
-    } finally {
-      await fileIo.close(file);
-    }
-  }
-
-  private resolveFileTimestamp(): string {
-    return new Date().toISOString()
-      .replace(/[:.]/g, '-')
-      .replace('T', '_')
-      .replace('Z', '');
-  }
-
-  private cancelledResult(message: string): BookmarkHtmlTransferApplicationResult {
+  private cancelledResult(message: ResourceStr): BookmarkHtmlTransferApplicationResult {
     return {
       completed: false,
       cancelled: true,
@@ -104,14 +66,55 @@ export class BookmarkHtmlTransferApplicationService {
     };
   }
 
-  private failureResult(title: string, error: Error): BookmarkHtmlTransferApplicationResult {
+  private failureResult(title: ResourceStr, error: Error): BookmarkHtmlTransferApplicationResult {
     return {
       completed: false,
       cancelled: false,
       title: title,
-      message: error.message.length > 0 ? error.message : '未知错误'
+      message: error.message.length > 0 ? error.message : $r('app.string.ui_unknown_error')
     };
   }
+}
+
+/**
+ * Pick an existing bookmark HTML document. Shared by the manager page staged
+ * import flow and the all-in-one application service so both stay in step.
+ */
+export async function pickBookmarkOpenUri(context: common.UIAbilityContext): Promise<string> {
+  const documentPicker = new picker.DocumentViewPicker(context);
+  const uris = await documentPicker.select({
+    maxSelectNumber: 1,
+    fileSuffixFilters: ['.html', '.htm']
+  });
+  return uris.length > 0 ? uris[0] : '';
+}
+
+/** Pick the destination for a bookmark HTML export. */
+export async function pickBookmarkSaveUri(context: common.UIAbilityContext, fileName: string): Promise<string> {
+  const documentPicker = new picker.DocumentViewPicker(context);
+  const uris = await documentPicker.save({
+    newFileNames: [fileName],
+    fileSuffixChoices: ['HTML|.html']
+  });
+  return uris.length > 0 ? uris[0] : '';
+}
+
+/** Write the exported HTML payload to a picked document URI. */
+export async function writeBookmarkTextToUri(uri: string, payload: string): Promise<void> {
+  const file = await fileIo.open(uri, fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.TRUNC);
+  try {
+    await fileIo.write(file.fd, payload);
+  } finally {
+    await fileIo.close(file);
+  }
+}
+
+/** Timestamp segment for the default bookmark export file name. */
+export function resolveBookmarkFileTimestamp(): string {
+  return new Date().toISOString()
+    .replace(/[:.]/g, '-')
+    .replace('T', '_')
+    .replace('Z', '');
 }
 
 /** Read the complete UTF-8 byte stream before decoding so chunk boundaries cannot corrupt text. */

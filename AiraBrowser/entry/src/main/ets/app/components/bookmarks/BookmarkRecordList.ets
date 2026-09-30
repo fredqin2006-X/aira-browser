@@ -1,3 +1,5 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
+import { resolveBookmarkNodeDisplayTitle } from '../../../core/resources/HistoryBookmarkDisplayText';
 import { image } from '@kit.ImageKit';
 import vibrator from '@ohos.vibrator';
 import { BookmarkNode } from '../../../common/models/BrowserModels';
@@ -231,7 +233,7 @@ export struct BookmarkRecordList {
       iconUri: this.getIconPathById(node.id),
       iconPixelMap: this.getIconPixelMap(node.id),
       fallbackLabel: this.resolveNodeFallbackLabel(node),
-      title: node.title,
+      title: resolveBookmarkNodeDisplayTitle(node.id, node.title),
       subtitle: this.resolveSubtitle(node),
       pressed: this.pressedNodeId === node.id,
       menuVisible: !this.isSelectionMode && this.contextMenuNodeId === node.id,
@@ -283,7 +285,7 @@ export struct BookmarkRecordList {
   @Builder
   private buildFolderRow(node: BookmarkNode, index: number) {
     WebsiteRecordRow({
-      title: node.title,
+      title: resolveBookmarkNodeDisplayTitle(node.id, node.title),
       subtitle: '',
       pressed: this.pressedNodeId === node.id,
       menuVisible: !this.isSelectionMode && this.contextMenuNodeId === node.id,
@@ -400,7 +402,7 @@ export struct BookmarkRecordList {
       .justifyContent(FlexAlign.Center)
       .alignItems(VerticalAlign.Center)
       .hitTestBehavior(HitTestMode.Block)
-      .accessibilityText(`拖动调整${node.type === 'folder' ? '文件夹' : '书签'}顺序`)
+      .accessibilityText($r('app.string.bookmark_drag_a11y', resolveAppResourceText(node.type === 'folder' ? $r('app.string.bookmark_drag_folder') : $r('app.string.bookmark_drag_bookmark'))))
       .gesture(
         PanGesture({ direction: PanDirection.Vertical, distance: 1 })
           .onActionStart(() => {

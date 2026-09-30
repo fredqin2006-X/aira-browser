@@ -24,7 +24,7 @@ export interface ReadingSurfaceOptions {
   pageNumberVisible: boolean;
   paragraphIndentVisible: boolean;
   continuationAvailable: boolean;
-  continuationLabel: string;
+  continuationLabel: ResourceStr;
   contentTopInset: number;
   contentBottomInset: number;
 }
@@ -94,7 +94,7 @@ export function createDefaultReadingSurfaceOptions(): ReadingSurfaceOptions {
     pageNumberVisible: true,
     paragraphIndentVisible: false,
     continuationAvailable: false,
-    continuationLabel: '继续阅读',
+    continuationLabel: $r('app.string.reader_continue_reading'),
     contentTopInset: 0,
     contentBottomInset: 0
   };

@@ -10,6 +10,7 @@ import {
 } from '../../common/models/BrowserModels';
 import { PreferencesRepository } from '../../data/preferences/PreferencesRepository';
 import { SiteCapabilityCatalogService, SiteCapabilityId } from '../../services/web/SiteCapabilityCatalogService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { SiteIdentityService } from '../../services/web/SiteIdentityService';
 
 export type SiteControlRuleSource = 'default' | 'site';
@@ -232,7 +233,7 @@ export class SiteControlsCoordinator {
     const normalizedFilter = this.normalizeFilterId(selectedFilter);
     if (normalizedFilter === 'open_app') {
       return {
-        title: '默认设置',
+        title: resolveAppResourceText($r('app.string.settings_site_controls_default_title')),
         valueLabel: this.capabilityCatalog.getExternalNavigationPolicyLabel(
           this.preferencesRepository.getPreferences().externalNavigation.appOpenPolicy
         ),
@@ -241,7 +242,7 @@ export class SiteControlsCoordinator {
     }
     const kind = this.capabilityCatalog.resolvePermissionKind(normalizedFilter);
     return {
-      title: '默认设置',
+      title: resolveAppResourceText($r('app.string.settings_site_controls_default_title')),
       valueLabel: this.capabilityCatalog.getPermissionRuleLabel(this.getDefaultRule(kind)),
       isEnabled: isEnabled
     };
@@ -314,16 +315,25 @@ export class SiteControlsCoordinator {
     blockRuleCount: number
   ): string {
     if (savedOriginCount <= 0) {
-      return '还没有已保存的站点权限规则。';
+      return resolveAppResourceText($r('app.string.settings_site_controls_summary_empty'));
     }
-    return `已保存 ${savedOriginCount} 个站点的权限规则；允许 ${allowRuleCount} 项，阻止 ${blockRuleCount} 项。`;
+    return resolveAppResourceText(
+      $r('app.string.settings_site_controls_summary_saved'),
+      savedOriginCount,
+      allowRuleCount,
+      blockRuleCount
+    );
   }
 
   private buildSessionOverviewSummary(originCount: number, totalRuleCount: number): string {
     if (totalRuleCount <= 0) {
-      return '当前私密会话还没有临时站点权限。';
+      return resolveAppResourceText($r('app.string.settings_site_controls_summary_private_empty'));
     }
-    return `本次私密会话有 ${Math.max(0, originCount)} 个站点、${Math.max(0, totalRuleCount)} 条临时权限；不会读取常规浏览资料。`;
+    return resolveAppResourceText(
+      $r('app.string.settings_site_controls_summary_private'),
+      Math.max(0, originCount),
+      Math.max(0, totalRuleCount)
+    );
   }
 
   private findPermissionSettings(
@@ -416,7 +426,9 @@ export class SiteControlsCoordinator {
       id: `${selectedFilter}:${aggregate.origin.length > 0 ? aggregate.origin : aggregate.host}`,
       host: aggregate.host,
       origin: origin,
-      title: aggregate.origin.length > 0 ? aggregate.origin : aggregate.host.length > 0 ? aggregate.host : '未知站点',
+      title: aggregate.origin.length > 0
+        ? aggregate.origin
+        : aggregate.host.length > 0 ? aggregate.host : resolveAppResourceText($r('app.string.settings_site_controls_unknown_site')),
       value: value,
       helperText: isCapabilityRow ? '' : this.buildAggregateHelperText(aggregate),
       updatedAt: updatedAt
@@ -429,7 +441,7 @@ export class SiteControlsCoordinator {
   ): string {
     if (selectedFilter === 'open_app') {
       if (aggregate.externalNavigationRule === undefined) {
-        return '询问';
+        return resolveAppResourceText($r('app.string.settings_site_capability_rule_ask'));
       }
       return this.capabilityCatalog.getExternalNavigationPolicyLabel(aggregate.externalNavigationRule.policy);
     }
@@ -483,23 +495,29 @@ export class SiteControlsCoordinator {
   private buildAggregateValue(aggregate: SiteControlsAggregate): string {
     const parts: string[] = [];
     if (aggregate.permissionSettings.length > 0) {
-      parts.push(`${aggregate.permissionSettings.length} 个权限站点记录`);
+      parts.push(resolveAppResourceText(
+        $r('app.string.settings_site_controls_fragment_permission_sites'),
+        aggregate.permissionSettings.length
+      ));
     }
     if (aggregate.externalNavigationRule !== undefined) {
-      parts.push(`打开应用${this.capabilityCatalog.getExternalNavigationPolicyLabel(aggregate.externalNavigationRule.policy)}`);
+      parts.push(resolveAppResourceText(
+        $r('app.string.settings_site_controls_fragment_external_actions'),
+        this.capabilityCatalog.getExternalNavigationPolicyLabel(aggregate.externalNavigationRule.policy)
+      ));
     }
-    return parts.length > 0 ? parts.join(' · ') : '已保存规则';
+    return parts.length > 0 ? parts.join(' · ') : resolveAppResourceText($r('app.string.settings_site_controls_fragment_saved_rules'));
   }
 
   private buildAggregateHelperText(aggregate: SiteControlsAggregate): string {
     const parts: string[] = [];
     if (aggregate.permissionSettings.length > 0) {
-      parts.push('设备权限');
+      parts.push(resolveAppResourceText($r('app.string.settings_site_controls_group_device_permission')));
     }
     if (aggregate.externalNavigationRule !== undefined) {
-      parts.push('打开应用');
+      parts.push(resolveAppResourceText($r('app.string.settings_site_controls_group_open_app')));
     }
-    return parts.length > 0 ? parts.join(' · ') : '点开继续管理';
+    return parts.length > 0 ? parts.join(' · ') : resolveAppResourceText($r('app.string.settings_site_controls_fragment_tap_to_manage'));
   }
 
   private hasAggregateRules(aggregate: SiteControlsAggregate): boolean {
@@ -520,7 +538,7 @@ export class SiteControlsCoordinator {
     const options: SiteControlsFilterOptionState[] = [
       {
         id: 'all',
-        title: '全部',
+        title: resolveAppResourceText($r('app.string.settings_site_controls_filter_all')),
         count: aggregates.length,
         isSelected: selectedFilter === 'all'
       }
@@ -578,39 +596,48 @@ export class SiteControlsCoordinator {
   ): string {
     const title = this.getFilterTitle(selectedFilter);
     if (query.trim().length > 0) {
-      return `${title} · 命中 ${visibleCount} / ${selectedFilterCount} 个站点`;
+      return resolveAppResourceText(
+        $r('app.string.settings_site_controls_title_matched'),
+        title,
+        visibleCount,
+        selectedFilterCount
+      );
     }
     if (selectedFilter === 'all') {
-      return `已保存权限或打开应用规则的站点 · ${totalCount} 个`;
+      return resolveAppResourceText(
+        $r('app.string.settings_site_controls_title_all_saved'), totalCount);
     }
-    return `${title}规则 · ${selectedFilterCount} 个站点`;
+    return resolveAppResourceText(
+      $r('app.string.settings_site_controls_title_filtered'), title, selectedFilterCount);
   }
 
   private buildListTitle(selectedFilter: SiteControlsFilterId): string {
     if (selectedFilter === 'all') {
-      return '站点规则';
+      return resolveAppResourceText($r('app.string.settings_site_controls_list_title'));
     }
     return this.getFilterTitle(selectedFilter);
   }
 
   private buildListEmptyTitle(selectedFilter: SiteControlsFilterId, query: string): string {
     if (query.trim().length > 0) {
-      return '没有找到这个站点';
+      return resolveAppResourceText($r('app.string.settings_site_controls_empty_search_title'));
     }
     if (selectedFilter === 'all') {
-      return '还没有站点权限规则';
+      return resolveAppResourceText($r('app.string.settings_site_controls_empty_title'));
     }
-    return `还没有${this.getFilterTitle(selectedFilter)}规则`;
+    return resolveAppResourceText(
+      $r('app.string.settings_site_controls_empty_filter_title'), this.getFilterTitle(selectedFilter));
   }
 
   private buildListEmptyMessage(selectedFilter: SiteControlsFilterId, query: string): string {
     if (query.trim().length > 0) {
-      return '换个关键词或能力筛选再试试';
+      return resolveAppResourceText($r('app.string.settings_site_controls_empty_search_message'));
     }
     if (selectedFilter === 'all') {
-      return '网站请求权限或被设置打开应用规则后，会出现在这里';
+      return resolveAppResourceText($r('app.string.settings_site_controls_empty_message'));
     }
-    return `有站点改过${this.getFilterTitle(selectedFilter)}规则后，会出现在这里`;
+    return resolveAppResourceText(
+      $r('app.string.settings_site_controls_empty_filter_message'), this.getFilterTitle(selectedFilter));
   }
 
   private pickLatestPermissionSettings(permissionSettings: SitePermissionSettings[]): SitePermissionSettings {
@@ -694,7 +721,7 @@ export class SiteControlsCoordinator {
 
   private getFilterTitle(filterId: SiteControlsFilterId): string {
     if (filterId === 'all') {
-      return '全部';
+      return resolveAppResourceText($r('app.string.settings_site_controls_filter_all'));
     }
     if (filterId === 'open_app') {
       return this.capabilityCatalog.getOpenAppDefinition().title;

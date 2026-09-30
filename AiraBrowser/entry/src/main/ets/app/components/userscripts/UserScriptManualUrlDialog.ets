@@ -19,7 +19,7 @@ export struct UserScriptManualUrlDialog {
 
   build() {
     Column({ space: 16 }) {
-      Text('从 URL 添加')
+      Text($r('app.string.user_script_add_from_url'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -43,7 +43,7 @@ export struct UserScriptManualUrlDialog {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '读取',
+          label: $r('app.string.user_script_action_fetch'),
           emphasis: 'primary',
           stacked: true,
           accentColor: this.storedAccentColor,
@@ -56,7 +56,7 @@ export struct UserScriptManualUrlDialog {
         })
 
         BrowserSheetActionButton({
-          label: '取消',
+          label: $r('app.string.user_script_action_cancel'),
           emphasis: 'ghost',
           stacked: true,
           buttonHeight: 44,

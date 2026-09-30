@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
-  detectHistoryBrowserKind,
   readInstalledHistoryBrowser,
-  vivaldiFromExtensionClientHints,
+  resolveHistoryBrowserKind,
   type HistoryBrowserKind,
 } from '@/features/history-takeover/historyTakeoverPolicy';
 import { resolveHistorySkin } from './skins/registry';
@@ -33,18 +32,12 @@ function initialHistoryBrowserKind(): HistoryBrowserKind | null {
   const navigatorObject = globalThis.navigator as ClientHintsNavigator | undefined;
   const userAgent = navigatorObject?.userAgent || '';
   const brands = navigatorObject?.userAgentData?.brands?.map((item) => String(item?.brand || '')) || [];
-  // Vivaldi masks itself as Chrome. The extension page is the one place that
-  // still gives a usable signal before the async tab probe returns.
-  if (vivaldiFromExtensionClientHints({
-    protocol: globalThis.location?.protocol,
-    userAgent,
-    brands,
-    platform: navigatorObject?.userAgentData?.platform,
-  })) {
+  if (/Vivaldi\//i.test(userAgent) || brands.some((brand) => /vivaldi/i.test(brand))) {
     return 'vivaldi';
   }
-  const detected = detectHistoryBrowserKind(userAgent);
-  // Chrome-like and Firefox-like user agents can still be Brave, Zen, or Vivaldi
-  // until their own browser signal is read.
-  return detected === 'chromium' || detected === 'firefox' || detected === 'chrome' ? null : detected;
+  const detected = resolveHistoryBrowserKind({ userAgent, brands, isBrave: false });
+  // Chrome and Edge stay on their own pages even when a later probe is uncertain.
+  if (detected === 'chrome' || detected === 'chromium') return 'chrome';
+  if (detected === 'edge') return 'edge';
+  return detected === 'firefox' ? null : detected;
 }

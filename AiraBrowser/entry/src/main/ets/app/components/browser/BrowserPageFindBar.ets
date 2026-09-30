@@ -110,7 +110,7 @@ export struct BrowserPageFindBar {
       .width(28)
       .height(28)
 
-    TextInput({ text: this.state.query, placeholder: '在页面中查找' })
+    TextInput({ text: this.state.query, placeholder: $r('app.string.page_find_placeholder') })
       .id(PAGE_FIND_INPUT_FOCUS_ID)
       .layoutWeight(1)
       .height(38)
@@ -138,7 +138,7 @@ export struct BrowserPageFindBar {
 
     Text(this.resolveTrailingText())
       .fontSize(13)
-      .fontColor(this.state.statusText.length > 0 ?
+      .fontColor(this.hasVisibleStatusText() ?
         this.storedSecondaryTextColor :
         this.storedPrimaryTextColor)
       .maxLines(1)
@@ -233,11 +233,16 @@ export struct BrowserPageFindBar {
     return true;
   }
 
-  private resolveTrailingText(): string {
-    if (this.state.statusText.length > 0) {
+  private resolveTrailingText(): ResourceStr {
+    if (this.hasVisibleStatusText()) {
       return this.state.statusText;
     }
     return this.state.progressText;
+  }
+
+  private hasVisibleStatusText(): boolean {
+    const statusText = this.state.statusText;
+    return typeof statusText !== 'string' || statusText.length > 0;
   }
 
   private resolveFloatingBarMaxWidth(): Length {

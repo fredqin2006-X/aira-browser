@@ -29,26 +29,26 @@ import { SettingsNavigationCoordinator } from '../router/SettingsNavigationCoord
 
 interface RetentionRuntimePolicyOption {
   id: BrowserRetentionProfileId;
-  title: string;
-  helperText: string;
+  title: ResourceStr;
+  helperText: ResourceStr;
 }
 
 const RETENTION_RUNTIME_POLICY_RADIO_GROUP: string = 'retention-runtime-policy';
 const RETENTION_RUNTIME_POLICY_OPTIONS: RetentionRuntimePolicyOption[] = [
   {
     id: 'memory_saver',
-    title: '省电优先',
-    helperText: '更快释放后台标签页，适合低内存、发热或耗电明显时使用'
+    title: $r('app.string.settings_advanced_retention_memory_saver'),
+    helperText: $r('app.string.settings_advanced_retention_memory_saver_helper')
   },
   {
     id: 'balanced',
-    title: '均衡',
-    helperText: '日常推荐，兼顾切回速度、内存占用和耗电'
+    title: $r('app.string.settings_advanced_retention_balanced'),
+    helperText: $r('app.string.settings_advanced_retention_balanced_helper')
   },
   {
     id: 'keep_more_tabs',
-    title: '多标签性能',
-    helperText: '平时保留更多后台标签页，切回更快但更耗内存和电量'
+    title: $r('app.string.settings_advanced_retention_keep_more_tabs'),
+    helperText: $r('app.string.settings_advanced_retention_keep_more_tabs_helper')
   }
 ];
 
@@ -83,7 +83,7 @@ struct RetentionRuntimePolicySettingsPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '标签页运行策略',
+        title: $r('app.string.settings_advanced_retention_page_title'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -107,7 +107,7 @@ struct RetentionRuntimePolicySettingsPage {
   @Builder
   private buildContent() {
     SettingsSection({
-      title: '后台标签页资源管理',
+      title: $r('app.string.settings_advanced_retention_row'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
@@ -135,7 +135,7 @@ struct RetentionRuntimePolicySettingsPage {
       }
 
       SettingsFooterText({
-        text: '这是平时的保活偏好。系统内存紧张时，Aira 会临时降低后台保活数量；前台标签页和受保护任务不会被普通回收策略释放。',
+        text: $r('app.string.settings_advanced_retention_page_footer'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -176,7 +176,7 @@ struct RetentionRuntimePolicySettingsPage {
       .catch((_error: Error) => {
         this.isSelectingOption = false;
         this.refreshState();
-        this.showToast('标签页运行策略更新失败。');
+        this.showToast($r('app.string.settings_advanced_retention_update_failed'));
       });
   }
 
@@ -212,7 +212,7 @@ struct RetentionRuntimePolicySettingsPage {
     return true;
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

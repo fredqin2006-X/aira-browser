@@ -1,4 +1,5 @@
 import { BookmarkNode } from '../../common/models/BrowserModels';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   createLocalBookmarkId,
   sanitizeBookmarkTitle
@@ -26,7 +27,7 @@ export class BookmarkFolderOptimisticCreateViewModel {
       id: createLocalBookmarkId('folder'),
       type: 'folder',
       parentId: parentId,
-      title: sanitizeBookmarkTitle(title, '新建文件夹'),
+      title: sanitizeBookmarkTitle(title, resolveAppResourceText($r('app.string.bookmark_new_folder'))),
       position: this.resolveNextPosition(siblings),
       createdAt: now,
       updatedAt: now,

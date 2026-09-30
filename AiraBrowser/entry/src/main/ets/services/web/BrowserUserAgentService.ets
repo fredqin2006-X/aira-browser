@@ -17,10 +17,10 @@ export interface BrowserUserAgentPreset {
 }
 
 export interface BrowserUserAgentRiskNotice {
-  title: string;
-  message: string;
-  confirmText: string;
-  cancelText: string;
+  title: ResourceStr;
+  message: ResourceStr;
+  confirmText: ResourceStr;
+  cancelText: ResourceStr;
 }
 
 export interface BrowserCustomUserAgentDraft {
@@ -134,10 +134,10 @@ export const AIRA_COMPAT_DESKTOP_USER_AGENT: string =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36';
 
 export const BROWSER_USER_AGENT_RISK_NOTICE: BrowserUserAgentRiskNotice = {
-  title: '网页标识兼容性提醒',
-  message: '切换为桌面端、自定义或伪装其它浏览器的 UA，可能让 Cloudflare、Turnstile 等验证认为浏览器环境不一致，导致验证码循环或验证失败。遇到登录、支付或验证异常时，请先改回 Aira 默认；如果仍异常，再选择 ArkWeb 原始标识重试。',
-  confirmText: '继续使用',
-  cancelText: '取消'
+  title: $r('app.string.web_ua_settings_risk_title'),
+  message: $r('app.string.web_ua_settings_risk_message'),
+  confirmText: $r('app.string.web_ua_settings_risk_confirm'),
+  cancelText: $r('app.string.settings_account_cancel')
 };
 
 export const DEFAULT_BROWSER_USER_AGENT_SETTINGS: BrowserUserAgentSettings = {

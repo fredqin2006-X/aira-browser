@@ -5,13 +5,13 @@ import {
 import { configureCenteredAlertDialog } from '../common/CenteredDialogSurface';
 
 export interface BrowserNativeAlertInformationPresentation {
-  title: string;
-  message: string;
-  confirmLabel: string;
+  title: ResourceStr;
+  message: ResourceStr;
+  confirmLabel: ResourceStr;
 }
 
 interface BrowserNativeAlertDialogButton {
-  value: string;
+  value: ResourceStr;
   fontColor?: ResourceColor;
   action: () => void;
 }

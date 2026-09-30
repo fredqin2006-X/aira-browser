@@ -6,7 +6,7 @@ import { SettingsOptionRow } from './SettingsRows';
 
 interface SiteControlsExternalNavigationDefaultOption {
   value: ExternalNavigationAppOpenPolicy;
-  label: string;
+  label: ResourceStr;
 }
 
 @Component
@@ -59,7 +59,7 @@ export struct SiteControlsExternalNavigationDefaultContent {
       }
 
       SettingsFooterText({
-        text: '控制网站尝试打开其他应用时，是先询问、直接允许，还是始终阻止。',
+        text: $r('app.string.settings_site_controls_external_default_note'),
         secondaryTextColor: this.secondaryTextColor
       })
     }
@@ -96,9 +96,9 @@ export struct SiteControlsExternalNavigationDefaultContent {
 
   private buildOptions(): SiteControlsExternalNavigationDefaultOption[] {
     return [
-      { value: 'ask', label: '跳转前询问' },
-      { value: 'allow', label: '始终允许' },
-      { value: 'block', label: '阻止' }
+      { value: 'ask', label: $r('app.string.settings_site_controls_external_default_ask') },
+      { value: 'allow', label: $r('app.string.settings_site_controls_external_default_allow') },
+      { value: 'block', label: $r('app.string.settings_site_controls_external_default_block') }
     ];
   }
 

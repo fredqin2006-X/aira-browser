@@ -8,8 +8,8 @@ export interface BookmarkManagerSearchState {
   isSearchMode: boolean;
   isActive: boolean;
   resultCount: number;
-  emptyTitle: string;
-  emptyMessage: string;
+  emptyTitle: ResourceStr;
+  emptyMessage: ResourceStr;
 }
 
 export interface BookmarkManagerSearchResult {
@@ -113,10 +113,10 @@ export class BookmarkManagerSearchViewModel {
       isSearchMode: isSearchMode,
       isActive: isActive,
       resultCount: resultCount,
-      emptyTitle: isActive ? '没有匹配的书签' : (isSearchMode ? '搜索书签' : '这里还没有书签'),
+      emptyTitle: isActive ? $r('app.string.bookmark_no_match') : (isSearchMode ? $r('app.string.bookmark_search') : $r('app.string.bookmark_empty')),
       emptyMessage: isActive
-        ? '换个关键词试试。'
-        : (isSearchMode ? '输入标题或网址开始搜索' : '点击右上角更多，可以先新建文件夹。')
+        ? $r('app.string.history_try_another')
+        : (isSearchMode ? $r('app.string.history_search_hint') : $r('app.string.bookmark_empty_hint'))
     };
   }
 }

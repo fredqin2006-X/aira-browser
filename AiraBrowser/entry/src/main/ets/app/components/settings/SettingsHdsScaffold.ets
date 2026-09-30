@@ -58,7 +58,7 @@ export struct SettingsHdsScaffold {
     };
   @StorageProp(BROWSER_THEME_STORAGE_RESOLVED_MODE_KEY) @Watch('syncStatusBarContentStyle')
   private storedResolvedThemeMode: string = 'light';
-  @Prop title: string = '';
+  @Prop title: ResourceStr = '';
   @Prop backIconKind: SettingsHdsBackIconKind = 'back';
   @Prop pageBackground: ResourceColor = DEFAULT_THEME_PALETTE.light.pageBackground;
   @Prop headerButtonBackground: ResourceColor = DEFAULT_THEME_PALETTE.light.controlBackground;
@@ -76,7 +76,7 @@ export struct SettingsHdsScaffold {
    * the membership page, whose only title-bar action is the low-frequency but
    * must-be-findable “恢复购买”. Empty keeps the icon-only surfaces unchanged.
    */
-  @Prop menuActionText: string = '';
+  @Prop menuActionText: ResourceStr = '';
   @Prop menuActionIcon: Resource | undefined = undefined;
   @Prop menuActionImageIcon: Resource | undefined = undefined;
   @Prop menuActionAiraIconId: AiraRenderableIconId | undefined = undefined;
@@ -306,7 +306,7 @@ export struct SettingsHdsScaffold {
   @Builder
   private buildGlassTrailingTitleActions() {
     Row({ space: SETTINGS_TITLE_BAR_CUSTOM_MENU_BUTTON_GAP }) {
-      if (this.menuActionText.length > 0) {
+      if (this.hasMenuActionText()) {
         this.buildGlassTextAction()
       }
       if (this.menuActions.length > 0 && this.collapseMenuActions) {
@@ -366,7 +366,6 @@ export struct SettingsHdsScaffold {
       .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
       .borderRadius(SETTINGS_TITLE_BAR_TEXT_ACTION_HEIGHT / 2)
       .padding({ left: SETTINGS_TITLE_BAR_TEXT_ACTION_HORIZONTAL_PADDING, right: SETTINGS_TITLE_BAR_TEXT_ACTION_HORIZONTAL_PADDING })
-      .accessibilityText(this.menuActionText)
       .onClick(() => {
         this.onMenuAction();
       })
@@ -628,6 +627,10 @@ export struct SettingsHdsScaffold {
     return [this.fallbackScroller];
   }
 
+  private hasMenuActionText(): boolean {
+    return typeof this.menuActionText !== 'string' || this.menuActionText.length > 0;
+  }
+
   private resolveBackLabel(): string {
     return this.backIconKind === 'close' ? '关闭设置' : '返回设置';
   }
@@ -644,7 +647,7 @@ export struct SettingsHdsScaffold {
 
   private shouldShowTrailingTitleActions(): boolean {
     return this.menuActions.length > 0 || this.menuActionLabel.length > 0 || this.showPrivateIndicator ||
-      this.menuActionText.length > 0;
+      this.hasMenuActionText();
   }
 
   private resolveMenuActionIcon(icon: Resource | undefined): Resource {

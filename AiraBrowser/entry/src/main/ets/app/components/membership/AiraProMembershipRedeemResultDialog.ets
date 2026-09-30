@@ -88,7 +88,7 @@ export struct AiraProMembershipRedeemResultDialog {
           })
 
           BrowserSheetActionButton({
-            label: '取消',
+            label: $r('app.string.settings_account_cancel'),
             emphasis: 'ghost',
             stacked: true,
             buttonHeight: 44,
@@ -124,7 +124,7 @@ export struct AiraProMembershipRedeemResultDialog {
         .fontColor(this.storedPrimaryTextColor)
         .lineHeight(REDEEM_RESULT_VALUE_FONT_SIZE)
 
-      if (this.result.unitText.length > 0) {
+      if (this.hasVisibleText(this.result.unitText)) {
         Text(this.result.unitText)
           .fontSize(REDEEM_RESULT_UNIT_FONT_SIZE)
           .fontWeight(FontWeight.Medium)
@@ -136,7 +136,11 @@ export struct AiraProMembershipRedeemResultDialog {
     .alignItems(VerticalAlign.Bottom)
   }
 
-  private resolveActionText(): string {
-    return this.result.actionText.length > 0 ? this.result.actionText : '知道了';
+  private resolveActionText(): ResourceStr {
+    return this.hasVisibleText(this.result.actionText) ? this.result.actionText : $r('app.string.settings_pro_got_it');
+  }
+
+  private hasVisibleText(value: ResourceStr): boolean {
+    return typeof value !== 'string' || value.length > 0;
   }
 }

@@ -79,6 +79,7 @@ import {
   VideoCompatibilityProfileAcquisitionScheduler,
   VideoCompatibilityReplacedGenericDeepProbeStrategyId
 } from '../../../services/media/VideoCompatibilityProfileAcquisitionRecipeService';
+import { resolveAppResourceText } from '../../resources/AppResourceText';
 
 const MEDIA_DISCOVERY_LOG_DOMAIN: number = 0xA1A0;
 const MEDIA_DISCOVERY_LOG_TAG: string = 'MediaDiscovery';
@@ -492,7 +493,7 @@ export class BrowserMediaDiscoveryCoordinator {
       signalKind: 'userscript_request'
     }).then((report) => {
       this.ingestSignals(input.tabId, report.signals, host, evidenceCapture);
-      host.showToast('已扫描页面媒体资源');
+      host.showToast(resolveAppResourceText($r('app.string.media_resource_toast_scan_done')));
     }).catch((_error: Error) => {});
   }
 
@@ -781,21 +782,21 @@ export class BrowserMediaDiscoveryCoordinator {
     if (target === undefined || !target.currentRoute) {
       return this.rejectActivePlaybackDownload(
         'missing_target',
-        '当前网页视频会话已经失效。'
+        resolveAppResourceText($r('app.string.media_resource_toast_session_expired'))
       );
     }
     const locatorIdentities = this.collectLatestPlaybackLocatorIdentities(target);
     if (locatorIdentities.length <= 0) {
       return this.rejectActivePlaybackDownload(
         'missing_locator',
-        '当前视频使用 blob/MSE 或没有可直接下载的地址，暂不支持下载。'
+        resolveAppResourceText($r('app.string.media_resource_download_blob_no_address'))
       );
     }
     const candidates = this.findCandidatesByLocatorIdentities(input.tabId, locatorIdentities);
     if (candidates.length <= 0) {
       return this.rejectActivePlaybackDownload(
         'missing_resource',
-        '当前视频使用 blob/MSE，或尚未嗅探到可下载地址。'
+        resolveAppResourceText($r('app.string.media_resource_download_blob_not_sniffed'))
       );
     }
     const supportedCandidates: MediaCandidate[] = [];
@@ -813,7 +814,7 @@ export class BrowserMediaDiscoveryCoordinator {
     if (supportedCandidates.length > 1) {
       return this.rejectActivePlaybackDownload(
         'ambiguous_resource',
-        '当前视频匹配到多个资源，暂时无法确定要下载哪一个。'
+        resolveAppResourceText($r('app.string.media_resource_download_ambiguous'))
       );
     }
     const resolution = this.resolveMediaResourceAction(input, supportedCandidates[0].id, 'download');
@@ -821,7 +822,7 @@ export class BrowserMediaDiscoveryCoordinator {
       return {
         reason: 'unsupported_resource',
         state: resolution.state,
-        message: '当前视频资源暂时不能创建下载任务。'
+        message: resolveAppResourceText($r('app.string.media_resource_download_cannot_create_task'))
       };
     }
     return {
@@ -1039,18 +1040,18 @@ export class BrowserMediaDiscoveryCoordinator {
   private resolveUnsupportedActivePlaybackMessage(candidates: MediaCandidate[]): string {
     for (let i = 0; i < candidates.length; i += 1) {
       if (candidates[i].playabilityState === 'protected') {
-        return '当前视频受加密或 DRM 保护，无法下载。';
+        return resolveAppResourceText($r('app.string.media_resource_download_drm_protected'));
       }
     }
     for (let i = 0; i < candidates.length; i += 1) {
       if (this.hasPairedAdaptiveAcquisition(candidates[i])) {
-        return '当前视频使用分离的音视频流，暂不支持直接下载。';
+        return resolveAppResourceText($r('app.string.media_resource_download_separate_streams'));
       }
       if (candidates[i].kind === 'dash') {
-        return '当前视频使用 DASH 分片，暂不支持直接下载。';
+        return resolveAppResourceText($r('app.string.media_resource_download_dash_segments'));
       }
     }
-    return '当前视频资源暂不支持下载。';
+    return resolveAppResourceText($r('app.string.media_resource_download_unsupported'));
   }
 
   private rejectActivePlaybackDownload(
@@ -1876,9 +1877,11 @@ export class BrowserMediaDiscoveryCoordinator {
     }
     try {
       const serialized = JSON.stringify(error);
-      return serialized.length > 0 ? serialized : '未知错误';
+      return serialized.length > 0
+        ? serialized
+        : resolveAppResourceText($r('app.string.media_resource_unknown_error'));
     } catch (_stringifyError) {
-      return '未知错误';
+      return resolveAppResourceText($r('app.string.media_resource_unknown_error'));
     }
   }
 

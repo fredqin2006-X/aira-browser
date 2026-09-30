@@ -3,7 +3,7 @@ import { HistoryFeature, HistoryManagementBoundary } from './HistoryFeature';
 
 export interface HistorySitePageStatus {
   loading: boolean;
-  error: string;
+  error: ResourceStr;
 }
 
 // One bounded query context per screen. The UI owns presentation, while this
@@ -121,7 +121,7 @@ export class HistorySitePageController {
         if (startedDuringMutation || this.feature.isMutationPending() ||
           revision !== this.feature.getDataRevision()) {
           this.initialized = false;
-          this.setStatus(false, '历史记录已更新，请重试。');
+          this.setStatus(false, $r('app.string.history_stale'));
           return;
         }
         this.offset += sites.length;
@@ -133,12 +133,12 @@ export class HistorySitePageController {
       })
       .catch((_error: Error) => {
         if (sequence === this.sequence) {
-          this.setStatus(false, '加载站点失败，请重试。');
+          this.setStatus(false, $r('app.string.history_load_sites_failed'));
         }
       });
   }
 
-  private setStatus(loading: boolean, error: string): void {
+  private setStatus(loading: boolean, error: ResourceStr): void {
     this.loading = loading;
     this.statusListener?.({ loading: loading, error: error });
   }

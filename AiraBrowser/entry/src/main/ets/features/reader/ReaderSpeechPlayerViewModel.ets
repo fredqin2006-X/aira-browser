@@ -2,14 +2,14 @@ import { ReaderModeArticle, ReaderModeBlock } from './ReaderModeModels';
 import { ReaderSpeechState } from './ReaderSpeechModels';
 
 export interface ReaderSpeechPlayerSnapshot {
-  title: string;
-  subtitle: string;
+  title: ResourceStr;
+  subtitle: ResourceStr;
   source: string;
   coverImageUrl: string;
-  currentText: string;
-  progressLabel: string;
+  currentText: ResourceStr;
+  progressLabel: ResourceStr;
   progressPercent: number;
-  statusLabel: string;
+  statusLabel: ResourceStr;
 }
 
 export class ReaderSpeechPlayerViewModel {
@@ -49,12 +49,12 @@ export class ReaderSpeechPlayerViewModel {
     return Math.max(0, Math.min(index, totalChunks - 1));
   }
 
-  private resolveTitle(article: ReaderModeArticle): string {
+  private resolveTitle(article: ReaderModeArticle): ResourceStr {
     const title = article.title.trim();
-    return title.length > 0 ? title : '听读正文';
+    return title.length > 0 ? title : $r('app.string.reader_speech_title');
   }
 
-  private resolveSubtitle(article: ReaderModeArticle): string {
+  private resolveSubtitle(article: ReaderModeArticle): ResourceStr {
     const parts: string[] = [];
     if (article.siteName.trim().length > 0) {
       parts.push(article.siteName.trim());
@@ -62,7 +62,7 @@ export class ReaderSpeechPlayerViewModel {
     if (article.byline.trim().length > 0) {
       parts.push(article.byline.trim());
     }
-    return parts.length > 0 ? parts.join(' · ') : '阅读模式';
+    return parts.length > 0 ? parts.join(' · ') : $r('app.string.reader_reading_mode');
   }
 
   private resolveSource(article: ReaderModeArticle): string {
@@ -105,19 +105,19 @@ export class ReaderSpeechPlayerViewModel {
     urls.push(normalized);
   }
 
-  private resolveCurrentText(chunks: string[], currentIndex: number): string {
+  private resolveCurrentText(chunks: string[], currentIndex: number): ResourceStr {
     if (chunks.length <= 0) {
-      return '正文整理完成后即可开始朗读。';
+      return $r('app.string.reader_speech_ready_hint');
     }
     return chunks[currentIndex] ?? chunks[0];
   }
 
-  private resolveProgressLabel(speechState: ReaderSpeechState, totalChunks: number): string {
+  private resolveProgressLabel(speechState: ReaderSpeechState, totalChunks: number): ResourceStr {
     if (totalChunks <= 0) {
-      return '暂无可朗读正文';
+      return $r('app.string.reader_speech_no_text');
     }
     const current = Math.max(1, Math.min(speechState.currentChunkIndex > 0 ? speechState.currentChunkIndex : 1, totalChunks));
-    return `第 ${current} 段 / 共 ${totalChunks} 段`;
+    return $r('app.string.reader_speech_progress', current, totalChunks);
   }
 
   private resolveProgressPercent(speechState: ReaderSpeechState, totalChunks: number): number {
@@ -128,22 +128,24 @@ export class ReaderSpeechPlayerViewModel {
     return Math.round((current / totalChunks) * 100);
   }
 
-  private resolveStatusLabel(speechState: ReaderSpeechState): string {
+  private resolveStatusLabel(speechState: ReaderSpeechState): ResourceStr {
     if (speechState.status === 'preparing') {
-      return '准备朗读';
+      return $r('app.string.reader_speech_status_preparing');
     }
     if (speechState.status === 'speaking') {
-      return '正在朗读';
+      return $r('app.string.reader_speech_status_speaking');
     }
     if (speechState.status === 'paused') {
-      return '已暂停';
+      return $r('app.string.reader_speech_status_paused');
     }
     if (speechState.status === 'stopping') {
-      return '正在停止';
+      return $r('app.string.reader_speech_status_stopping');
     }
     if (speechState.status === 'error') {
-      return speechState.message.length > 0 ? speechState.message : '朗读失败';
+      return `${speechState.message}`.length > 0
+        ? speechState.message
+        : $r('app.string.reader_speech_status_failed');
     }
-    return '未开始';
+    return $r('app.string.reader_speech_status_idle');
   }
 }

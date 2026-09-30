@@ -9,9 +9,9 @@ const PHONE_SETTINGS_SHEET_HEADER_ROW_HEIGHT: number = 56;
 @Component
 export struct BrowserPhoneSettingsSheetHeader {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY) private storedPrimaryTextColor: string = '#111318';
-  @Prop title: string = '';
+  @Prop title: ResourceStr = '';
   @Prop showBackButton: boolean = false;
-  @Prop backAccessibilityText: string = '返回';
+  @Prop backAccessibilityText: ResourceStr = $r('app.string.bottom_panel_back');
   /** Row height. The 40vp button stays centered in it, so a taller modal bar does not shift the glyph. */
   @Prop rowHeight: number = PHONE_SETTINGS_SHEET_HEADER_ROW_HEIGHT;
   /**

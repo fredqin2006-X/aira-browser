@@ -23,10 +23,11 @@ import {
   BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY,
   BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY
 } from '../../../core/theme/BrowserThemeStorageKeys';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 interface UserScriptInstallInfoRowView {
-  label: string;
-  value: string;
+  label: ResourceStr;
+  value: ResourceStr;
 }
 
 @Component
@@ -117,7 +118,7 @@ export struct UserScriptInstallScreen {
         airaIconId: 'browser.tabs.delete',
         iconSize: 17,
         actionEnabled: !this.installBusy,
-        accessibilityLabel: '关闭',
+        accessibilityLabel: $r('app.string.user_script_action_close'),
         onAction: () => {
           this.onClose();
         }
@@ -150,7 +151,7 @@ export struct UserScriptInstallScreen {
 
         if (this.sourceUrl.trim().length > 0) {
           Column({ space: 6 }) {
-            Text('脚本地址')
+            Text($r('app.string.user_script_script_url'))
               .width('100%')
               .fontSize(12)
               .fontColor(this.storedSecondaryTextColor)
@@ -188,7 +189,7 @@ export struct UserScriptInstallScreen {
   private buildRetryAction() {
     Row() {
       BrowserSheetActionButton({
-        label: '重试',
+        label: $r('app.string.user_script_action_retry'),
         emphasis: 'primary',
         accentColor: this.storedAccentColor,
         actionEnabled: this.canRetrySourceLoad(),
@@ -211,7 +212,7 @@ export struct UserScriptInstallScreen {
         .height(32)
         .color(this.storedAccentColor)
 
-      Text('正在读取脚本…')
+      Text($r('app.string.user_script_reading_script'))
         .fontSize(15)
         .fontColor(this.storedPrimaryTextColor)
         .maxLines(1)
@@ -237,7 +238,7 @@ export struct UserScriptInstallScreen {
         .clip(true)
 
         if (this.isUpdatingInstalledScript() && this.preview.errorMessage.length <= 0) {
-          Text('安装后会替换已安装的同名脚本，脚本保存的数据保持不变。')
+          Text($r('app.string.user_script_replace_note'))
             .width('100%')
             .fontSize(13)
             .lineHeight(18)
@@ -249,22 +250,28 @@ export struct UserScriptInstallScreen {
     }
   }
 
-  private resolvePreviewSectionTitle(): string {
+  private resolvePreviewSectionTitle(): ResourceStr {
     if (this.shouldShowInstallConfirmation()) {
-      return this.isUpdatingInstalledScript() ? '待更新脚本' : '待安装脚本';
+      return this.isUpdatingInstalledScript()
+        ? $r('app.string.user_script_preview_update')
+        : $r('app.string.user_script_preview_install');
     }
-    return '脚本信息';
+    return $r('app.string.user_script_preview_info');
   }
 
   private isUpdatingInstalledScript(): boolean {
     return this.existingTarget.scriptId.length > 0;
   }
 
-  private resolveInstallActionLabel(): string {
+  private resolveInstallActionLabel(): ResourceStr {
     if (this.installBusy) {
-      return this.isUpdatingInstalledScript() ? '正在更新…' : '正在安装…';
+      return this.isUpdatingInstalledScript()
+        ? $r('app.string.user_script_updating')
+        : $r('app.string.user_script_installing');
     }
-    return this.isUpdatingInstalledScript() ? '更新' : '安装';
+    return this.isUpdatingInstalledScript()
+      ? $r('app.string.user_script_action_update')
+      : $r('app.string.user_script_action_install');
   }
 
   @Builder
@@ -283,7 +290,9 @@ export struct UserScriptInstallScreen {
       })
 
       Text(this.preview.name.length > 0 ? this.preview.name :
-        (this.isUpdatingInstalledScript() ? '准备更新用户脚本' : '准备安装用户脚本'))
+        (this.isUpdatingInstalledScript()
+          ? $r('app.string.user_script_prepare_update')
+          : $r('app.string.user_script_prepare_install')))
         .width('100%')
         .fontSize(22)
         .fontWeight(FontWeight.Bold)
@@ -334,7 +343,7 @@ export struct UserScriptInstallScreen {
   }
 
   @Builder
-  private buildSectionTitle(title: string) {
+  private buildSectionTitle(title: ResourceStr) {
     Text(title)
       .width('100%')
       .fontSize(13)
@@ -347,33 +356,48 @@ export struct UserScriptInstallScreen {
   private buildPreviewDetails() {
     if (this.preview.version.length > 0) {
       this.buildInfoRow(
-        { label: '版本', value: this.resolveVersionValue() },
+        { label: $r('app.string.user_script_meta_version'), value: this.resolveVersionValue() },
         this.hasRowsAfterVersion()
       )
     }
     if (this.preview.sourceLabel.length > 0) {
-      this.buildInfoRow({ label: '来源', value: this.preview.sourceLabel }, this.hasRowsAfterSource())
+      this.buildInfoRow(
+        { label: $r('app.string.user_script_meta_source'), value: this.preview.sourceLabel },
+        this.hasRowsAfterSource()
+      )
     }
     if (this.preview.scope.length > 0) {
       this.buildInfoRow({
-        label: '运行网站',
+        label: $r('app.string.user_script_label_sites'),
         value: this.preview.scopeDetail.length > 0 ? this.preview.scopeDetail : this.preview.scope
       }, this.hasRowsAfterScope())
     }
     if (this.preview.description.length > 0) {
-      this.buildInfoRow({ label: '说明', value: this.preview.description }, this.hasRowsAfterDescription())
+      this.buildInfoRow(
+        { label: $r('app.string.user_script_label_description'), value: this.preview.description },
+        this.hasRowsAfterDescription()
+      )
     }
     if (this.preview.grants.length > 0) {
-      this.buildInfoRow({ label: '脚本能力', value: this.preview.grants }, this.hasRowsAfterGrants())
+      this.buildInfoRow(
+        { label: $r('app.string.user_script_label_capabilities'), value: this.preview.grants },
+        this.hasRowsAfterGrants()
+      )
     }
     if (this.preview.runAtLabel.length > 0) {
-      this.buildInfoRow({ label: '运行时机', value: this.preview.runAtLabel }, this.hasRowsAfterRunAt())
+      this.buildInfoRow(
+        { label: $r('app.string.user_script_meta_run_at'), value: this.preview.runAtLabel },
+        this.hasRowsAfterRunAt()
+      )
     }
     if (this.preview.updateLabel.length > 0) {
-      this.buildInfoRow({ label: '更新', value: this.preview.updateLabel }, this.hasPreviewMessages())
+      this.buildInfoRow(
+        { label: $r('app.string.user_script_action_update'), value: this.preview.updateLabel },
+        this.hasPreviewMessages()
+      )
     }
     if (this.shouldShowPendingPreviewMessage()) {
-      this.buildPreviewMessage('安装前会自动读取脚本名称和运行网站。', false)
+      this.buildPreviewMessage($r('app.string.user_script_pending_preview_message'), false)
     }
     if (this.preview.errorMessage.length > 0) {
       this.buildPreviewMessage(this.preview.errorMessage, true)
@@ -388,7 +412,7 @@ export struct UserScriptInstallScreen {
     if (!this.isUpdatingInstalledScript() || installedVersion.length === 0) {
       return this.preview.version;
     }
-    return `${this.preview.version}（已安装 ${installedVersion}）`;
+    return resolveAppResourceText($r('app.string.user_script_version_installed'), this.preview.version, installedVersion);
   }
 
   @Builder
@@ -423,7 +447,7 @@ export struct UserScriptInstallScreen {
   }
 
   @Builder
-  private buildPreviewMessage(message: string, isError: boolean) {
+  private buildPreviewMessage(message: ResourceStr, isError: boolean) {
     Text(message)
       .width('100%')
       .fontSize(13)

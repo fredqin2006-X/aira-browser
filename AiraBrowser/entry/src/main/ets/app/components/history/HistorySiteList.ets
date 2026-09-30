@@ -1,3 +1,4 @@
+import { localizeHistoryHost } from '../../../core/resources/HistoryBookmarkDisplayText';
 import { image } from '@kit.ImageKit';
 import { HistorySiteGroup } from '../../../features/history/HistoryViewModel';
 import { HistorySiteListDataSource } from '../../../features/history/HistorySiteListDataSource';
@@ -111,8 +112,8 @@ export struct HistorySiteList {
       iconUri: this.getIconPathById(site.key),
       iconPixelMap: this.getIconPixelMap(site.key),
       fallbackLabel: resolveSiteIconFallbackLabel(site.title, site.host),
-      title: site.host,
-      subtitle: `${site.visitCount} 次访问 · ${site.uniqueUrlCount} 个页面 · 最近 ${site.latestTitle}`,
+      title: localizeHistoryHost(site.host),
+      subtitle: $r('app.string.history_visit_summary', site.visitCount, site.uniqueUrlCount, site.latestTitle),
       pressed: this.pressedSiteKey === site.key,
       menuVisible: !this.isSelectionMode && this.contextMenuSiteKey === site.key,
       selected: this.isSiteSelected(site.key),
@@ -239,8 +240,8 @@ struct HistorySiteRecordRow {
   @Prop iconUri: string = '';
   @Prop iconPixelMap: image.PixelMap | undefined = undefined;
   @Prop fallbackLabel: string = '#';
-  @Prop title: string = '';
-  @Prop subtitle: string = '';
+  @Prop title: ResourceStr = '';
+  @Prop subtitle: ResourceStr = '';
   @Prop pressed: boolean = false;
   @Prop menuVisible: boolean = false;
   @Prop selected: boolean = false;
@@ -261,8 +262,8 @@ struct HistorySiteRecordRow {
     this.iconUri = params.iconUri as string;
     this.iconPixelMap = params.iconPixelMap as image.PixelMap | undefined;
     this.fallbackLabel = params.fallbackLabel as string;
-    this.title = params.title as string;
-    this.subtitle = params.subtitle as string;
+    this.title = params.title as ResourceStr;
+    this.subtitle = params.subtitle as ResourceStr;
     this.pressed = params.pressed as boolean;
     this.menuVisible = params.menuVisible as boolean;
     this.selected = params.selected as boolean;
@@ -344,12 +345,12 @@ struct HistorySiteRecordRow {
 
   @Builder
   private buildMenuItems() {
-    MenuItem({ content: '查看记录' })
+    MenuItem({ content: $r('app.string.history_view_records') })
       .onClick(() => {
         this.onOpenSite();
       })
 
-    MenuItem({ content: '删除该站点记录' })
+    MenuItem({ content: $r('app.string.history_delete_site_short') })
       .onClick(() => {
         this.onDeleteSite();
       })

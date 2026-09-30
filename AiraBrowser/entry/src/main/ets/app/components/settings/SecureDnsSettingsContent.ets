@@ -23,7 +23,6 @@ import {
 } from './SettingsDesktopRows';
 
 const SECURE_DNS_RADIO_GROUP: string = 'secure-dns-provider';
-const SECURE_DNS_STRICT_MODE_TITLE: string = '强制 DoH';
 
 @Component
 export struct SecureDnsSettingsContent {
@@ -60,7 +59,7 @@ export struct SecureDnsSettingsContent {
   build() {
     Column({ space: 16 }) {
       SettingsSection({
-        title: 'DNS 服务',
+        title: $r('app.string.settings_privacy_protection_dns_service'),
         secondaryTextColor: this.secondaryTextColor
       }) {
         SettingsGroupCard({
@@ -93,19 +92,19 @@ export struct SecureDnsSettingsContent {
       }
 
       SettingsSection({
-        title: '解析策略',
+        title: $r('app.string.settings_privacy_protection_dns_strategy'),
         secondaryTextColor: this.secondaryTextColor
       }) {
         this.buildStrictModeSurface()
 
         SettingsFooterText({
-          text: '开启后不回退系统 DNS，DoH 服务器不可用时网页将无法加载；关闭后会自动回退，域名解析可能是明文。选择系统 DNS 时此开关不生效。',
+          text: $r('app.string.settings_privacy_protection_dns_strategy_footer'),
           secondaryTextColor: this.secondaryTextColor
         })
       }
 
       SettingsSection({
-        title: '自定义 DNS',
+        title: $r('app.string.settings_privacy_protection_dns_custom_section'),
         secondaryTextColor: this.secondaryTextColor
       }) {
         if (this.state.customProfiles.length > 0) {
@@ -145,7 +144,7 @@ export struct SecureDnsSettingsContent {
           }
         } else {
           SettingsFooterText({
-            text: '还没有自定义 DNS，可从右上角添加。',
+            text: $r('app.string.settings_privacy_protection_dns_empty'),
             secondaryTextColor: this.secondaryTextColor
           })
         }
@@ -160,7 +159,7 @@ export struct SecureDnsSettingsContent {
     if (this.desktopPresentation) {
       SettingsDesktopGroup({ surfaceColor: this.surfaceBackground }) {
         SettingsDesktopSwitchRow({
-          title: SECURE_DNS_STRICT_MODE_TITLE,
+          title: $r('app.string.settings_privacy_protection_dns_force_doh'),
           checked: this.state.settings.strictMode,
           isEnabled: !this.state.saving,
           primaryTextColor: this.primaryTextColor,
@@ -178,7 +177,7 @@ export struct SecureDnsSettingsContent {
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsSwitchRow({
-          title: SECURE_DNS_STRICT_MODE_TITLE,
+          title: $r('app.string.settings_privacy_protection_dns_force_doh'),
           checked: this.state.settings.strictMode,
           rowPosition: 'single',
           isEnabled: !this.state.saving,

@@ -23,6 +23,7 @@ import {
   BrowserToolbarSlotActionState,
   BrowserToolbarSlotId
 } from './BrowserToolbarCustomizationViewModel';
+import { bottomPanelCustomizeSlot, resourceStrKey, resourceStrPresent } from './BrowserBottomPanelText';
 import { BrowserBottomPanelActionEnablementById } from './BrowserBottomPanelActionEnablement';
 import {
   BrowserWebProtectionFeedbackPresentation,
@@ -78,13 +79,13 @@ export interface BrowserBottomChromePresentationFacts {
   panelExpansionEnabled: boolean;
   addressInput: string;
   addressDisplayText: string;
-  placeholder: string;
+  placeholder: ResourceStr;
   searchEnginePresentation?: BrowserSearchEngineChromePresentation;
   toolbarSlotActions?: BrowserToolbarSlotActionState[];
   toolbarActionEnablement?: BrowserBottomPanelActionEnablementById;
   toolbarInteractionProfileActive?: boolean;
   customizationPreview?: boolean;
-  gesturePromptText?: string;
+  gesturePromptText?: ResourceStr;
   webProtectionFeedback?: BrowserWebProtectionFeedbackPresentation;
   leadingHeaderActions: BrowserBottomAddressPanelHeaderAction[];
   trailingHeaderActions: BrowserBottomAddressPanelHeaderAction[];
@@ -94,14 +95,14 @@ export interface BrowserBottomChromeReturnHomeGestureInput {
   source: BrowserBottomChromeGestureSource;
   offsetY: number;
   eligible: boolean;
-  promptText?: string;
+  promptText?: ResourceStr;
 }
 
 export interface BrowserBottomChromeReturnHomeGestureState {
   active: boolean;
   armed: boolean;
   progress: number;
-  promptText: string;
+  promptText: ResourceStr;
 }
 
 interface BrowserBottomChromeFrameValues {
@@ -187,7 +188,7 @@ interface BrowserBottomChromePresentationValues {
   centerPrimaryVisualEnabled: boolean;
   trailingOuterVisualEnabled: boolean;
   addressInput: string;
-  placeholder: string;
+  placeholder: ResourceStr;
   searchEnginePresentation: BrowserSearchEngineChromePresentation;
   centerContent: BrowserBottomChromeCenterContentPresentation;
   leadingOuterIconId: AiraRenderableIconId;
@@ -222,23 +223,24 @@ const BROWSER_BOTTOM_CHROME_COMPACT_VERTICAL_PADDING: number = 4;
 const BROWSER_BOTTOM_CHROME_COMPACT_GESTURE_PROGRESS: number = 0.5;
 const BROWSER_BOTTOM_CHROME_RETURN_HOME_ACTIVE_OFFSET_Y: number = 8;
 const BROWSER_BOTTOM_CHROME_RETURN_HOME_RELEASE_OFFSET_Y: number = 44;
-const BROWSER_BOTTOM_CHROME_DEFAULT_GESTURE_PROMPT: string = '松手打开主页';
+const BROWSER_BOTTOM_CHROME_DEFAULT_GESTURE_PROMPT: ResourceStr =
+  $r('app.string.bottom_panel_release_open_home');
 const BROWSER_BOTTOM_CHROME_FOCUS_READY_PROGRESS: number = 0.35;
 const BROWSER_BOTTOM_CHROME_FRAME_EPSILON: number = 0.001;
 const EMPTY_SEARCH_ENGINE_CHROME_PRESENTATION: BrowserSearchEngineChromePresentation =
-  new BrowserSearchEngineChromePresentation('bing', [], '搜索或输入网址');
+  new BrowserSearchEngineChromePresentation('bing', [], $r('app.string.aira_search_card_placeholder'));
 
 export class BrowserBottomChromeTapIntent {
   kind: BrowserBottomChromeTapIntentKind;
   actionId: string;
   slotId: string;
-  disabledMessage: string;
+  disabledMessage: ResourceStr;
 
   constructor(
     kind: BrowserBottomChromeTapIntentKind,
     actionId: string = '',
     slotId: string = '',
-    disabledMessage: string = ''
+    disabledMessage: ResourceStr = ''
   ) {
     this.kind = kind;
     this.actionId = actionId;
@@ -250,13 +252,13 @@ export class BrowserBottomChromeTapIntent {
 export class BrowserBottomChromeTapTarget {
   intent: BrowserBottomChromeTapIntent;
   enabled: boolean;
-  accessibilityText: string;
+  accessibilityText: ResourceStr;
   reliable: boolean;
 
   constructor(
     intent: BrowserBottomChromeTapIntent,
     enabled: boolean,
-    accessibilityText: string,
+    accessibilityText: ResourceStr,
     reliable: boolean = false
   ) {
     this.intent = intent;
@@ -375,17 +377,17 @@ export class BrowserBottomChromeMotionDirective {
 export class BrowserBottomChromeCenterContentPresentation {
   activeLayer: BrowserBottomChromeCenterContentLayer;
   displayKey: string;
-  displayText: string;
+  displayText: ResourceStr;
   displayUsesSecondaryTone: boolean;
-  promptText: string;
+  promptText: ResourceStr;
   webProtectionFeedback: BrowserWebProtectionFeedbackPresentation;
 
   constructor(
     activeLayer: BrowserBottomChromeCenterContentLayer,
     displayKey: string,
-    displayText: string,
+    displayText: ResourceStr,
     displayUsesSecondaryTone: boolean,
-    promptText: string,
+    promptText: ResourceStr,
     webProtectionFeedback: BrowserWebProtectionFeedbackPresentation =
       EMPTY_BROWSER_WEB_PROTECTION_FEEDBACK_PRESENTATION
   ) {
@@ -432,7 +434,7 @@ export class BrowserBottomChromePresentation {
   centerPrimaryVisualEnabled: boolean;
   trailingOuterVisualEnabled: boolean;
   addressInput: string;
-  placeholder: string;
+  placeholder: ResourceStr;
   searchEnginePresentation: BrowserSearchEngineChromePresentation;
   centerContent: BrowserBottomChromeCenterContentPresentation;
   leadingOuterIconId: AiraRenderableIconId;
@@ -758,7 +760,7 @@ export class BrowserBottomChromePresentationViewModel {
     return new BrowserBottomChromeTapTarget(
       new BrowserBottomChromeTapIntent('dispatch-header-action', 'bottomChromeRestore'),
       true,
-      '恢复工具栏'
+      $r('app.string.bottom_panel_restore_toolbar')
     );
   }
 
@@ -858,18 +860,18 @@ export class BrowserBottomChromePresentationViewModel {
     );
   }
 
-  private resolveDisplayText(facts: BrowserBottomChromePresentationFacts): string {
-    if (facts.addressDisplayText.trim().length > 0) {
+  private resolveDisplayText(facts: BrowserBottomChromePresentationFacts): ResourceStr {
+    if (resourceStrPresent(facts.addressDisplayText)) {
       return facts.addressDisplayText;
     }
-    if (facts.addressInput.trim().length > 0) {
+    if (resourceStrPresent(facts.addressInput)) {
       return facts.addressInput;
     }
     return facts.placeholder;
   }
 
-  private resolveDisplayKey(displayText: string, displayUsesSecondaryTone: boolean): string {
-    return displayText + (displayUsesSecondaryTone ? '|secondary' : '|primary');
+  private resolveDisplayKey(displayText: ResourceStr, displayUsesSecondaryTone: boolean): string {
+    return resourceStrKey(displayText) + (displayUsesSecondaryTone ? '|secondary' : '|primary');
   }
 
   private buildLeadingOuterTarget(
@@ -926,14 +928,16 @@ export class BrowserBottomChromePresentationViewModel {
       return new BrowserBottomChromeTapTarget(
         new BrowserBottomChromeTapIntent('activate-editing'),
         true,
-        facts.scene === 'home' ? '搜索或输入网址' : '编辑当前网址'
+        facts.scene === 'home' ?
+          $r('app.string.aira_search_card_placeholder') : $r('app.string.bottom_panel_edit_address')
       );
     }
     if (facts.panelExpansionEnabled) {
       return new BrowserBottomChromeTapTarget(
         new BrowserBottomChromeTapIntent('dispatch-header-action', 'bottomChromeMenu'),
         true,
-        mode === 'center-active-tools' ? '收起工具栏' : '展开工具栏'
+        mode === 'center-active-tools' ?
+          $r('app.string.bottom_panel_collapse_toolbar') : $r('app.string.bottom_panel_expand_toolbar')
       );
     }
     return EMPTY_TAP_TARGET;
@@ -948,7 +952,7 @@ export class BrowserBottomChromePresentationViewModel {
       return new BrowserBottomChromeTapTarget(
         new BrowserBottomChromeTapIntent('open-search-engine-menu'),
         (facts.searchEnginePresentation?.searchEngines.length ?? 0) > 0,
-        '选择搜索引擎'
+        $r('app.string.bottom_panel_choose_search_engine')
       );
     }
     if (mode === 'resting-three-block' || mode === 'center-active-tools') {
@@ -961,7 +965,8 @@ export class BrowserBottomChromePresentationViewModel {
       return new BrowserBottomChromeTapTarget(
         new BrowserBottomChromeTapIntent('dispatch-header-action', 'bottomChromeMenu'),
         true,
-        mode === 'center-active-tools' ? '收起工具栏' : '展开工具栏'
+        mode === 'center-active-tools' ?
+          $r('app.string.bottom_panel_collapse_toolbar') : $r('app.string.bottom_panel_expand_toolbar')
       );
     }
     return EMPTY_TAP_TARGET;
@@ -977,14 +982,14 @@ export class BrowserBottomChromePresentationViewModel {
       return new BrowserBottomChromeTapTarget(
         new BrowserBottomChromeTapIntent('dispatch-header-action', 'copyLink'),
         true,
-        '复制当前网址'
+        $r('app.string.bottom_panel_copy_address')
       );
     }
     if (mode === 'center-active-editing' && facts.scene === 'home' && facts.addressInput.trim().length > 0) {
       return new BrowserBottomChromeTapTarget(
         new BrowserBottomChromeTapIntent('clear-input'),
         true,
-        '清除输入'
+        $r('app.string.bottom_panel_clear_input')
       );
     }
     if (mode === 'resting-three-block' || mode === 'center-active-tools') {
@@ -1007,7 +1012,7 @@ export class BrowserBottomChromePresentationViewModel {
       return new BrowserBottomChromeTapTarget(
         new BrowserBottomChromeTapIntent('restore-current-address'),
         true,
-        '编辑当前网址'
+        $r('app.string.bottom_panel_edit_address')
       );
     }
     return EMPTY_TAP_TARGET;
@@ -1024,7 +1029,7 @@ export class BrowserBottomChromePresentationViewModel {
       return new BrowserBottomChromeTapTarget(
         new BrowserBottomChromeTapIntent('dispatch-header-action', 'toolbarCustomization', slot.id),
         true,
-        `设置${slot.slotTitle}`
+        bottomPanelCustomizeSlot(slot.id)
       );
     }
     if (slot.tap.action.isNone) {
@@ -1055,7 +1060,7 @@ export class BrowserBottomChromePresentationViewModel {
       const enablement = facts.toolbarActionEnablement?.[action.id];
       const enabled = enablement?.enabled ?? true;
       const disabledMessage = enabled ? '' :
-        (enablement?.disabledMessage ?? `当前页面无法${action.title}。`);
+        (enablement?.disabledMessage ?? $r('app.string.bottom_panel_action_unavailable'));
       return new BrowserBottomChromeTapTarget(
         new BrowserBottomChromeTapIntent('dispatch-panel-action', action.id, slotId, disabledMessage),
         enabled,
@@ -1072,7 +1077,7 @@ export class BrowserBottomChromePresentationViewModel {
           'dispatch-header-action',
           action.id,
           slotId,
-          enabled ? '' : '当前页面无法展开工具栏。'
+          enabled ? '' : $r('app.string.bottom_panel_toolbar_unavailable')
         ),
         enabled,
         action.title
@@ -1101,7 +1106,7 @@ export class BrowserBottomChromePresentationViewModel {
         'dispatch-header-action',
         action.id,
         slotId,
-        `当前页面无法${action.title}。`
+        $r('app.string.bottom_panel_action_unavailable')
       ),
       false,
       action.title
@@ -1133,8 +1138,8 @@ function buildHeaderActionTarget(
     (action.id === 'webBack' || action.id === 'webForward');
   const enabled = reliableWebHistoryAction || action.enabled;
   const actionDisabledMessage = action.disabledMessage ?? '';
-  const disabledMessage = actionDisabledMessage.trim().length > 0 ?
-    actionDisabledMessage : `当前页面无法${action.title}。`;
+  const disabledMessage = resourceStrPresent(actionDisabledMessage) ?
+    actionDisabledMessage : $r('app.string.bottom_panel_action_unavailable');
   return new BrowserBottomChromeTapTarget(
     new BrowserBottomChromeTapIntent(
       'dispatch-header-action',

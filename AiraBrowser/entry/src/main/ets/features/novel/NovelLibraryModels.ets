@@ -55,7 +55,7 @@ export interface NovelBookshelfState {
   loading: boolean;
   novels: NovelBookshelfBook[];
   comics: NovelBookshelfBook[];
-  errorMessage: string;
+  errorMessage: ResourceStr;
 }
 
 export function normalizeNovelDetailUrl(value: string): string {

@@ -48,6 +48,7 @@ import {
 } from './SettingsDesktopRows';
 import { isPrivateBoundaryRoute } from '../../../common/utils/RouteParamUtils';
 import { SettingsNavigationCoordinator } from '../../router/SettingsNavigationCoordinator';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BROWSER_THEME_STORAGE_ACCENT_KEY,
   BROWSER_THEME_STORAGE_DIVIDER_KEY,
@@ -151,7 +152,7 @@ export struct BrowserUserAgentSettingsScreen {
 
   build() {
     SettingsHdsScaffold({
-      title: '网页标识',
+      title: $r('app.string.site_version_preset_title'),
       backIconKind: 'back',
       pageBackground: this.storedPageBackgroundColor,
       headerButtonBackground: this.storedPressedBackgroundColor,
@@ -180,10 +181,10 @@ export struct BrowserUserAgentSettingsScreen {
         }) {
           if (this.showUserAgentNotice) {
             SettingsNoticeCard({
-              title: '网页标识会影响兼容性',
+              title: $r('app.string.web_ua_settings_notice_title'),
               message: this.desktopPresentation
-                ? '切换其它桌面端 UA 后，部分网站可能显示或播放异常。'
-                : '切换桌面端或自定义 UA 后，部分网站可能显示或播放异常。',
+                ? $r('app.string.web_ua_settings_notice_message_desktop_other')
+                : $r('app.string.web_ua_settings_notice_message_desktop_custom'),
               desktopPresentation: this.desktopPresentation,
               onClosed: () => {
                 this.showUserAgentNotice = false;
@@ -193,7 +194,7 @@ export struct BrowserUserAgentSettingsScreen {
           }
           this.buildSummarySection()
           if (this.desktopPresentation) {
-            this.buildOptionSection('桌面端网页', this.resolveDesktopPresentationOptions())
+            this.buildOptionSection($r('app.string.site_version_preset_desktop_group'), this.resolveDesktopPresentationOptions())
           } else {
             this.buildMobileSection()
             this.buildDesktopSection()
@@ -226,11 +227,11 @@ export struct BrowserUserAgentSettingsScreen {
         this.revealController.rememberTargetArea(targetId, area);
       }
     }) {
-      SettingsSection({ title: '当前默认' }) {
+      SettingsSection({ title: $r('app.string.web_ua_settings_current_default') }) {
         if (this.desktopPresentation) {
           SettingsDesktopGroup({ surfaceColor: this.storedSurfaceBackgroundColor }) {
             SettingsDesktopStaticValueRow({
-              title: '默认网页标识',
+              title: $r('app.string.web_ua_settings_default_identity'),
               value: this.viewState.summary,
               primaryTextColor: this.storedPrimaryTextColor,
               secondaryTextColor: this.storedSecondaryTextColor
@@ -239,7 +240,7 @@ export struct BrowserUserAgentSettingsScreen {
         } else {
           SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
             SettingsStaticValueRow({
-            title: '默认网页标识',
+            title: $r('app.string.web_ua_settings_default_identity'),
             value: this.viewState.summary,
             rowPosition: 'single'
             })
@@ -251,12 +252,12 @@ export struct BrowserUserAgentSettingsScreen {
 
   @Builder
   private buildMobileSection() {
-    this.buildOptionSection('移动端网页', this.viewState.mobileOptions)
+    this.buildOptionSection($r('app.string.site_version_preset_mobile_group'), this.viewState.mobileOptions)
   }
 
   @Builder
   private buildDesktopSection() {
-    this.buildOptionSection('桌面端网页', this.viewState.desktopOptions)
+    this.buildOptionSection($r('app.string.site_version_preset_desktop_group'), this.viewState.desktopOptions)
   }
 
   private resolveDesktopPresentationOptions(): BrowserUserAgentOptionView[] {
@@ -275,7 +276,7 @@ export struct BrowserUserAgentSettingsScreen {
   @Builder
   private buildCustomInputSection() {
     if (this.viewState.customUserAgents.length > 0) {
-      SettingsSection({ title: '自定义 UA' }) {
+      SettingsSection({ title: $r('app.string.settings_custom_ua') }) {
         if (this.desktopPresentation) {
           SettingsDesktopGroup({ surfaceColor: this.storedSurfaceBackgroundColor }) {
             this.buildCustomUserAgentList()
@@ -322,7 +323,7 @@ export struct BrowserUserAgentSettingsScreen {
           }
         }) {
           SettingsActionButton({
-            title: '自定义 UA',
+            title: $r('app.string.settings_custom_ua'),
             isEnabled: !this.isSaving,
             accentColor: this.storedPrimaryTextColor,
             pressedBackgroundColor: this.storedSurfaceBackgroundColor,
@@ -400,7 +401,7 @@ export struct BrowserUserAgentSettingsScreen {
       .buttonStyle(ButtonStyleMode.NORMAL)
       .backgroundColor($r('app.color.permission_blocked'))
       .stateEffect(true)
-      .accessibilityText('删除')
+      .accessibilityText($r('app.string.settings_delete'))
       .onClick(() => {
         this.confirmAndRemoveCustomUserAgent(option);
       })
@@ -428,7 +429,7 @@ export struct BrowserUserAgentSettingsScreen {
         BrowserImmersiveSheetLayout({
           footerVisible: true,
           closeVisible: true,
-          closeAccessibilityLabel: '关闭',
+          closeAccessibilityLabel: $r('app.string.web_ua_settings_close'),
           onClose: (): void => {
             this.customUserAgentSheetVisible = false;
           },
@@ -452,7 +453,7 @@ export struct BrowserUserAgentSettingsScreen {
     // "class constructor cannot called without 'new'" if BrowserFeatureSheetHeader
     // is constructed directly inside a @BuilderParam arrow function.
     BrowserFeatureSheetHeader({
-      title: '自定义 UA'
+      title: $r('app.string.settings_custom_ua')
     })
   }
 
@@ -478,7 +479,7 @@ export struct BrowserUserAgentSettingsScreen {
   @Builder
   private buildCustomUserAgentCenteredContent() {
     Column({ space: 14 }) {
-      Text('自定义 UA')
+      Text($r('app.string.settings_custom_ua'))
         .width('100%')
         .fontSize(21)
         .fontWeight(FontWeight.Bold)
@@ -523,9 +524,9 @@ export struct BrowserUserAgentSettingsScreen {
   private buildCustomUserAgentFields(topPadding: number) {
     Column({ space: 14 }) {
       this.buildSheetTextInput(
-        '名称',
+        $r('app.string.web_ua_settings_field_name'),
         this.customUserAgentNameDraft,
-        '例如：Windows Chrome',
+        $r('app.string.web_ua_settings_field_name_placeholder'),
         40,
         (value: string): void => {
           this.customUserAgentNameDraft = value;
@@ -551,7 +552,7 @@ export struct BrowserUserAgentSettingsScreen {
   @Builder
   private buildCustomUserAgentActionButton() {
     BrowserSheetActionButton({
-      label: '保存',
+      label: $r('app.string.web_ua_settings_action_save'),
       emphasis: 'primary',
       actionEnabled: !this.isSaving && this.customUserAgentValueDraft.trim().length > 0,
       onAction: (): void => {
@@ -562,9 +563,9 @@ export struct BrowserUserAgentSettingsScreen {
 
   @Builder
   private buildSheetTextInput(
-    label: string,
+    label: ResourceStr,
     text: string,
-    placeholder: string,
+    placeholder: ResourceStr,
     maxLength: number,
     onChange: (value: string) => void
   ) {
@@ -608,7 +609,7 @@ export struct BrowserUserAgentSettingsScreen {
         .fontSize(14)
         .fontColor(this.storedSecondaryTextColor)
 
-      TextArea({ text: this.customUserAgentValueDraft, placeholder: '粘贴完整 User-Agent' })
+      TextArea({ text: this.customUserAgentValueDraft, placeholder: $r('app.string.web_ua_settings_field_user_agent_placeholder') })
         .width('100%')
         .height(160)
         .fontSize(14)
@@ -640,7 +641,7 @@ export struct BrowserUserAgentSettingsScreen {
   }
 
   @Builder
-  private buildOptionSection(title: string, options: BrowserUserAgentOptionView[]) {
+  private buildOptionSection(title: ResourceStr, options: BrowserUserAgentOptionView[]) {
     SettingsSection({ title: title }) {
       if (this.desktopPresentation) {
         SettingsDesktopGroup({ surfaceColor: this.storedSurfaceBackgroundColor }) {
@@ -740,7 +741,7 @@ export struct BrowserUserAgentSettingsScreen {
       userAgent: this.customUserAgentValueDraft
     });
     if (record === undefined) {
-      this.errorMessage = '请先输入 User-Agent。';
+      this.errorMessage = resolveAppResourceText($r('app.string.web_ua_settings_error_user_agent_required'));
       return;
     }
     this.showUserAgentRiskNotice(() => {
@@ -778,7 +779,11 @@ export struct BrowserUserAgentSettingsScreen {
     this.settingsCoordinator.saveSettings(settings, this.buildBoundary())
       .then((result: BrowserUserAgentSettingsMutationResult) => {
         if (!result.allowed) {
-          this.restoreFailedMutation(previousSettings, previousViewState, '当前会话不可修改全局网页标识。');
+          this.restoreFailedMutation(
+            previousSettings,
+            previousViewState,
+            resolveAppResourceText($r('app.string.web_ua_settings_error_readonly'))
+          );
           return;
         }
         this.applySavedSettings(result.settings);
@@ -786,7 +791,11 @@ export struct BrowserUserAgentSettingsScreen {
         this.isSaving = false;
       })
       .catch((_error: Error) => {
-        this.restoreFailedMutation(previousSettings, previousViewState, '保存失败，请稍后重试。');
+        this.restoreFailedMutation(
+          previousSettings,
+          previousViewState,
+          resolveAppResourceText($r('app.string.web_ua_settings_error_save_failed'))
+        );
       });
   }
 
@@ -798,7 +807,11 @@ export struct BrowserUserAgentSettingsScreen {
     this.settingsCoordinator.upsertCustomUserAgent(name, userAgent, this.buildBoundary())
       .then((result: BrowserUserAgentSettingsMutationResult) => {
         if (!result.allowed) {
-          this.restoreFailedMutation(previousSettings, previousViewState, '当前会话不可修改全局网页标识。');
+          this.restoreFailedMutation(
+            previousSettings,
+            previousViewState,
+            resolveAppResourceText($r('app.string.web_ua_settings_error_readonly'))
+          );
           return;
         }
         this.applySavedSettings(result.settings);
@@ -809,7 +822,11 @@ export struct BrowserUserAgentSettingsScreen {
         this.isSaving = false;
       })
       .catch((_error: Error) => {
-        this.restoreFailedMutation(previousSettings, previousViewState, '保存失败，请稍后重试。');
+        this.restoreFailedMutation(
+          previousSettings,
+          previousViewState,
+          resolveAppResourceText($r('app.string.web_ua_settings_error_save_failed'))
+        );
       });
   }
 
@@ -832,7 +849,11 @@ export struct BrowserUserAgentSettingsScreen {
     this.settingsCoordinator.selectCustomUserAgent(recordId, this.buildBoundary())
       .then((result: BrowserUserAgentSettingsMutationResult) => {
         if (!result.allowed) {
-          this.restoreFailedMutation(previousSettings, previousViewState, '当前会话不可修改全局网页标识。');
+          this.restoreFailedMutation(
+            previousSettings,
+            previousViewState,
+            resolveAppResourceText($r('app.string.web_ua_settings_error_readonly'))
+          );
           return;
         }
         this.applySavedSettings(result.settings);
@@ -840,22 +861,32 @@ export struct BrowserUserAgentSettingsScreen {
         this.isSaving = false;
       })
       .catch((_error: Error) => {
-        this.restoreFailedMutation(previousSettings, previousViewState, '保存失败，请稍后重试。');
+        this.restoreFailedMutation(
+          previousSettings,
+          previousViewState,
+          resolveAppResourceText($r('app.string.web_ua_settings_error_save_failed'))
+        );
       });
   }
 
   private confirmAndRemoveCustomUserAgent(option: BrowserCustomUserAgentOptionView): void {
     showCenteredAlertDialog({
-      title: '删除自定义 UA',
-      message: `删除“${option.title}”后，${this.settingsCoordinator.countCustomUserAgentReferences(option.id)} 个站点将跟随全局网页标识。`,
+      title: resolveAppResourceText($r('app.string.web_ua_settings_custom_ua_dialog_title')),
+      message: resolveAppResourceText(
+        $r(
+          'app.string.web_ua_settings_custom_ua_delete_message',
+          option.title,
+          this.settingsCoordinator.countCustomUserAgentReferences(option.id)
+        )
+      ),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: resolveAppResourceText($r('app.string.element_hide_dialog_cancel')),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '删除',
+        value: resolveAppResourceText($r('app.string.element_hide_dialog_delete')),
         action: () => {
           this.removeCustomUserAgent(option.id);
         }
@@ -871,7 +902,11 @@ export struct BrowserUserAgentSettingsScreen {
     this.settingsCoordinator.removeCustomUserAgent(recordId, this.buildBoundary())
       .then((result: BrowserUserAgentSettingsMutationResult) => {
         if (!result.allowed) {
-          this.restoreFailedMutation(previousSettings, previousViewState, '当前会话不可修改全局网页标识。');
+          this.restoreFailedMutation(
+            previousSettings,
+            previousViewState,
+            resolveAppResourceText($r('app.string.web_ua_settings_error_readonly'))
+          );
           return;
         }
         this.applySavedSettings(result.settings);
@@ -879,7 +914,11 @@ export struct BrowserUserAgentSettingsScreen {
         this.isSaving = false;
       })
       .catch((_error: Error) => {
-        this.restoreFailedMutation(previousSettings, previousViewState, '删除失败，请稍后重试。');
+        this.restoreFailedMutation(
+          previousSettings,
+          previousViewState,
+          resolveAppResourceText($r('app.string.web_ua_settings_error_delete_failed'))
+        );
       });
   }
 

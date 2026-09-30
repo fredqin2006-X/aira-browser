@@ -4,7 +4,6 @@ import {
   CENTERED_DIALOG_CORNER_RADIUS_VP, showCenteredAlertDialog
 } from '../components/common/CenteredDialogSurface';
 import { common } from '@kit.AbilityKit';
-import { fileIo, picker } from '@kit.CoreFileKit';
 import router from '@ohos.router';
 import vibrator from '@ohos.vibrator';
 import {
@@ -77,6 +76,8 @@ import {
   PRIVATE_BOOKMARK_TOOLBAR_ROOT_ID,
   isBookmarkRootNodeId
 } from '../../data/repositories/BookmarkRepositoryCore';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
+import { resolveBookmarkNodeDisplayTitle } from '../../core/resources/HistoryBookmarkDisplayText';
 import {
   BrowserBookmarkScopeRouteParams,
   BrowserBookmarkScopeService
@@ -87,7 +88,10 @@ import {
   BookmarkManagerCreateFolderDialog,
   BookmarkManagerEditNodeDialog
 } from '../components/bookmarks/BookmarkManagerDialogs';
-import { readBookmarkTextFromUri } from '../../services/bookmarks/BookmarkHtmlTransferApplicationService';
+import {
+  BookmarkHtmlTransferCoordinator,
+  BookmarkHtmlTransferHost
+} from '../../core/bookmarks/BookmarkHtmlTransferCoordinator';
 import { BookmarkImportResultDialog } from '../components/bookmarks/BookmarkImportResultDialog';
 import {
   BROWSER_THEME_STORAGE_DIVIDER_KEY,
@@ -138,6 +142,8 @@ struct BookmarkManagerPage {
     this.bookmarksFeature,
     new BookmarkMutationService(sharedBookmarkRepository, sharedBrowserDatabase)
   );
+  private bookmarkHtmlTransferCoordinator: BookmarkHtmlTransferCoordinator =
+    new BookmarkHtmlTransferCoordinator(this.bookmarkManagementFeature);
   private homeShortcutToggleService: HomeShortcutToggleService = new HomeShortcutToggleService(sharedShortcutRepository);
   private webPageShareService: WebPageShareService = new WebPageShareService();
   private privateBoundaryNavigationService: BrowserPrivateBoundaryNavigationService = new BrowserPrivateBoundaryNavigationService();
@@ -160,9 +166,9 @@ struct BookmarkManagerPage {
   @State private toolbarRootNodeCount: number = 0;
   @State private otherRootNodeCount: number = 0;
   @State currentFolderId: string = '';
-  @State currentFolderTitle: string = '书签管理';
+  @State currentFolderTitle: ResourceStr = $r('app.string.bookmark_manager');
   @State private selectedRootId: string = BOOKMARK_TOOLBAR_ROOT_ID;
-  @State message: string = '';
+  @State message: ResourceStr = '';
   @State newFolderTitle: string = '';
   @State editingNodeId: string = '';
   @State editingNodeType: string = 'bookmark';
@@ -177,7 +183,7 @@ struct BookmarkManagerPage {
   @State private moveFolderSheetVisible: boolean = false;
   @State private moveFolderTargetOptions: BookmarkFolderOptionView[] = [];
   @State private pendingMoveNodeIds: string[] = [];
-  @State private moveFolderSheetMessage: string = '';
+  @State private moveFolderSheetMessage: ResourceStr = '';
   @State private moveFolderTargetPreparing: boolean = false;
   @State private isInitialBookmarkLoadPending: boolean = true;
   @State private folderBookmarkCountState: BookmarkFolderCountState =
@@ -196,14 +202,15 @@ struct BookmarkManagerPage {
   private moveFolderTargetPrepareGeneration: number = 0;
   @State pressedNodeId: string = '';
   @State contextMenuNodeId: string = '';
-  @State private bookmarkTransferTitle: string = '';
-  @State private bookmarkTransferSubtitle: string = '';
+  @State private bookmarkTransferTitle: ResourceStr = '';
+  @State private bookmarkTransferSubtitle: ResourceStr = '';
   @State private bookmarkTransferProgress: number = 0;
   @State private bookmarkTransferInProgress: boolean = false;
-  @State private bookmarkTransferDetailsText: string = '';
+  @State private bookmarkTransferDetailsText: ResourceStr = '';
   @State private bookmarkTransferDetailOpacity: number = 1;
   @State private bookmarkImportResultSummary: string = '';
   @State private bookmarkImportResultBatchId: string = '';
+  private bookmarkImportResultDialogPending: boolean = false;
   @State private bookmarkImportResultFolderCount: number = 0;
   @State private bookmarkImportResultBookmarkCount: number = 0;
   @State private bookmarkImportResultDuplicateCount: number = 0;
@@ -288,7 +295,7 @@ struct BookmarkManagerPage {
     (): void => {
       this.closeBookmarkTransferProgressDialog();
     },
-    (title: string, subtitle: string): void => {
+    (title: ResourceStr, subtitle: ResourceStr): void => {
       this.showBookmarkTransferResultDialog(title, subtitle);
     }
   );
@@ -437,7 +444,7 @@ struct BookmarkManagerPage {
       },
       onReorderApplied: (nodes: BookmarkNode[]): void => this.setCurrentFolderNodes(nodes),
       onReorderError: (error: Error): void => {
-        this.showDialog('排序失败', `书签顺序保存失败：${this.stringifyError(error)}`);
+        this.showDialog($r('app.string.bookmark_sort_failed'), $r('app.string.bookmark_sort_failed_detail', this.stringifyError(error)));
       },
       onUpdatePressedNode: (nodeId: string, type: TouchType): void => this.updatePressedNode(nodeId, type),
       onOpenContextMenu: (nodeId: string): void => this.openContextMenu(nodeId),
@@ -462,7 +469,7 @@ struct BookmarkManagerPage {
 
   private openBookmarkMoveFolderSelectionForSelectedNodes(): void {
     if (this.selectedNodeIds.length === 0) {
-      this.showDialog('暂无可整理项', '请先选择要整理的书签或文件夹。');
+      this.showDialog($r('app.string.bookmark_nothing_to_organize'), $r('app.string.bookmark_select_to_organize'));
       return;
     }
     this.openBookmarkMoveFolderSelection(this.selectedNodeIds.slice());
@@ -473,7 +480,7 @@ struct BookmarkManagerPage {
       return;
     }
     if (nodeIds.some((id: string) => isBookmarkRootNodeId(id))) {
-      this.showDialog('无法移动', '系统根节点不可移动，请取消选择根节点后重试。');
+      this.showDialog($r('app.string.bookmark_cannot_move'), $r('app.string.bookmark_root_immovable'));
       return;
     }
     this.pendingMoveNodeIds = nodeIds.slice();
@@ -494,10 +501,15 @@ struct BookmarkManagerPage {
       this.exitSelectionMode();
       this.reloadNodes();
       this.showNativeToast(nodeIds.length > 1
-        ? `已移动 ${nodeIds.length} 项。`
-        : `已移动到“${targetFolderTitle.length > 0 ? targetFolderTitle : '目标文件夹'}”。`);
+        ? $r('app.string.bookmark_moved_count', nodeIds.length)
+        : $r('app.string.bookmark_moved_to', targetFolderTitle.length > 0
+          ? targetFolderTitle
+          : resolveAppResourceText($r('app.string.bookmark_move_target_fallback'))));
     } catch (error) {
-      this.showDialog('移动失败', `移动失败：${this.stringifyError(error as Error)}`);
+      this.showDialog(
+        $r('app.string.bookmark_move_failed'),
+        $r('app.string.bookmark_move_failed_detail', this.stringifyError(error as Error))
+      );
     }
   }
 
@@ -551,7 +563,7 @@ struct BookmarkManagerPage {
         this.moveFolderTargetPreparing = false;
         this.moveFolderSheetVisible = false;
         this.clearMoveFolderSelectionSheet();
-        this.showDialog('无法移动', '当前没有可移动到的文件夹。');
+        this.showDialog($r('app.string.bookmark_cannot_move'), $r('app.string.bookmark_no_move_target'));
         return;
       }
       this.moveFolderTargetOptions = options;
@@ -561,7 +573,7 @@ struct BookmarkManagerPage {
         return;
       }
       this.moveFolderTargetPreparing = false;
-      this.moveFolderSheetMessage = `文件夹加载失败：${this.stringifyError(error as Error)}`;
+      this.moveFolderSheetMessage = $r('app.string.bookmark_folder_load_failed_detail', this.stringifyError(error as Error));
     }
   }
 
@@ -627,7 +639,7 @@ struct BookmarkManagerPage {
         this.isInitialBookmarkLoadPending = false;
       })
       .catch((error: Error) => {
-        this.message = `书签加载失败：${JSON.stringify(error)}`;
+        this.message = $r('app.string.bookmark_load_failed_detail', JSON.stringify(error));
         this.applyBookmarkSearchResult(this.bookmarkManagerSearchViewModel.reset());
         this.homeShortcutCache = [];
         this.homeShortcutNodeIds = [];
@@ -758,13 +770,13 @@ struct BookmarkManagerPage {
 
   private openBookmarkNode(node: BookmarkNode, intent: BrowserAppUrlOpenIntent = 'current_tab'): void {
     if (node.url === undefined || node.url.length === 0) {
-      this.message = '这个书签没有可打开的网址。';
+      this.message = $r('app.string.bookmark_no_url');
       return;
     }
     try {
       this.bookmarkManagementFeature.authorizeNavigation();
     } catch (error) {
-      this.showDialog('无法打开', this.stringifyError(error as Error));
+      this.showDialog($r('app.string.history_cannot_open'), this.stringifyError(error as Error));
       return;
     }
     router.back({
@@ -784,7 +796,7 @@ struct BookmarkManagerPage {
 
   private createFolder(): void {
     if (this.resolveActiveFolderId().length === 0) {
-      this.showDialog('无法新建', '请先进入书签栏或其他书签，再新建文件夹。');
+      this.showDialog($r('app.string.bookmark_cannot_create'), $r('app.string.bookmark_create_need_folder'));
       return;
     }
     this.newFolderTitle = this.buildNewFolderTitle();
@@ -793,12 +805,12 @@ struct BookmarkManagerPage {
 
   private confirmCreateFolder(folderTitle: string): void {
     if (this.resolveActiveFolderId().length === 0) {
-      this.showDialog('无法新建', '请先进入书签栏或其他书签，再新建文件夹。');
+      this.showDialog($r('app.string.bookmark_cannot_create'), $r('app.string.bookmark_create_need_folder'));
       return;
     }
     const normalizedTitle = folderTitle.trim();
     if (normalizedTitle.length === 0) {
-      this.showDialog('新建失败', '请输入文件夹名称。');
+      this.showDialog($r('app.string.bookmark_create_failed'), $r('app.string.bookmark_folder_name_required'));
       return;
     }
     const parentId = this.resolveActiveFolderId();
@@ -832,7 +844,7 @@ struct BookmarkManagerPage {
         this.setCurrentFolderNodes(removeResult.nodes);
         this.folderBookmarkCountState = removeResult.folderCountState;
         this.scheduleVisibleAuxRefresh(0);
-        this.showDialog('新建失败', `新建文件夹失败：${JSON.stringify(error)}`);
+        this.showDialog($r('app.string.bookmark_create_failed'), $r('app.string.bookmark_create_failed_detail', JSON.stringify(error)));
       });
   }
 
@@ -851,16 +863,19 @@ struct BookmarkManagerPage {
     return !this.bookmarkSearchState.isSearchMode && !isBookmarkRootNodeId(nodeId);
   }
 
-  private resolveTitle(): string {
-    let title: string;
+  private resolveTitle(): ResourceStr {
     if (this.isSelectionMode) {
-      title = `已选 ${this.selectedNodeIds.length} 项`;
-    } else {
-      title = this.currentFolderTitle;
+      return this.isSessionEphemeral && this.bookmarkScope === 'regular'
+        ? $r('app.string.bookmark_regular_selected', this.selectedNodeIds.length)
+        : $r('app.string.bookmark_selected_short', this.selectedNodeIds.length);
     }
-    return this.isSessionEphemeral && this.bookmarkScope === 'regular'
-      ? `常规书签 · ${title}`
-      : title;
+    const folderTitle = typeof this.currentFolderTitle === 'string'
+      ? resolveBookmarkNodeDisplayTitle(this.resolveActiveFolderId(), this.currentFolderTitle)
+      : this.currentFolderTitle;
+    if (this.isSessionEphemeral && this.bookmarkScope === 'regular') {
+      return $r('app.string.bookmark_regular_named', resolveAppResourceText(folderTitle));
+    }
+    return folderTitle;
   }
 
   private resolveBackIconKind(): 'close' | 'back' {
@@ -895,11 +910,15 @@ struct BookmarkManagerPage {
 
   private applyRouteFolder(params: BookmarkManagerRouteParams | undefined): void {
     this.currentFolderId = params?.folderId ?? '';
-    const defaultTitle = this.bookmarkScopeService.buildTitle('书签管理', this.bookmarkScope);
     this.selectedRootId = this.bookmarkScope === 'private'
       ? PRIVATE_BOOKMARK_TOOLBAR_ROOT_ID
       : BOOKMARK_TOOLBAR_ROOT_ID;
-    this.currentFolderTitle = params?.folderTitle ?? (this.currentFolderId.length > 0 ? '文件夹' : defaultTitle);
+    const defaultTitle: ResourceStr = this.bookmarkScope === 'private'
+      ? $r('app.string.bookmark_private_manager')
+      : $r('app.string.bookmark_manager');
+    this.currentFolderTitle = params?.folderTitle ?? (
+      this.currentFolderId.length > 0 ? $r('app.string.bookmark_folder_fallback') : defaultTitle
+    );
   }
 
   private openFolderPage(folder: BookmarkNode): void {
@@ -914,13 +933,13 @@ struct BookmarkManagerPage {
         bookmarkScope: this.bookmarkScope
       }
     }).catch((_error: Error) => {
-      this.showNativeToast('打开文件夹失败。');
+      this.showNativeToast($r('app.string.bookmark_open_folder_failed'));
     });
   }
 
   private enterSelectionMode(initialNodeId?: string): void {
     if (!this.canEnterSelectionMode()) {
-      this.showDialog('无法编辑', '当前没有可编辑的书签或文件夹。');
+      this.showDialog($r('app.string.bookmark_cannot_edit'), $r('app.string.bookmark_nothing_to_edit'));
       return;
     }
     this.isSelectionMode = true;
@@ -987,20 +1006,20 @@ struct BookmarkManagerPage {
       return;
     }
     if (this.selectedNodeIds.some((id: string) => isBookmarkRootNodeId(id))) {
-      this.showDialog('无法删除', '系统根节点不可删除，请先进入根节点后整理其中的书签。');
+      this.showDialog($r('app.string.bookmark_cannot_delete'), $r('app.string.bookmark_root_undeletable'));
       return;
     }
     showCenteredAlertDialog({
-      title: '删除书签',
-      message: `确定删除选中的 ${this.selectedNodeIds.length} 项吗？文件夹内的书签也会一起删除。`,
+      title: $r('app.string.bookmark_delete_bookmark'),
+      message: $r('app.string.bookmark_delete_selected_confirm', this.selectedNodeIds.length),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.settings_delete'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.deleteSelectedNodes();
@@ -1018,14 +1037,14 @@ struct BookmarkManagerPage {
       return;
     }
     if (deletingIds.some((id: string) => isBookmarkRootNodeId(id))) {
-      this.showDialog('无法删除', '系统根节点不可删除，请先进入根节点后整理其中的书签。');
+      this.showDialog($r('app.string.bookmark_cannot_delete'), $r('app.string.bookmark_root_undeletable'));
       return;
     }
     this.isTransferBusy = true;
     this.exitSelectionMode();
     this.removeBookmarkNodesByIds(deletingIds);
     this.scheduleVisibleAuxRefresh(0);
-    this.showNativeToast(`已删除 ${deletingIds.length} 项。`);
+    this.showNativeToast($r('app.string.bookmark_deleted_count', deletingIds.length));
     this.bookmarkManagementFeature.deleteNodes(deletingIds)
       .then((deletedCount: number) => {
         if (deletedCount !== deletingIds.length) {
@@ -1034,7 +1053,10 @@ struct BookmarkManagerPage {
       })
       .catch((error: Error) => {
         this.reloadNodes();
-        this.showDialog('删除失败', `删除失败：${this.stringifyError(error)}`);
+        this.showDialog(
+          $r('app.string.history_delete_failed'),
+          $r('app.string.history_delete_failed_detail', this.stringifyError(error))
+        );
       })
       .finally(() => {
         this.isTransferBusy = false;
@@ -1046,44 +1068,7 @@ struct BookmarkManagerPage {
       return;
     }
     this.isTransferBusy = true;
-    let importStage = '打开文件选择器';
-    this.pickOpenUri()
-      .then((uri: string | undefined) => {
-        if (uri === undefined) {
-          return Promise.resolve();
-        }
-        this.beginBookmarkTransferProgress('正在导入书签', '正在读取书签文件');
-        return this.waitForBookmarkProgressFrame()
-          .then(() => {
-            importStage = '读取文件';
-            this.updateBookmarkTransferProgress('正在导入书签', '正在读取书签文件', 18);
-            return this.readTextFromUri(uri);
-          })
-          .then((payload: string) => {
-            importStage = '解析文件';
-            this.updateBookmarkTransferProgress('正在导入书签', '正在检查书签内容', 36);
-            return this.waitForBookmarkProgressFrame().then(() => payload);
-          })
-          .then((payload: string) => {
-            importStage = '写入数据库';
-            this.updateBookmarkTransferProgress('正在导入书签', '正在写入本地书签', 68);
-            return this.waitForBookmarkProgressFrame()
-              .then(() => this.bookmarkManagementFeature.applyHtmlImport(payload));
-          })
-          .then((result: AiraBookmarkImportApplyResult) => {
-            importStage = '刷新书签';
-            this.updateBookmarkTransferProgress('正在导入书签', '正在刷新书签列表', 88);
-            this.setCurrentFolderNodes(this.resolveCurrentChildren());
-            this.refreshRootPageSnapshots();
-            this.scheduleVisibleAuxRefresh(0);
-            this.applyBookmarkImportResult(result);
-            this.finishBookmarkTransferProgress('导入成功', result.summary);
-          });
-      })
-      .catch((error: Error) => {
-        this.completeBookmarkTransferProgressDialog();
-        this.showDialog('导入失败', `导入失败（${importStage}）：${this.stringifyError(error)}`);
-      })
+    void this.bookmarkHtmlTransferCoordinator.importHtml(this.buildBookmarkHtmlTransferHost())
       .finally(() => {
         this.isTransferBusy = false;
       });
@@ -1094,56 +1079,52 @@ struct BookmarkManagerPage {
       return;
     }
     this.isTransferBusy = true;
-    const fileName = `aira-bookmarks-${this.resolveFileTimestamp()}.html`;
-    this.pickSaveUri(fileName)
-      .then((uri: string | undefined) => {
-        if (uri === undefined) {
-          return Promise.resolve();
-        }
-        const payload = this.bookmarkManagementFeature.buildHtmlExport();
-        return this.writeTextToUri(uri, payload).then(() => {
-          this.showDialog('导出成功', '书签已导出为浏览器通用 HTML 文件。');
-        });
-      })
-      .catch((error: Error) => {
-        this.showDialog('导出失败', `导出失败：${this.stringifyError(error)}`);
-      })
+    void this.bookmarkHtmlTransferCoordinator.exportHtml(this.buildBookmarkHtmlTransferHost())
       .finally(() => {
         this.isTransferBusy = false;
       });
   }
 
-  private pickOpenUri(): Promise<string | undefined> {
-    const documentPicker = new picker.DocumentViewPicker(this.getPickerContext());
-    return documentPicker.select({
-      maxSelectNumber: 1,
-      fileSuffixFilters: ['.html', '.htm']
-    }).then((uris: Array<string>) => uris.length > 0 ? uris[0] : undefined);
-  }
-
-  private pickSaveUri(fileName: string): Promise<string | undefined> {
-    const documentPicker = new picker.DocumentViewPicker(this.getPickerContext());
-    return documentPicker.save({
-      newFileNames: [fileName],
-      fileSuffixChoices: ['HTML|.html']
-    }).then((uris: Array<string>) => uris.length > 0 ? uris[0] : undefined);
+  private buildBookmarkHtmlTransferHost(): BookmarkHtmlTransferHost {
+    const host = new BookmarkHtmlTransferHost();
+    host.pickerContext = (): common.UIAbilityContext =>
+      this.getUIContext().getHostContext() as common.UIAbilityContext;
+    host.waitForProgressFrame = (): Promise<void> => this.waitForBookmarkProgressFrame();
+    host.beginTransfer = (title: ResourceStr, subtitle: ResourceStr): void =>
+      this.beginBookmarkTransferProgress(title, subtitle);
+    host.updateTransfer = (title: ResourceStr, subtitle: ResourceStr, progress: number): void =>
+      this.updateBookmarkTransferProgress(title, subtitle, progress);
+    host.finishTransfer = (title: ResourceStr, subtitle: ResourceStr): void =>
+      this.finishBookmarkTransferProgress(title, subtitle);
+    host.completeTransfer = (): void => this.completeBookmarkTransferProgressDialog();
+    host.refreshAfterImport = (): void => {
+      this.setCurrentFolderNodes(this.resolveCurrentChildren());
+      this.refreshRootPageSnapshots();
+      this.scheduleVisibleAuxRefresh(0);
+    };
+    host.applyImportResult = (result: AiraBookmarkImportApplyResult): void => this.applyBookmarkImportResult(result);
+    host.showTransferSuccess = (title: ResourceStr, message: ResourceStr): void => this.showDialog(title, message);
+    host.showTransferFailure = (title: ResourceStr, message: ResourceStr): void => this.showDialog(title, message);
+    host.stringifyError = (error: Error): string => this.stringifyError(error);
+    return host;
   }
 
   private getPickerContext(): common.UIAbilityContext {
     return this.getUIContext().getHostContext() as common.UIAbilityContext;
   }
 
-  private beginBookmarkTransferProgress(title: string, subtitle: string): void {
+  private beginBookmarkTransferProgress(title: ResourceStr, subtitle: ResourceStr): void {
+    this.bookmarkImportResultDialogPending = false;
     this.bookmarkTransferProgressController.begin(title, subtitle);
   }
 
-  private updateBookmarkTransferProgress(title: string, subtitle: string, progress: number): void {
+  private updateBookmarkTransferProgress(title: ResourceStr, subtitle: ResourceStr, progress: number): void {
     this.bookmarkTransferProgressController.update(title, subtitle, progress);
   }
 
   private finishBookmarkTransferProgress(
-    title: string,
-    subtitle: string,
+    title: ResourceStr,
+    subtitle: ResourceStr,
     onComplete?: () => void,
     showResultDialog: boolean = true
   ): void {
@@ -1245,10 +1226,10 @@ struct BookmarkManagerPage {
       .then((result: HomeShortcutToggleResult) => {
         this.homeShortcutCache = result.shortcuts;
         this.applyHomeShortcutToggleResult(result, node);
-        this.showNativeToast(result.added ? '已添加到主页。' : '已从主页移除。');
+        this.showNativeToast(result.added ? $r('app.string.history_home_added') : $r('app.string.history_home_removed'));
       })
       .catch((error: Error) => {
-        this.showDialog('操作失败', `更新主页快捷方式失败：${this.stringifyError(error)}`);
+        this.showDialog($r('app.string.history_action_failed'), $r('app.string.history_home_failed_detail', this.stringifyError(error)));
       });
   }
 
@@ -1277,7 +1258,7 @@ struct BookmarkManagerPage {
     this.homeShortcutNodeIds = this.homeShortcutNodeIds.filter((id: string) => matchingIds.indexOf(id) < 0);
   }
 
-  private showNativeToast(message: string): void {
+  private showNativeToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,
@@ -1288,38 +1269,26 @@ struct BookmarkManagerPage {
     }
   }
 
-  private showDialog(title: string, message: string): void {
+  private showDialog(title: ResourceStr, message: ResourceStr): void {
     showCenteredAlertDialog({
       title: title,
       message: message,
       autoCancel: true,
       confirm: {
-        value: '知道了',
+        value: $r('app.string.settings_pro_got_it'),
         action: () => {
         }
       }
     });
   }
 
-  private showBookmarkTransferResultDialog(title: string, subtitle: string): void {
-    if (title === '导入成功' && this.bookmarkImportResultBatchId.length > 0) {
+  private showBookmarkTransferResultDialog(title: ResourceStr, subtitle: ResourceStr): void {
+    if (this.bookmarkImportResultDialogPending && this.bookmarkImportResultBatchId.length > 0) {
+      this.bookmarkImportResultDialogPending = false;
       this.bookmarkImportResultDialogController.open();
       return;
     }
     this.showDialog(title, subtitle);
-  }
-
-  private async readTextFromUri(uri: string): Promise<string> {
-    return readBookmarkTextFromUri(uri);
-  }
-
-  private async writeTextToUri(uri: string, payload: string): Promise<void> {
-    const file = await fileIo.open(uri, fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.TRUNC);
-    try {
-      await fileIo.write(file.fd, payload);
-    } finally {
-      await fileIo.close(file);
-    }
   }
 
   private updatePressedNode(nodeId: string, type: TouchType): void {
@@ -1570,7 +1539,7 @@ struct BookmarkManagerPage {
 
   private openEditDialog(node: BookmarkNode): void {
     if (isBookmarkRootNodeId(node.id)) {
-      this.showDialog('无法编辑', '系统根节点不可编辑，请进入根节点后整理其中的内容。');
+      this.showDialog($r('app.string.bookmark_cannot_edit'), $r('app.string.bookmark_root_uneditable'));
       return;
     }
     this.editingNodeId = node.id;
@@ -1589,17 +1558,17 @@ struct BookmarkManagerPage {
       return;
     }
     if (isBookmarkRootNodeId(node.id)) {
-      this.showDialog('无法编辑', '系统根节点不可编辑，请进入根节点后整理其中的内容。');
+      this.showDialog($r('app.string.bookmark_cannot_edit'), $r('app.string.bookmark_root_uneditable'));
       return;
     }
     const normalizedTitle = this.editingTitle.trim();
     const normalizedUrl = this.editingUrl.trim();
     if (normalizedTitle.length === 0) {
-      this.showDialog('保存失败', '请输入名称。');
+      this.showDialog($r('app.string.bookmark_save_failed'), $r('app.string.bookmark_name_required'));
       return;
     }
     if (node.type === 'bookmark' && normalizedUrl.length === 0) {
-      this.showDialog('保存失败', '请输入网址。');
+      this.showDialog($r('app.string.bookmark_save_failed'), $r('app.string.bookmark_url_required'));
       return;
     }
     const operation = this.bookmarkManagementFeature.beginUpdateNode({
@@ -1620,32 +1589,32 @@ struct BookmarkManagerPage {
     operation.completion
       .then((updatedNode: BookmarkNode | undefined) => {
         if (updatedNode === undefined) {
-          throw new Error('未找到要编辑的书签。');
+          throw new Error(resolveAppResourceText($r('app.string.bookmark_edit_missing')));
         }
       })
       .catch((error: Error) => {
-        this.showDialog('保存失败', `保存失败：${this.stringifyError(error)}`);
+        this.showDialog($r('app.string.bookmark_save_failed'), $r('app.string.bookmark_save_failed_detail', this.stringifyError(error)));
       });
   }
 
   private confirmDeleteNode(node: BookmarkNode): void {
     if (isBookmarkRootNodeId(node.id)) {
-      this.showDialog('无法删除', '系统根节点不可删除，请整理根节点中的内容。');
+      this.showDialog($r('app.string.bookmark_cannot_delete'), $r('app.string.bookmark_root_undeletable_short'));
       return;
     }
     showCenteredAlertDialog({
-      title: node.type === 'folder' ? '删除文件夹' : '删除书签',
+      title: node.type === 'folder' ? $r('app.string.bookmark_delete_folder') : $r('app.string.bookmark_delete_bookmark'),
       message: node.type === 'folder'
-        ? `确定删除“${node.title}”吗？文件夹内的书签也会一起删除。`
-        : `确定删除“${node.title}”吗？`,
+        ? $r('app.string.bookmark_delete_folder_confirm', node.title)
+        : $r('app.string.bookmark_delete_one_confirm', node.title),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.settings_delete'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.deleteNode(node.id);
@@ -1659,14 +1628,16 @@ struct BookmarkManagerPage {
       return;
     }
     if (isBookmarkRootNodeId(nodeId)) {
-      this.showDialog('无法删除', '系统根节点不可删除，请整理根节点中的内容。');
+      this.showDialog($r('app.string.bookmark_cannot_delete'), $r('app.string.bookmark_root_undeletable_short'));
       return;
     }
     const deletingNode = this.findNodeById(nodeId);
     this.isTransferBusy = true;
     this.removeBookmarkNodesByIds([nodeId]);
     this.scheduleVisibleAuxRefresh(0);
-    this.showNativeToast(deletingNode?.type === 'folder' ? '已删除文件夹。' : '已删除书签。');
+    this.showNativeToast(deletingNode?.type === 'folder'
+      ? $r('app.string.bookmark_folder_deleted')
+      : $r('app.string.bookmark_bookmark_deleted'));
     this.bookmarkManagementFeature.deleteNode(nodeId)
       .then((deleted: boolean) => {
         if (!deleted) {
@@ -1675,7 +1646,10 @@ struct BookmarkManagerPage {
       })
       .catch((error: Error) => {
         this.reloadNodes();
-        this.showDialog('删除失败', `删除失败：${this.stringifyError(error)}`);
+        this.showDialog(
+          $r('app.string.history_delete_failed'),
+          $r('app.string.history_delete_failed_detail', this.stringifyError(error))
+        );
       })
       .finally(() => {
         this.isTransferBusy = false;
@@ -1689,14 +1663,14 @@ struct BookmarkManagerPage {
     try {
       this.bookmarkManagementFeature.authorizeShare();
     } catch (error) {
-      this.showDialog('无法分享', this.stringifyError(error as Error));
+      this.showDialog($r('app.string.history_cannot_share'), this.stringifyError(error as Error));
       return;
     }
     this.webPageShareService.shareWebPage(this.getPickerContext(), {
       title: node.title,
       url: node.url
     }).catch((error: Error) => {
-      this.showDialog('分享失败', `分享失败：${this.stringifyError(error)}`);
+      this.showDialog($r('app.string.history_share_failed'), $r('app.string.bookmark_share_failed_detail', this.stringifyError(error)));
     });
   }
 
@@ -1773,16 +1747,10 @@ struct BookmarkManagerPage {
     );
   }
 
-  private resolveFileTimestamp(): string {
-    return new Date().toISOString()
-      .replace(/[:.]/g, '-')
-      .replace('T', '_')
-      .replace('Z', '');
-  }
-
   private applyBookmarkImportResult(result: AiraBookmarkImportApplyResult): void {
     this.bookmarkImportResultSummary = result.summary;
     this.bookmarkImportResultBatchId = result.batchId;
+    this.bookmarkImportResultDialogPending = result.batchId.length > 0;
     this.bookmarkImportResultFolderCount = result.importedFolderCount;
     this.bookmarkImportResultBookmarkCount = result.importedBookmarkCount;
     this.bookmarkImportResultDuplicateCount = result.duplicateCount;
@@ -1794,6 +1762,6 @@ struct BookmarkManagerPage {
       return error.message;
     }
     const serialized = JSON.stringify(error);
-    return serialized.length > 0 ? serialized : '未知错误';
+    return serialized.length > 0 ? serialized : resolveAppResourceText($r('app.string.ui_unknown_error'));
   }
 }

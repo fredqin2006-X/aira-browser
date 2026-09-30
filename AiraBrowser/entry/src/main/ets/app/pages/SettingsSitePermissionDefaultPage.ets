@@ -30,6 +30,7 @@ import {
   BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY
 } from '../../core/theme/BrowserThemeStorageKeys';
 import { SiteCapabilityCatalogService } from '../../services/web/SiteCapabilityCatalogService';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 interface SettingsSitePermissionDefaultPageParams {
   kind?: string;
@@ -145,7 +146,10 @@ struct SettingsSitePermissionDefaultPage {
   }
 
   private buildFooterText(): string {
-    return `${this.capabilityCatalog.getPermissionObjectLabel(this.kind)}默认设置会在站点没有单独规则时使用。`;
+    return resolveAppResourceText(
+      $r('app.string.settings_site_permissions_default_note'),
+      this.capabilityCatalog.getPermissionObjectLabel(this.kind)
+    );
   }
 
   private resolveOptionRenderKey(option: SettingsSitePermissionDefaultOption): string {

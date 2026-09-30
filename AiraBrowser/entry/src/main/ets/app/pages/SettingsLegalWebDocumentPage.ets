@@ -11,6 +11,7 @@ import {
   resolveAiraLegalDocumentLink
 } from '../../services/legal/AiraLegalDocuments';
 import { SettingsNavigationCoordinator } from '../router/SettingsNavigationCoordinator';
+import { localizeAboutLegalDocumentTitle } from '../../core/settings/SettingsAboutCopy';
 import { SettingsHdsScaffold } from '../components/settings/SettingsHdsScaffold';
 import { AiraLegalWebDocumentContent } from '../components/legal/AiraLegalWebDocumentContent';
 
@@ -37,7 +38,7 @@ struct SettingsLegalWebDocumentPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: this.documentLink.title,
+        title: localizeAboutLegalDocumentTitle(this.documentLink.id),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,

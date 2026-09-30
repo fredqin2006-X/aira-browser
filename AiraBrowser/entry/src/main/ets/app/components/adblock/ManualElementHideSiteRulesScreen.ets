@@ -24,7 +24,7 @@ export struct ManualElementHideSiteRulesScreen {
     host: '',
     enabled: false,
     rules: [],
-    ruleCountText: '没有清理规则',
+    ruleCountText: $r('app.string.element_hide_settings_no_rules'),
     hasRules: false
   };
   @Prop dataScope: string = '';
@@ -84,7 +84,7 @@ export struct ManualElementHideSiteRulesScreen {
   @Builder
   private buildSiteSettingsSection() {
     SettingsSection({
-      title: '网站设置',
+      title: $r('app.string.element_hide_site_rules_title'),
       secondaryTextColor: this.secondaryTextColor
     }) {
       Column({ space: 10 }) {
@@ -93,7 +93,7 @@ export struct ManualElementHideSiteRulesScreen {
           desktopPresentation: this.desktopPresentation
         }) {
           SettingsSwitchRow({
-            title: '自动隐藏已清理元素',
+            title: $r('app.string.element_hide_site_rules_auto_hide'),
             desktopPresentation: this.desktopPresentation,
             checked: this.state.enabled,
             rowPosition: 'single',
@@ -107,8 +107,8 @@ export struct ManualElementHideSiteRulesScreen {
         }
         SettingsFooterText({
           text: this.state.enabled
-            ? '刷新或再次打开这个网站时，会继续应用下面的清理规则。'
-            : '已暂停；刷新或再次打开这个网站时，不会应用下面的清理规则。',
+            ? $r('app.string.element_hide_site_rules_active')
+            : $r('app.string.element_hide_site_rules_paused'),
           secondaryTextColor: this.secondaryTextColor
         })
       }
@@ -159,7 +159,7 @@ export struct ManualElementHideSiteRulesScreen {
       .type(ButtonType.Circle)
       .buttonStyle(ButtonStyleMode.TEXTUAL)
       .stateEffect(true)
-      .accessibilityText(`删除规则 ${item.selector}`)
+      .accessibilityText($r('app.string.element_hide_site_rules_delete_a11y', item.selector))
       .onClick(() => {
         this.onDeleteRule(this.state.host, item.id, item.selector);
       })
@@ -172,7 +172,7 @@ export struct ManualElementHideSiteRulesScreen {
   @Builder
   private buildClearAllAction() {
     SettingsActionButton({
-      title: '清除这个网站的全部规则',
+      title: $r('app.string.element_hide_site_rules_clear_site'),
       emphasis: 'danger',
       variant: 'tonal',
       pressedBackgroundColor: this.pressedBackground,

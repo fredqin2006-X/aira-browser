@@ -68,7 +68,7 @@ export interface WebAppInstallShell {
   captureSnapshot: () => WebAppInstallShellSnapshot;
   publishDialogSnapshot: (snapshot: WebAppInstallDialogSnapshot) => void;
   openDialog: () => void;
-  showToast: (message: string) => void;
+  showToast: (message: ResourceStr) => void;
 }
 
 interface WebAppInstallSession {
@@ -144,7 +144,7 @@ export class WebAppInstallCoordinator {
     const snapshot = this.shell.captureSnapshot();
     const currentUrl = snapshot.url.trim();
     if (currentUrl.length === 0) {
-      this.shell.showToast('当前没有可安装为应用的网址。');
+      this.shell.showToast($r('app.string.settings_web_app_install_no_url'));
       return;
     }
     const currentTitle = snapshot.title.trim().length > 0 ? snapshot.title.trim() : currentUrl;
@@ -264,11 +264,11 @@ export class WebAppInstallCoordinator {
   private confirm(): void {
     const session = this.session;
     if (session === undefined) {
-      this.shell.showToast('安装信息已失效，请重新打开。');
+      this.shell.showToast($r('app.string.settings_web_app_install_stale'));
       return;
     }
     if (this.dialogSnapshot.iconProcessing) {
-      this.shell.showToast('图标正在处理中，请稍候。');
+      this.shell.showToast($r('app.string.settings_web_app_install_icon_busy'));
       return;
     }
     this.session = undefined;
@@ -283,12 +283,12 @@ export class WebAppInstallCoordinator {
       : session.snapshot.url.trim();
     if (launchUrl.length === 0) {
       await this.iconSelectionService.discard(session.customIcon);
-      this.shell.showToast('当前没有可安装为应用的网址。');
+      this.shell.showToast($r('app.string.settings_web_app_install_no_url'));
       return;
     }
     const label = title.trim().length > 0 ? title.trim() : launchUrl;
     const context = session.snapshot.context;
-    this.shell.showToast('正在打开系统确认...');
+    this.shell.showToast($r('app.string.settings_web_app_install_opening'));
     try {
       const result: DesktopShortcutResult = await this.shortcutService.addWebPageShortcut(context, {
         url: launchUrl,
@@ -315,7 +315,7 @@ export class WebAppInstallCoordinator {
       }
       this.shell.showToast(result.message);
     } catch (_error) {
-      this.shell.showToast('添加到桌面失败，请稍后重试。');
+      this.shell.showToast($r('app.string.settings_web_app_install_failed'));
     } finally {
       await this.iconSelectionService.discard(session.customIcon);
     }
@@ -372,10 +372,10 @@ export class WebAppInstallCoordinator {
     return fileUri.getUriFromPath(normalized);
   }
 
-  private resolveIconErrorMessage(error: Object | undefined): string {
+  private resolveIconErrorMessage(error: Object | undefined): ResourceStr {
     if (error instanceof Error && error.message.trim().length > 0) {
       return error.message.trim();
     }
-    return '无法处理这张图片，请换一张再试。';
+    return $r('app.string.settings_web_app_install_icon_invalid');
   }
 }

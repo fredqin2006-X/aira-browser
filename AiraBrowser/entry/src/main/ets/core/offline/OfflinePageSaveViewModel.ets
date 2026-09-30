@@ -12,7 +12,6 @@ export interface OfflinePageSaveEligibilityInput {
   currentTitle?: string;
 }
 
-const CANNOT_SAVE_MESSAGE = '当前页面无法保存';
 const INTERNAL_SCHEME_PREFIXES: string[] = [
   'aira:',
   'about:',
@@ -43,11 +42,11 @@ export class OfflinePageSaveViewModel {
     };
   }
 
-  resolveMessage(reason: OfflinePageSaveBlockedReason): string {
+  resolveMessage(reason: OfflinePageSaveBlockedReason): ResourceStr {
     if (reason === 'none') {
       return '';
     }
-    return CANNOT_SAVE_MESSAGE;
+    return $r('app.string.offline_save_failed');
   }
 
   private resolveBlockedReason(

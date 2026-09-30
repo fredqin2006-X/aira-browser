@@ -3,7 +3,7 @@ import { CrossDeviceTabPresencePanelStatus } from '../deviceTabs/CrossDeviceTabP
 import { CrossDeviceBrowserIconKind, resolveCrossDeviceBrowserIconKind } from './CrossDeviceBrowserIcon';
 
 /**
- * What a row on the 跨设备互联 page does when tapped. The page is a read-only
+ * What a row on the 与电脑互联 page does when tapped. The page is a read-only
  * projection plus these jumps; it never owns sync state itself.
  */
 export type CrossDeviceLinkActionId =
@@ -61,7 +61,7 @@ export interface CrossDeviceLinkViewState {
   linkEnabled: boolean;
   linkSwitchEnabled: boolean;
   /** The one row that leaves the page for the sync owner; its value names the active mode. */
-  syncSettingsValue: string;
+  syncSettingsValue: ResourceStr;
   /**
    * This phone, always first and always present: the user is looking at it, so a list that
    * leaves it out is describing the wrong thing.
@@ -136,7 +136,7 @@ export interface CrossDeviceLinkFacts {
   cloudEntitlement: CrossDeviceLinkCloudEntitlement;
   /** Only used to name the current mode on the 同步设置 row; this page never writes sync. */
   hasConfiguredSync: boolean;
-  goalLabel: string;
+  goalLabel: ResourceStr;
 }
 
 const SIGNED_OUT_TITLE: string = '未登录';
@@ -149,8 +149,8 @@ const LOCAL_DEVICE_VALUE: string = '当前设备';
 const WEBDAV_NOTICE: string = 'WebDAV 只能同步书签，没有网页接力和跨设备标签页。';
 const HUAWEI_SPACE_NOTICE: string = '华为云空间在华为设备之间同步，没有电脑浏览器端。';
 const ACCOUNT_LINK_NOTICE: string = '登录后即可和电脑互联，不必先开启数据同步。';
-const PRO_REQUIRED_NOTICE: string = '跨设备互联需要 Aira Pro，也可以改用自己的私有化部署。';
-const PRO_EXPIRED_NOTICE: string = 'Aira Pro 已过期，跨设备互联已暂停。续费后会恢复原来的开关。';
+const PRO_REQUIRED_NOTICE: string = '与电脑互联需要 Aira Pro，也可以改用自己的私有化部署。';
+const PRO_EXPIRED_NOTICE: string = 'Aira Pro 已过期，与电脑互联已暂停。续费后会恢复原来的开关。';
 const NO_PROVIDER_NOTICE_COMMUNITY: string = '还没配置同步，先配置私有化部署，就能和电脑连上。';
 
 const SELF_HOSTED_SECTION_TITLE: string = '不想登录账号';
@@ -186,12 +186,169 @@ const DEVICES_SIGNED_OUT_DETAIL: string = '电脑端登录后，这里会显示�
 
 const SELF_HOSTED_TITLE: string = '私有化部署';
 
-const LINK_SWITCH_TITLE: string = '跨设备互联';
+const LINK_SWITCH_TITLE: string = '与电脑互联';
 const LINK_SWITCH_DETAIL: string = '跨设备标签页和网页推送，和数据同步互不影响。';
 const SYNC_SETTINGS_TITLE: string = '同步设置';
 const SYNC_SETTINGS_VALUE_UNSET: string = '去开启同步';
 const ADD_DEVICE_ROW_TITLE: string = '添加设备';
 const ADD_DEVICE_ROW_DETAIL: string = '扫一扫电脑上的二维码';
+
+export function localizeCrossDeviceLinkCopy(value: ResourceStr): ResourceStr {
+  if (typeof value !== 'string') {
+    return value;
+  }
+  if (value === '与电脑互联') {
+    return $r('app.string.settings_sync_cross_device');
+  }
+  if (value === '跨设备标签页和网页推送，和数据同步互不影响。') {
+    return $r('app.string.settings_link_switch_detail');
+  }
+  if (value === '去开启同步') {
+    return $r('app.string.settings_link_turn_on_sync');
+  }
+  if (value === '添加设备') {
+    return $r('app.string.settings_link_add_device');
+  }
+  if (value === '扫一扫电脑上的二维码') {
+    return $r('app.string.settings_link_add_device_detail');
+  }
+  if (value === '当前设备') {
+    return $r('app.string.settings_link_current_device');
+  }
+  if (value === '本机') {
+    return $r('app.string.settings_link_this_phone');
+  }
+  if (value === '未登录') {
+    return $r('app.string.settings_account_signed_out');
+  }
+  if (value === '登录后即可和电脑互联，数据同步可以另开') {
+    return $r('app.string.settings_link_signed_out_note');
+  }
+  if (value === '已登录账号') {
+    return $r('app.string.settings_link_account_fallback');
+  }
+  if (value.indexOf('账号 ID ') === 0) {
+    return $r('app.string.settings_link_account_id', value.substring('账号 ID '.length));
+  }
+  if (value === 'WebDAV 只能同步书签，没有网页接力和跨设备标签页。') {
+    return $r('app.string.settings_link_webdav_notice');
+  }
+  if (value === '华为云空间在华为设备之间同步，没有电脑浏览器端。') {
+    return $r('app.string.settings_link_huawei_notice');
+  }
+  if (value === '登录后即可和电脑互联，不必先开启数据同步。') {
+    return $r('app.string.settings_link_sign_in_notice');
+  }
+  if (value === '与电脑互联需要 Aira Pro，也可以改用自己的私有化部署。') {
+    return $r('app.string.settings_link_pro_required');
+  }
+  if (value === 'Aira Pro 已过期，与电脑互联已暂停。续费后会恢复原来的开关。') {
+    return $r('app.string.settings_link_pro_expired');
+  }
+  if (value === '还没配置同步，先配置私有化部署，就能和电脑连上。') {
+    return $r('app.string.settings_link_no_provider');
+  }
+  if (value === '不想登录账号') {
+    return $r('app.string.settings_link_skip_account');
+  }
+  if (value === '推荐方式') {
+    return $r('app.string.settings_link_recommended');
+  }
+  if (value === '用私有化部署：书签、历史记录、网页接力、跨设备标签页全都能用，免账号、免会员。') {
+    return $r('app.string.settings_link_self_host_footer');
+  }
+  if (value === '私有化部署用的是你自己的服务器，不需要登录账号，书签、历史记录、网页接力和跨设备标签页都能用。') {
+    return $r('app.string.settings_link_self_host_footer_community');
+  }
+  if (value === '私有化部署') {
+    return $r('app.string.settings_pro_self_hosting');
+  }
+  if (value === '当前没有在线电脑') {
+    return $r('app.string.settings_link_devices_empty');
+  }
+  if (value === '连接后在手机上就能看到电脑打开的网页') {
+    return $r('app.string.settings_link_devices_empty_detail');
+  }
+  if (value === '正在读取在线电脑…') {
+    return $r('app.string.settings_link_devices_loading');
+  }
+  if (value === '暂时读不到在线电脑') {
+    return $r('app.string.settings_link_devices_error');
+  }
+  if (value === '稍后再看，或确认电脑端是否还开着浏览器') {
+    return $r('app.string.settings_link_devices_error_detail');
+  }
+  if (value === '登录账号后查看') {
+    return $r('app.string.settings_link_devices_signed_out');
+  }
+  if (value === '电脑端登录后，这里会显示它打开的网页') {
+    return $r('app.string.settings_link_devices_signed_out_detail');
+  }
+  if (value === '跨设备标签页需要先完成连接。') {
+    return $r('app.string.settings_link_connect_first');
+  }
+  if (value === '在电脑上安装 Aira-sync 扩展') {
+    return $r('app.string.settings_link_step_install');
+  }
+  if (value === '点扩展图标，选「使用账号登录」') {
+    return $r('app.string.settings_link_step_cloud_login');
+  }
+  if (value === '用「扫一扫」扫电脑上的二维码') {
+    return $r('app.string.settings_link_step_cloud_scan');
+  }
+  if (value === '在手机这里点「去配对」，填服务器地址和配对码') {
+    return $r('app.string.settings_link_step_pair');
+  }
+  if (value === '在电脑端扩展里填同一个地址和配对码') {
+    return $r('app.string.settings_link_step_pair_desktop');
+  }
+  if (value === '换一种能和电脑连上的同步方式') {
+    return $r('app.string.settings_link_step_change_method');
+  }
+  if (value === '按提示在手机和电脑两端填同一份地址') {
+    return $r('app.string.settings_link_step_same_address');
+  }
+  if (value === 'Chrome 扩展') {
+    return $r('app.string.settings_pro_device_chrome');
+  }
+  if (value === 'Edge 扩展') {
+    return $r('app.string.settings_pro_device_edge');
+  }
+  if (value === 'Firefox 扩展') {
+    return $r('app.string.settings_pro_device_firefox');
+  }
+  if (value === '本地安装包') {
+    return $r('app.string.settings_link_ext_local');
+  }
+  if (value === '查看') {
+    return $r('app.string.settings_pro_value_view');
+  }
+  if (value === '复制') {
+    return $r('app.string.settings_link_ext_copy');
+  }
+  if (value === '把当前页推到电脑') {
+    return $r('app.string.settings_link_guide_push_title');
+  }
+  if (value === '打开工具栏点推送，电脑会新开这个页面，手机上的标签还在。') {
+    return $r('app.string.settings_link_guide_push_message');
+  }
+  if (value === '看到电脑打开的标签页') {
+    return $r('app.string.settings_link_guide_tabs_title');
+  }
+  if (value === '电脑上正在开的网页，会列在手机的跨设备标签页里。') {
+    return $r('app.string.settings_link_guide_tabs_message');
+  }
+  if (value === '下一个') {
+    return $r('app.string.settings_link_guide_next');
+  }
+  if (value === '查看互联教程') {
+    return $r('app.string.settings_link_guide_open');
+  }
+  if (value === '不再提示') {
+    return $r('app.string.settings_link_guide_skip');
+  }
+  return value;
+}
 
 /**
  * The link switch is usable when this device can actually carry tab handoff. Official
@@ -270,7 +427,7 @@ export class CrossDeviceLinkViewModel {
    * The settings row names the mode the switch actually controls, so the value is the sync
    * owner's own goal label rather than this page's guess at a provider name.
    */
-  private resolveSyncSettingsValue(facts: CrossDeviceLinkFacts): string {
+  private resolveSyncSettingsValue(facts: CrossDeviceLinkFacts): ResourceStr {
     if (!facts.hasConfiguredSync) {
       return SYNC_SETTINGS_VALUE_UNSET;
     }

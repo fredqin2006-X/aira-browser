@@ -1,4 +1,5 @@
 import { BrowserWebLoadDataPayload } from '../browser/BrowserWebLoadCoordinator';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export const SAVED_PAGE_WEB_TAB_URL_PREFIX: string = 'aira://saved-page';
 
@@ -66,9 +67,11 @@ export function resolveSavedPageWebTabDisplayUrl(url: string): string {
 }
 
 export function buildSavedPageLoadingPayload(url: string): BrowserWebLoadDataPayload {
+  const title = resolveAppResourceText($r('app.string.offline_saved_web_loading_title'));
+  const message = resolveAppResourceText($r('app.string.offline_saved_web_loading'));
   return {
-    data: '<!DOCTYPE html><html><head><meta charset="utf-8"><title>已保存的网页</title></head>' +
-      '<body><p>正在打开已保存的网页...</p></body></html>',
+    data: `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title></head>` +
+      `<body><p>${message}</p></body></html>`,
     mimeType: 'text/html',
     encoding: 'UTF-8',
     baseUrl: url,

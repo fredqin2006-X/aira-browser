@@ -24,6 +24,7 @@ import {
   BrowserHttpsFirstNavigationService,
   sharedBrowserHttpsFirstNavigationService
 } from '../../services/web/BrowserHttpsFirstNavigationService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface SettingsSiteDataClearBoundary {
   profileId?: BrowserProfileId | string;
@@ -156,7 +157,7 @@ export class SettingsSiteDataClearCoordinator {
     if (!this.isBoundaryConsistent(request.privacyMode, request.dataScope)) {
       return {
         hasError: true,
-        message: '浏览数据范围不一致，未执行清理。'
+        message: resolveAppResourceText($r('app.string.settings_privacy_protection_clear_range_mismatch'))
       };
     }
     const state = this.buildState({
@@ -168,7 +169,7 @@ export class SettingsSiteDataClearCoordinator {
     if (selectedItemIds.length === 0) {
       return {
         hasError: true,
-        message: '请选择要清除的数据。'
+        message: resolveAppResourceText($r('app.string.settings_privacy_protection_clear_nothing_selected'))
       };
     }
 
@@ -184,7 +185,8 @@ export class SettingsSiteDataClearCoordinator {
           await this.historyRepository?.deleteVisitsInRange(timeRange.startAt, timeRange.endAt);
         }
       } catch (error) {
-        failureMessages.push(`历史记录：${JSON.stringify(error)}`);
+        failureMessages.push(resolveAppResourceText(
+          $r('app.string.settings_privacy_protection_item_history')) + '：' + JSON.stringify(error));
       }
     }
 
@@ -201,7 +203,8 @@ export class SettingsSiteDataClearCoordinator {
           );
         }
       } catch (error) {
-        failureMessages.push(`最近关闭：${JSON.stringify(error)}`);
+        failureMessages.push(resolveAppResourceText(
+          $r('app.string.settings_privacy_protection_item_recently_closed')) + '：' + JSON.stringify(error));
       }
     }
 
@@ -228,7 +231,8 @@ export class SettingsSiteDataClearCoordinator {
     if (state.dataScope === 'session_ephemeral' && selectedSet.has('site_permissions')) {
       const cleanupResult = this.sitePolicyService?.clearSessionSitePermissionSettings(state.profileId);
       if (cleanupResult === undefined) {
-        failureMessages.push('临时权限：清除失败');
+        failureMessages.push(resolveAppResourceText(
+          $r('app.string.settings_privacy_protection_clear_temp_permission_failed')));
       }
     }
     if (state.dataScope === 'profile_persistent' && selectedSet.has('site_permissions')) {
@@ -245,19 +249,23 @@ export class SettingsSiteDataClearCoordinator {
           dataScope: state.dataScope
         });
       } catch (error) {
-        failureMessages.push(`HTTP 兼容访问决定：${JSON.stringify(error)}`);
+        failureMessages.push(resolveAppResourceText(
+          $r('app.string.settings_privacy_protection_clear_https_label')) + '：' + JSON.stringify(error));
       }
     }
 
     if (failureMessages.length > 0) {
       return {
         hasError: true,
-        message: `部分浏览数据清除失败：${failureMessages.join('；')}`
+        message: resolveAppResourceText(
+          $r('app.string.settings_privacy_protection_clear_partial_failed'),
+          failureMessages.join('；')
+        )
       };
     }
     return {
       hasError: false,
-      message: '所选浏览数据已清除。'
+      message: resolveAppResourceText($r('app.string.settings_privacy_protection_clear_done'))
     };
   }
 

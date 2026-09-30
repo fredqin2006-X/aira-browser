@@ -12,7 +12,7 @@ import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundary
 
 export interface BrowserRetentionSettingsApplyResult {
   settings: BrowserRetentionSettings;
-  message: string;
+  message: ResourceStr;
 }
 
 export class BrowserRetentionSettingsCoordinator {
@@ -59,13 +59,13 @@ export class BrowserRetentionSettingsCoordinator {
     };
   }
 
-  buildResultMessage(profileId: BrowserRetentionProfileId): string {
+  buildResultMessage(profileId: BrowserRetentionProfileId): ResourceStr {
     if (profileId === 'memory_saver') {
-      return '已切换为省电优先。';
+      return $r('app.string.settings_advanced_retention_applied_memory_saver');
     }
     if (profileId === 'keep_more_tabs') {
-      return '已切换为多标签性能。';
+      return $r('app.string.settings_advanced_retention_applied_keep_more_tabs');
     }
-    return '已切换为均衡策略。';
+    return $r('app.string.settings_advanced_retention_applied_balanced');
   }
 }

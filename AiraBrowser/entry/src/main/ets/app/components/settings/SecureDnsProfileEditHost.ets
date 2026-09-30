@@ -19,6 +19,8 @@ import {
   BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY
 } from '../../../core/theme/BrowserThemeStorageKeys';
 import { SettingsHdsScaffold } from './SettingsHdsScaffold';
+import { localizePrivacyProtectionCopy } from '../../../core/settings/SettingsPrivacyProtectionCopy';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   SettingsPresentationScrollBody,
   SettingsScrollBody,
@@ -89,7 +91,10 @@ export struct SecureDnsProfileEditHost {
   aboutToAppear(): void {
     this.draft = sharedSecureDnsSettingsCoordinator.buildCustomProfileDraft(this.profileId);
     if (this.profileId.length > 0 && this.draft.id.length === 0) {
-      promptAction.showToast({ message: '这个自定义 DNS 已不存在。', duration: 1800 });
+      promptAction.showToast({
+        message: $r('app.string.settings_privacy_protection_dns_not_exist'),
+        duration: 1800
+      });
       this.onBack?.();
     }
   }
@@ -108,7 +113,9 @@ export struct SecureDnsProfileEditHost {
   private buildWorkspaceContent() {
     Column() {
       SettingsDesktopWorkspaceHeader({
-        title: this.draft.id.length > 0 ? '编辑自定义 DNS' : '添加自定义 DNS',
+        title: this.draft.id.length > 0
+          ? $r('app.string.settings_privacy_protection_dns_edit_title')
+          : $r('app.string.settings_add_custom_dns'),
         showBackButton: true,
         primaryTextColor: this.storedPrimaryTextColor,
         iconColor: this.storedSecondaryTextColor,
@@ -138,7 +145,9 @@ export struct SecureDnsProfileEditHost {
   private buildPageContent() {
     Column() {
       SettingsHdsScaffold({
-        title: this.draft.id.length > 0 ? '编辑自定义 DNS' : '添加自定义 DNS',
+        title: this.draft.id.length > 0
+          ? $r('app.string.settings_privacy_protection_dns_edit_title')
+          : $r('app.string.settings_add_custom_dns'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -166,7 +175,7 @@ export struct SecureDnsProfileEditHost {
   @Builder
   private buildDialogContent() {
     Column({ space: 16 }) {
-      Text('添加自定义 DNS')
+      Text($r('app.string.settings_add_custom_dns'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -177,7 +186,9 @@ export struct SecureDnsProfileEditHost {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: this.saving ? '保存中...' : '保存并使用',
+          label: this.saving ?
+            $r('app.string.settings_privacy_protection_dns_saving') :
+            $r('app.string.settings_privacy_protection_dns_save_use'),
           emphasis: 'primary',
           stacked: true,
           actionEnabled: !this.saving && !this.deleting,
@@ -191,7 +202,7 @@ export struct SecureDnsProfileEditHost {
         })
 
         BrowserSheetActionButton({
-          label: '取消',
+          label: $r('app.string.settings_privacy_protection_dialog_cancel'),
           emphasis: 'ghost',
           stacked: true,
           actionEnabled: !this.saving && !this.deleting,
@@ -217,10 +228,10 @@ export struct SecureDnsProfileEditHost {
         SettingsTextField({
           desktopPresentation: this.desktopPresentation,
           underlineStyle: this.presentationMode === 'dialog',
-          label: '名称',
+          label: $r('app.string.settings_privacy_protection_dns_name'),
           text: this.draft.name,
-          placeholder: '例如：家庭 DNS / 公司 DNS',
-          errorText: this.draft.nameError,
+          placeholder: $r('app.string.settings_privacy_protection_dns_name_placeholder'),
+          errorText: localizePrivacyProtectionCopy(this.draft.nameError),
           isEnabled: !this.saving && !this.deleting,
           maxLength: 80,
           controlBackgroundColor: this.resolveFieldBackgroundColor(),
@@ -234,10 +245,10 @@ export struct SecureDnsProfileEditHost {
         SettingsTextField({
           desktopPresentation: this.desktopPresentation,
           underlineStyle: this.presentationMode === 'dialog',
-          label: 'DoH 地址',
+          label: $r('app.string.settings_privacy_protection_dns_endpoint'),
           text: this.draft.endpoint,
           placeholder: 'https://example.com/dns-query',
-          errorText: this.draft.endpointError,
+          errorText: localizePrivacyProtectionCopy(this.draft.endpointError),
           isEnabled: !this.saving && !this.deleting,
           inputType: InputType.URL,
           maxLength: 2048,
@@ -273,7 +284,9 @@ export struct SecureDnsProfileEditHost {
 
         if (this.draft.id.length > 0) {
           SettingsActionButton({
-            title: this.deleting ? '删除中...' : '删除 DNS',
+            title: this.deleting ?
+              $r('app.string.settings_privacy_protection_dns_deleting') :
+              $r('app.string.settings_privacy_protection_dns_delete'),
             emphasis: 'danger',
             isEnabled: !this.saving && !this.deleting,
             pressedBackgroundColor: this.storedPressedBackgroundColor,
@@ -327,18 +340,20 @@ export struct SecureDnsProfileEditHost {
   }
 
   private confirmDeleteProfile(): void {
-    const profileName = this.draft.name.trim().length > 0 ? this.draft.name.trim() : '这个 DNS';
+    const profileName = this.draft.name.trim().length > 0
+      ? this.draft.name.trim()
+      : resolveAppResourceText($r('app.string.settings_privacy_protection_dns_this'));
     showCenteredAlertDialog({
-      title: '删除自定义 DNS',
-      message: `确定删除“${profileName}”吗？如果它正在使用，将回退到系统 DNS。`,
+      title: $r('app.string.settings_privacy_protection_dns_delete_title'),
+      message: $r('app.string.settings_privacy_protection_dns_delete_message', profileName),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_privacy_protection_dialog_cancel'),
         action: (): void => {
         }
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.settings_delete'),
         fontColor: $r('app.color.permission_blocked'),
         action: (): void => {
           void this.deleteProfile();
@@ -347,11 +362,13 @@ export struct SecureDnsProfileEditHost {
     });
   }
 
-  private resolveSaveButtonTitle(): string {
+  private resolveSaveButtonTitle(): ResourceStr {
     if (this.saving) {
-      return '保存中...';
+      return $r('app.string.settings_privacy_protection_dns_saving');
     }
-    return this.draft.id.length > 0 ? '保存' : '保存并使用';
+    return this.draft.id.length > 0 ?
+      $r('app.string.ui_save') :
+      $r('app.string.settings_privacy_protection_dns_save_use');
   }
 
   private resolveFieldBackgroundColor(): ResourceColor {
@@ -384,7 +401,7 @@ export struct SecureDnsProfileEditHost {
 
   private showMessage(message: string): void {
     if (message.length > 0) {
-      promptAction.showToast({ message: message, duration: 1800 });
+      promptAction.showToast({ message: localizePrivacyProtectionCopy(message), duration: 1800 });
     }
   }
 }

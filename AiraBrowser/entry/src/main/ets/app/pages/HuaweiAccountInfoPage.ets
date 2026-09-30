@@ -27,6 +27,7 @@ import {
 import { SettingsNavigationCoordinator } from '../router/SettingsNavigationCoordinator';
 import { AppServiceModeGateService } from '../../services/settings/AppServiceModeGateService';
 import { resolveAiraHuaweiAccountIdentity } from '../../common/models/AiraSyncModels';
+import { preferSignOutMessage } from '../../core/account/HuaweiAccountMutationCoordinator';
 
 @Entry
 @Component
@@ -66,7 +67,7 @@ struct HuaweiAccountInfoPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '账号信息',
+        title: $r('app.string.settings_account_info'),
         backIconKind: 'back',
         pageBackground: this.theme.pageBackground,
         headerButtonBackground: this.theme.controlBackground,
@@ -155,20 +156,20 @@ struct HuaweiAccountInfoPage {
       return;
     }
     if (!sharedHuaweiAccountMutationCoordinator.canSignOut(this.buildDataBoundaryInput())) {
-      this.showToast('请回到普通会话后退出华为账号。');
+      this.showToast($r('app.string.settings_account_sign_out_private'));
       return;
     }
     showCenteredAlertDialog({
-      title: '退出华为账号吗',
-      message: '退出后会关闭书签云同步并清除本机保存的华为账号身份，本机书签不会删除。WebDAV 配置和同步状态会保留。',
+      title: $r('app.string.settings_account_sign_out_title'),
+      message: $r('app.string.settings_account_sign_out_message'),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '退出',
+        value: $r('app.string.settings_account_sign_out'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.signOutHuaweiAccount();
@@ -188,7 +189,7 @@ struct HuaweiAccountInfoPage {
     sharedHuaweiAccountMutationCoordinator.signOut(this.buildDataBoundaryInput())
       .then((result) => {
         if (!result.ok) {
-          this.showToast(result.message.length > 0 ? result.message : result.title);
+          this.showToast(preferSignOutMessage(result));
           return;
         }
         this.refreshState();
@@ -196,7 +197,7 @@ struct HuaweiAccountInfoPage {
         router.back();
       })
       .catch((error: Error) => {
-        this.showToast(error.message.length > 0 ? error.message : '退出失败');
+        this.showToast(error.message.length > 0 ? error.message : $r('app.string.settings_account_sign_out_failed'));
       })
       .finally(() => {
         this.isBusy = false;
@@ -214,20 +215,20 @@ struct HuaweiAccountInfoPage {
     const settings = sharedAiraSyncConfigStore.getSettings();
     const uid = resolveAiraHuaweiAccountIdentity(settings.huaweiCloud, settings.huaweiSpace).uid;
     if (uid.length <= 0) {
-      this.showToast('当前没有可复制的账号 ID');
+      this.showToast($r('app.string.settings_account_copy_empty'));
       return;
     }
     try {
       const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, uid);
       pasteboard.getSystemPasteboard().setData(data)
         .then(() => {
-          this.showToast('账号 ID 已复制');
+          this.showToast($r('app.string.settings_account_copied'));
         })
         .catch((_error: Error) => {
-          this.showToast('复制失败，请稍后重试');
+          this.showToast($r('app.string.settings_account_copy_failed'));
         });
     } catch (_error) {
-      this.showToast('复制失败，请稍后重试');
+      this.showToast($r('app.string.settings_account_copy_failed'));
     }
   }
 
@@ -235,7 +236,7 @@ struct HuaweiAccountInfoPage {
     this.theme = this.themeViewStateFactory.build(sharedPreferencesRepository.getPreferences());
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     this.getUIContext().getPromptAction().showToast({
       message: message,
       duration: 1800

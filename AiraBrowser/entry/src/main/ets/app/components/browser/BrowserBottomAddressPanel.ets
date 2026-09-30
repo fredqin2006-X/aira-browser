@@ -1,4 +1,5 @@
 import { BrowserAddressBarTabSwipeEvent } from '../../../core/browser/BrowserAddressBarTabSwipePolicy';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BrowserBottomAddressPanelAction,
   BrowserBottomAddressPanelActionId,
@@ -50,6 +51,14 @@ import {
   BROWSER_BOTTOM_PANEL_FLOATING_CONTENT_REVEAL_DISTANCE,
   BROWSER_BOTTOM_PANEL_FLOATING_CONTENT_EXIT_BARRIER_MS
 } from '../../../core/browser/BrowserBottomPanelMotionTokens';
+import {
+  bottomPanelContinueReading,
+  bottomPanelContinueReadingA11y,
+  bottomPanelExit,
+  bottomPanelExitPrivate,
+  resourceStrKey,
+  resourceStrPresent
+} from '../../../core/browser/BrowserBottomPanelText';
 import {
   BrowserDetentBottomPanel,
   BrowserDetentBottomPanelGestureFrame,
@@ -236,36 +245,36 @@ function buildDefaultBrowserBottomAddressPanelActionInput(): BrowserBottomAddres
     readerModeEnabled: false,
     webpageTranslationEnabled: true,
     offlinePageSaveEnabled: true,
-    offlinePageSaveDisabledMessage: '当前页面无法保存',
+    offlinePageSaveDisabledMessage: $r('app.string.bottom_panel_save_unavailable'),
     bookmarksEnabled: true,
-    bookmarksActionLabel: '添加书签',
+    bookmarksActionLabel: $r('app.string.bottom_panel_action_bookmark'),
     bookmarksActionIcon: $r('sys.symbol.bookmark'),
-    bookmarksActionDisabledMessage: '当前页面无法收藏',
+    bookmarksActionDisabledMessage: $r('app.string.bottom_panel_bookmark_unavailable'),
     bookmarksActionSelected: false,
     bookmarksActionVersion: 0,
     appProxyActive: false,
-    userAgentActionLabel: '网站版本',
-    userAgentActionTrailingText: '跟随默认',
+    userAgentActionLabel: $r('app.string.bottom_panel_action_user_agent'),
+    userAgentActionTrailingText: $r('app.string.site_version_mode_default'),
     userAgentActionIcon: $r('sys.symbol.rectangle_on_rectangle_fill'),
     userAgentActionVersion: 0,
-    textZoomActionLabel: '网页文字大小',
+    textZoomActionLabel: $r('app.string.bottom_panel_action_text_zoom'),
     textZoomActionTrailingText: '100%',
     textZoomActionIcon: $r('sys.symbol.doc_text_fill'),
     textZoomActionVersion: 0,
-    userAgentPresetActionLabel: '网页标识',
-    userAgentPresetActionTrailingText: 'Aira默认',
+    userAgentPresetActionLabel: $r('app.string.bottom_panel_action_user_agent_preset'),
+    userAgentPresetActionTrailingText: $r('app.string.web_ua_preset_aira_default'),
     userAgentPresetActionIcon: $r('sys.symbol.compass_circle_fill'),
     userAgentPresetActionVersion: 0,
-    screenOrientationActionLabel: '屏幕方向：跟随系统',
-    screenOrientationActionTrailingText: '跟随系统',
+    screenOrientationActionLabel: $r('app.string.bottom_panel_action_screen_orientation'),
+    screenOrientationActionTrailingText: $r('app.string.settings_screen_orientation_system_title'),
     screenOrientationActionIcon: $r('sys.symbol.gyroscope'),
     screenOrientationActionVersion: 0,
-    themeModeActionLabel: '跟随系统外观',
-    themeModeActionTrailingText: '跟随系统',
+    themeModeActionLabel: $r('app.string.bottom_panel_theme_system'),
+    themeModeActionTrailingText: $r('app.string.bottom_panel_theme_system'),
     themeModeActionIcon: $r('sys.symbol.sun_max_fill'),
     themeModeActionVersion: 0,
-    fullScreenModeActionLabel: '全屏模式',
-    fullScreenModeActionTrailingText: '沉浸浏览',
+    fullScreenModeActionLabel: $r('app.string.bottom_panel_action_full_screen_mode'),
+    fullScreenModeActionTrailingText: $r('app.string.bottom_panel_action_full_screen_mode_subtitle'),
     fullScreenModeActionIcon: $r('sys.symbol.fullscreen'),
     fullScreenModeActionVersion: 0
   };
@@ -408,8 +417,8 @@ export struct BrowserBottomAddressPanel {
   @State private liveFloatingHeaderVisible: boolean = true;
   @State private livePanelMotionState: BrowserBottomPanelMotionState = DEFAULT_BROWSER_BOTTOM_PANEL_MOTION_STATE;
   @State private liveAddressInput: string = '';
-  @State private liveAddressDisplayText: string = '';
-  @State private liveAddressPlaceholder: string = '';
+  @State private liveAddressDisplayText: ResourceStr = '';
+  @State private liveAddressPlaceholder: ResourceStr = '';
   @State private floatingHeaderTracksPanelMotion: boolean = false;
   @State private liveBottomChromePresentation: BrowserBottomChromePresentation =
     DEFAULT_BROWSER_BOTTOM_CHROME_PRESENTATION;
@@ -430,7 +439,7 @@ export struct BrowserBottomAddressPanel {
   @Prop centerActionEnabled: boolean = false;
   @Prop centerActionIcon: Resource = $r('sys.symbol.plus');
   @Prop centerActionText: string = '';
-  @Prop centerActionAccessibilityText: string = '中间操作';
+  @Prop centerActionAccessibilityText: Resource = $r('app.string.bottom_panel_center_action');
   @Prop homeSuggestions: SearchSuggestion[] = [];
   @Prop homeSuggestionsVisible: boolean = false;
   @Prop currentTabSuggestionRefId: string = '';
@@ -1262,11 +1271,11 @@ export struct BrowserBottomAddressPanel {
 
   @Builder
   private buildViewerActionSlots() {
-    this.buildHeaderImageIconButton(undefined, '主页', true, 'viewerHome', () => {
+    this.buildHeaderImageIconButton(undefined, $r('app.string.bottom_panel_action_home'), true, 'viewerHome', () => {
       this.onAction('home');
     }, 0, 0, 'browser.shortcut.home')
     this.buildHeaderFixedButtonGap()
-    this.buildHeaderImageIconButton(undefined, '文件信息', true, 'viewerInfo', () => {
+    this.buildHeaderImageIconButton(undefined, $r('app.string.bottom_panel_action_viewer_info'), true, 'viewerInfo', () => {
       this.onAction('viewerInfo');
     }, 0, 0, 'browser.toolbar.siteInfo')
   }
@@ -1274,7 +1283,7 @@ export struct BrowserBottomAddressPanel {
   @Builder
   private buildHeaderImageIconButton(
     imageIcon: Resource | undefined,
-    accessibilityText: string,
+    accessibilityText: ResourceStr,
     enabled: boolean,
     actionId: string,
     action: () => void,
@@ -1316,7 +1325,7 @@ export struct BrowserBottomAddressPanel {
     .focusable(false)
     .focusOnTouch(false)
     .enabled(true)
-    .accessibilityText(accessibilityText)
+    .accessibilityText(resolveAppResourceText(accessibilityText))
     .hitTestBehavior(this.shouldHeaderActionReceiveTouch(enabled) ? HitTestMode.Default : HitTestMode.None)
     .scale({
       x: this.resolveHeaderButtonEnterScale(),
@@ -1520,7 +1529,7 @@ export struct BrowserBottomAddressPanel {
         })
 
         Column({ space: 2 }) {
-          Text('继续阅读')
+          Text(bottomPanelContinueReading())
             .fontSize(15)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.resolveItemTextColor(true))
@@ -1563,7 +1572,7 @@ export struct BrowserBottomAddressPanel {
     .borderRadius(16)
     .stateEffect(true)
     .enabled(!this.liveReadingContinuation.loading)
-    .accessibilityText(`继续阅读${this.liveReadingContinuation.title}`)
+    .accessibilityText(bottomPanelContinueReadingA11y(this.liveReadingContinuation.title))
     .onClick((): void => {
       this.onContinueReading();
     })
@@ -1823,7 +1832,7 @@ export struct BrowserBottomAddressPanel {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .layoutWeight(1)
 
-        if ((item.trailingText ?? '').length > 0) {
+        if (resourceStrPresent(item.trailingText)) {
           Text(item.trailingText ?? '')
             .fontSize(WEB_BOTTOM_LIST_TRAILING_TEXT_SIZE)
             .fontColor(this.resolveSecondaryActionTrailingTextColor(item))
@@ -1956,8 +1965,8 @@ export struct BrowserBottomAddressPanel {
     const privateModeActive = this.buildActionInput().privateModeActive;
     return {
       id: action.id,
-      title: privateModeActive ? '退出隐私模式' : '隐私模式',
-      trailingText: privateModeActive ? '退出' : '私密',
+      title: privateModeActive ? bottomPanelExitPrivate() : $r('app.string.bottom_panel_action_new_private_tab'),
+      trailingText: privateModeActive ? bottomPanelExit() : $r('app.string.bottom_panel_action_new_private_tab_subtitle'),
       icon: action.icon,
       airaIconId: 'browser.toolbar.privacyMode',
       enabled: action.enabled,
@@ -2221,7 +2230,7 @@ export struct BrowserBottomAddressPanel {
     return `${this.liveBottomChromePresentation.contentPresentation}:${item.id}:` +
       `${this.resolveActionRenderVersion(item)}:image:` +
       `${item.enabled ? 'enabled' : 'disabled'}:${item.selected === true ? 'selected' : 'idle'}:` +
-      `${item.title}:${item.trailingText ?? ''}:${item.disabledMessage}`;
+      `${resourceStrKey(item.title)}:${resourceStrKey(item.trailingText ?? '')}:${resourceStrKey(item.disabledMessage)}`;
   }
 
   private buildPanelActionPressKey(item: BrowserBottomAddressPanelAction): string {
@@ -2324,9 +2333,8 @@ export struct BrowserBottomAddressPanel {
       return;
     }
     if (!item.enabled) {
-      const message = item.disabledMessage.trim();
-      if (message.length > 0) {
-        this.getUIContext().getPromptAction().showToast({ message: message, duration: 1500 });
+      if (resourceStrPresent(item.disabledMessage)) {
+        this.getUIContext().getPromptAction().showToast({ message: item.disabledMessage, duration: 1500 });
       }
       return;
     }
@@ -2359,9 +2367,8 @@ export struct BrowserBottomAddressPanel {
       return;
     }
     if (!item.enabled) {
-      const message = item.disabledMessage.trim();
-      if (message.length > 0) {
-        this.getUIContext().getPromptAction().showToast({ message: message, duration: 1500 });
+      if (resourceStrPresent(item.disabledMessage)) {
+        this.getUIContext().getPromptAction().showToast({ message: item.disabledMessage, duration: 1500 });
       }
       return;
     }
@@ -2436,9 +2443,8 @@ export struct BrowserBottomAddressPanel {
 
   private dispatchHeaderAction(item: BrowserBottomAddressPanelHeaderAction): void {
     if (!item.enabled) {
-      const message = item.disabledMessage.trim();
-      if (message.length > 0) {
-        this.getUIContext().getPromptAction().showToast({ message: message, duration: 1500 });
+      if (resourceStrPresent(item.disabledMessage)) {
+        this.getUIContext().getPromptAction().showToast({ message: item.disabledMessage, duration: 1500 });
       }
       return;
     }
@@ -2495,7 +2501,7 @@ export struct BrowserBottomAddressPanel {
       intent.actionId,
       intent.slotId
     );
-    if (intent.disabledMessage.trim().length > 0) {
+    if (resourceStrPresent(intent.disabledMessage)) {
       this.getUIContext().getPromptAction().showToast({
         message: intent.disabledMessage,
         duration: 1500
@@ -2699,7 +2705,10 @@ export struct BrowserBottomAddressPanel {
     )
       .catch((_error: Error) => {
         this.syncLiveQuickActionOrder(this.resolveBaseUnifiedQuickActions());
-        this.getUIContext().getPromptAction().showToast({ message: '底部工具栏更新失败。', duration: 2200 });
+        this.getUIContext().getPromptAction().showToast({
+          message: $r('app.string.bottom_panel_toolbar_update_failed'),
+          duration: 2200
+        });
       });
   }
 
@@ -3457,8 +3466,8 @@ export struct BrowserBottomAddressPanel {
     action();
   }
 
-  private getAddressText(): string {
-    if (this.liveAddressDisplayText.trim().length > 0) {
+  private getAddressText(): ResourceStr {
+    if (resourceStrPresent(this.liveAddressDisplayText)) {
       return this.liveAddressDisplayText;
     }
     if (this.liveAddressInput.trim().length > 0) {
@@ -3489,7 +3498,7 @@ export struct BrowserBottomAddressPanel {
     const value = this.restorableWebAddressText;
     if (value.length <= 0) {
       this.getUIContext().getPromptAction().showToast({
-        message: '当前没有可编辑的网址。',
+        message: $r('app.string.bottom_panel_no_editable_address'),
         duration: 1500
       });
       return;
@@ -3662,7 +3671,7 @@ export struct BrowserBottomAddressPanel {
     this.downloadIndicatorState = createHiddenDownloadToolbarIndicatorState();
   }
 
-  private resolveAddressInputPlaceholder(): string {
+  private resolveAddressInputPlaceholder(): ResourceStr {
     return this.addressInputAdapterActive ? this.liveAddressPlaceholder : '';
   }
 
@@ -3683,7 +3692,7 @@ export struct BrowserBottomAddressPanel {
   }
 
   private resolveAddressTextColor(): ResourceColor {
-    return this.getAddressText().length > 0 ? this.resolvePrimaryTextColor() : this.resolveSecondaryTextColor();
+    return resourceStrPresent(this.getAddressText()) ? this.resolvePrimaryTextColor() : this.resolveSecondaryTextColor();
   }
 
   private resolveHeaderButtonEnterScale(): number {

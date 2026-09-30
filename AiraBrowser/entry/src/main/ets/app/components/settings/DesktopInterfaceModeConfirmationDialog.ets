@@ -19,7 +19,7 @@ export struct DesktopInterfaceModeConfirmationDialog {
   build() {
     Column({ space: 16 }) {
       Column({ space: 8 }) {
-        Text('在手机上使用桌面界面？')
+        Text($r('app.string.settings_desktop_on_phone_title'))
           .width('100%')
           .fontSize(20)
           .fontWeight(FontWeight.Bold)
@@ -28,7 +28,7 @@ export struct DesktopInterfaceModeConfirmationDialog {
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-        Text('桌面界面主要为大屏和鼠标键盘设计。手机屏幕上可能出现内容过密、按钮过小或部分页面布局不适配。')
+        Text($r('app.string.settings_desktop_on_phone_message'))
           .width('100%')
           .fontSize(14)
           .lineHeight(20)
@@ -81,7 +81,7 @@ export struct DesktopInterfaceModeConfirmationDialog {
         .height(20)
         .hitTestBehavior(HitTestMode.None)
 
-      Text('我了解桌面界面在手机上可能显示异常')
+      Text($r('app.string.settings_desktop_on_phone_ack'))
         .layoutWeight(1)
         .fontSize(14)
         .lineHeight(20)

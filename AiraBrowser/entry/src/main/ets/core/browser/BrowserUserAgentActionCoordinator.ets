@@ -22,6 +22,7 @@ import {
   BrowserDesktopSiteModeSheetViewModel
 } from './BrowserDesktopSiteModeSheetViewModel';
 import { BrowserWebPageToolsCoordinator } from './BrowserWebPageToolsCoordinator';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { BrowserBrowsingIdentityPolicyCoordinator } from './BrowserBrowsingIdentityPolicyCoordinator';
 import {
   BrowserUserAgentRuntimePolicyCoordinator,
@@ -224,7 +225,7 @@ export class BrowserUserAgentActionCoordinator {
       this.optimisticSettings = previousOptimisticSettings;
       this.userAgentPresetActionVersion += 1;
       this.publishPresentation();
-      this.showToast('网页标识保存失败。');
+      this.showToast(resolveAppResourceText($r('app.string.web_ua_save_failed')));
       return;
     }
     this.optimisticSettings = undefined;
@@ -232,7 +233,10 @@ export class BrowserUserAgentActionCoordinator {
     this.desktopSiteActionVersion += 1;
     this.userAgentPresetActionVersion += 1;
     this.publishPresentation(undefined, savedSettings);
-    await this.handleRuntimeChangeCommitted(`已切换为${this.userAgentService.resolveSettingsSummary(savedSettings)}。`);
+    await this.handleRuntimeChangeCommitted(resolveAppResourceText($r(
+      'app.string.web_ua_switched_to',
+      this.resolveResourceText(this.userAgentSettingsViewModel.resolveSettingsSummary(savedSettings))
+    )));
   }
 
   private publishPresentation(
@@ -257,7 +261,7 @@ export class BrowserUserAgentActionCoordinator {
       userAgentPresetActionVersion: this.userAgentPresetActionVersion,
       desktopSiteModeSheetState: this.desktopSiteModeSheetViewModel.buildState(
         desktopSiteMode,
-        this.userAgentService.resolveSettingsSummary(normalizedSettings)
+        this.resolveResourceText(this.userAgentSettingsViewModel.resolveSettingsSummary(normalizedSettings))
       ),
       userAgentPresetSheetState: this.userAgentSettingsViewModel.buildState(normalizedSettings),
       selectedPresetId: normalizedSettings.defaultMode === 'custom'
@@ -289,7 +293,7 @@ export class BrowserUserAgentActionCoordinator {
     if (normalizedTabId.length === 0 || host.length === 0 || origin.length === 0) {
       return {
         ok: false,
-        message: '打开网页后可设置网站版本。'
+        message: resolveAppResourceText($r('app.string.web_ua_open_page_first'))
       };
     }
     const identityId = mode === 'desktop' ? DESKTOP_CHROME_USER_AGENT_PRESET_ID :
@@ -316,12 +320,12 @@ export class BrowserUserAgentActionCoordinator {
 
   private resolveSavedMessage(mode: BrowserDesktopSiteMode): string {
     if (mode === 'desktop') {
-      return '当前标签页已临时使用桌面版。';
+      return resolveAppResourceText($r('app.string.web_ua_temp_desktop'));
     }
     if (mode === 'mobile') {
-      return '当前标签页已临时使用移动版。';
+      return resolveAppResourceText($r('app.string.web_ua_temp_mobile'));
     }
-    return '当前标签页已跟随默认。';
+    return resolveAppResourceText($r('app.string.web_ua_temp_default'));
   }
 
   private async handleRuntimeChangeCommitted(
@@ -335,7 +339,7 @@ export class BrowserUserAgentActionCoordinator {
     }
     if (result.status === 'identity_unchanged') {
       this.showToast(result.resolution.winningSource === 'mandatory_host'
-        ? '网页标识选择已保存；当前网站继续使用 Aira 兼容标识。'
+        ? resolveAppResourceText($r('app.string.web_ua_runtime_identity_unchanged'))
         : message);
       return;
     }
@@ -343,10 +347,14 @@ export class BrowserUserAgentActionCoordinator {
       return;
     }
     if (result.status === 'transition_deferred') {
-      this.showToast('网页标识选择已保存。为保留返回与前进历史，当前标签仍使用原网页标识；Web 运行时重建后生效。');
+      this.showToast(resolveAppResourceText($r('app.string.web_ua_runtime_deferred')));
       return;
     }
     this.showToast(message);
+  }
+
+  private resolveResourceText(value: ResourceStr): string {
+    return typeof value === 'string' ? value : resolveAppResourceText(value);
   }
 
   private showToast(message: string): void {

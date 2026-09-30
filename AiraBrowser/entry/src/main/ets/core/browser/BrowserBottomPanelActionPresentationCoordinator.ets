@@ -4,10 +4,7 @@ import {
   BrowserThemeMode,
   BrowserUserAgentSettings
 } from '../../common/models/BrowserModels';
-import {
-  BrowserDesktopSiteMode,
-  BrowserUserAgentService
-} from '../../services/web/BrowserUserAgentService';
+import { BrowserDesktopSiteMode } from '../../services/web/BrowserUserAgentService';
 import { AppChromeIconTone } from '../resources/AppIconResources';
 import { AiraRenderableIconId } from '../resources/GeneratedAiraIconCatalog';
 import { BrowserBookmarkActionState } from './BrowserBookmarkActionCoordinator';
@@ -40,6 +37,24 @@ import {
   BrowserToolbarCustomizationViewModel,
   BrowserToolbarSlotActionState
 } from './BrowserToolbarCustomizationViewModel';
+import { BrowserUserAgentSettingsViewModel } from '../settings/BrowserUserAgentSettingsViewModel';
+import {
+  bottomPanelActionSubtitle,
+  bottomPanelActionTitle,
+  bottomPanelBack,
+  bottomPanelExit,
+  bottomPanelExitPrivate,
+  bottomPanelFindUnavailable,
+  bottomPanelForward,
+  bottomPanelHideAdsUnavailable,
+  bottomPanelHideRuleCount,
+  bottomPanelInspectUnavailable,
+  bottomPanelReload,
+  bottomPanelTabs,
+  bottomPanelThemePage,
+  bottomPanelThemeTitle,
+  resourceStrKey
+} from './BrowserBottomPanelText';
 
 export interface BrowserBottomPanelActionSurfaceInput {
   activeTabIsWebPage: boolean;
@@ -134,7 +149,7 @@ export class BrowserBottomPanelActionPresentationCoordinator {
     new BrowserWebSurfaceActionEntryViewModel();
   private webpageTranslationEntryViewModel: WebpageTranslationEntryViewModel =
     new WebpageTranslationEntryViewModel();
-  private userAgentService: BrowserUserAgentService = new BrowserUserAgentService();
+  private userAgentSettingsViewModel: BrowserUserAgentSettingsViewModel = new BrowserUserAgentSettingsViewModel();
   private screenOrientationViewModel: BrowserScreenOrientationViewModel = new BrowserScreenOrientationViewModel();
   private textZoomViewModel: BrowserWebTextZoomViewModel = new BrowserWebTextZoomViewModel();
   private desktopSiteModeViewModel: BrowserDesktopSiteModeSheetViewModel =
@@ -285,11 +300,11 @@ export class BrowserBottomPanelActionPresentationCoordinator {
     };
     const findAction: BrowserBottomPanelActionEnablement = {
       enabled: input.pageFindEnabled,
-      disabledMessage: input.pageFindEnabled ? '' : '当前页面暂不可查找'
+      disabledMessage: input.pageFindEnabled ? '' : bottomPanelFindUnavailable()
     };
     const manualElementHideAction: BrowserBottomPanelActionEnablement = {
       enabled: input.manualElementHideEnabled,
-      disabledMessage: input.manualElementHideEnabled ? '' : '当前页面无法标记广告'
+      disabledMessage: input.manualElementHideEnabled ? '' : bottomPanelHideAdsUnavailable()
     };
     const result: BrowserBottomPanelActionEnablementById = {};
     result.bookmark = bookmarkAction;
@@ -314,7 +329,7 @@ export class BrowserBottomPanelActionPresentationCoordinator {
     result.manualElementHide = manualElementHideAction;
     result.elementInspection = {
       enabled: input.elementInspectionEnabled,
-      disabledMessage: input.elementInspectionEnabled ? '' : '当前页面暂不可审查元素'
+      disabledMessage: input.elementInspectionEnabled ? '' : bottomPanelInspectUnavailable()
     };
     result.translate = translationAction;
     result.reader = webPageAction;
@@ -443,16 +458,16 @@ export class BrowserBottomPanelActionPresentationCoordinator {
     }
     if (state.effectiveHomeMode) {
       return [
-        this.buildHeaderAction('webBack', '返回', $r('sys.symbol.chevron_left'), false, '',
+        this.buildHeaderAction('webBack', bottomPanelBack(), $r('sys.symbol.chevron_left'), false, '',
           'reliableTrigger', 'browser.toolbar.back'),
-        this.buildHeaderAction('webForward', '前进', $r('sys.symbol.chevron_right'), false, '',
+        this.buildHeaderAction('webForward', bottomPanelForward(), $r('sys.symbol.chevron_right'), false, '',
           'reliableTrigger', 'browser.toolbar.forward')
       ];
     }
     return [
-      this.buildHeaderAction('webBack', '返回', $r('sys.symbol.chevron_left'), state.canGoBack, '',
+      this.buildHeaderAction('webBack', bottomPanelBack(), $r('sys.symbol.chevron_left'), state.canGoBack, '',
         'reliableTrigger', 'browser.toolbar.back'),
-      this.buildHeaderAction('webForward', '前进', $r('sys.symbol.chevron_right'), state.canGoForward, '',
+      this.buildHeaderAction('webForward', bottomPanelForward(), $r('sys.symbol.chevron_right'), state.canGoForward, '',
         'reliableTrigger', 'browser.toolbar.forward')
     ];
   }
@@ -463,17 +478,17 @@ export class BrowserBottomPanelActionPresentationCoordinator {
     }
     if (state.effectiveHomeMode) {
       return [
-        this.buildHeaderAction('webReload', '刷新', $r('sys.symbol.arrow_clockwise'), true, '',
+        this.buildHeaderAction('webReload', bottomPanelReload(), $r('sys.symbol.arrow_clockwise'), true, '',
           'enabledState', 'browser.toolbar.refresh'),
-        this.buildHeaderAction('openTabs', '标签页', $r('sys.symbol.rectangle_on_rectangle_fill'), true, '',
+        this.buildHeaderAction('openTabs', bottomPanelTabs(), $r('sys.symbol.rectangle_on_rectangle_fill'), true, '',
           'enabledState', 'browser.toolbar.tabs')
       ];
     }
     return [
-      this.buildHeaderAction('webReload', '刷新', $r('sys.symbol.arrow_clockwise'), true, '',
+      this.buildHeaderAction('webReload', bottomPanelReload(), $r('sys.symbol.arrow_clockwise'), true, '',
         'enabledState', 'browser.toolbar.refresh'),
-      this.buildHeaderAction('openTabs', '标签页', $r('sys.symbol.rectangle_on_rectangle_fill'), true, '',
-      'enabledState', 'browser.toolbar.tabs')
+      this.buildHeaderAction('openTabs', bottomPanelTabs(), $r('sys.symbol.rectangle_on_rectangle_fill'), true, '',
+        'enabledState', 'browser.toolbar.tabs')
     ];
   }
 
@@ -507,29 +522,31 @@ export class BrowserBottomPanelActionPresentationCoordinator {
       bookmarksActionSelected: actionEnablement.bookmark?.enabled === true && input.bookmarkActionState.hasBookmark,
       bookmarksActionVersion: input.bookmarkActionVersion,
       appProxyActive: input.appProxyActive,
-      userAgentActionLabel: '网站版本',
+      userAgentActionLabel: bottomPanelActionTitle('userAgent'),
       userAgentActionTrailingText: this.desktopSiteModeViewModel.resolveToolbarLabel(input.desktopSiteMode),
       userAgentActionIcon: this.resolveUserAgentActionIcon(input.desktopSiteMode),
       userAgentActionVersion: input.userAgentActionVersion,
-      textZoomActionLabel: '网页文字大小',
+      textZoomActionLabel: bottomPanelActionTitle('textZoom'),
       textZoomActionTrailingText: this.textZoomViewModel.buildState(input.textZoomRatio).percentLabel,
       textZoomActionIcon: $r('sys.symbol.doc_text_fill'),
       textZoomActionVersion: input.textZoomActionVersion,
-      userAgentPresetActionLabel: '网页标识',
-      userAgentPresetActionTrailingText: this.userAgentService.resolveSettingsSummary(input.userAgentPresetSettings),
+      userAgentPresetActionLabel: bottomPanelActionTitle('userAgentPreset'),
+      userAgentPresetActionTrailingText: this.userAgentSettingsViewModel.resolveSettingsSummary(input.userAgentPresetSettings),
       userAgentPresetActionIcon: this.resolveUserAgentPresetActionIcon(input.userAgentPresetSettings),
       userAgentPresetActionVersion: input.userAgentPresetActionVersion,
-      screenOrientationActionLabel: '屏幕方向',
+      screenOrientationActionLabel: bottomPanelActionTitle('screenOrientation'),
       screenOrientationActionTrailingText: this.screenOrientationViewModel.resolveLabel(input.screenOrientationMode),
       screenOrientationActionIcon: this.screenOrientationViewModel.resolveIcon(input.screenOrientationMode),
       screenOrientationActionVersion: input.screenOrientationActionVersion,
-      themeModeActionLabel: '网页外观',
+      themeModeActionLabel: bottomPanelThemePage(),
       themeModeActionTrailingText: this.resolveThemeModeActionTrailingText(input.themeMode, input.resolvedThemeMode),
       themeModeActionIcon: input.themeMode === 'system' ?
         this.resolveSystemThemeModeActionIcon(input.resolvedThemeMode) : input.themeModeIcon,
       themeModeActionVersion: input.themeModeActionVersion,
-      fullScreenModeActionLabel: input.fullScreenModeEnabled ? '退出全屏模式' : '全屏模式',
-      fullScreenModeActionTrailingText: input.fullScreenModeEnabled ? '已开启' : '沉浸浏览',
+      fullScreenModeEnabled: input.fullScreenModeEnabled,
+      fullScreenModeActionLabel: input.fullScreenModeEnabled ?
+        $r('app.string.bottom_panel_exit_fullscreen') : bottomPanelActionTitle('fullScreenMode'),
+      fullScreenModeActionTrailingText: $r('app.string.bottom_panel_action_full_screen_mode_subtitle'),
       fullScreenModeActionIcon: input.fullScreenModeEnabled ?
         $r('sys.symbol.exit_full_screen') :
         $r('sys.symbol.fullscreen'),
@@ -552,19 +569,19 @@ export class BrowserBottomPanelActionPresentationCoordinator {
       input.readerModeEnabled ? 'reader=1' : 'reader=0',
       input.webpageTranslationEnabled ? 'translate=1' : 'translate=0',
       input.offlinePageSaveEnabled ? 'offline=1' : 'offline=0',
-      `offlineMessage=${input.offlinePageSaveDisabledMessage}`,
+      `offlineMessage=${resourceStrKey(input.offlinePageSaveDisabledMessage)}`,
       input.bookmarksEnabled ? 'bookmark=1' : 'bookmark=0',
       input.bookmarksActionSelected === true ? 'bookmarkSelected=1' : 'bookmarkSelected=0',
-      `bookmarkLabel=${input.bookmarksActionLabel}`,
-      `bookmarkMessage=${input.bookmarksActionDisabledMessage}`,
+      `bookmarkLabel=${resourceStrKey(input.bookmarksActionLabel)}`,
+      `bookmarkMessage=${resourceStrKey(input.bookmarksActionDisabledMessage)}`,
       `bookmarkVersion=${input.bookmarksActionVersion ?? 0}`,
       input.appProxyActive === true ? 'proxy=1' : 'proxy=0',
-      `ua=${input.userAgentActionLabel}:${input.userAgentActionTrailingText}:${input.userAgentActionVersion ?? 0}`,
-      `textZoom=${input.textZoomActionTrailingText}:${input.textZoomActionVersion ?? 0}`,
-      `uaPreset=${input.userAgentPresetActionTrailingText}:${input.userAgentPresetActionVersion ?? 0}`,
-      `orientation=${input.screenOrientationActionTrailingText}:${input.screenOrientationActionVersion ?? 0}`,
-      `theme=${input.themeModeActionTrailingText}:${input.themeModeActionVersion ?? 0}`,
-      `fullScreen=${input.fullScreenModeActionLabel}:${input.fullScreenModeActionVersion ?? 0}`
+      `ua=${resourceStrKey(input.userAgentActionLabel)}:${resourceStrKey(input.userAgentActionTrailingText)}:${input.userAgentActionVersion ?? 0}`,
+      `textZoom=${resourceStrKey(input.textZoomActionTrailingText)}:${input.textZoomActionVersion ?? 0}`,
+      `uaPreset=${resourceStrKey(input.userAgentPresetActionTrailingText)}:${input.userAgentPresetActionVersion ?? 0}`,
+      `orientation=${resourceStrKey(input.screenOrientationActionTrailingText)}:${input.screenOrientationActionVersion ?? 0}`,
+      `theme=${resourceStrKey(input.themeModeActionTrailingText)}:${input.themeModeActionVersion ?? 0}`,
+      `fullScreen=${input.fullScreenModeEnabled === true ? '1' : '0'}:${input.fullScreenModeActionVersion ?? 0}`
     ].join('|');
   }
 
@@ -574,7 +591,7 @@ export class BrowserBottomPanelActionPresentationCoordinator {
       if (state === undefined) {
         return `${actionId}=missing`;
       }
-      return `${actionId}=${state.enabled ? '1' : '0'}:${state.disabledMessage}`;
+      return `${actionId}=${state.enabled ? '1' : '0'}:${resourceStrKey(state.disabledMessage)}`;
     }).join(',');
   }
 
@@ -582,8 +599,8 @@ export class BrowserBottomPanelActionPresentationCoordinator {
     return [
       {
         id: 'home',
-        title: '主页',
-        trailingText: '新标签',
+        title: bottomPanelActionTitle('home'),
+        trailingText: bottomPanelActionSubtitle('home'),
         icon: $r('sys.symbol.house_fill'),
         airaIconId: 'browser.shortcut.home',
         enabled: true,
@@ -591,8 +608,8 @@ export class BrowserBottomPanelActionPresentationCoordinator {
       },
       {
         id: 'viewerInfo',
-        title: '文件信息',
-        trailingText: '只读查看',
+        title: bottomPanelActionTitle('viewerInfo'),
+        trailingText: bottomPanelActionSubtitle('viewerInfo'),
         icon: $r('sys.symbol.info_circle'),
         airaIconId: 'browser.toolbar.siteInfo',
         enabled: true,
@@ -601,14 +618,8 @@ export class BrowserBottomPanelActionPresentationCoordinator {
     ];
   }
 
-  resolveThemeModeActionTitleForMode(mode: BrowserThemeMode): string {
-    if (mode === 'light') {
-      return '浅色模式';
-    }
-    if (mode === 'dark') {
-      return '深色模式';
-    }
-    return '跟随系统外观';
+  resolveThemeModeActionTitleForMode(mode: BrowserThemeMode): ResourceStr {
+    return bottomPanelThemeTitle(mode);
   }
 
   private resolveUserAgentActionIcon(mode: BrowserDesktopSiteMode): Resource {
@@ -633,9 +644,9 @@ export class BrowserBottomPanelActionPresentationCoordinator {
   private resolveThemeModeActionTrailingText(
     mode: BrowserThemeMode,
     resolvedThemeMode: BrowserResolvedThemeMode
-  ): string {
+  ): ResourceStr {
     if (mode === 'system') {
-      return resolvedThemeMode === 'dark' ? '深色模式' : '浅色模式';
+      return bottomPanelThemeTitle(resolvedThemeMode);
     }
     return this.resolveThemeModeActionTitleForMode(mode);
   }
@@ -653,8 +664,8 @@ export class BrowserBottomPanelActionPresentationCoordinator {
         const privateModeActive = state.privateModeActive;
         return {
           id: action.id,
-          title: privateModeActive ? '退出隐私模式' : '隐私模式',
-          trailingText: privateModeActive ? '退出' : '私密',
+          title: privateModeActive ? bottomPanelExitPrivate() : bottomPanelActionTitle('newPrivateTab'),
+          trailingText: privateModeActive ? bottomPanelExit() : bottomPanelActionSubtitle('newPrivateTab'),
           icon: action.icon,
           airaIconId: 'browser.toolbar.privacyMode',
           enabled: action.enabled,
@@ -680,24 +691,24 @@ export class BrowserBottomPanelActionPresentationCoordinator {
       const ruleCount = state.manualElementHideRuleCount;
       return {
         id: action.id,
-        title: '标记广告',
-        trailingText: ruleCount > 0 ? `${ruleCount} 条` : '手动隐藏',
+        title: bottomPanelActionTitle('manualElementHide'),
+        trailingText: ruleCount > 0 ? bottomPanelHideRuleCount(ruleCount) : bottomPanelActionSubtitle('manualElementHide'),
         icon: action.icon,
         imageIcon: action.imageIcon,
         airaIconId: action.airaIconId,
         enabled: state.manualElementHideEnabled,
-        disabledMessage: '当前页面无法标记广告',
+        disabledMessage: bottomPanelHideAdsUnavailable(),
         selected: false,
         renderVersion: ruleCount
       };
     });
   }
 
-  private resolveSiteSecurityTitle(currentUrl: string, addressInput: string): string {
+  private resolveSiteSecurityTitle(currentUrl: string, addressInput: string): ResourceStr {
     if (this.isSecureCurrentSite(currentUrl, addressInput)) {
-      return '访问安全';
+      return $r('app.string.bottom_panel_secure');
     }
-    return '连接未验证';
+    return $r('app.string.bottom_panel_unverified');
   }
 
   private resolveSiteSecurityIcon(currentUrl: string, addressInput: string): Resource {
@@ -713,10 +724,10 @@ export class BrowserBottomPanelActionPresentationCoordinator {
 
   private buildHeaderAction(
     id: string,
-    title: string,
+    title: ResourceStr,
     icon: Resource,
     enabled: boolean,
-    disabledMessage: string,
+    disabledMessage: ResourceStr,
     triggerPolicy: 'enabledState' | 'reliableTrigger',
     airaIconId: AiraRenderableIconId
   ): BrowserBottomAddressPanelHeaderAction {

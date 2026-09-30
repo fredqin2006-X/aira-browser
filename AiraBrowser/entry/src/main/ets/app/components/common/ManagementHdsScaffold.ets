@@ -1,4 +1,5 @@
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { common } from '@kit.AbilityKit';
 import {
   BlurStrategy,
@@ -30,7 +31,7 @@ import {
 export type ManagementHdsBackIconKind = 'close' | 'back';
 
 export interface ManagementHdsMenuAction {
-  label: string;
+  label: ResourceStr;
   icon?: Resource;
   enabled?: boolean;
   action: () => void;
@@ -55,7 +56,7 @@ export function resolveManagementImmersiveTitleBottomInset(topSafeInsetVp: numbe
 @Component
 export struct ManagementHdsScaffold {
   @StorageProp(BROWSER_THEME_STORAGE_RESOLVED_MODE_KEY) private storedResolvedThemeMode: string = 'light';
-  @Prop title: string = '';
+  @Prop title: ResourceStr = '';
   @Prop backIconKind: ManagementHdsBackIconKind = 'close';
   @Prop pageBackground: ResourceColor = DEFAULT_THEME_PALETTE.light.pageBackground;
   @Prop primaryTextColor: ResourceColor = '#111318';
@@ -326,7 +327,7 @@ export struct ManagementHdsScaffold {
         .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
         .borderRadius(MANAGEMENT_TITLE_ACTION_SIZE / 2)
         .stateEffect(true)
-        .accessibilityText(this.resolveBackLabel())
+        .accessibilityText(resolveAppResourceText(this.resolveBackLabel()))
         .onClick(() => {
           this.onBack();
         })
@@ -346,7 +347,7 @@ export struct ManagementHdsScaffold {
     Row({ space: MANAGEMENT_TITLE_ACTION_GAP }) {
       ForEach(this.resolveDirectMenuActions(), (menuAction: ManagementHdsMenuAction) => {
         this.buildGlassMenuAction(menuAction)
-      }, (menuAction: ManagementHdsMenuAction) => menuAction.label)
+      }, (_menuAction: ManagementHdsMenuAction, index: number) => `menu-${index}`)
       if (this.resolveOverflowMenuActions().length > 0) {
         this.buildGlassOverflowAction()
       }
@@ -391,7 +392,7 @@ export struct ManagementHdsScaffold {
         .borderRadius(MANAGEMENT_TITLE_ACTION_SIZE / 2)
         .stateEffect(true)
         .enabled(menuAction.enabled !== false)
-        .accessibilityText(menuAction.label)
+        .accessibilityText(resolveAppResourceText(menuAction.label))
         .onClick(() => {
           if (menuAction.enabled !== false) {
             menuAction.action();
@@ -431,7 +432,7 @@ export struct ManagementHdsScaffold {
         .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
         .borderRadius(MANAGEMENT_TITLE_ACTION_SIZE / 2)
         .stateEffect(true)
-        .accessibilityText('更多操作')
+        .accessibilityText($r('app.string.settings_more_actions'))
         .bindMenu(this.buildOverflowMenu())
       }
     }
@@ -450,7 +451,7 @@ export struct ManagementHdsScaffold {
               menuAction.action();
             }
           })
-      }, (menuAction: ManagementHdsMenuAction) => menuAction.label)
+      }, (_menuAction: ManagementHdsMenuAction, index: number) => `overflow-${index}`)
     }
     .backgroundColor(resolveFloatingGlassMaterialBackgroundColor(
       $r('app.color.surface_floating_background')
@@ -484,7 +485,7 @@ export struct ManagementHdsScaffold {
     .width(MANAGEMENT_TITLE_ACTION_SIZE)
     .height(MANAGEMENT_TITLE_ACTION_SIZE)
     .hitTestBehavior(HitTestMode.None)
-    .accessibilityText('私密会话')
+    .accessibilityText($r('app.string.ui_private_session'))
   }
 
   private refreshTopSafeInset(): void {
@@ -518,8 +519,8 @@ export struct ManagementHdsScaffold {
     return [this.fallbackScroller];
   }
 
-  private resolveBackLabel(): string {
-    return this.backIconKind === 'close' ? '关闭' : '返回';
+  private resolveBackLabel(): ResourceStr {
+    return this.backIconKind === 'close' ? $r('app.string.ui_close') : $r('app.string.settings_sync_back');
   }
 
   private resolveBackIcon(): Resource {

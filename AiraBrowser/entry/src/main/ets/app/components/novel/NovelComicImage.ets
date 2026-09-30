@@ -32,7 +32,7 @@ export struct NovelComicImage {
           .autoResize(true)
           .draggable(false)
       } else if (this.loadState === 'failed') {
-        Text('图片加载失败')
+        Text($r('app.string.novel_comic_image_failed'))
           .fontSize(14)
           .fontColor(this.primaryTextColor)
       } else {

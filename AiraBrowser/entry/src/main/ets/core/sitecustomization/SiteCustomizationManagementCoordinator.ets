@@ -13,6 +13,7 @@ import {
   normalizeBrowserSessionPrivacyMode
 } from '../../common/models/BrowserModels';
 import { BrowserSitePrivacyRuleRepository } from '../../data/browser/BrowserSitePrivacyRuleRepository';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { BrowserUserAgentSettingsRepository } from '../../data/browser/BrowserUserAgentSettingsRepository';
 import {
   SavedSiteSettingRepository,
@@ -193,11 +194,11 @@ export class SiteCustomizationManagementCoordinator {
   resolveManualTarget(value: string): SiteCustomizationManualTargetResult {
     const trimmed = value.trim();
     if (trimmed.length <= 0) {
-      return { errorMessage: '请输入站点地址。' };
+      return { errorMessage: resolveAppResourceText($r('app.string.settings_site_customization_error_address_required')) };
     }
     const target = this.resolveTarget(trimmed);
     if (target === undefined) {
-      return { errorMessage: '请输入有效的 HTTP 或 HTTPS 站点地址。' };
+      return { errorMessage: resolveAppResourceText($r('app.string.settings_site_customization_error_address_invalid')) };
     }
     return {
       target: target,
@@ -264,15 +265,19 @@ export class SiteCustomizationManagementCoordinator {
     const isUnreadable = unreadableEntry !== undefined;
     const summaryParts: string[] = [];
     if (isUnreadable) {
-      summaryParts.push('站点设置数据不可读，请重置后重新设置');
+      summaryParts.push(resolveAppResourceText($r('app.string.settings_site_customization_fragment_unreadable')));
     } else if (savedEntry !== undefined && savedEntry.overrides.userAgentIdentityId !== undefined) {
       summaryParts.push(this.resolveSavedIdentitySummary(savedEntry));
     }
     if (typeof savedEntry?.overrides.javaScriptEnabled === 'boolean') {
-      summaryParts.push(savedEntry.overrides.javaScriptEnabled ? 'JavaScript 已允许' : 'JavaScript 已阻止');
+      summaryParts.push(savedEntry.overrides.javaScriptEnabled
+        ? resolveAppResourceText($r('app.string.settings_site_customization_fragment_js_allowed'))
+        : resolveAppResourceText($r('app.string.settings_site_customization_fragment_js_blocked')));
     }
     if (privateSiteRule !== undefined) {
-      summaryParts.push(privateSiteRule.preserveCookiesOnClose ? '关闭后清除，保留 Cookie' : '关闭后清除');
+      summaryParts.push(privateSiteRule.preserveCookiesOnClose
+        ? resolveAppResourceText($r('app.string.settings_site_customization_fragment_clear_keep_cookies'))
+        : resolveAppResourceText($r('app.string.settings_site_customization_fragment_clear_on_close')));
     }
     const sessionPermissionSummary = this.buildPermissionSettingsSummary(sessionPermissionSettings);
     if (sessionPermissionSummary.length > 0) {
@@ -283,13 +288,17 @@ export class SiteCustomizationManagementCoordinator {
     return {
       host: normalizedHost,
       origin: siteControls.origin.length > 0 ? siteControls.origin : normalizedOrigin,
-      title: normalizedOrigin.length > 0 ? normalizedOrigin : normalizedHost.length > 0 ? normalizedHost : '当前站点',
-      summary: summaryParts.length > 0 ? summaryParts.join(' · ') : '还没有为这个站点设置过任何规则',
+      title: normalizedOrigin.length > 0
+        ? normalizedOrigin
+        : normalizedHost.length > 0 ? normalizedHost : resolveAppResourceText($r('app.string.settings_site_customization_current_site')),
+      summary: summaryParts.length > 0
+        ? summaryParts.join(' · ')
+        : resolveAppResourceText($r('app.string.settings_site_customization_summary_empty')),
       externalNavigationPolicy: this.resolveExternalNavigationPolicy(externalNavigationState),
       hasExternalNavigationRule: externalNavigationState?.hasSiteRule ?? false,
       desktopSiteSummary: savedEntry !== undefined && savedEntry.overrides.userAgentIdentityId !== undefined
         ? this.resolveSavedIdentitySummary(savedEntry)
-        : '跟随全局',
+        : resolveAppResourceText($r('app.string.settings_site_customization_follow_global')),
       hasDesktopSiteRule: savedEntry !== undefined && savedEntry.overrides.userAgentIdentityId !== undefined,
       javaScriptPolicy: this.resolveJavaScriptPolicy(savedEntry),
       hasJavaScriptRule: typeof savedEntry?.overrides.javaScriptEnabled === 'boolean',
@@ -611,7 +620,7 @@ export class SiteCustomizationManagementCoordinator {
     if (unreadableEntry !== undefined) {
       const reset = await this.savedSiteSettingRepository.resetUnreadableEntry(normalizedOrigin, profileId);
       if (!reset) {
-        throw new Error('站点设置已被其他窗口修改，请刷新后重试。');
+        throw new Error(resolveAppResourceText($r('app.string.settings_site_customization_error_stale')));
       }
     }
     const externalNavigationSettings = this.preferencesRepository.getPreferences().externalNavigation;
@@ -650,7 +659,7 @@ export class SiteCustomizationManagementCoordinator {
     if (unreadableEntry !== undefined) {
       const reset = await this.savedSiteSettingRepository.resetUnreadableEntry(normalizedOrigin, profileId);
       if (!reset) {
-        throw new Error('站点设置已被其他窗口修改，请刷新后重试。');
+        throw new Error(resolveAppResourceText($r('app.string.settings_site_customization_error_stale')));
       }
     }
     const externalNavigationSettings = this.preferencesRepository.getPreferences().externalNavigation;
@@ -802,52 +811,68 @@ export class SiteCustomizationManagementCoordinator {
         id: aggregate.origin.length > 0 ? aggregate.origin : aggregate.host,
         host: aggregate.host,
         origin: aggregate.origin,
-        title: aggregate.origin.length > 0 ? aggregate.origin : aggregate.host.length > 0 ? aggregate.host : '未知站点',
-        value: '站点设置数据不可读',
-        helperText: '打开后可重置此记录',
+        title: aggregate.origin.length > 0
+          ? aggregate.origin
+          : aggregate.host.length > 0 ? aggregate.host : resolveAppResourceText($r('app.string.settings_site_controls_unknown_site')),
+        value: resolveAppResourceText($r('app.string.settings_site_customization_value_unreadable')),
+        helperText: resolveAppResourceText($r('app.string.settings_site_customization_helper_resettable')),
         updatedAt: aggregate.updatedAt,
         isEnabled: true
       };
     }
     const valueParts: string[] = [];
     if (aggregate.externalNavigationRule !== undefined) {
-      valueParts.push(`打开应用${this.getExternalNavigationPolicyLabel(aggregate.externalNavigationRule.policy)}`);
+      valueParts.push(resolveAppResourceText(
+        $r('app.string.settings_site_controls_fragment_external_actions'),
+        this.getExternalNavigationPolicyLabel(aggregate.externalNavigationRule.policy)
+      ));
     }
     if (aggregate.savedEntry !== undefined && aggregate.savedEntry.overrides.userAgentIdentityId !== undefined) {
       valueParts.push(this.resolveSavedIdentitySummary(aggregate.savedEntry));
     }
     if (typeof aggregate.savedEntry?.overrides.javaScriptEnabled === 'boolean') {
-      valueParts.push(aggregate.savedEntry.overrides.javaScriptEnabled ? 'JavaScript 允许' : 'JavaScript 阻止');
+      valueParts.push(aggregate.savedEntry.overrides.javaScriptEnabled
+        ? resolveAppResourceText($r('app.string.settings_site_customization_fragment_js_allow'))
+        : resolveAppResourceText($r('app.string.settings_site_customization_fragment_js_block')));
     }
     if (aggregate.privateSiteRule !== undefined) {
-      valueParts.push(aggregate.privateSiteRule.preserveCookiesOnClose ? '关闭后清除，保留 Cookie' : '关闭后清除');
+      valueParts.push(aggregate.privateSiteRule.preserveCookiesOnClose
+        ? resolveAppResourceText($r('app.string.settings_site_customization_fragment_clear_keep_cookies'))
+        : resolveAppResourceText($r('app.string.settings_site_customization_fragment_clear_on_close')));
     }
     if (aggregate.permissionSettings.length > 0) {
-      valueParts.push(`${aggregate.permissionSettings.length} 项权限`);
+      valueParts.push(resolveAppResourceText(
+        $r('app.string.settings_site_customization_fragment_permission_count'),
+        aggregate.permissionSettings.length
+      ));
     }
     const helperParts: string[] = [];
     if (aggregate.externalNavigationRule !== undefined) {
-      helperParts.push('打开应用');
+      helperParts.push(resolveAppResourceText($r('app.string.settings_site_controls_group_open_app')));
     }
     if (aggregate.savedEntry !== undefined && aggregate.savedEntry.overrides.userAgentIdentityId !== undefined) {
-      helperParts.push('网页标识');
+      helperParts.push(resolveAppResourceText($r('app.string.settings_site_customization_helper_identity')));
     }
     if (typeof aggregate.savedEntry?.overrides.javaScriptEnabled === 'boolean') {
       helperParts.push('JavaScript');
     }
     if (aggregate.privateSiteRule !== undefined) {
-      helperParts.push('关闭后清除');
+      helperParts.push(resolveAppResourceText($r('app.string.settings_site_customization_fragment_clear_on_close')));
     }
     if (aggregate.permissionSettings.length > 0) {
-      helperParts.push('权限');
+      helperParts.push(resolveAppResourceText($r('app.string.settings_site_customization_helper_permissions')));
     }
     return {
       id: aggregate.origin.length > 0 ? aggregate.origin : aggregate.host,
       host: aggregate.host,
       origin: aggregate.origin,
-      title: aggregate.origin.length > 0 ? aggregate.origin : aggregate.host.length > 0 ? aggregate.host : '未知站点',
-      value: valueParts.length > 0 ? valueParts.join(' · ') : '已自定义',
-      helperText: helperParts.length > 0 ? helperParts.join(' · ') : '点开继续管理',
+      title: aggregate.origin.length > 0
+        ? aggregate.origin
+        : aggregate.host.length > 0 ? aggregate.host : resolveAppResourceText($r('app.string.settings_site_controls_unknown_site')),
+      value: valueParts.length > 0 ? valueParts.join(' · ') : resolveAppResourceText($r('app.string.settings_site_customization_value_customized')),
+      helperText: helperParts.length > 0
+        ? helperParts.join(' · ')
+        : resolveAppResourceText($r('app.string.settings_site_controls_fragment_tap_to_manage')),
       updatedAt: aggregate.updatedAt,
       isEnabled: true
     };
@@ -861,7 +886,9 @@ export class SiteCustomizationManagementCoordinator {
       id: `${capabilityId}:${aggregate.origin.length > 0 ? aggregate.origin : aggregate.host}`,
       host: aggregate.host,
       origin: aggregate.origin,
-      title: aggregate.origin.length > 0 ? aggregate.origin : aggregate.host.length > 0 ? aggregate.host : '未知站点',
+      title: aggregate.origin.length > 0
+        ? aggregate.origin
+        : aggregate.host.length > 0 ? aggregate.host : resolveAppResourceText($r('app.string.settings_site_controls_unknown_site')),
       value: this.buildCapabilityValue(aggregate, capabilityId),
       helperText: '',
       updatedAt: this.resolveCapabilityUpdatedAt(aggregate, capabilityId),
@@ -891,14 +918,18 @@ export class SiteCustomizationManagementCoordinator {
   ): string {
     if (capabilityId === 'external_actions') {
       return aggregate.externalNavigationRule === undefined
-        ? '询问'
+        ? resolveAppResourceText($r('app.string.settings_site_capability_rule_ask'))
         : this.getExternalNavigationPolicyLabel(aggregate.externalNavigationRule.policy);
     }
     if (capabilityId === 'desktop_site') {
-      return aggregate.savedEntry === undefined ? '跟随全局' : this.resolveSavedIdentitySummary(aggregate.savedEntry);
+      return aggregate.savedEntry === undefined
+        ? resolveAppResourceText($r('app.string.settings_site_customization_follow_global'))
+        : this.resolveSavedIdentitySummary(aggregate.savedEntry);
     }
     if (capabilityId === 'javascript') {
-      return aggregate.savedEntry?.overrides.javaScriptEnabled === true ? '允许' : '阻止';
+      return aggregate.savedEntry?.overrides.javaScriptEnabled === true
+        ? resolveAppResourceText($r('app.string.settings_site_capability_rule_allow'))
+        : resolveAppResourceText($r('app.string.settings_site_capability_rule_block'));
     }
     return this.sitePrivacyRuleService.resolveRuleSummary(aggregate.privateSiteRule);
   }
@@ -1148,7 +1179,7 @@ export class SiteCustomizationManagementCoordinator {
     const identityId = entry.overrides.userAgentIdentityId ?? '';
     const identity = this.userAgentService.getIdentityCatalog(this.userAgentSettingsRepository.getSettings())
       .find((item: BrowserUserAgentIdentity) => item.id === identityId);
-    return identity?.title ?? '不可用的网页标识';
+    return identity?.title ?? resolveAppResourceText($r('app.string.settings_site_customization_identity_unavailable'));
   }
 
   private resolveJavaScriptPolicy(entry: SavedSiteSettingEntry | undefined): SiteJavaScriptPolicy {

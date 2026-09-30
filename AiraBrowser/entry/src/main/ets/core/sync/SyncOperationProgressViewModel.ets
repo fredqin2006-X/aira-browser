@@ -35,7 +35,10 @@ export class SyncOperationProgressViewModel {
     return target;
   }
 
-  resolveTimeoutMessage(title: string): string {
+  resolveTimeoutMessage(title: ResourceStr): string {
+    if (typeof title !== 'string') {
+      return '同步等待时间过长，请检查网络或稍后再试。';
+    }
     if (title.indexOf('上传') >= 0) {
       return '上传时间过长，请检查网络或 WebDAV 服务后再试。';
     }

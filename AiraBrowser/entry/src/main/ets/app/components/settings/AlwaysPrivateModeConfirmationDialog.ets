@@ -19,7 +19,7 @@ export struct AlwaysPrivateModeConfirmationDialog {
   build() {
     Column({ space: 16 }) {
       Column({ space: 8 }) {
-        Text('始终保持隐私模式')
+        Text($r('app.string.settings_always_private_title'))
           .width('100%')
           .fontSize(20)
           .fontWeight(FontWeight.Bold)
@@ -28,7 +28,7 @@ export struct AlwaysPrivateModeConfirmationDialog {
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-        Text('开启后，重新启动 Aira 会默认进入隐私模式。你仍然可以在本次使用中临时切换到普通模式，但下次启动会再次回到隐私模式。')
+        Text($r('app.string.settings_always_private_message'))
           .width('100%')
           .fontSize(14)
           .lineHeight(20)
@@ -41,7 +41,7 @@ export struct AlwaysPrivateModeConfirmationDialog {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '确认开启',
+          label: $r('app.string.settings_privacy_confirm_on'),
           emphasis: 'primary',
           stacked: true,
           actionEnabled: this.accepted,
@@ -55,7 +55,7 @@ export struct AlwaysPrivateModeConfirmationDialog {
         })
 
         BrowserSheetActionButton({
-          label: '取消',
+          label: $r('app.string.settings_account_cancel'),
           emphasis: 'ghost',
           stacked: true,
           buttonHeight: 44,
@@ -81,7 +81,7 @@ export struct AlwaysPrivateModeConfirmationDialog {
         .height(20)
         .hitTestBehavior(HitTestMode.None)
 
-      Text('我理解重启后会默认回到隐私模式')
+      Text($r('app.string.settings_always_private_ack'))
         .layoutWeight(1)
         .fontSize(14)
         .lineHeight(20)

@@ -105,44 +105,67 @@ export class AccountActivityHeatmapViewModel {
     return Math.max(1, scores[index]);
   }
 
-  private buildAccessibilityText(date: string, count: number): string {
+  private buildAccessibilityText(date: string, count: number): Resource {
     if (count <= 0) {
-      return `${date} 无活跃`;
+      return $r('app.string.settings_account_activity_a11y_none', date);
     }
-    return `${date} 活跃 ${count} 点`;
+    return $r('app.string.settings_account_activity_a11y_points', date, count);
   }
 
-  private buildTooltipText(date: string, count: number, level: number, isToday: boolean): string {
-    const dateText = this.formatDateLabel(date);
-    const activityText = count > 0 ? `活跃 ${count} 点 · ${this.resolveLevelLabel(level)}` : '暂无活跃记录';
-    if (isToday) {
-      return `今天 ${dateText}\n${activityText}`;
-    }
-    return `${dateText}\n${activityText}`;
-  }
-
-  private resolveLevelLabel(level: number): string {
-    if (level <= 0) {
-      return '未点亮';
-    }
-    if (level === 1) {
-      return '轻度';
-    }
-    if (level === 2) {
-      return '常用';
-    }
-    if (level === 3) {
-      return '活跃';
-    }
-    return '高活跃';
-  }
-
-  private formatDateLabel(date: string): string {
+  private buildTooltipText(date: string, count: number, level: number, isToday: boolean): ResourceStr {
     const month = Number(date.slice(5, 7));
     const day = Number(date.slice(8, 10));
     if (!Number.isFinite(month) || !Number.isFinite(day) || month <= 0 || day <= 0) {
-      return date;
+      return this.buildRawActivityTooltip(date, count, isToday);
     }
-    return `${month} 月 ${day} 日`;
+    return this.buildDatedActivityTooltip(month, day, count, level, isToday);
+  }
+
+  private buildRawActivityTooltip(date: string, count: number, isToday: boolean): ResourceStr {
+    if (count <= 0) {
+      return isToday
+        ? $r('app.string.settings_account_activity_today_empty_raw', date)
+        : $r('app.string.settings_account_activity_day_empty_raw', date);
+    }
+    return isToday
+      ? $r('app.string.settings_account_activity_today_points_raw', date, count)
+      : $r('app.string.settings_account_activity_day_points_raw', date, count);
+  }
+
+  private buildDatedActivityTooltip(
+    month: number,
+    day: number,
+    count: number,
+    level: number,
+    isToday: boolean
+  ): ResourceStr {
+    if (count <= 0) {
+      return isToday
+        ? $r('app.string.settings_account_activity_today_empty', month, day)
+        : $r('app.string.settings_account_activity_day_empty', month, day);
+    }
+    if (level === 1) {
+      return isToday
+        ? $r('app.string.settings_account_activity_today_light', month, day, count)
+        : $r('app.string.settings_account_activity_day_light', month, day, count);
+    }
+    if (level === 2) {
+      return isToday
+        ? $r('app.string.settings_account_activity_today_regular', month, day, count)
+        : $r('app.string.settings_account_activity_day_regular', month, day, count);
+    }
+    if (level === 3) {
+      return isToday
+        ? $r('app.string.settings_account_activity_today_active', month, day, count)
+        : $r('app.string.settings_account_activity_day_active', month, day, count);
+    }
+    if (level >= 4) {
+      return isToday
+        ? $r('app.string.settings_account_activity_today_high', month, day, count)
+        : $r('app.string.settings_account_activity_day_high', month, day, count);
+    }
+    return isToday
+      ? $r('app.string.settings_account_activity_today_points', month, day, count)
+      : $r('app.string.settings_account_activity_day_points', month, day, count);
   }
 }

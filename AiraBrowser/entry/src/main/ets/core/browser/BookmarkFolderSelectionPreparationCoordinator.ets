@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   BookmarkNode,
   BookmarkStorageScope
@@ -185,7 +186,7 @@ export class BookmarkFolderSelectionPreparationCoordinator {
         parentId: parentId,
         childFolderCount: childFolderCount,
         bookmarkCount: bookmarkCount,
-        bookmarkCountText: `${bookmarkCount} 个书签`,
+        bookmarkCountText: resolveAppResourceText($r('app.string.bookmark_count', bookmarkCount)),
         depth: this.resolveOptionDepth(parentId)
       };
       return option;

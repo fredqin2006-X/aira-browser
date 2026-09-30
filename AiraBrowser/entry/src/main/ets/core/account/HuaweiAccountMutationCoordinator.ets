@@ -21,8 +21,15 @@ const HUAWEI_ACCOUNT_MUTATION_TAG: string = 'HuaweiAccountMutation';
 
 export interface HuaweiAccountSignOutResult {
   ok: boolean;
-  title: string;
-  message: string;
+  title: ResourceStr;
+  message: ResourceStr;
+}
+
+export function preferSignOutMessage(result: HuaweiAccountSignOutResult): ResourceStr {
+  if (typeof result.message === 'string' && result.message.length === 0) {
+    return result.title;
+  }
+  return result.message;
 }
 
 export class HuaweiAccountMutationCoordinator {
@@ -115,8 +122,8 @@ export class HuaweiAccountMutationCoordinator {
     if (!this.canSignOut(boundaryInput)) {
       return {
         ok: false,
-        title: '私密会话不修改账号状态',
-        message: '请回到普通会话后退出华为账号。'
+        title: $r('app.string.settings_account_private_blocked'),
+        message: $r('app.string.settings_account_sign_out_private')
       };
     }
     await sharedCrossDeviceTabPresenceCoordinator.clearCurrentAccountSnapshot()
@@ -126,7 +133,7 @@ export class HuaweiAccountMutationCoordinator {
     await this.signOutAgcSessionIfAvailable();
     return {
       ok: true,
-      title: '已退出华为账号',
+      title: $r('app.string.settings_account_signed_out_done'),
       message: ''
     };
   }

@@ -5,6 +5,8 @@ import {
 import { UserScriptValueManagementProjection } from '../../features/userscripts/UserScriptValueModels';
 import { UserScriptCapabilityContractService } from '../../services/userscripts/UserScriptCapabilityContractService';
 import { UserScriptMatchService } from '../../services/userscripts/UserScriptMatchService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
+import { USER_SCRIPT_SOURCE_OFFLINE_MESSAGE, USER_SCRIPT_SOURCE_UNREACHABLE_MESSAGE } from '../../services/userscripts/UserScriptSourceFetchService';
 
 export interface UserScriptRowView {
   id: string;
@@ -101,13 +103,13 @@ export function resolveUserScriptInstallSurfaceMode(
 
 export function resolveUserScriptInstallLoadFailureTitle(errorMessage: string): string {
   const message = errorMessage.trim();
-  if (message.indexOf('没有可用网络') >= 0) {
-    return '当前没有可用网络';
+  if (message.indexOf(USER_SCRIPT_SOURCE_OFFLINE_MESSAGE) >= 0) {
+    return resolveAppResourceText($r('app.string.user_script_load_error_no_network'));
   }
-  if (message.indexOf('无法连接') >= 0 || message.indexOf('访问不到') >= 0) {
-    return '无法连接脚本地址';
+  if (message.indexOf(USER_SCRIPT_SOURCE_UNREACHABLE_MESSAGE) >= 0) {
+    return resolveAppResourceText($r('app.string.user_script_load_error_cannot_connect'));
   }
-  return '无法读取脚本';
+  return resolveAppResourceText($r('app.string.user_script_load_error_cannot_read'));
 }
 
 export class UserScriptsSettingsViewModel {
@@ -153,31 +155,35 @@ export class UserScriptsSettingsViewModel {
       if (projection.migration.unreadableLegacySnapshot) {
         return {
           visible: true,
-          title: '部分旧用户脚本数据未迁移',
-          message: '旧数据文件无法解析，已保留原文件；用户脚本仍可正常运行。'
+          title: resolveAppResourceText($r('app.string.user_script_recovery_title_partial')),
+          message: resolveAppResourceText($r('app.string.user_script_recovery_unreadable'))
         };
       }
       const scriptMessage = projection.migration.skippedScriptCount > 0 ?
-        `${projection.migration.skippedScriptCount} 个脚本的旧数据未能迁移。` : '';
+        resolveAppResourceText($r('app.string.user_script_recovery_scripts_skipped'), projection.migration.skippedScriptCount) : '';
       const recordMessage = projection.migration.skippedUnattributedRecordCount > 0 ?
-        `${projection.migration.skippedUnattributedRecordCount} 条旧记录无法识别所属脚本。` : '';
+        resolveAppResourceText($r('app.string.user_script_recovery_records_skipped'), projection.migration.skippedUnattributedRecordCount) : '';
       return {
         visible: true,
-        title: '部分旧用户脚本数据未迁移',
-        message: `${scriptMessage}${recordMessage}旧文件已保留，其他脚本可正常运行。`
+        title: resolveAppResourceText($r('app.string.user_script_recovery_title_partial')),
+        message: `${scriptMessage}${recordMessage}${resolveAppResourceText($r('app.string.user_script_recovery_files_kept'))}`
       };
     }
     const stage = projection.incident.stage.length > 0 ?
       projection.incident.stage : projection.readiness.failureStage;
     const code = projection.incident.code.length > 0 ?
       projection.incident.code : projection.readiness.failureCode;
-    const diagnostic = stage.length > 0 || code.length > 0 ? `（${stage || 'unknown'}/${code || 'unknown'}）` : '';
+    const diagnostic = stage.length > 0 || code.length > 0
+      ? resolveAppResourceText($r('app.string.user_script_recovery_diagnostic'), stage || 'unknown', code || 'unknown')
+      : '';
     return {
       visible: true,
-      title: blocked ? '用户脚本数据不可用' : '用户脚本数据暂未保存',
+      title: blocked
+        ? resolveAppResourceText($r('app.string.user_script_recovery_unavailable'))
+        : resolveAppResourceText($r('app.string.user_script_recovery_not_saved')),
       message: blocked ?
-        `已暂停脚本运行；重新打开 Aira 后会自动重试。${diagnostic}` :
-        `仍使用上个已提交版本；脚本下次写入时会自动重试。${diagnostic}`
+        `${resolveAppResourceText($r('app.string.user_script_recovery_blocked_message'))}${diagnostic}` :
+        `${resolveAppResourceText($r('app.string.user_script_recovery_pending_message'))}${diagnostic}`
     };
   }
 
@@ -229,7 +235,9 @@ export class UserScriptsSettingsViewModel {
       return '';
     }
     const previewRules = rules.slice(0, 3);
-    const suffix = rules.length > previewRules.length ? ` 等 ${rules.length} 条规则` : `${rules.length} 条规则`;
+    const suffix = rules.length > previewRules.length
+      ? resolveAppResourceText($r('app.string.user_script_scope_rules_more'), rules.length)
+      : resolveAppResourceText($r('app.string.user_script_scope_rules'), rules.length);
     return `${previewRules.join('\n')}\n${suffix}`;
   }
 
@@ -238,44 +246,44 @@ export class UserScriptsSettingsViewModel {
       return 'URL';
     }
     if (record.installSource === 'file') {
-      return '本地文件';
+      return resolveAppResourceText($r('app.string.user_script_install_source_file'));
     }
     if (record.installSource === 'gallery') {
-      return '脚本市场';
+      return resolveAppResourceText($r('app.string.user_script_install_source_gallery'));
     }
-    return '手动输入';
+    return resolveAppResourceText($r('app.string.user_script_install_source_manual'));
   }
 
   private summarizeUpdateInfo(record: InstalledUserScriptState | UserScriptPackageCandidate): string {
     if (record.updateUrl.length > 0 && record.downloadUrl.length > 0) {
-      return '支持检查更新和下载更新';
+      return resolveAppResourceText($r('app.string.user_script_update_check_and_download'));
     }
     if (record.updateUrl.length > 0) {
-      return '支持检查更新';
+      return resolveAppResourceText($r('app.string.user_script_update_check_only'));
     }
     if (record.downloadUrl.length > 0) {
-      return '支持下载更新';
+      return resolveAppResourceText($r('app.string.user_script_update_download_only'));
     }
-    return '未提供更新地址';
+    return resolveAppResourceText($r('app.string.user_script_update_none'));
   }
 
   private summarizeRunAt(runAt: string): string {
     if (runAt === 'document-start') {
-      return '页面开始加载时';
+      return resolveAppResourceText($r('app.string.user_script_run_at_document_start'));
     }
     if (runAt === 'document-idle') {
-      return '页面空闲后';
+      return resolveAppResourceText($r('app.string.user_script_run_at_document_idle'));
     }
     if (runAt === 'main-menu') {
-      return '主菜单触发';
+      return resolveAppResourceText($r('app.string.user_script_run_at_main_menu'));
     }
     if (runAt === 'tool-menu') {
-      return '工具菜单触发';
+      return resolveAppResourceText($r('app.string.user_script_run_at_tool_menu'));
     }
     if (runAt === 'context-menu') {
-      return '上下文菜单触发';
+      return resolveAppResourceText($r('app.string.user_script_run_at_context_menu'));
     }
-    return '页面加载完成后';
+    return resolveAppResourceText($r('app.string.user_script_run_at_document_end'));
   }
 
 }

@@ -8,6 +8,8 @@ import {
 import router from '@ohos.router';
 import { common } from '@kit.AbilityKit';
 import { pasteboard } from '@kit.BasicServicesKit';
+import { localizeCommunityUpdateMessage } from '../../core/settings/SettingsAboutCopy';
+import { localizeExperimentUpdateToast, localizeExperimentsRiskPromptCopy } from '../../core/settings/SettingsExperimentsCopy';
 import {
   SettingsDetailActionButtonState,
   SettingsDetailRowAction,
@@ -500,9 +502,9 @@ struct SettingsDetailPage {
     try {
       const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, AIRA_SUPPORT_QQ_GROUP_NUMBER);
       await pasteboard.getSystemPasteboard().setData(data);
-      this.showToast('已复制QQ群号');
+      this.showToast($r('app.string.settings_about_qq_copied'));
     } catch (_error) {
-      this.showToast('QQ群号复制失败，请稍后再试。');
+      this.showToast($r('app.string.settings_about_qq_copy_failed'));
     }
   }
 
@@ -571,7 +573,7 @@ struct SettingsDetailPage {
     return new SettingsDetailNavigationActionCallbackHandlers(
       (): BrowserBoundaryRouteState => this.buildForwardRouteParams(),
       (): common.UIAbilityContext => this.getAbilityContext(),
-      (message: string): void => {
+      (message: ResourceStr): void => {
         this.showToast(message);
       },
       (): void => {
@@ -601,15 +603,19 @@ struct SettingsDetailPage {
     try {
       const result = await this.communityUpdateCheckService.check();
       this.nativeAlertDialogPresenter.inform({
-        title: '检查更新',
-        message: result.message,
-        confirmLabel: '知道了'
+        title: $r('app.string.user_script_check_updates'),
+        message: localizeCommunityUpdateMessage(
+          result.outcome,
+          result.outcome === 'up_to_date' ? result.current.versionName : (result.release?.versionName ?? ''),
+          result.message
+        ),
+        confirmLabel: $r('app.string.settings_pro_got_it')
       });
     } catch (_error) {
       this.nativeAlertDialogPresenter.inform({
-        title: '检查更新',
-        message: '检查更新失败，请稍后再试。',
-        confirmLabel: '知道了'
+        title: $r('app.string.user_script_check_updates'),
+        message: $r('app.string.settings_about_update_failed'),
+        confirmLabel: $r('app.string.settings_pro_got_it')
       });
     } finally {
       this.communityUpdateChecking = false;
@@ -630,7 +636,7 @@ struct SettingsDetailPage {
     } catch (_error) {
       this.selectedThemeMode = previousThemeMode;
       this.refreshState();
-      this.showToast('外观模式更新失败。');
+      this.showToast($r('app.string.bottom_panel_theme_update_failed'));
     }
   }
 
@@ -658,7 +664,7 @@ struct SettingsDetailPage {
     } catch (_error) {
       this.appearanceSettings = previousSettings;
       this.refreshStateWithExternalNavigationPolicy(this.selectedExternalNavigationPolicy);
-      this.showToast('外观设置更新失败。');
+      this.showToast($r('app.string.settings_appearance_update_failed'));
     }
   }
 
@@ -678,7 +684,7 @@ struct SettingsDetailPage {
     } catch (_error) {
       this.settingsRenderVersion += 1;
       this.refreshState();
-      this.showToast('应用服务模式更新失败。');
+      this.showToast($r('app.string.settings_advanced_service_mode_update_failed'));
     }
   }
 
@@ -699,10 +705,11 @@ struct SettingsDetailPage {
         privacyMode: this.privacyMode
       }, nextSettings);
       this.refreshState();
-      this.showToast(nextSettings.privateModeAuthenticationEnabled ? '隐私模式验证已开启。' : '隐私模式验证已关闭。');
+      this.showToast(nextSettings.privateModeAuthenticationEnabled ?
+        $r('app.string.settings_privacy_auth_on') : $r('app.string.settings_privacy_auth_off'));
     } catch (_error) {
       this.refreshState();
-      this.showToast('隐私模式验证设置更新失败。');
+      this.showToast($r('app.string.settings_privacy_auth_failed'));
     }
   }
 
@@ -736,10 +743,11 @@ struct SettingsDetailPage {
         privacyMode: this.privacyMode
       }, nextSettings);
       this.refreshState();
-      this.showToast(nextSettings.alwaysUsePrivateMode === true ? '重启后将默认进入隐私模式。' : '已关闭始终保持隐私模式。');
+      this.showToast(nextSettings.alwaysUsePrivateMode === true ?
+        $r('app.string.settings_privacy_always_on_toast') : $r('app.string.settings_privacy_always_off_toast'));
     } catch (_error) {
       this.refreshState();
-      this.showToast('始终保持隐私模式设置更新失败。');
+      this.showToast($r('app.string.settings_privacy_always_failed'));
     }
   }
 
@@ -760,10 +768,11 @@ struct SettingsDetailPage {
         privacyMode: this.privacyMode
       }, nextSettings);
       this.refreshState();
-      this.showToast(nextSettings.privateModePreserveCookiesOnClose ? '隐私模式会保留 Cookie。' : '隐私模式会清除 Cookie。');
+      this.showToast(nextSettings.privateModePreserveCookiesOnClose ?
+        $r('app.string.settings_privacy_cookies_on_toast') : $r('app.string.settings_privacy_cookies_off_toast'));
     } catch (_error) {
       this.refreshState();
-      this.showToast('隐私模式 Cookie 设置更新失败。');
+      this.showToast($r('app.string.settings_privacy_cookies_failed'));
     }
   }
 
@@ -785,10 +794,11 @@ struct SettingsDetailPage {
         privacyMode: this.privacyMode
       }, nextSettings);
       this.refreshState();
-      this.showToast(enabled ? '隐私模式会运行用户脚本。' : '隐私模式不再运行用户脚本。');
+      this.showToast(enabled ?
+        $r('app.string.settings_privacy_scripts_on_toast') : $r('app.string.settings_privacy_scripts_off_toast'));
     } catch (_error) {
       this.refreshState();
-      this.showToast('隐私模式用户脚本设置更新失败。');
+      this.showToast($r('app.string.settings_privacy_scripts_failed'));
     }
   }
 
@@ -826,12 +836,12 @@ struct SettingsDetailPage {
         this.experimentSettings = settings;
         this.rebuildStateFromLocalSettings();
         this.experimentSettingsRefreshSignal.bump();
-        this.showToast(this.viewModel.buildExperimentUpdateToast(previousSettings, settings));
+        this.showToast(localizeExperimentUpdateToast(this.viewModel.buildExperimentUpdateToast(previousSettings, settings)));
       })
       .catch((_error: Error) => {
         this.experimentSettings = previousSettings;
         this.rebuildStateFromLocalSettings();
-        this.showToast('实验室设置更新失败。');
+        this.showToast($r('app.string.settings_experiments_update_failed'));
       });
   }
 
@@ -875,7 +885,7 @@ struct SettingsDetailPage {
       message: resetState.message,
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_privacy_protection_dialog_cancel'),
         action: () => {
         }
       },
@@ -903,16 +913,16 @@ struct SettingsDetailPage {
 
   private confirmRefreshSiteIcons(): void {
     showCenteredAlertDialog({
-      title: '刷新网站图标？',
-      message: '会保留当前图标，并在后台重新获取高清图标。获取失败的网站会继续显示文字图标或旧图标。',
+      title: $r('app.string.settings_privacy_protection_refresh_icons_title'),
+      message: $r('app.string.settings_privacy_protection_refresh_icons_message'),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_privacy_protection_dialog_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '开始刷新',
+        value: $r('app.string.settings_privacy_protection_start_refresh'),
         action: () => {
           void this.refreshSiteIcons();
         }
@@ -926,19 +936,19 @@ struct SettingsDetailPage {
     }
     this.siteIconRefreshing = true;
     this.refreshState();
-    this.showToast('正在刷新网站图标...');
+    this.showToast($r('app.string.settings_privacy_protection_refreshing'));
     try {
       const result = await this.siteIconCacheMaintenanceCoordinator.refreshKnownSiteIcons();
       this.showToast(result.message);
     } catch (_error) {
-      this.showToast('网站图标刷新失败，请稍后再试。');
+      this.showToast($r('app.string.settings_privacy_protection_refresh_failed'));
     } finally {
       this.siteIconRefreshing = false;
       this.refreshState();
     }
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,
@@ -950,17 +960,17 @@ struct SettingsDetailPage {
 
   private showRiskPrompt(prompt: SettingsRiskPromptState, onConfirm: () => void): void {
     showCenteredAlertDialog({
-      title: prompt.title,
-      message: prompt.message,
+      title: localizeExperimentsRiskPromptCopy(prompt.title),
+      message: localizeExperimentsRiskPromptCopy(prompt.message),
       autoCancel: true,
       primaryButton: {
-        value: prompt.cancelLabel,
+        value: localizeExperimentsRiskPromptCopy(prompt.cancelLabel),
         action: () => {
           this.refreshState();
         }
       },
       secondaryButton: {
-        value: prompt.confirmLabel,
+        value: localizeExperimentsRiskPromptCopy(prompt.confirmLabel),
         fontColor: prompt.confirmIsDestructive ? $r('app.color.permission_blocked') : this.themedAccentColor,
         action: () => {
           onConfirm();

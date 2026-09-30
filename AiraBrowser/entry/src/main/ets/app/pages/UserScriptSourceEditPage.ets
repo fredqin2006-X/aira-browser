@@ -66,7 +66,7 @@ struct UserScriptSourceEditPage {
       this.source
     )) {
       this.getUIContext().getPromptAction().showToast({
-        message: '脚本编辑会话已失效，请返回后重试。',
+        message: $r('app.string.user_script_edit_session_expired'),
         duration: 1800
       });
       return;

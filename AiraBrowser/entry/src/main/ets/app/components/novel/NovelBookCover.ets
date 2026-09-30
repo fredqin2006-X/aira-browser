@@ -78,7 +78,7 @@ export struct NovelBookCover {
       .justifyContent(FlexAlign.Center)
       .alignItems(HorizontalAlign.Center)
 
-      Text('小说阅读')
+      Text($r('app.string.bookshelf_cover_fallback'))
         .fontSize(10)
         .fontColor(this.fallbackSecondaryTextColor)
     }
@@ -92,9 +92,9 @@ export struct NovelBookCover {
     this.loadCover();
   }
 
-  private resolveFallbackTitle(): string {
+  private resolveFallbackTitle(): ResourceStr {
     const normalized: string = this.title.trim();
-    return normalized.length > 0 ? normalized : '未命名小说';
+    return normalized.length > 0 ? normalized : $r('app.string.bookshelf_unnamed');
   }
 
   private loadCover(): void {

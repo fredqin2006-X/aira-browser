@@ -35,7 +35,7 @@ export struct ExternalAppSearchSettingsScreen {
 
   build() {
     SettingsHdsScaffold({
-      title: '跨应用搜索',
+      title: $r('app.string.settings_search_engine_external_app'),
       backIconKind: 'back',
       pageBackground: this.theme.pageBackground,
       headerButtonBackground: this.theme.controlBackground,
@@ -65,7 +65,7 @@ export struct ExternalAppSearchSettingsScreen {
   @Builder
   private buildMasterSection() {
     SettingsSection({
-      title: '功能',
+      title: $r('app.string.settings_search_engine_external_feature'),
       secondaryTextColor: this.theme.textSecondary
     }) {
       SettingsGroupCard({
@@ -73,7 +73,7 @@ export struct ExternalAppSearchSettingsScreen {
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsSwitchRow({
-          title: '显示应用入口',
+          title: $r('app.string.settings_search_engine_external_show_entries'),
           desktopPresentation: this.desktopPresentation,
           checked: this.featureEnabled,
           primaryTextColor: this.theme.textPrimary,
@@ -86,7 +86,7 @@ export struct ExternalAppSearchSettingsScreen {
         })
       }
       SettingsFooterText({
-        text: '开启后，搜索框展开时会显示下方选择的应用入口。关闭后会保留当前选择。',
+        text: $r('app.string.settings_search_engine_external_show_note'),
         secondaryTextColor: this.theme.textSecondary
       })
     }
@@ -95,7 +95,7 @@ export struct ExternalAppSearchSettingsScreen {
   @Builder
   private buildTargetSection() {
     SettingsSection({
-      title: '显示的应用',
+      title: $r('app.string.settings_search_engine_external_shown_apps'),
       secondaryTextColor: this.theme.textSecondary
     }) {
       ExternalAppSearchTargetList({
@@ -112,7 +112,7 @@ export struct ExternalAppSearchSettingsScreen {
         }
       })
       SettingsFooterText({
-        text: '拖动开关左侧的手柄可以调整应用入口顺序。',
+        text: $r('app.string.settings_search_engine_external_reorder_note'),
         secondaryTextColor: this.theme.textSecondary
       })
     }

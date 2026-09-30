@@ -1,14 +1,23 @@
 {
   "latestAppGalleryRelease": {
-    "versionName": "3.5.2",
-    "versionCode": 1000479,
-    "releasedAt": "2026-09-29",
+    "versionName": "3.5.3",
+    "versionCode": 1000480,
+    "releasedAt": "2026-09-30",
     "source": "formal-package-generated",
-    "notes": "Formal AppGallery package that adds a looping video wallpaper and more homepage logo presets with an opacity slider, a list style for the tab overview, and drops a web app when its desktop shortcut is removed. The top address follows the current page, the split address row meets the page top, bookmark bar and other bookmarks swipe, history segments switch on tap, a gifted member can still buy, and the expired sheet offers long-term membership. Closing the tab overview onto a page no longer flashes the homepage, and tab cards still fit when display size shrinks. Built from committed HEAD bdd7ac6 plus the 3.5.2 (1000479) version and release-note changes in the same working tree, signed with the Aira release certificate and the AppGallery release Profile for com.aira.browser, with crash symbols archived. The release-signed APP build passed, and the outer APP signature plus the packed release Profile were verified independently. This records a locally generated formal package and does not claim AppGallery review approval or on-shelf publication.",
-    "artifact": "AiraBrowser/build/outputs/default/Aira-official-v3.5.2-1000479-release-signed.app",
-    "sha256": "03750cb5c969c208b81746e8df06588698602d782fd004ec6370e4be57520f7a"
+    "notes": "Formal AppGallery package that offers long-term membership at the National Day price of ¥48 with a 7折 badge from October 1 through October 7, then restores the regular price. The membership page no longer lists the phone client, the launch screen no longer keeps the classic icon after an icon change, opening the tab list no longer squashes the page, and auto and solid wallpaper modes sync. Built from committed HEAD 637882b7 plus the 3.5.3 (1000480) version and release-note changes in the same working tree, signed with the Aira release certificate and the AppGallery release Profile for com.aira.browser, with crash symbols archived. The release-signed APP build passed, and the outer APP signature plus the packed release Profile were verified independently. This records a locally generated formal package and does not claim AppGallery review approval or on-shelf publication.",
+    "artifact": "AiraBrowser/build/outputs/default/Aira-official-v3.5.3-1000480-release-signed.app",
+    "sha256": "bc947e9c031125b3318b687f23fe2dffdd56a327c39343c96a96e9bc1efef470"
   },
   "history": [
+    {
+      "versionName": "3.5.3",
+      "versionCode": 1000480,
+      "releasedAt": "2026-09-30",
+      "source": "formal-package-generated",
+      "notes": "Formal AppGallery package that offers long-term membership at the National Day price of ¥48 with a 7折 badge from October 1 through October 7, then restores the regular price. The membership page no longer lists the phone client, the launch screen no longer keeps the classic icon after an icon change, opening the tab list no longer squashes the page, and auto and solid wallpaper modes sync. Built from committed HEAD 637882b7 plus the 3.5.3 (1000480) version and release-note changes in the same working tree, signed with the Aira release certificate and the AppGallery release Profile for com.aira.browser, with crash symbols archived. The release-signed APP build passed, and the outer APP signature plus the packed release Profile were verified independently. This records a locally generated formal package and does not claim AppGallery review approval or on-shelf publication.",
+      "artifact": "AiraBrowser/build/outputs/default/Aira-official-v3.5.3-1000480-release-signed.app",
+      "sha256": "bc947e9c031125b3318b687f23fe2dffdd56a327c39343c96a96e9bc1efef470"
+    },
     {
       "versionName": "3.5.2",
       "versionCode": 1000479,

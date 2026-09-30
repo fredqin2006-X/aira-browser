@@ -29,24 +29,24 @@ import { SettingsDesktopWorkspaceHeader } from './SettingsDesktopWorkspaceHeader
 interface AppProxyProtocolOption {
   scheme: BrowserAppProxyScheme;
   title: string;
-  helperText: string;
+  helperText: ResourceStr;
 }
 
 const APP_PROXY_PROTOCOL_OPTIONS: AppProxyProtocolOption[] = [
   {
     scheme: 'http',
     title: 'HTTP',
-    helperText: '适合常见本地调试代理。'
+    helperText: $r('app.string.settings_app_proxy_protocol_http_desc')
   },
   {
     scheme: 'https',
     title: 'HTTPS',
-    helperText: '代理服务器入口使用 TLS。'
+    helperText: $r('app.string.settings_app_proxy_protocol_https_desc')
   },
   {
     scheme: 'socks5',
     title: 'SOCKS5',
-    helperText: '适合通用 TCP 代理服务。'
+    helperText: $r('app.string.settings_app_proxy_protocol_socks5_desc')
   }
 ];
 const APP_PROXY_PROTOCOL_SELECTION_KEY: string = 'app_proxy_protocol_selection';
@@ -86,7 +86,7 @@ export struct AppProxyProtocolSettingsHost {
     Column() {
       if (this.desktopPresentation) {
         SettingsDesktopWorkspaceHeader({
-          title: '代理协议',
+          title: $r('app.string.settings_app_proxy_protocol_title'),
           showBackButton: true,
           primaryTextColor: this.storedPrimaryTextColor,
           iconColor: this.storedSecondaryTextColor,
@@ -98,7 +98,7 @@ export struct AppProxyProtocolSettingsHost {
       }
 
       SettingsHdsScaffold({
-        title: '代理协议',
+        title: $r('app.string.settings_app_proxy_protocol_title'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -165,7 +165,7 @@ export struct AppProxyProtocolSettingsHost {
       this.handleBack();
     } catch (_error) {
       this.saving = false;
-      this.showToast('代理协议更新失败。');
+      this.showToast($r('app.string.settings_app_proxy_protocol_update_failed'));
     }
   }
 
@@ -217,7 +217,7 @@ export struct AppProxyProtocolSettingsHost {
     router.back();
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     promptAction.showToast({
       message: message,
       duration: 1800

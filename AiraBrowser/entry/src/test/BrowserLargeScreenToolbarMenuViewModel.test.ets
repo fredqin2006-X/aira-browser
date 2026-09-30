@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@ohos/hypium';
 import { BrowserBottomAddressPanelAction } from '../main/ets/core/browser/BrowserBottomAddressPanelViewModel';
 import { BrowserBottomPanelActionId } from '../main/ets/core/browser/BrowserBottomPanelActionCatalog';
+import { resourceStrKey } from '../main/ets/core/browser/BrowserBottomPanelText';
 import {
   BROWSER_LARGE_SCREEN_PRIVACY_MODE_TITLE,
   BROWSER_LARGE_SCREEN_SCRIPT_MANAGEMENT_TITLE,
@@ -144,8 +145,14 @@ export default function browserLargeScreenToolbarMenuViewModelTest(): void {
 
       expect(groups.map((group: BrowserLargeScreenToolbarMenuPageToolGroup): string => group.id).join(','))
         .assertEqual('reading,media,development,more');
-      expect(groups.map((group: BrowserLargeScreenToolbarMenuPageToolGroup): string => group.title).join('|'))
-        .assertEqual('阅读|媒体|开发|');
+      expect(groups.map((group: BrowserLargeScreenToolbarMenuPageToolGroup): string =>
+        resourceStrKey(group.title)).join('|'))
+        .assertEqual([
+          resourceStrKey($r('app.string.bottom_panel_group_reading')),
+          resourceStrKey($r('app.string.bottom_panel_group_media')),
+          resourceStrKey($r('app.string.bottom_panel_group_development')),
+          ''
+        ].join('|'));
       expect(entryIds(groups[0].items).join(',')).assertEqual('find,reader,translate');
       expect(entryIds(groups[1].items).join(',')).assertEqual('video,offline');
       expect(entryIds(development === undefined ? [] : development.items).join(','))

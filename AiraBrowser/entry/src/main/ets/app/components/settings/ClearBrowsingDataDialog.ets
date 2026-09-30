@@ -23,6 +23,7 @@ import {
   browserSheetHeaderBlurModifier
 } from '../browser/BrowserModalBottomSheet';
 import { CENTERED_DIALOG_SYSTEM_TALL_PADDED_SURFACE_MODIFIER } from '../common/CenteredDialogSurface';
+import { localizePrivacyProtectionCopy } from '../../../core/settings/SettingsPrivacyProtectionCopy';
 
 const CLEAR_BROWSING_DATA_RANGE_GROUP: string = 'clear-browsing-data-range';
 const CLEAR_BROWSING_DATA_SHEET_SIDE_PADDING: number = 16;
@@ -57,7 +58,7 @@ export struct ClearBrowsingDataContent {
   @Builder
   private buildDialogLayout() {
     Column({ space: 16 }) {
-      Text(this.dialogState.title)
+      Text(localizePrivacyProtectionCopy(this.dialogState.title))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -92,7 +93,7 @@ export struct ClearBrowsingDataContent {
       BrowserImmersiveSheetLayout({
         footerVisible: true,
         closeVisible: true,
-        closeAccessibilityLabel: '关闭',
+        closeAccessibilityLabel: $r('app.string.ui_close'),
         onClose: (): void => {
           this.onCancel();
         },
@@ -171,10 +172,10 @@ export struct ClearBrowsingDataContent {
   private buildSectionList() {
     Column({ space: 12 }) {
       if (this.dialogState.showTimeRange) {
-        this.buildSectionTitle(this.dialogState.timeRangeTitle)
+        this.buildSectionTitle(localizePrivacyProtectionCopy(this.dialogState.timeRangeTitle))
         this.buildTimeRanges()
       }
-      this.buildSectionTitle(this.dialogState.dataTypesTitle)
+      this.buildSectionTitle(localizePrivacyProtectionCopy(this.dialogState.dataTypesTitle))
       this.buildDataItems()
     }
     .width('100%')
@@ -184,7 +185,7 @@ export struct ClearBrowsingDataContent {
   private buildActions() {
     Column({ space: 8 }) {
       BrowserSheetActionButton({
-        label: this.dialogState.confirmLabel,
+        label: localizePrivacyProtectionCopy(this.dialogState.confirmLabel),
         emphasis: 'primary',
         stacked: true,
         actionEnabled: this.selectedItemIds.length > 0,
@@ -197,7 +198,7 @@ export struct ClearBrowsingDataContent {
       })
 
       BrowserSheetActionButton({
-        label: '取消',
+        label: $r('app.string.settings_privacy_protection_dialog_cancel'),
         emphasis: 'ghost',
         stacked: true,
         buttonHeight: 44,
@@ -211,7 +212,7 @@ export struct ClearBrowsingDataContent {
   }
 
   @Builder
-  private buildSectionTitle(title: string) {
+  private buildSectionTitle(title: ResourceStr) {
     Text(title)
       .width('100%')
       .fontSize(13)
@@ -237,7 +238,7 @@ export struct ClearBrowsingDataContent {
   @Builder
   private buildTimeRangeRow(range: SettingsBrowsingDataClearTimeRangeState, index: number) {
     Row({ space: 12 }) {
-      Text(range.title)
+      Text(localizePrivacyProtectionCopy(range.title))
         .layoutWeight(1)
         .fontSize(15)
         .fontColor(this.storedPrimaryTextColor)
@@ -284,14 +285,14 @@ export struct ClearBrowsingDataContent {
   private buildDataItemRow(item: SettingsBrowsingDataClearItemState, index: number) {
     Row({ space: 12 }) {
       Column({ space: 3 }) {
-        Text(item.title)
+        Text(localizePrivacyProtectionCopy(item.title))
           .width('100%')
           .fontSize(15)
           .fontColor(this.storedPrimaryTextColor)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-        Text(item.summary)
+        Text(localizePrivacyProtectionCopy(item.summary))
           .width('100%')
           .fontSize(12)
           .lineHeight(17)

@@ -9,8 +9,8 @@ export interface SiteCertificatePresentationRuntimeContext {
 }
 
 export interface SiteCertificatePresentationState {
-  summary: string;
-  detailStatus: string;
+  summary: ResourceStr;
+  detailStatus: ResourceStr;
   subject: string;
   issuer: string;
   validFrom: string;
@@ -20,12 +20,10 @@ export interface SiteCertificatePresentationState {
   chainCount: number;
 }
 
-const SITE_CERTIFICATE_LOADING_TEXT: string = '正在读取证书信息...';
-const SITE_CERTIFICATE_READY_STATUS: string = '连接安全，证书已读取';
-
 export class SiteCertificatePresentationService {
   buildLoadingState(): SiteCertificatePresentationState {
-    return this.buildState(SITE_CERTIFICATE_LOADING_TEXT, SITE_CERTIFICATE_LOADING_TEXT);
+    const loadingText = $r('app.string.settings_site_certificate_loading');
+    return this.buildState(loadingText, loadingText);
   }
 
   async resolveCurrentStateFromLifecyclePort(
@@ -33,28 +31,28 @@ export class SiteCertificatePresentationService {
     context: SiteCertificatePresentationRuntimeContext
   ): Promise<SiteCertificatePresentationState> {
     if (!context.controllerAttached) {
-      return this.buildUnavailableState('网页还未加载完成');
+      return this.buildUnavailableState($r('app.string.settings_site_certificate_unavailable_not_loaded'));
     }
     if (!context.secureCurrentSite) {
-      return this.buildUnavailableState('当前连接未使用 HTTPS');
+      return this.buildUnavailableState($r('app.string.settings_site_certificate_unavailable_insecure'));
     }
 
     const controller = runtimeLifecyclePort.resolveActiveController();
     if (controller === undefined) {
-      return this.buildUnavailableState('证书信息读取失败');
+      return this.buildUnavailableState($r('app.string.settings_site_certificate_unavailable_failed'));
     }
     try {
       const certificates = await controller.getCertificate();
       if (certificates.length === 0) {
-        return this.buildUnavailableState('未读取到证书信息');
+        return this.buildUnavailableState($r('app.string.settings_site_certificate_unavailable_missing'));
       }
       return this.buildLoadedState(certificates[0], certificates.length, context.currentSiteHost);
     } catch (_error) {
-      return this.buildUnavailableState('证书信息读取失败');
+      return this.buildUnavailableState($r('app.string.settings_site_certificate_unavailable_failed'));
     }
   }
 
-  buildUnavailableState(status: string): SiteCertificatePresentationState {
+  buildUnavailableState(status: ResourceStr): SiteCertificatePresentationState {
     return this.buildState(status, status);
   }
 
@@ -67,7 +65,7 @@ export class SiteCertificatePresentationService {
     const validTo = this.formatCertificateDate(this.readCertificateNotAfterTime(certificate));
     return {
       summary: this.buildCertificateSummary(issuer, validTo, chainLength),
-      detailStatus: SITE_CERTIFICATE_READY_STATUS,
+      detailStatus: $r('app.string.settings_site_certificate_ready_status'),
       subject: this.readCertificateSubject(certificate, fallbackSubject),
       issuer: issuer,
       validFrom: this.formatCertificateDate(this.readCertificateNotBeforeTime(certificate)),
@@ -78,14 +76,14 @@ export class SiteCertificatePresentationService {
     };
   }
 
-  buildChainDetailText(chainCount: number): string {
+  buildChainDetailText(chainCount: number): ResourceStr {
     if (chainCount <= 0) {
       return '';
     }
-    return `共 ${chainCount} 个证书`;
+    return $r('app.string.settings_site_certificate_chain_count', chainCount);
   }
 
-  private buildState(summary: string, detailStatus: string): SiteCertificatePresentationState {
+  private buildState(summary: ResourceStr, detailStatus: ResourceStr): SiteCertificatePresentationState {
     return {
       summary: summary,
       detailStatus: detailStatus,
@@ -99,18 +97,26 @@ export class SiteCertificatePresentationService {
     };
   }
 
-  private buildCertificateSummary(issuer: string, validUntil: string, chainLength: number): string {
-    const chainText = chainLength > 1 ? `，证书链 ${chainLength} 个` : '';
+  private buildCertificateSummary(issuer: string, validUntil: string, chainLength: number): ResourceStr {
+    const hasChain = chainLength > 1;
     if (issuer.length > 0 && validUntil.length > 0) {
-      return `由 ${issuer} 签发，有效至 ${validUntil}${chainText}`;
+      return hasChain
+        ? $r('app.string.settings_site_certificate_summary_issued_valid_chain', issuer, validUntil, chainLength)
+        : $r('app.string.settings_site_certificate_summary_issued_valid', issuer, validUntil);
     }
     if (validUntil.length > 0) {
-      return `证书有效至 ${validUntil}${chainText}`;
+      return hasChain
+        ? $r('app.string.settings_site_certificate_summary_valid_chain', validUntil, chainLength)
+        : $r('app.string.settings_site_certificate_summary_valid', validUntil);
     }
     if (issuer.length > 0) {
-      return `由 ${issuer} 签发${chainText}`;
+      return hasChain
+        ? $r('app.string.settings_site_certificate_summary_issued_chain', issuer, chainLength)
+        : $r('app.string.settings_site_certificate_summary_issued', issuer);
     }
-    return `证书已读取${chainText}`;
+    return hasChain
+      ? $r('app.string.settings_site_certificate_summary_ready_chain', chainLength)
+      : $r('app.string.settings_site_certificate_summary_ready');
   }
 
   private readCertificateIssuer(certificate: cert.X509Cert): string {

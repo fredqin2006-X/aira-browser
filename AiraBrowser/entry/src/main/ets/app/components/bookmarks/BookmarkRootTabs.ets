@@ -103,11 +103,11 @@ export struct BookmarkRootTabs {
     return [
       {
         id: this.resolveToolbarRootId(),
-        title: this.scope === 'private' ? '隐私书签栏' : '书签栏'
+        title: this.scope === 'private' ? $r('app.string.bookmark_root_private_toolbar') : $r('app.string.bookmark_root_toolbar')
       },
       {
         id: this.resolveOtherRootId(),
-        title: this.scope === 'private' ? '其他隐私书签' : '其他书签'
+        title: this.scope === 'private' ? $r('app.string.bookmark_root_private_other') : $r('app.string.bookmark_root_other')
       }
     ];
   }

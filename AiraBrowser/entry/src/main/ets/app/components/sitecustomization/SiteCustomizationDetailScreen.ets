@@ -35,12 +35,13 @@ import {
   SiteCapabilityCatalogService
 } from '../../../services/web/SiteCapabilityCatalogService';
 import { SiteCustomizationFocusCapability } from '../../../core/sitecontrols/SiteControlsNavigationDecision';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 const SITE_JAVASCRIPT_RADIO_GROUP: string = 'site-javascript-policy';
 
 interface SiteJavaScriptPolicyOption {
   value: SiteJavaScriptPolicy;
-  title: string;
+  title: ResourceStr;
 }
 
 @Component
@@ -58,7 +59,7 @@ export struct SiteCustomizationDetailScreen {
     summary: '',
     externalNavigationPolicy: 'ask',
     hasExternalNavigationRule: false,
-    desktopSiteSummary: '跟随全局',
+    desktopSiteSummary: resolveAppResourceText($r('app.string.settings_site_customization_follow_global')),
     hasDesktopSiteRule: false,
     javaScriptPolicy: 'default',
     hasJavaScriptRule: false,
@@ -83,7 +84,7 @@ export struct SiteCustomizationDetailScreen {
 
   build() {
     SettingsHdsScaffold({
-      title: this.state.title.length > 0 ? this.state.title : '当前站点设置',
+      title: this.state.title.length > 0 ? this.state.title : $r('app.string.settings_site_customization_current_site_settings'),
       backIconKind: 'back',
       pageBackground: this.storedPageBackgroundColor,
       headerButtonBackground: this.storedPressedBackgroundColor,
@@ -149,7 +150,7 @@ export struct SiteCustomizationDetailSections {
     summary: '',
     externalNavigationPolicy: 'ask',
     hasExternalNavigationRule: false,
-    desktopSiteSummary: '跟随全局',
+    desktopSiteSummary: resolveAppResourceText($r('app.string.settings_site_customization_follow_global')),
     hasDesktopSiteRule: false,
     javaScriptPolicy: 'default',
     hasJavaScriptRule: false,
@@ -194,20 +195,20 @@ export struct SiteCustomizationDetailSections {
 
   @Builder
   private buildUnreadableSection() {
-    SettingsSection({ title: '站点设置' }) {
+    SettingsSection({ title: $r('app.string.settings_site_customization_title') }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsStaticValueRow({
-          title: '数据状态',
+          title: $r('app.string.settings_site_customization_data_state'),
           desktopPresentation: this.desktopPresentation,
-          value: '无法读取',
+          value: $r('app.string.settings_site_customization_unreadable'),
           rowPosition: 'single'
         })
       }
       SettingsFooterText({
-        text: '此记录已损坏或来自不支持的版本。重置后可重新设置当前站点。',
+        text: $r('app.string.settings_site_customization_unreadable_note'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -215,13 +216,13 @@ export struct SiteCustomizationDetailSections {
 
   @Builder
   private buildPrivacySection() {
-    SettingsSection({ title: '隐私' }) {
+    SettingsSection({ title: $r('app.string.settings_site_customization_privacy') }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsSwitchRow({
-          title: '关闭后清除',
+          title: $r('app.string.settings_site_customization_fragment_clear_on_close'),
           desktopPresentation: this.desktopPresentation,
           checked: this.state.privateSiteEnabled,
           rowPosition: this.state.privateSiteEnabled ? 'first' : 'single',
@@ -232,7 +233,7 @@ export struct SiteCustomizationDetailSections {
         if (this.state.privateSiteEnabled) {
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
           SettingsSwitchRow({
-            title: '保留 Cookie',
+            title: $r('app.string.settings_site_customization_keep_cookies'),
             desktopPresentation: this.desktopPresentation,
             checked: this.state.preserveCookiesOnClose,
             rowPosition: 'last',
@@ -244,8 +245,8 @@ export struct SiteCustomizationDetailSections {
       }
       SettingsFooterText({
         text: this.state.preserveCookiesOnClose
-          ? '关闭此站点后仍会清除站点存储、缓存、历史和最近关闭记录，但保留 Cookie 登录状态。'
-          : '关闭此站点后会清除站点存储、Cookie、缓存、历史和最近关闭记录。',
+          ? $r('app.string.settings_site_customization_clear_keep_cookies_note')
+          : $r('app.string.settings_site_customization_clear_note'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -253,22 +254,22 @@ export struct SiteCustomizationDetailSections {
 
   @Builder
   private buildDisplaySection() {
-    SettingsSection({ title: '显示与兼容' }) {
+    SettingsSection({ title: $r('app.string.settings_site_customization_display_compat') }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
       }) {
         if (this.focusCapability !== 'desktop_site') {
           SettingsStaticValueRow({
-            title: '字体大小',
+            title: $r('app.string.settings_site_customization_font_size'),
             desktopPresentation: this.desktopPresentation,
-            value: '跟随默认',
+            value: $r('app.string.settings_site_customization_follow_default'),
             rowPosition: 'first'
           })
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         }
         SettingsNavigationRow({
-          title: '网页标识',
+          title: $r('app.string.settings_site_customization_helper_identity'),
           desktopPresentation: this.desktopPresentation,
           value: this.state.desktopSiteSummary,
           rowPosition: this.focusCapability === 'desktop_site' ? 'single' : 'last',
@@ -327,7 +328,7 @@ export struct SiteCustomizationDetailSections {
         }, (option: SiteJavaScriptPolicyOption): string => option.value)
       }
       SettingsFooterText({
-        text: '更改后重新加载此网站生效。阻止 JavaScript 可能导致网页无法正常使用。',
+        text: $r('app.string.settings_site_customization_js_note'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -335,7 +336,7 @@ export struct SiteCustomizationDetailSections {
 
   @Builder
   private buildPermissionSection() {
-    SettingsSection({ title: '站点权限' }) {
+    SettingsSection({ title: $r('app.string.settings_site_customization_site_permissions') }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
@@ -370,7 +371,7 @@ export struct SiteCustomizationDetailSections {
 
   @Builder
   private buildExternalActionSection() {
-    SettingsSection({ title: '外部动作' }) {
+    SettingsSection({ title: $r('app.string.settings_site_customization_external_actions') }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
@@ -396,13 +397,13 @@ export struct SiteCustomizationDetailSections {
 
   @Builder
   private buildResetSection() {
-    SettingsSection({ title: '管理' }) {
+    SettingsSection({ title: $r('app.string.settings_site_customization_management') }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
       }) {
         SettingsActionButton({
-          title: '重置当前站点',
+          title: $r('app.string.settings_site_customization_reset_site'),
           isEnabled: this.state.resetEnabled,
           emphasis: 'danger',
           pressedBackgroundColor: this.storedPressedBackgroundColor,
@@ -420,9 +421,9 @@ export struct SiteCustomizationDetailSections {
 
   private buildJavaScriptPolicyOptions(): SiteJavaScriptPolicyOption[] {
     return [
-      { value: 'default', title: '跟随默认设置' },
-      { value: 'allow', title: '允许' },
-      { value: 'block', title: '阻止' }
+      { value: 'default', title: $r('app.string.settings_site_customization_external_follow_default') },
+      { value: 'allow', title: $r('app.string.settings_site_capability_rule_allow') },
+      { value: 'block', title: $r('app.string.settings_site_capability_rule_block') }
     ];
   }
 
@@ -437,14 +438,14 @@ export struct SiteCustomizationDetailSections {
     return `${this.renderVersion}_${group.kind}_${group.selectedRule}`;
   }
 
-  private resolveRuleLabel(rule: string): string {
+  private resolveRuleLabel(rule: string): ResourceStr {
     if (rule === 'allow') {
-      return '允许';
+      return $r('app.string.settings_site_capability_rule_allow');
     }
     if (rule === 'block') {
-      return '阻止';
+      return $r('app.string.settings_site_capability_rule_block');
     }
-    return '询问';
+    return $r('app.string.settings_site_capability_rule_ask');
   }
 
   private resolveRowPosition(index: number, total: number): 'single' | 'first' | 'middle' | 'last' {

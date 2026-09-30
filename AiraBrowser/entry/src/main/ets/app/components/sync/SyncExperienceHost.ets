@@ -37,6 +37,7 @@ import {
 import { SyncExperienceScreen } from './SyncExperienceScreen';
 import { SyncAdditionalBackupHost } from './SyncAdditionalBackupHost';
 import { SyncOperationProgressDialog } from './SyncOperationProgressDialog';
+import { SyncExperienceLinesDialog } from './SyncExperienceLinesDialog';
 import { SettingsNavigationCoordinator } from '../../router/SettingsNavigationCoordinator';
 import { SystemSettingsLaunchService } from '../../../services/system/SystemSettingsLaunchService';
 import { AppRuntimeContext } from '../../runtime/AppRuntimeContext';
@@ -74,14 +75,47 @@ export struct SyncExperienceHost {
   @State private preActiveStatusKind: SyncExperiencePreActiveStatusKind = 'initial-loading';
   @State private activeSheetVisible: boolean = false;
   @State private desktopGuideNavigationActive: boolean = false;
-  @State private syncProgressTitle: string = '';
-  @State private syncProgressSubtitle: string = '';
+  @State private syncProgressTitle: ResourceStr = '';
+  @State private syncProgressSubtitle: ResourceStr = '';
   @State private syncProgressValue: number = 0;
   @State private syncProgressInProgress: boolean = false;
-  @State private syncProgressDetailsText: string = '';
+  @State private syncProgressDetailsText: ResourceStr = '';
   @State private syncProgressDetailOpacity: number = 1;
   private stateRefreshRevision: number = 0;
   private setupSelectionCommitted: boolean = false;
+  @State private outcomeDialogTitle: ResourceStr = '';
+  @State private outcomeDialogLines: ResourceStr[] = [];
+  @State private outcomeDialogActionKind: string = 'confirm';
+  private outcomeLinesDialogOpen: boolean = false;
+  private outcomeLinesDialogController: CustomDialogController = new CustomDialogController({
+    builder: SyncExperienceLinesDialog({
+      title: $outcomeDialogTitle,
+      lines: $outcomeDialogLines,
+      actionKind: $outcomeDialogActionKind,
+      onRetry: () => {
+        this.closeOutcomeLinesDialog();
+        this.syncNow();
+      },
+      onChangeMethod: () => {
+        this.closeOutcomeLinesDialog();
+        this.activeSheetVisible = true;
+      },
+      onDismiss: () => {
+        this.closeOutcomeLinesDialog();
+      }
+    }),
+    alignment: DialogAlignment.Center,
+    autoCancel: true,
+    customStyle: false,
+    backgroundColor: resolveCenteredDialogSurfaceColor(),
+    backgroundBlurStyle: BlurStyle.NONE,
+    cornerRadius: CENTERED_DIALOG_CORNER_RADIUS_VP,
+    width: resolveCenteredDialogControllerWidth('m'),
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      this.outcomeLinesDialogOpen = false;
+      dismissDialogAction.dismiss();
+    }
+  });
   private syncProgressDialogOpen: boolean = false;
   private syncProgressDialogController: CustomDialogController = new CustomDialogController({
     builder: SyncOperationProgressDialog({
@@ -121,7 +155,7 @@ export struct SyncExperienceHost {
     (): void => {
       this.closeSyncProgressDialog();
     },
-    (title: string, subtitle: string): void => {
+    (title: ResourceStr, subtitle: ResourceStr): void => {
       this.showDialog(title, subtitle);
     }
   );
@@ -358,8 +392,9 @@ export struct SyncExperienceHost {
     const silentFirstActivation = !this.state.hasActiveProvider;
     if (!silentFirstActivation) {
       this.syncProgressController.begin(
-        '正在更改同步方式',
-        '正在读取、合并并保存同步数据'
+        $r('app.string.settings_sync_changing'),
+        $r('app.string.settings_sync_changing_detail'),
+        'sync'
       );
     }
     sharedSyncExperienceCoordinator.requestGoalChange(remoteKind, confirmed, firstActivationItems)
@@ -417,7 +452,11 @@ export struct SyncExperienceHost {
     }
     this.isBusy = true;
     if (!enabled) {
-      this.syncProgressController.begin('正在暂停书签同步', '正在保存当前书签同步状态');
+      this.syncProgressController.begin(
+        $r('app.string.settings_sync_pausing_bookmarks'),
+        $r('app.string.settings_sync_pausing_bookmarks_detail'),
+        'sync'
+      );
     }
     sharedSyncExperienceCoordinator.setBookmarkSelected(enabled)
       .then((outcome: SyncExperienceActionOutcome) => {
@@ -462,7 +501,11 @@ export struct SyncExperienceHost {
     );
     this.isBusy = true;
     if (changesHiddenDomain && !enabled) {
-      this.syncProgressController.begin('正在保存同步内容', '正在暂停最后一项同步内容');
+      this.syncProgressController.begin(
+        $r('app.string.settings_sync_saving_content'),
+        $r('app.string.settings_sync_saving_content_detail'),
+        'sync'
+      );
     }
     sharedSyncExperienceCoordinator.setPersonalizationItemSelected(id, enabled)
       .then((outcome: SyncExperienceActionOutcome) => {
@@ -480,7 +523,11 @@ export struct SyncExperienceHost {
 
   private completeProgressOutcome(outcome: SyncExperienceActionOutcome): void {
     if (outcome.type === 'completed') {
-      this.syncProgressController.finish(outcome.title, outcome.message, undefined, false);
+      this.syncProgressController.finish(outcome.title, outcome.message, () => {
+        if (this.hasMultipleOutcomeLines(outcome)) {
+          this.showMultipleOutcomeLines(outcome, 'confirm');
+        }
+      }, false);
       return;
     }
     this.syncProgressController.fail(outcome.title, outcome.message);
@@ -493,9 +540,9 @@ export struct SyncExperienceHost {
         title: outcome.title,
         message: outcome.message,
         autoCancel: true,
-        primaryButton: { value: '取消', action: () => {} },
+        primaryButton: { value: $r('app.string.settings_account_cancel'), action: () => {} },
         secondaryButton: {
-          value: '更改',
+          value: $r('app.string.settings_sync_change'),
           action: () => {
             this.changeGoal(outcome.remoteKind as AiraSyncProviderKind, true);
           }
@@ -519,7 +566,7 @@ export struct SyncExperienceHost {
         );
         return;
       }
-      this.showDialog(outcome.title, outcome.message);
+      this.showOutcomeOrDialog(outcome);
       return;
     }
     if (outcome.type === 'membership-required' && outcome.membershipDecision !== undefined) {
@@ -532,7 +579,7 @@ export struct SyncExperienceHost {
     }
     if (outcome.type === 'blocked' && outcome.requiresBookmarkResolution === true) {
       if (outcome.remoteKind === undefined) {
-        this.showDialog(outcome.title, outcome.message);
+        this.showOutcomeOrDialog(outcome);
         return;
       }
       const conflictRemoteKind = outcome.remoteKind;
@@ -541,13 +588,13 @@ export struct SyncExperienceHost {
         message: outcome.message,
         autoCancel: true,
         primaryButton: {
-          value: '以云端为准',
+          value: $r('app.string.settings_sync_prefer_cloud'),
           action: () => {
             this.resolveBookmarkConflicts(conflictRemoteKind, 'prefer-remote');
           }
         },
         secondaryButton: {
-          value: '以本机为准',
+          value: $r('app.string.settings_sync_prefer_local'),
           action: () => {
             this.resolveBookmarkConflicts(conflictRemoteKind, 'prefer-local');
           }
@@ -555,46 +602,52 @@ export struct SyncExperienceHost {
       });
       return;
     }
-    this.showDialog(outcome.title, outcome.message);
+    this.showOutcomeOrDialog(outcome);
   }
 
   private showFailureRecoveryDialog(outcome: SyncExperienceActionOutcome): void {
     if (outcome.bookmarkFailure?.code === 'BKM-PROTOCOL-UPDATE-001') {
       showCenteredAlertDialog({
-        title: '需要升级后才能同步',
-        message: 'Aira 云书签同步已经切换到新协议。请升级 App 后再同步；本机书签和其他同步方式不会被删除。',
+        title: $r('app.string.settings_sync_upgrade_required_title'),
+        message: $r('app.string.settings_sync_upgrade_required_message'),
         autoCancel: false,
         buttonDirection: DialogButtonDirection.VERTICAL,
         buttons: [
           {
-            value: '前往升级',
+            value: $r('app.string.settings_sync_go_update'),
             primary: true,
             fontColor: this.storedOnAccentColor,
             backgroundColor: this.storedAccentColor,
             action: (): void => {
               sharedClientUpdatePolicyService.deferCurrentRequirement();
               if (!AppRuntimeContext.hasUIAbilityContext()) {
-                this.showDialog('无法打开升级页面', '请稍后在应用市场搜索 Aira。');
+                this.showDialog(
+                  $r('app.string.settings_sync_update_open_failed'),
+                  $r('app.string.settings_sync_update_search')
+                );
                 return;
               }
               this.systemSettingsLaunchService.openAppGalleryDetailPage(
                 AppRuntimeContext.getUIAbilityContext()
               ).then((result): void => {
                 if (!result.success) {
-                  this.showDialog('无法打开升级页面', `${result.message} 请稍后在应用市场搜索 Aira。`);
+                  this.showDialog(
+                    $r('app.string.settings_sync_update_open_failed'),
+                    $r('app.string.settings_sync_update_failed_detail', result.message)
+                  );
                 }
               });
             }
           },
           {
-            value: '更换同步方式',
+            value: $r('app.string.settings_sync_change_method'),
             action: (): void => {
               sharedClientUpdatePolicyService.deferCurrentRequirement();
               this.activeSheetVisible = true;
             }
           },
           {
-            value: '继续使用本地功能',
+            value: $r('app.string.settings_sync_keep_local'),
             action: (): void => {
               sharedClientUpdatePolicyService.deferCurrentRequirement();
             }
@@ -604,14 +657,17 @@ export struct SyncExperienceHost {
       return;
     }
     if (outcome.retryAction === 'sync' && outcome.remoteKind !== undefined) {
+      if (this.showMultipleOutcomeLines(outcome, 'retry_change')) {
+        return;
+      }
       showCenteredAlertDialog({
-        title: outcome.title.length > 0 ? outcome.title : '同步失败',
+        title: this.hasVisibleOutcomeTitle(outcome.title) ? outcome.title : $r('app.string.settings_sync_failed'),
         message: outcome.message,
         autoCancel: true,
         buttonDirection: DialogButtonDirection.VERTICAL,
         buttons: [
           {
-            value: '再次同步',
+            value: $r('app.string.settings_sync_retry_sync'),
             primary: true,
             fontColor: this.storedOnAccentColor,
             backgroundColor: this.storedAccentColor,
@@ -620,26 +676,29 @@ export struct SyncExperienceHost {
             }
           },
           {
-            value: '更换同步方式',
+            value: $r('app.string.settings_sync_change_method'),
             fontColor: this.storedAccentColor,
             action: () => {
               this.activeSheetVisible = true;
             }
           },
-          { value: '知道了', action: () => {} }
+          { value: $r('app.string.settings_pro_got_it'), action: () => {} }
         ]
       });
       return;
     }
     if (outcome.retryAction === 'sync') {
+      if (this.showMultipleOutcomeLines(outcome, 'retry')) {
+        return;
+      }
       showCenteredAlertDialog({
-        title: outcome.title.length > 0 ? outcome.title : '同步失败',
+        title: this.hasVisibleOutcomeTitle(outcome.title) ? outcome.title : $r('app.string.settings_sync_failed'),
         message: outcome.message,
         autoCancel: true,
         buttonDirection: DialogButtonDirection.VERTICAL,
         buttons: [
           {
-            value: '再次同步',
+            value: $r('app.string.settings_sync_retry_sync'),
             primary: true,
             fontColor: this.storedOnAccentColor,
             backgroundColor: this.storedAccentColor,
@@ -647,20 +706,23 @@ export struct SyncExperienceHost {
               this.syncNow();
             }
           },
-          { value: '知道了', action: () => {} }
+          { value: $r('app.string.settings_pro_got_it'), action: () => {} }
         ]
       });
       return;
     }
     if (outcome.remoteKind !== undefined) {
+      if (this.showMultipleOutcomeLines(outcome, 'change')) {
+        return;
+      }
       showCenteredAlertDialog({
-        title: outcome.title.length > 0 ? outcome.title : '同步失败',
+        title: this.hasVisibleOutcomeTitle(outcome.title) ? outcome.title : $r('app.string.settings_sync_failed'),
         message: outcome.message,
         autoCancel: true,
         buttonDirection: DialogButtonDirection.VERTICAL,
         buttons: [
           {
-            value: '更换同步方式',
+            value: $r('app.string.settings_sync_change_method'),
             primary: true,
             fontColor: this.storedOnAccentColor,
             backgroundColor: this.storedAccentColor,
@@ -668,12 +730,12 @@ export struct SyncExperienceHost {
               this.activeSheetVisible = true;
             }
           },
-          { value: '知道了', action: () => {} }
+          { value: $r('app.string.settings_pro_got_it'), action: () => {} }
         ]
       });
       return;
     }
-    this.showDialog(outcome.title, outcome.message);
+    this.showOutcomeOrDialog(outcome);
   }
 
   private resolveBookmarkConflicts(
@@ -684,7 +746,11 @@ export struct SyncExperienceHost {
       return;
     }
     this.isBusy = true;
-    this.syncProgressController.begin('正在处理书签冲突', '正在按你的选择合并并保存书签');
+    this.syncProgressController.begin(
+      $r('app.string.settings_sync_resolving_conflicts'),
+      $r('app.string.settings_sync_resolving_conflicts_detail'),
+      'sync'
+    );
     sharedSyncExperienceCoordinator.resolveBookmarkConflicts(remoteKind, resolution)
       .then((outcome: SyncExperienceActionOutcome) => {
         this.completeProgressOutcome(outcome);
@@ -700,13 +766,13 @@ export struct SyncExperienceHost {
       decision.primaryAction === 'open_pro';
     if (isCrossSystemBookmarkUpgrade) {
       showCenteredAlertDialog({
-        title: 'Aira 云书签同步需要 Pro',
-        message: 'Aira 官方托管的跨设备书签同步需要 Pro。你也可以免费使用私有化部署、华为云空间或 WebDAV。',
+        title: $r('app.string.settings_sync_pro_required_title'),
+        message: $r('app.string.settings_sync_pro_required_message'),
         autoCancel: true,
         buttonDirection: DialogButtonDirection.VERTICAL,
         buttons: [
           {
-            value: '查看 Aira Pro',
+            value: $r('app.string.settings_sync_view_pro'),
             primary: true,
             fontColor: this.storedOnAccentColor,
             backgroundColor: this.storedAccentColor,
@@ -715,7 +781,7 @@ export struct SyncExperienceHost {
             }
           },
           {
-            value: '选择其他同步方式',
+            value: $r('app.string.settings_sync_choose_other'),
             fontColor: this.storedAccentColor,
             action: () => {
               this.activeSheetVisible = true;
@@ -726,12 +792,14 @@ export struct SyncExperienceHost {
       return;
     }
     showCenteredAlertDialog({
-      title: decision.title.length > 0 ? decision.title : '需要 Aira Pro',
+      title: decision.title.length > 0 ? decision.title : $r('app.string.settings_sync_pro_needed'),
       message: decision.message,
       autoCancel: true,
-      primaryButton: { value: '稍后', action: () => {} },
+      primaryButton: { value: $r('app.string.settings_sync_later'), action: () => {} },
       secondaryButton: {
-        value: decision.primaryAction === 'open_pro' ? '查看 Aira Pro' : '查看权益',
+        value: decision.primaryAction === 'open_pro'
+          ? $r('app.string.settings_sync_view_pro')
+          : $r('app.string.settings_sync_view_benefits'),
         action: () => {
           this.navigationCoordinator.openAiraPro(this.buildBoundary('sync_experience_membership'));
         }
@@ -739,11 +807,51 @@ export struct SyncExperienceHost {
     });
   }
 
-  private showDialog(title: string, message: string): void {
+  private showOutcomeOrDialog(outcome: SyncExperienceActionOutcome): void {
+    if (this.showMultipleOutcomeLines(outcome, 'confirm')) {
+      return;
+    }
+    this.showDialog(outcome.title, outcome.message);
+  }
+
+  private hasMultipleOutcomeLines(outcome: SyncExperienceActionOutcome): boolean {
+    return outcome.messageLines !== undefined && outcome.messageLines.length > 1;
+  }
+
+  private showMultipleOutcomeLines(outcome: SyncExperienceActionOutcome, actionKind: string): boolean {
+    if (!this.hasMultipleOutcomeLines(outcome)) {
+      return false;
+    }
+    const lines = outcome.messageLines !== undefined ? outcome.messageLines : [];
+    this.outcomeDialogTitle = this.hasVisibleOutcomeTitle(outcome.title)
+      ? outcome.title
+      : $r('app.string.settings_sync_result_fallback');
+    this.outcomeDialogLines = lines;
+    this.outcomeDialogActionKind = actionKind;
+    if (!this.outcomeLinesDialogOpen) {
+      this.outcomeLinesDialogOpen = true;
+      this.outcomeLinesDialogController.open();
+    }
+    return true;
+  }
+
+  private closeOutcomeLinesDialog(): void {
+    if (!this.outcomeLinesDialogOpen) {
+      return;
+    }
+    this.outcomeLinesDialogOpen = false;
+    this.outcomeLinesDialogController.close();
+  }
+
+  private hasVisibleOutcomeTitle(title: ResourceStr): boolean {
+    return typeof title !== 'string' || title.length > 0;
+  }
+
+  private showDialog(title: ResourceStr, message: ResourceStr): void {
     showCenteredAlertDialog({
       title: title,
       message: message,
-      confirm: { value: '知道了', action: () => {} }
+      confirm: { value: $r('app.string.settings_pro_got_it'), action: () => {} }
     });
   }
 

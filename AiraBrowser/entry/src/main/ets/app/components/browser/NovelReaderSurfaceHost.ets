@@ -4,6 +4,7 @@ import {
   resolveNovelModeLabel
 } from '../../../features/novel/NovelReaderModels';
 import { BROWSER_THEME_STORAGE_RESOLVED_MODE_KEY } from '../../../core/theme/BrowserThemeStorageKeys';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   resolveBrowserBottomFloatingMaterialShadowColor,
   resolveBrowserBottomNeutralPrimaryColor
@@ -96,7 +97,9 @@ export struct NovelReaderSurfaceHost {
       .padding(0)
       .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
       .stateEffect(false)
-      .accessibilityText(`重新进入${resolveNovelModeLabel(this.state.contentKind)}`)
+      .accessibilityText(resolveAppResourceText(
+        $r('app.string.novel_reenter_mode', resolveNovelModeLabel(this.state.contentKind))
+      ))
       .position({ x: this.resolveButtonX(), y: this.resolveButtonY() })
       .zIndex(NOVEL_REENTRY_BUTTON_Z_INDEX)
       .shadow({

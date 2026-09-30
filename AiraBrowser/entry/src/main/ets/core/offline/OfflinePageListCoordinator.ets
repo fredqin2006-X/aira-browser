@@ -44,7 +44,7 @@ export class OfflinePageListCoordinator {
       dataScope,
       privacyMode
     )) {
-      return this.viewModel.buildFailureState('当前隐私策略不允许读取已保存页面');
+      return this.viewModel.buildFailureState($r('app.string.offline_list_blocked'));
     }
     try {
       await this.repository.initialize();
@@ -56,7 +56,7 @@ export class OfflinePageListCoordinator {
       const verifiedRecords = await this.verifyOpenStatuses(records, persistStatusRepairs);
       return this.viewModel.buildState(verifiedRecords);
     } catch (_error) {
-      return this.viewModel.buildFailureState('已保存页面读取失败');
+      return this.viewModel.buildFailureState($r('app.string.offline_list_load_failed'));
     }
   }
 
@@ -69,14 +69,14 @@ export class OfflinePageListCoordinator {
     )) {
       return {
         ok: false,
-        message: '当前隐私策略不允许删除离线页面'
+        message: $r('app.string.offline_delete_blocked')
       };
     }
     const normalizedId = pageId.trim();
     if (normalizedId.length === 0) {
       return {
         ok: false,
-        message: '未找到要删除的离线页面'
+        message: $r('app.string.offline_delete_missing')
       };
     }
     try {
@@ -84,19 +84,19 @@ export class OfflinePageListCoordinator {
       if (record === undefined) {
         return {
           ok: false,
-          message: '离线页面不存在'
+          message: $r('app.string.offline_page_not_found')
         };
       }
       await this.deleteFiles(record);
       await this.repository.delete(record.id);
       return {
         ok: true,
-        message: '离线页面已删除'
+        message: $r('app.string.offline_delete_done')
       };
     } catch (_error) {
       return {
         ok: false,
-        message: '删除离线页面失败'
+        message: $r('app.string.offline_delete_failed')
       };
     }
   }

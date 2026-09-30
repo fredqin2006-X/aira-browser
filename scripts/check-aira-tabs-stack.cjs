@@ -403,12 +403,11 @@ test('the four styles are offered 卡片平铺 first, and every normaliser names
   assert.match(listLayer, /frameScale: this\.resolveListRowFrameScale\(item\.tab\.id\)/);
   assert.match(overlay, /getListEntryDissolveCurve\(\)/);
   assert.match(overlay, /listEntrySnapshotSuppressed/);
-  assert.match(overlay, /imageBlurExtra: this\.isListLayout\(\) \? this\.listEntryImageBlur : 0/);
   assert.doesNotMatch(listLayer, /top: this\.resolveContentTopPadding\(\)/);
   assert.match(overlay, /listEntrySnapshotOpacity = 0/);
   const session = read('AiraBrowser/entry/src/main/ets/core/browser/BrowserTabsOverviewSessionCoordinator.ets');
-  assert.match(session, /tabOverviewLayoutStyle === 'list'/);
-  assert.match(session, /BROWSER_TABS_OVERVIEW_LIST_ROW_CORNER_RADIUS/);
+  assert.match(session, /this\.styleEntryPolicy\.resolve\(facts\.tabOverviewLayoutStyle\)/);
+  assert.doesNotMatch(session, /tabOverviewLayoutStyle === 'list'/);
   assert.match(overlay, /!this\.isMorphCoveredTab\(tabId\)/);
   const listRow = read('AiraBrowser/entry/src/main/ets/app/components/browser/BrowserTabOverviewListRow.ets');
   assert.match(listRow, /\.opacity\(this\.contentOpacity\)/);
@@ -615,6 +614,16 @@ test('the overlay deck wires the policy, per-frame motion and the reference visu
   assert.match(overlay, /if \(this\.entrySharedSnapshotMounted && !this\.shouldMountSharedSnapshotInDeck\(\) &&\s*!this\.isStackEntryMorph\(\)\) \{\s*this\.buildSharedSnapshotOverlay\(\)/);
   // In-deck morph must not reuse the overlay-root 20/25 z-index; the slot wrapper owns stacking.
   assert.match(overlay, /snapshotLayerZIndex: inDeck \? 0 : FLOATING_TABS_SHARED_SNAPSHOT_Z_INDEX/);
+  // List clip fade is a separate node. Its opacity must not be chained onto the card shrink.
+  const listMorph = overlay.slice(overlay.indexOf('private buildListClipSnapshotOverlay'),
+    overlay.indexOf('private buildListEntrySurface'));
+  const cardMorph = overlay.slice(overlay.indexOf('private buildCoveringSnapshotOverlay'),
+    overlay.indexOf('private buildListClipSnapshotOverlay'));
+  assert.match(listMorph, /imageBlurExtra: this\.listEntryImageBlur/);
+  assert.match(listMorph, /\.opacity\(this\.resolveListEntrySnapshotOpacity\(\)\)/);
+  assert.match(cardMorph, /imageBlurExtra: 0/);
+  assert.doesNotMatch(cardMorph, /resolveListEntrySnapshotOpacity/);
+  assert.match(cardMorph, /\.zIndex\(inDeck \? 0 : FLOATING_TABS_SHARED_SNAPSHOT_Z_INDEX\)/);
   assert.match(overlay, /this\.buildSharedSnapshotOverlay\(true\)/);
   // Waiting snaps to the origin (duration 0). Settling uses the 350ms implicit fly-in. A duration of
   // 0 for the whole displacement made ArkUI snap the derived translate to rest with no motion.
@@ -684,4 +693,55 @@ test('the overlay deck wires the policy, per-frame motion and the reference visu
   assert.match(overlay, /swipeFlyoutOffset: this\.usesUpwardCardDismiss\(\) \? this\.resolveRootHeight\(\)/);
   assert.doesNotMatch(overlay, /private playDeckSlotReorder/);
   assert.doesNotMatch(overlay, /settleTo\(/);
+});
+
+test('each tab overview style owns a closed entry profile', () => {
+  const policyExports = load(
+    'AiraBrowser/entry/src/main/ets/core/browser/tabsOverview/BrowserTabsOverviewStyleEntryPolicy.ets',
+    name => {
+      assert.equal(name, '../BrowserTabsOverviewVisualTokens');
+      return {
+        BROWSER_TABS_OVERVIEW_CARD_CORNER_RADIUS: 26,
+        BROWSER_TABS_OVERVIEW_LIST_ROW_CORNER_RADIUS: 14
+      };
+    });
+  const policy = new policyExports.BrowserTabsOverviewStyleEntryPolicy();
+  const grid = policy.resolve('grid');
+  const strip = policy.resolve('horizontal_cards');
+  const stack = policy.resolve('stack');
+  const list = policy.resolve('list');
+  const unknown = policy.resolve('nope');
+  for (const card of [grid, strip, unknown]) {
+    assert.equal(card.snapshotMotion, 'scale');
+    assert.equal(card.pinImageToSource, false);
+    assert.equal(card.fadesCoveringSnapshot, false);
+    assert.equal(card.paintsEntrySurface, false);
+    assert.equal(card.cornerRadius, 26);
+  }
+  assert.equal(grid.morphHost, 'above_cards');
+  assert.equal(strip.morphHost, 'above_cards');
+  assert.equal(stack.morphHost, 'deck');
+  assert.equal(stack.snapshotMotion, 'scale');
+  assert.equal(stack.fadesCoveringSnapshot, false);
+  assert.equal(stack.pinImageToSource, false);
+  assert.equal(list.morphHost, 'above_cards');
+  assert.equal(list.snapshotMotion, 'clip');
+  assert.equal(list.pinImageToSource, true);
+  assert.equal(list.fadesCoveringSnapshot, true);
+  assert.equal(list.paintsEntrySurface, true);
+  assert.equal(list.cornerRadius, 14);
+  assert.equal(policy.resolve(undefined).style, 'grid');
+  const source = fs.readFileSync(path.resolve(__dirname,
+    '../AiraBrowser/entry/src/main/ets/core/browser/tabsOverview/BrowserTabsOverviewStyleEntryPolicy.ets'),
+    'utf8');
+  assert.match(source, /private gridProfile\(\)/);
+  assert.match(source, /private horizontalCardsProfile\(\)/);
+  assert.match(source, /private stackProfile\(\)/);
+  assert.match(source, /private listProfile\(\)/);
+  // List-only effects live on the list record alone. A card profile must not grow one by sharing it.
+  assert.equal((source.match(/fadesCoveringSnapshot: true/g) || []).length, 1);
+  assert.equal((source.match(/pinImageToSource: true/g) || []).length, 1);
+  assert.equal((source.match(/paintsEntrySurface: true/g) || []).length, 1);
+  assert.equal((source.match(/morphHost: 'deck'/g) || []).length, 1);
+  assert.equal((source.match(/snapshotMotion: 'clip'/g) || []).length, 1);
 });

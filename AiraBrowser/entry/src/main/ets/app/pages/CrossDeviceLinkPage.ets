@@ -9,6 +9,8 @@ import { CrossDeviceLinkHost } from '../components/sync/CrossDeviceLinkHost';
 struct CrossDeviceLinkPage {
   @State private refreshToken: number = 0;
   @State private pageVisible: boolean = false;
+  @State private guideVisible: boolean = false;
+  @State private guideDismissToken: number = 0;
 
   onPageShow(): void {
     this.pageVisible = true;
@@ -19,11 +21,23 @@ struct CrossDeviceLinkPage {
     this.pageVisible = false;
   }
 
+  onBackPress(): boolean {
+    if (!this.guideVisible) {
+      return false;
+    }
+    this.guideDismissToken += 1;
+    return true;
+  }
+
   build() {
     Column() {
       CrossDeviceLinkHost({
         refreshToken: this.refreshToken,
-        pageVisible: this.pageVisible
+        pageVisible: this.pageVisible,
+        guideDismissToken: this.guideDismissToken,
+        onGuideVisibility: (visible: boolean): void => {
+          this.guideVisible = visible;
+        }
       })
         .width('100%')
         .height('100%')

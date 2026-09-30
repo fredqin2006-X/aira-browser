@@ -49,7 +49,7 @@ export class HistoryManagerScreenController {
   private timelineLoading: boolean = false;
   private timelineInitialized: boolean = false;
   private timelineRevision: number = -1;
-  private timelineErrorListener?: (message: string) => void;
+  private timelineErrorListener?: (message: ResourceStr) => void;
   private timelineLoadingListener?: (loading: boolean) => void;
   private timelineDeletionSequence: number = 0;
   private timelineDeletionFailed: boolean = false;
@@ -89,7 +89,7 @@ export class HistoryManagerScreenController {
     this.timelineRevision = -1;
   }
 
-  setTimelineErrorListener(listener?: (message: string) => void): void {
+  setTimelineErrorListener(listener?: (message: ResourceStr) => void): void {
     this.timelineErrorListener = listener;
   }
 
@@ -158,7 +158,7 @@ export class HistoryManagerScreenController {
         }
         this.clearActiveTimelineFirstPageRequest(request);
         if (startedDuringMutation || !this.acceptTimelineRevision(revision)) {
-          this.timelineErrorListener?.('历史记录已更新，请重试。');
+          this.timelineErrorListener?.($r('app.string.history_stale'));
           this.setTimelineLoading(false);
           return;
         }
@@ -173,7 +173,7 @@ export class HistoryManagerScreenController {
       .catch((_error: Error) => {
         if (this.isTimelineRequestCurrent(sequence, normalizedQuery)) {
           this.clearActiveTimelineFirstPageRequest(request);
-          this.timelineErrorListener?.('加载历史记录失败，请重试。');
+          this.timelineErrorListener?.($r('app.string.history_load_failed_retry'));
           this.setTimelineLoading(false);
         }
       });
@@ -200,7 +200,7 @@ export class HistoryManagerScreenController {
     }
     if (!this.acceptTimelineRevision(this.timelineRevision)) {
       this.invalidateTimelineCache();
-      this.timelineErrorListener?.('历史记录已更新，请重试。');
+      this.timelineErrorListener?.($r('app.string.history_stale'));
       return;
     }
     this.timelineErrorListener?.('');
@@ -223,7 +223,7 @@ export class HistoryManagerScreenController {
         this.clearActiveTimelinePaginationRequest(request);
         if (!this.acceptTimelineRevision(revision)) {
           this.invalidateTimelineCache();
-          this.timelineErrorListener?.('历史记录已更新，请重试。');
+          this.timelineErrorListener?.($r('app.string.history_stale'));
           this.setTimelineLoading(false);
           return;
         }
@@ -244,7 +244,7 @@ export class HistoryManagerScreenController {
       .catch((_error: Error) => {
         if (this.isTimelineRequestCurrent(sequence, normalizedQuery)) {
           this.clearActiveTimelinePaginationRequest(request);
-          this.timelineErrorListener?.('加载更多历史记录失败，请重试。');
+          this.timelineErrorListener?.($r('app.string.history_load_more_failed'));
           this.setTimelineLoading(false);
         }
       });

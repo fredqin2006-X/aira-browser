@@ -20,6 +20,7 @@ import {
 } from '../../data/browser/PrivateModeCookieSnapshotRepository';
 import { PreferencesRepository } from '../../data/preferences/PreferencesRepository';
 import { sharedBrowserSslDecisionCacheRuntime } from './BrowserSslDecisionCacheRuntime';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export interface CurrentSiteDataSummary {
   cookieCount: number;
@@ -74,9 +75,9 @@ export class ArkWebIncognitoRuntimeClearOptions {
 }
 
 export interface SiteDataClearDialogState {
-  title: string;
-  message: string;
-  confirmLabel: string;
+  title: ResourceStr;
+  message: ResourceStr;
+  confirmLabel: ResourceStr;
 }
 
 export interface SiteDataClearCurrentPlan {
@@ -354,15 +355,15 @@ export class SiteDataControlService {
     const plan = this.buildClearCurrentSiteDataPlan('', profileId, privacyMode, dataScope);
     if (plan.dataScope === 'session_ephemeral') {
       return {
-        title: '无法按站点清除私密数据',
-        message: '系统当前不支持只清除这个私密站点的存储或 Cookie，请前往“隐私防护”清除本次私密数据。',
-        confirmLabel: '知道了'
+        title: $r('app.string.settings_site_info_clear_dialog_private_title'),
+        message: $r('app.string.settings_site_info_clear_dialog_private_message'),
+        confirmLabel: $r('app.string.settings_site_info_clear_dialog_private_confirm')
       };
     }
     return {
-      title: '清除当前站点存储',
-      message: '只会清除当前网站保存的本地数据，不会清除 Cookie 或网页缓存，登录状态可能保留。确定要继续吗？',
-      confirmLabel: '清除'
+      title: $r('app.string.settings_site_info_clear_dialog_title'),
+      message: $r('app.string.settings_site_info_clear_dialog_message'),
+      confirmLabel: $r('app.string.settings_site_info_clear_dialog_confirm')
     };
   }
 
@@ -470,7 +471,7 @@ export class SiteDataControlService {
     if (context === undefined) {
       return {
         hasError: true,
-        message: '浏览数据范围不一致，未执行清理。'
+        message: resolveAppResourceText($r('app.string.settings_site_info_erasure_scope_mismatch'))
       };
     }
     const plan = this.buildClearCurrentSiteDataPlan(
@@ -483,8 +484,8 @@ export class SiteDataControlService {
       return {
         hasError: true,
         message: plan.dataScope === 'session_ephemeral'
-          ? '系统当前不支持按站点清除私密存储，请前往“隐私防护”清除本次私密数据。'
-          : '当前站点没有可按站点清除的本地存储。'
+          ? resolveAppResourceText($r('app.string.settings_site_info_private_clear_unsupported'))
+          : resolveAppResourceText($r('app.string.settings_site_info_no_clearable_storage'))
       };
     }
     try {
@@ -492,12 +493,15 @@ export class SiteDataControlService {
     } catch (error) {
       return {
         hasError: true,
-        message: `清除当前站点存储失败：${JSON.stringify(error)}`
+        message: resolveAppResourceText(
+          $r('app.string.settings_site_info_clear_failed_detail'),
+          JSON.stringify(error)
+        )
       };
     }
     return {
       hasError: false,
-      message: '当前站点存储已清除，Cookie 和网页缓存已保留。'
+      message: resolveAppResourceText($r('app.string.settings_site_info_cleared'))
     };
   }
 

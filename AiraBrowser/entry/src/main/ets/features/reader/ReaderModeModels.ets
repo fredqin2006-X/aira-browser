@@ -116,7 +116,7 @@ export interface ReaderModeSearchState {
 export interface ReaderModeViewState {
   visible: boolean;
   loading: boolean;
-  errorMessage: string;
+  errorMessage: ResourceStr;
   article: ReaderModeArticle;
   preferences: ReaderModePreferences;
   search: ReaderModeSearchState;

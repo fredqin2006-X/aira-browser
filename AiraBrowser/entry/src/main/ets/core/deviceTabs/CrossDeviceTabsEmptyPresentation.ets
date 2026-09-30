@@ -82,10 +82,10 @@ export function buildCrossDeviceTabsEmptyPresentation(
   if (kind === 'link_disabled') {
     return {
       kind: kind,
-      title: '跨设备互联未开启',
+      title: '与电脑互联未开启',
       message: '开启后即可看到电脑上的标签页，和数据同步无关。',
       primaryAction: 'enable_link',
-      primaryLabel: '开启跨设备互联',
+      primaryLabel: '开启与电脑互联',
       secondaryAction: 'none',
       secondaryLabel: ''
     };

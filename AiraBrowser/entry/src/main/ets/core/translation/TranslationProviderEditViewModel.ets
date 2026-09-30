@@ -4,6 +4,7 @@ import {
   TranslationProviderTemplateId
 } from '../../common/models/BrowserModels';
 import { TranslationProviderTemplateService } from '../../services/translation/TranslationProviderTemplateService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface TranslationProviderEditFieldView {
   key: string;
@@ -84,7 +85,7 @@ export class TranslationProviderEditViewModel {
     const template = this.templateService.findTemplate(draft.templateId);
     const validationError = persistedError.length > 0 ? persistedError : this.buildValidationError(draft);
     return {
-      title: '配置服务商',
+      title: resolveAppResourceText($r('app.string.settings_web_translation_config_title')),
       displayName: draft.displayName,
       endpoint: draft.endpoint,
       apiKey: draft.apiKey,
@@ -138,71 +139,71 @@ export class TranslationProviderEditViewModel {
     switch (templateId) {
       case 'custom_http':
         return [
-          { key: 'displayName', label: '名称', placeholder: '例如 我的翻译服务', secure: false },
+          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_custom')), secure: false },
           { key: 'endpoint', label: 'HTTPS Endpoint', placeholder: 'https://api.example.com/translate', secure: false }
         ];
       case 'baidu':
       case 'youdao':
         return [
-          { key: 'displayName', label: '名称', placeholder: '例如 百度翻译', secure: false },
-          { key: 'appId', label: 'App ID', placeholder: '填写你的应用 ID', secure: false },
-          { key: 'secretKey', label: '应用密钥', placeholder: '填写你的应用密钥', secure: true }
+          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', '百度翻译')), secure: false },
+          { key: 'appId', label: 'App ID', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_app_id_placeholder')), secure: false },
+          { key: 'secretKey', label: resolveAppResourceText($r('app.string.settings_web_translation_field_secret')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_secret_placeholder')), secure: true }
         ];
       case 'tencent_cloud':
         return [
-          { key: 'displayName', label: '名称', placeholder: '例如 腾讯云翻译', secure: false },
-          { key: 'appId', label: 'SecretId', placeholder: '填写你的 SecretId', secure: false },
-          { key: 'secretKey', label: 'SecretKey', placeholder: '填写你的 SecretKey', secure: true },
-          { key: 'region', label: '地域', placeholder: '例如 ap-shanghai', secure: false }
+          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', '腾讯云翻译')), secure: false },
+          { key: 'appId', label: 'SecretId', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', 'SecretId')), secure: false },
+          { key: 'secretKey', label: 'SecretKey', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', 'SecretKey')), secure: true },
+          { key: 'region', label: resolveAppResourceText($r('app.string.settings_web_translation_field_region')), placeholder: 'ap-shanghai', secure: false }
         ];
       case 'alibaba_cloud':
         return [
-          { key: 'displayName', label: '名称', placeholder: '例如 阿里云翻译', secure: false },
-          { key: 'appId', label: 'AccessKey ID', placeholder: '填写你的 AccessKey ID', secure: false },
-          { key: 'secretKey', label: 'AccessKey Secret', placeholder: '填写你的 AccessKey Secret', secure: true },
-          { key: 'region', label: '地域', placeholder: '例如 cn-hangzhou', secure: false }
+          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', '阿里云翻译')), secure: false },
+          { key: 'appId', label: 'AccessKey ID', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', 'AccessKey ID')), secure: false },
+          { key: 'secretKey', label: 'AccessKey Secret', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_access_secret_placeholder')), secure: true },
+          { key: 'region', label: resolveAppResourceText($r('app.string.settings_web_translation_field_region')), placeholder: 'cn-hangzhou', secure: false }
         ];
       case 'volcano':
         return [
-          { key: 'displayName', label: '名称', placeholder: '例如 火山翻译', secure: false },
-          { key: 'appId', label: 'Access Key', placeholder: '填写你的 Access Key', secure: false },
-          { key: 'secretKey', label: 'Secret Key', placeholder: '填写你的 Secret Key', secure: true },
-          { key: 'region', label: '区域', placeholder: '例如 cn-north-1', secure: false }
+          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', '火山翻译')), secure: false },
+          { key: 'appId', label: 'Access Key', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_access_placeholder')), secure: false },
+          { key: 'secretKey', label: 'Secret Key', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_secret_key_placeholder')), secure: true },
+          { key: 'region', label: resolveAppResourceText($r('app.string.settings_web_translation_field_area')), placeholder: 'cn-north-1', secure: false }
         ];
       case 'microsoft':
         return [
-          { key: 'displayName', label: '名称', placeholder: '例如 Microsoft Translator', secure: false },
-          { key: 'apiKey', label: '订阅 Key', placeholder: '填写你的订阅 Key', secure: true },
-          { key: 'region', label: '区域', placeholder: '例如 eastasia', secure: false }
+          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', 'Microsoft Translator')), secure: false },
+          { key: 'apiKey', label: resolveAppResourceText($r('app.string.settings_web_translation_field_subscription_key')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_subscription_placeholder')), secure: true },
+          { key: 'region', label: resolveAppResourceText($r('app.string.settings_web_translation_field_area')), placeholder: 'eastasia', secure: false }
         ];
       case 'google_cloud':
         return [
-          { key: 'displayName', label: '名称', placeholder: '例如 Google Cloud', secure: false },
-          { key: 'apiKey', label: 'API Key', placeholder: '填写你的 API Key', secure: true },
-          { key: 'model', label: '项目或模型', placeholder: '可选', secure: false }
+          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', 'Google Cloud')), secure: false },
+          { key: 'apiKey', label: 'API Key', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_api_key_placeholder')), secure: true },
+          { key: 'model', label: resolveAppResourceText($r('app.string.settings_web_translation_field_model')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_optional')), secure: false }
         ];
       default:
         return [
-          { key: 'displayName', label: '名称', placeholder: '例如 DeepL', secure: false },
-          { key: 'apiKey', label: 'API Key', placeholder: '填写你的 API Key', secure: true }
+          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', 'DeepL')), secure: false },
+          { key: 'apiKey', label: 'API Key', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_api_key_placeholder')), secure: true }
         ];
     }
   }
 
   private buildValidationError(draft: TranslationProviderEditDraft): string {
     if (draft.displayName.trim().length === 0) {
-      return '请填写服务名称。';
+      return resolveAppResourceText($r('app.string.settings_web_translation_validation_name'));
     }
     if (draft.templateId === 'custom_http') {
       const endpoint = draft.endpoint.trim();
       if (!endpoint.toLowerCase().startsWith('https://')) {
-        return '自定义翻译服务必须使用 HTTPS endpoint。';
+        return resolveAppResourceText($r('app.string.settings_web_translation_validation_https'));
       }
       const lowerEndpoint = endpoint.toLowerCase();
       if (lowerEndpoint.indexOf('?') >= 0 &&
         (lowerEndpoint.indexOf('key=') >= 0 || lowerEndpoint.indexOf('token=') >= 0 ||
           lowerEndpoint.indexOf('secret=') >= 0 || lowerEndpoint.indexOf('password=') >= 0)) {
-        return '不要把 API 密钥放在 URL 查询参数中。';
+        return resolveAppResourceText($r('app.string.settings_web_translation_validation_url_secret'));
       }
       return '';
     }
@@ -210,21 +211,21 @@ export class TranslationProviderEditViewModel {
       case 'deepl':
       case 'google_cloud':
       case 'microsoft':
-        return draft.apiKey.trim().length > 0 ? '' : '请填写该服务商的 API Key。';
+        return draft.apiKey.trim().length > 0 ? '' : resolveAppResourceText($r('app.string.settings_web_translation_validation_api_key'));
       case 'baidu':
       case 'youdao':
         return draft.appId.trim().length > 0 && draft.secretKey.trim().length > 0
           ? ''
-          : '请填写该服务商的应用 ID 和应用密钥。';
+          : resolveAppResourceText($r('app.string.settings_web_translation_validation_app'));
       case 'tencent_cloud':
         return draft.appId.trim().length > 0 && draft.secretKey.trim().length > 0
           ? ''
-          : '请填写腾讯云 SecretId 和 SecretKey。';
+          : resolveAppResourceText($r('app.string.settings_web_translation_validation_tencent'));
       case 'alibaba_cloud':
       case 'volcano':
         return draft.appId.trim().length > 0 && draft.secretKey.trim().length > 0
           ? ''
-          : '请填写 Access Key 和 Secret Key。';
+          : resolveAppResourceText($r('app.string.settings_web_translation_validation_access'));
       default:
         return '';
     }
@@ -233,8 +234,8 @@ export class TranslationProviderEditViewModel {
 
   private buildHelperText(template: TranslationProviderTemplate): string {
     if (template.id === 'custom_http') {
-      return '清风会用 POST JSON 发送 sourceLanguage、targetLanguage 和 texts 数组；响应可返回 items、translations 或 results。';
+      return resolveAppResourceText($r('app.string.settings_web_translation_helper_custom'));
     }
-    return '清风会直接请求该服务商官方接口。翻译前会提示你确认页面文字将发送到所选服务。';
+    return resolveAppResourceText($r('app.string.settings_web_translation_helper_official'));
   }
 }

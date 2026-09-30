@@ -23,7 +23,7 @@ export struct BrowserLargeScreenModalHeader {
   private storedSecondaryTextColor: string = '#5F6875';
   @StorageProp(BROWSER_THEME_STORAGE_FLOATING_SURFACE_KEY)
   private storedFloatingSurfaceColor: string = '#FFFFFF';
-  @Prop title: string = '';
+  @Prop title: ResourceStr = '';
   @Prop dialogMode: boolean = false;
   @Prop showBackButton: boolean = false;
   @Prop showRefreshButton: boolean = false;

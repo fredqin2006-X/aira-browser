@@ -36,6 +36,7 @@ import {
 } from '../../../core/siteicons/SiteIconListPresenter';
 import { SiteControlsManualOriginDialog } from './SiteControlsManualOriginDialog';
 import { resolveCenteredDialogControllerWidth,  resolveCenteredDialogSurfaceColor, CENTERED_DIALOG_CORNER_RADIUS_VP } from '../common/CenteredDialogSurface';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 const SITE_CONTROLS_CAPABILITY_LIST_CACHE_COUNT: number = 8;
 const SITE_CONTROLS_CAPABILITY_SITE_ROW_CARD_RADIUS: number = 22;
@@ -66,13 +67,13 @@ export struct SiteControlsCapabilityScreen {
     hasRows: false,
     hasFilteredRows: false,
     summaryLine: '',
-    listTitle: '站点规则',
-    emptyTitle: '还没有站点权限规则',
-    emptyMessage: '网站请求权限或被设置打开应用规则后，会出现在这里'
+    listTitle: resolveAppResourceText($r('app.string.settings_site_controls_list_title')),
+    emptyTitle: resolveAppResourceText($r('app.string.settings_site_controls_empty_title')),
+    emptyMessage: resolveAppResourceText($r('app.string.settings_site_controls_empty_message'))
   };
   @Prop defaultState: SiteControlsCapabilityDefaultState = {
-    title: '默认设置',
-    valueLabel: '询问',
+    title: resolveAppResourceText($r('app.string.settings_site_controls_default_title')),
+    valueLabel: resolveAppResourceText($r('app.string.settings_site_capability_rule_ask')),
     isEnabled: true
   };
   @Prop pageTitle: string = '';
@@ -162,7 +163,7 @@ export struct SiteControlsCapabilityScreen {
         ListItem() {
           SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
             SettingsActionButton({
-              title: '添加网站例外',
+              title: $r('app.string.settings_site_controls_add_exception'),
               pressedBackgroundColor: this.storedPressedBackgroundColor,
               onAction: (): void => {
                 this.openManualOriginDialog();
@@ -192,7 +193,7 @@ export struct SiteControlsCapabilityScreen {
   private buildSearchSection() {
     SettingsTextField({
       text: this.state.query,
-      placeholder: '搜索站点',
+      placeholder: $r('app.string.settings_site_controls_search_placeholder'),
       controlBackgroundColor: this.storedSurfaceBackgroundColor,
       primaryTextColor: this.storedPrimaryTextColor,
       secondaryTextColor: this.storedSecondaryTextColor,
@@ -204,7 +205,7 @@ export struct SiteControlsCapabilityScreen {
 
   @Builder
   private buildDefaultSection() {
-    SettingsSection({ title: '默认' }) {
+    SettingsSection({ title: $r('app.string.settings_site_controls_section_default') }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsNavigationRow({
           title: this.defaultState.title,
@@ -226,7 +227,7 @@ export struct SiteControlsCapabilityScreen {
   private buildWebsiteListItems() {
     if (this.state.hasFilteredRows) {
       ListItem() {
-        SettingsSectionTitle({ title: '网站' })
+        SettingsSectionTitle({ title: $r('app.string.settings_site_controls_section_sites') })
       }
       .width('100%')
       .margin({ bottom: -8 })
@@ -311,18 +312,20 @@ export struct SiteControlsCapabilityScreen {
     }
     const value = this.manualOriginDraft.trim();
     if (value.length === 0) {
-      this.manualOriginError = '请输入站点地址。';
+      this.manualOriginError = resolveAppResourceText($r('app.string.settings_site_customization_error_address_required'));
       return false;
     }
     this.onOpenManualOrigin?.(value);
     return true;
   }
 
-  private resolveTitle(): string {
+  private resolveTitle(): ResourceStr {
     if (this.pageTitle.trim().length > 0) {
       return this.pageTitle;
     }
-    return this.state.listTitle.length > 0 ? this.state.listTitle : '权限';
+    return this.state.listTitle.length > 0
+      ? this.state.listTitle
+      : $r('app.string.settings_site_controls_section_permissions');
   }
 
   private getRowsDataSource(): SiteControlsListRowDataSource {

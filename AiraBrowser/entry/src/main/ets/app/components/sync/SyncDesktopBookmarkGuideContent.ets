@@ -76,7 +76,7 @@ export struct SyncDesktopBookmarkGuideContent {
         payload.historyUrl
       );
     } catch (_error) {
-      this.showToast('跨设备使用指南加载失败');
+      this.showToast($r('app.string.settings_sync_self_host_guide_content_failed'));
     }
   }
 
@@ -113,11 +113,11 @@ export struct SyncDesktopBookmarkGuideContent {
         this.showToast(result.message);
       })
       .catch((_error: Error) => {
-        this.showToast('复制失败，请稍后重试。');
+        this.showToast($r('app.string.settings_sync_self_host_guide_copy_failed'));
       });
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

@@ -4,8 +4,7 @@ import {
   OfflinePageOpenStatus,
   OfflinePageRecord
 } from '../../common/models/OfflinePageModels';
-
-const EMPTY_MESSAGE: string = '还没有保存的离线页面';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export class OfflinePageListViewModel {
   buildLoadingState(): OfflinePageListState {
@@ -13,7 +12,7 @@ export class OfflinePageListViewModel {
       loading: true,
       empty: false,
       items: [],
-      message: '正在读取已保存页面...'
+      message: $r('app.string.offline_list_loading')
     };
   }
 
@@ -23,11 +22,11 @@ export class OfflinePageListViewModel {
       loading: false,
       empty: items.length === 0,
       items: items,
-      message: items.length === 0 ? EMPTY_MESSAGE : ''
+      message: items.length === 0 ? $r('app.string.offline_list_empty') : ''
     };
   }
 
-  buildFailureState(message: string): OfflinePageListState {
+  buildFailureState(message: ResourceStr): OfflinePageListState {
     return {
       loading: false,
       empty: true,
@@ -37,9 +36,14 @@ export class OfflinePageListViewModel {
   }
 
   private buildItem(record: OfflinePageRecord): OfflinePageListItem {
-    const title = record.title.trim().length > 0 ? record.title.trim() : '未命名离线页面';
-    const siteName = record.siteName.trim().length > 0 ? record.siteName.trim() :
-      (record.host.trim().length > 0 ? record.host.trim() : '未知来源');
+    const title = record.title.trim().length > 0
+      ? record.title.trim()
+      : resolveAppResourceText($r('app.string.offline_unnamed_page'));
+    const siteName = record.siteName.trim().length > 0
+      ? record.siteName.trim()
+      : (record.host.trim().length > 0
+        ? record.host.trim()
+        : resolveAppResourceText($r('app.string.offline_unknown_source')));
     return {
       id: record.id,
       title: title,
@@ -55,17 +59,17 @@ export class OfflinePageListViewModel {
     };
   }
 
-  private resolveOpenStatusText(status: OfflinePageOpenStatus): string {
+  private resolveOpenStatusText(status: OfflinePageOpenStatus): ResourceStr {
     if (status === 'available') {
-      return '可正常打开';
+      return $r('app.string.offline_open_status_available');
     }
     if (status === 'missing_snapshot') {
-      return '正文文件缺失';
+      return $r('app.string.offline_open_status_missing_snapshot');
     }
     if (status === 'missing_assets') {
-      return '部分资源缺失';
+      return $r('app.string.offline_open_status_missing_assets');
     }
-    return '离线副本异常';
+    return $r('app.string.offline_open_status_corrupted');
   }
 
   private formatSavedAt(value: number): string {

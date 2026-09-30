@@ -7,6 +7,7 @@ import {
   buildReaderSpeechVoiceId,
   createDefaultReaderSpeechVoiceOption
 } from '../../features/reader/ReaderSpeechModels';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 const READER_SPEECH_DOMAIN: number = 0x0000;
 const READER_SPEECH_TAG: string = 'ReaderSpeech';
@@ -27,7 +28,7 @@ export interface ReaderSpeechServiceListener {
   onChunkStart?: (progress: ReaderSpeechProgress) => void;
   onComplete?: () => void;
   onStop?: () => void;
-  onError?: (message: string) => void;
+  onError?: (message: ResourceStr) => void;
 }
 
 export class ReaderSpeechService {
@@ -51,7 +52,7 @@ export class ReaderSpeechService {
     const speakableChunks = chunks.map((chunk: string) => chunk.trim())
       .filter((chunk: string) => chunk.length > 0);
     if (speakableChunks.length <= 0) {
-      this.listener?.onError?.('没有可朗读的正文。');
+      this.listener?.onError?.($r('app.string.reader_speech_no_body'));
       return;
     }
     const operationGeneration = this.operationGeneration + 1;
@@ -191,7 +192,8 @@ export class ReaderSpeechService {
       return engine;
     } catch (error) {
       const businessError = error as BusinessError;
-      const message = businessError.message ?? '系统朗读引擎初始化失败。';
+      const message: string = businessError.message ??
+        resolveAppResourceText($r('app.string.reader_speech_engine_init_failed'));
       if (this.enginePromise === enginePromise) {
         this.enginePromise = undefined;
       }
@@ -280,7 +282,8 @@ export class ReaderSpeechService {
       const businessError = error as BusinessError;
       this.speaking = false;
       this.resetQueue();
-      this.listener?.onError?.(businessError.message ?? '朗读启动失败。');
+      this.listener?.onError?.(businessError.message ??
+        $r('app.string.reader_speech_start_failed_short'));
     }
   }
 
@@ -353,49 +356,52 @@ export class ReaderSpeechService {
     };
   }
 
-  private buildVoiceTitle(language: string, person: number, gender: string): string {
-    const genderLabel = this.resolveGenderLabel(gender);
-    if (genderLabel.length > 0) {
-      return `${this.resolveLanguageLabel(language)}${genderLabel}`;
+  private buildVoiceTitle(language: string, person: number, gender: string): ResourceStr {
+    if (this.isChineseVoice(language)) {
+      if (this.isFemaleVoice(gender)) {
+        return $r('app.string.reader_voice_title_female');
+      }
+      if (this.isMaleVoice(gender)) {
+        return $r('app.string.reader_voice_title_male');
+      }
+      return $r('app.string.reader_voice_title_person', person);
     }
-    return `${this.resolveLanguageLabel(language)}音色 ${person}`;
+    return $r('app.string.reader_voice_title_other', language.trim(), person);
   }
 
-  private buildVoiceHelperText(language: string, style: string, gender: string, status: string): string {
-    const parts: string[] = [this.resolveLanguageLabel(language)];
-    const genderLabel = this.resolveGenderLabel(gender);
-    if (genderLabel.length > 0) {
-      parts.push(genderLabel);
+  private buildVoiceHelperText(language: string, style: string, gender: string, status: string): ResourceStr {
+    const suffix = this.buildVoiceHelperSuffix(style, status);
+    if (this.isChineseVoice(language)) {
+      if (this.isFemaleVoice(gender)) {
+        return $r('app.string.reader_voice_helper_female', suffix);
+      }
+      if (this.isMaleVoice(gender)) {
+        return $r('app.string.reader_voice_helper_male', suffix);
+      }
+      return $r('app.string.reader_voice_helper_plain', suffix);
     }
+    return $r('app.string.reader_voice_helper_other', language.trim(), suffix);
+  }
+
+  private buildVoiceHelperSuffix(style: string, status: string): string {
+    const parts: string[] = [];
     if (style.trim().length > 0) {
       parts.push(style.trim());
     }
     if (status.trim().length > 0) {
       parts.push(status.trim());
     }
-    return parts.join(' · ');
+    return parts.map((part: string): string => ` · ${part}`).join('');
   }
 
-  private resolveLanguageLabel(language: string): string {
-    const normalized = language.trim().toLowerCase();
-    if (normalized === 'zh-cn' || normalized === 'zh_cn') {
-      return '中文';
-    }
-    if (normalized === 'en-us' || normalized === 'en_us') {
-      return '英语';
-    }
-    return language.trim().length > 0 ? language.trim() : '系统';
-  }
-
-  private resolveGenderLabel(gender: string): string {
+  private isFemaleVoice(gender: string): boolean {
     const normalized = gender.trim().toLowerCase();
-    if (normalized === 'female' || normalized === 'woman') {
-      return '女声';
-    }
-    if (normalized === 'male' || normalized === 'man') {
-      return '男声';
-    }
-    return gender.trim();
+    return normalized === 'female' || normalized === 'woman';
+  }
+
+  private isMaleVoice(gender: string): boolean {
+    const normalized = gender.trim().toLowerCase();
+    return normalized === 'male' || normalized === 'man';
   }
 
   private isVoiceAvailable(status: string): boolean {
@@ -407,17 +413,17 @@ export class ReaderSpeechService {
     return normalized === 'zh' || normalized === 'zh-cn' || normalized === 'zh_cn';
   }
 
-  private buildErrorMessage(errorCode: number, errorMessage: string): string {
+  private buildErrorMessage(errorCode: number, errorMessage: string): ResourceStr {
     if (errorCode === 1002300006) {
-      return '系统朗读服务正忙，请稍后再试。';
+      return $r('app.string.reader_speech_engine_busy');
     }
     if (errorCode === 1002300007) {
-      return '系统朗读引擎还没有准备好。';
+      return $r('app.string.reader_speech_engine_not_ready');
     }
     if (errorCode === 1002300001) {
-      return '正文内容暂时不能朗读。';
+      return $r('app.string.reader_speech_content_unavailable');
     }
-    return errorMessage.length > 0 ? errorMessage : '朗读失败，请稍后再试。';
+    return errorMessage.length > 0 ? errorMessage : $r('app.string.reader_speech_failed_retry');
   }
 
   private resetQueue(): void {

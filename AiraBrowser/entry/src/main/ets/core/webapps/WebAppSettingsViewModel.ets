@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { DesktopWebEntryRecord } from '../../data/webapps/WebAppInstallModels';
 
 export interface WebAppSettingsListItemState {
@@ -10,8 +11,8 @@ export interface WebAppSettingsListItemState {
 
 export interface WebAppSettingsListState {
   items: WebAppSettingsListItemState[];
-  emptyTitle: string;
-  emptyMessage: string;
+  emptyTitle: ResourceStr;
+  emptyMessage: ResourceStr;
 }
 
 export interface WebAppSettingsDetailState {
@@ -40,8 +41,8 @@ export class WebAppSettingsViewModel {
       .sort((left: DesktopWebEntryRecord, right: DesktopWebEntryRecord) => right.updatedAt - left.updatedAt);
     return {
       items: this.dedupeRecords(installedRecords).map((record: DesktopWebEntryRecord) => this.buildListItem(record)),
-      emptyTitle: '还没有网页应用',
-      emptyMessage: '添加后会显示在这里。'
+      emptyTitle: $r('app.string.settings_web_apps_empty_title'),
+      emptyMessage: $r('app.string.settings_web_apps_empty_message')
     };
   }
 
@@ -49,7 +50,7 @@ export class WebAppSettingsViewModel {
     if (record === undefined) {
       return {
         shortcutId: shortcutId.trim(),
-        title: '网页应用',
+        title: resolveAppResourceText($r('app.string.settings_web_apps')),
         subtitle: '',
         iconPath: '',
         defaultFullscreen: false,
@@ -124,7 +125,7 @@ export class WebAppSettingsViewModel {
       return title;
     }
     const launchUrl = record.launchUrl.trim();
-    return launchUrl.length > 0 ? launchUrl : '网页应用';
+    return launchUrl.length > 0 ? launchUrl : resolveAppResourceText($r('app.string.settings_web_apps'));
   }
 
   private resolveSubtitle(record: DesktopWebEntryRecord): string {

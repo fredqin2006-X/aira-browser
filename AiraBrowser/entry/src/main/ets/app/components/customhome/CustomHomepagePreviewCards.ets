@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { CustomHomepageChoiceViewState } from '../../../core/customhome/CustomHomepageSettingsViewModel';
 import { CustomHomepagePreviewLayoutState } from '../../../core/customhome/CustomHomepagePreviewViewModel';
 import {
@@ -80,7 +81,7 @@ export struct CustomHomepagePreviewCards {
   @Builder
   private buildImportHomepageItem() {
     Column({ space: 8 }) {
-      this.buildHomepageCardTitle('导入主页')
+      this.buildHomepageCardTitle($r('app.string.settings_custom_home_import'))
       this.buildImportHomepageCard()
     }
     .width(this.layoutState.cardWidth)
@@ -127,22 +128,22 @@ export struct CustomHomepagePreviewCards {
       .borderRadius(HOMEPAGE_PREVIEW_OVERFLOW_BUTTON_SIZE / 2)
       .margin({ top: HOMEPAGE_PREVIEW_OVERFLOW_INSET, right: HOMEPAGE_PREVIEW_OVERFLOW_INSET })
       .enabled(!this.busy)
-      .accessibilityText(`更多“${choice.title}”操作`)
+      .accessibilityText(resolveAppResourceText($r('app.string.settings_custom_home_more_actions'), choice.title))
       .bindMenu([
         {
-          value: '查看信息',
+          value: resolveAppResourceText($r('app.string.settings_custom_home_view_info')),
           action: () => {
             this.onInfo(choice);
           }
         },
         {
-          value: '导出',
+          value: resolveAppResourceText($r('app.string.settings_custom_home_export')),
           action: () => {
             this.onExport(choice);
           }
         },
         {
-          value: '删除',
+          value: resolveAppResourceText($r('app.string.settings_custom_home_delete')),
           action: () => {
             this.onRemove(choice);
           }
@@ -164,7 +165,7 @@ export struct CustomHomepagePreviewCards {
         checkmarkColor: this.storedSurfaceBackgroundColor
       })
         .margin({ bottom: 10 })
-        .accessibilityText('当前主页')
+        .accessibilityText(resolveAppResourceText($r('app.string.settings_custom_home_current')))
     }
     .width('100%')
     .height('100%')
@@ -227,7 +228,7 @@ export struct CustomHomepagePreviewCards {
   }
 
   @Builder
-  private buildHomepageCardTitle(title: string) {
+  private buildHomepageCardTitle(title: ResourceStr) {
     Row() {
       Text(title)
         .fontSize(13)

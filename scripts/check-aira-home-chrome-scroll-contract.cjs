@@ -100,6 +100,9 @@ function evaluateCommonJs(sourcePath, requireModule) {
     module,
     exports: module.exports,
     require: requireModule,
+    // ArkTS resources resolve in the ArkUI runtime; the harness only needs the
+    // resource identity plus its format arguments.
+    $r: (value, ...args) => args.length > 0 ? `${value} ${args.join(' ')}` : value,
     Date,
     Math,
     Number,
@@ -553,6 +556,16 @@ function evaluateChromePresentationModule() {
         BROWSER_BOTTOM_PANEL_MOTION_DURATION_MS: 180,
         resolveBrowserBottomPanelMiddleSnapCurve: () => ({}),
         resolveBrowserBottomPanelMotionCurve: () => ({})
+      };
+    }
+    if (request === './BrowserBottomPanelText') {
+      return {
+        resourceStrPresent: (value) => value !== undefined &&
+          (typeof value !== 'string' || value.trim().length > 0),
+        resourceStrKey: (value) => value === undefined
+          ? ''
+          : (typeof value === 'string' ? value : `r:${value.id}`),
+        bottomPanelCustomizeSlot: () => 'app.string.bottom_panel_customize_slot'
       };
     }
     if (request === './BrowserSearchEnginePresentationViewModel') {

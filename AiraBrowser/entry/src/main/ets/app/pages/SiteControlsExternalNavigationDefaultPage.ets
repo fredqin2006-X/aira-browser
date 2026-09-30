@@ -36,7 +36,7 @@ struct SiteControlsExternalNavigationDefaultPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '外部应用跳转',
+        title: $r('app.string.settings_site_controls_external_default_title'),
         backIconKind: 'back',
         pageBackground: this.theme.pageBackground,
         headerButtonBackground: this.theme.pressedBackground,

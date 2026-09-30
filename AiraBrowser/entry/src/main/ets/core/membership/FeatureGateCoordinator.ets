@@ -30,7 +30,7 @@ export type FeatureGateAction = EntitlementPrimaryAction | 'dismiss' | 'purchase
  */
 export interface FeatureGateRenewalBenefitState {
   id: string;
-  title: string;
+  title: ResourceStr;
   iconId: AiraRenderableIconId;
 }
 

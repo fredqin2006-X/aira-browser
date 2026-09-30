@@ -35,7 +35,7 @@ struct SettingsThirdPartyNoticesPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '第三方开源许可',
+        title: $r('app.string.settings_about_third_party'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -84,7 +84,7 @@ struct SettingsThirdPartyNoticesPage {
         payload.historyUrl
       );
     } catch (_error) {
-      this.showToast('第三方许可声明加载失败');
+      this.showToast($r('app.string.settings_about_notices_failed'));
     }
   }
 
@@ -102,7 +102,7 @@ struct SettingsThirdPartyNoticesPage {
     };
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

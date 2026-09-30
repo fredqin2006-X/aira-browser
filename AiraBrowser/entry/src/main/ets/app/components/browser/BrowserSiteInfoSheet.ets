@@ -4,6 +4,7 @@ import {
   SitePermissionRule
 } from '../../../common/models/BrowserModels';
 import { curves } from '@kit.ArkUI';
+import { i18n } from '@kit.LocalizationKit';
 import {
   BROWSER_THEME_STORAGE_ACCENT_KEY,
   BROWSER_THEME_STORAGE_CONTROL_BACKGROUND_KEY,
@@ -43,6 +44,7 @@ import {
   SiteCapabilityCatalogService,
   SitePermissionRuleOption
 } from '../../../services/web/SiteCapabilityCatalogService';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BrowserSiteControlsApplicationSnapshot,
   BrowserSiteControlsUserAction,
@@ -115,7 +117,7 @@ export struct BrowserSiteInfoSheet {
         icon: $r('sys.symbol.xmark'),
         iconSize: BROWSER_FEATURE_SHEET_HEADER_ICON_SIZE,
         buttonSize: BROWSER_FEATURE_SHEET_HEADER_BUTTON_SIZE,
-        accessibilityLabel: '关闭站点信息',
+        accessibilityLabel: $r('app.string.settings_site_info_close'),
         immersiveMaterialEnabled: true,
         onAction: (): void => {
           this.onAction('close');
@@ -170,7 +172,7 @@ export struct BrowserSiteInfoSheet {
     if (this.snapshot.session.mode === 'security') {
       this.buildSecurityReportActions()
     } else if (this.snapshot.session.mode === 'certificate') {
-      this.buildSinglePrimaryAction('完成')
+      this.buildSinglePrimaryAction($r('app.string.settings_site_info_done'))
     }
   }
 
@@ -214,12 +216,12 @@ export struct BrowserSiteInfoSheet {
   }
 
   @Builder
-  private buildFeatureHeader(title: string, nested: boolean) {
+  private buildFeatureHeader(title: ResourceStr, nested: boolean) {
     BrowserFeatureSheetHeader({
       title: title,
       titleColor: this.storedPrimaryTextColor,
       showLeadingButton: nested,
-      leadingAccessibilityLabel: '返回站点信息',
+      leadingAccessibilityLabel: $r('app.string.settings_site_info_back'),
       onLeadingAction: (): void => {
         this.onAction('navigate_back');
       }
@@ -234,7 +236,7 @@ export struct BrowserSiteInfoSheet {
       }
 
       ListItem() {
-        Text('这里只统计 Aira 实际执行的网页保护动作，不包含 Cookie 或指纹策略的推测次数。')
+        Text($r('app.string.settings_site_info_protection_note'))
           .width('100%')
           .padding({ left: 4, right: 4 })
           .fontSize(12)
@@ -274,8 +276,8 @@ export struct BrowserSiteInfoSheet {
   private buildSecurityNavigationGroup() {
     SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
       SettingsNavigationRow({
-        title: '连接',
-        value: this.snapshot.connectionTitle.length > 0 ? this.snapshot.connectionTitle : '站点信息',
+        title: $r('app.string.settings_site_info_connection'),
+        value: this.snapshot.connectionTitle,
         icon: this.snapshot.isSecureSite ? $r('sys.symbol.lock_fill') : $r('sys.symbol.exclamationmark_triangle_fill'),
         iconBackgroundColor: this.storedControlBackgroundColor,
         iconColor: this.snapshot.isSecureSite ? this.storedAccentColor : this.storedSecondaryTextColor,
@@ -289,7 +291,7 @@ export struct BrowserSiteInfoSheet {
       })
       SettingsGroupDivider({ dividerColor: this.storedDividerColor })
       SettingsNavigationRow({
-        title: '网页内容过滤',
+        title: $r('app.string.settings_site_info_content_filter'),
         value: this.getProtectionSummaryText(),
         icon: $r('sys.symbol.shield_checkered'),
         iconBackgroundColor: this.storedControlBackgroundColor,
@@ -304,7 +306,7 @@ export struct BrowserSiteInfoSheet {
       })
       SettingsGroupDivider({ dividerColor: this.storedDividerColor })
       SettingsNavigationRow({
-        title: '防跟踪防护',
+        title: $r('app.string.settings_site_info_tracking_protection'),
         value: this.snapshot.trackingProtectionSummary,
         airaIconId: 'settings.privacySecurity',
         iconBackgroundColor: this.storedControlBackgroundColor,
@@ -319,7 +321,7 @@ export struct BrowserSiteInfoSheet {
       })
       SettingsGroupDivider({ dividerColor: this.storedDividerColor })
       SettingsNavigationRow({
-        title: '站点设置',
+        title: $r('app.string.settings_site_info_site_settings'),
         value: '',
         icon: $r('sys.symbol.person_shield_fill'),
         iconBackgroundColor: this.storedControlBackgroundColor,
@@ -339,7 +341,7 @@ export struct BrowserSiteInfoSheet {
   private buildSecurityProtectionSwitchGroup() {
     SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
       SettingsSwitchRow({
-        title: '本站网页内容过滤',
+        title: $r('app.string.settings_site_info_site_protection_switch'),
         checked: this.snapshot.session.protection.siteEnabled,
         isEnabled: this.snapshot.session.protection.siteToggleEnabled,
         rowPosition: 'single',
@@ -356,15 +358,21 @@ export struct BrowserSiteInfoSheet {
   @Builder
   private buildSecurityMetricRow() {
     Row({ space: 8 }) {
-      this.buildSecurityMetricCard(this.formatMetricCount(this.resolveSecurityBlockedCount()), '', '本页保护')
-      this.buildSecurityMetricCard(this.formatMetricCount(this.snapshot.todayProtectionActionCount), '', '今日保护')
-      this.buildSecurityMetricCard(this.formatMetricCount(this.snapshot.sevenDayProtectionActionCount), '', '近 7 天')
+      this.buildSecurityMetricCard(
+        this.formatMetricCount(this.resolveSecurityBlockedCount()), '', $r('app.string.settings_site_info_metric_page')
+      )
+      this.buildSecurityMetricCard(
+        this.formatMetricCount(this.snapshot.todayProtectionActionCount), '', $r('app.string.settings_site_info_metric_today')
+      )
+      this.buildSecurityMetricCard(
+        this.formatMetricCount(this.snapshot.sevenDayProtectionActionCount), '', $r('app.string.settings_site_info_metric_week')
+      )
     }
     .width('100%')
   }
 
   @Builder
-  private buildSecurityMetricCard(value: string, unit: string, label: string) {
+  private buildSecurityMetricCard(value: ResourceStr, unit: string, label: ResourceStr) {
     Column({ space: 4 }) {
       Row({ space: 2 }) {
         Text(value)
@@ -408,7 +416,7 @@ export struct BrowserSiteInfoSheet {
   private buildSecurityReportActions() {
     Column({ space: 8 }) {
       BrowserSheetActionButton({
-        label: '站点信息',
+        label: $r('app.string.settings_site_info_action_overview'),
         emphasis: 'primary',
         stacked: true,
         accentColor: this.storedAccentColor,
@@ -418,7 +426,7 @@ export struct BrowserSiteInfoSheet {
       })
 
       BrowserSheetActionButton({
-        label: '拦截日志',
+        label: $r('app.string.settings_site_info_action_log'),
         emphasis: 'ghost',
         stacked: true,
         onAction: () => {
@@ -475,7 +483,7 @@ export struct BrowserSiteInfoSheet {
   private buildPrivateSessionGroup() {
     SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
       SettingsStaticValueRow({
-        title: '仅本次私密会话',
+        title: $r('app.string.settings_site_info_private_session_only'),
         value: '',
         rowPosition: 'single',
         primaryTextColor: this.storedPrimaryTextColor,
@@ -510,7 +518,7 @@ export struct BrowserSiteInfoSheet {
   private buildProtectionCategoryGroup() {
     SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
       SettingsStaticValueRow({
-        title: '请求拦截',
+        title: $r('app.string.settings_site_info_request_blocking'),
         value: `${this.snapshot.session.protection.requestBlockingCount}`,
         rowPosition: 'first',
         primaryTextColor: this.storedPrimaryTextColor,
@@ -518,7 +526,7 @@ export struct BrowserSiteInfoSheet {
       })
       SettingsGroupDivider({ dividerColor: this.storedDividerColor })
       SettingsStaticValueRow({
-        title: '链接清理',
+        title: $r('app.string.settings_site_info_link_cleaning'),
         value: `${this.snapshot.session.protection.linkCleaningCount}`,
         rowPosition: 'middle',
         primaryTextColor: this.storedPrimaryTextColor,
@@ -526,7 +534,7 @@ export struct BrowserSiteInfoSheet {
       })
       SettingsGroupDivider({ dividerColor: this.storedDividerColor })
       SettingsStaticValueRow({
-        title: '元素隐藏',
+        title: $r('app.string.settings_site_info_element_hiding'),
         value: `${this.snapshot.session.protection.elementHidingCount}`,
         rowPosition: 'last',
         primaryTextColor: this.storedPrimaryTextColor,
@@ -548,7 +556,7 @@ export struct BrowserSiteInfoSheet {
   }
 
   @Builder
-  private buildPermissionRow(kind: SitePermissionKind, title: string, index: number, total: number) {
+  private buildPermissionRow(kind: SitePermissionKind, title: ResourceStr, index: number, total: number) {
     SettingsNavigationRow({
       title: title,
       value: this.getPermissionRuleLabel(kind),
@@ -624,15 +632,17 @@ export struct BrowserSiteInfoSheet {
     Column({ space: 8 }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsStaticValueRow({
-          title: '站点数据',
-          value: this.snapshot.siteDataSummary.length > 0 ? this.snapshot.siteDataSummary : '暂无',
+          title: $r('app.string.settings_site_info_site_data'),
+          value: this.snapshot.siteDataSummary,
           rowPosition: 'first',
           primaryTextColor: this.storedPrimaryTextColor,
           secondaryTextColor: this.storedSecondaryTextColor
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsNavigationRow({
-          title: this.snapshot.isPrivateMode ? '管理本次私密数据' : '管理全部浏览数据',
+          title: this.snapshot.isPrivateMode
+            ? $r('app.string.settings_site_info_manage_private_data')
+            : $r('app.string.settings_site_info_manage_all_data'),
           value: '',
           rowPosition: 'last',
           primaryTextColor: this.storedPrimaryTextColor,
@@ -645,8 +655,8 @@ export struct BrowserSiteInfoSheet {
       }
 
       Text(this.snapshot.isPrivateMode
-        ? '系统当前不支持按站点清除私密存储，请使用上方入口清除本次私密数据。'
-        : '只清除该网站保存的本地数据；Cookie 和网页缓存会保留，登录状态可能继续保留。')
+        ? $r('app.string.settings_site_info_private_storage_note')
+        : $r('app.string.settings_site_info_storage_note'))
         .width('100%')
         .padding({ left: 4, right: 4 })
         .fontSize(12)
@@ -654,7 +664,7 @@ export struct BrowserSiteInfoSheet {
 
       Row() {
         BrowserSheetActionButton({
-          label: '清除当前站点存储',
+          label: $r('app.string.settings_site_info_clear_storage'),
           emphasis: 'destructive',
           actionEnabled: this.snapshot.canClearCurrentSiteStorage,
           onAction: () => {
@@ -672,7 +682,7 @@ export struct BrowserSiteInfoSheet {
     Column({ space: 8 }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsNavigationRow({
-          title: '隐私保护',
+          title: $r('app.string.settings_site_info_privacy_protection'),
           value: this.getPrivacyCoverageValue(),
           rowPosition: 'first',
           primaryTextColor: this.storedPrimaryTextColor,
@@ -684,7 +694,9 @@ export struct BrowserSiteInfoSheet {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsSwitchRow({
-          title: this.snapshot.isPrivateMode ? '本站网页保护（仅本次私密会话）' : '本站网页保护',
+          title: this.snapshot.isPrivateMode
+            ? $r('app.string.settings_site_info_site_protection_private')
+            : $r('app.string.settings_site_info_site_protection'),
           checked: this.snapshot.session.protection.siteEnabled,
           isEnabled: this.snapshot.session.protection.siteToggleEnabled,
           rowPosition: 'middle',
@@ -697,8 +709,8 @@ export struct BrowserSiteInfoSheet {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
       SettingsNavigationRow({
-          title: '保护活动摘要',
-          value: `${this.snapshot.session.protection.blockedCount} 项`,
+          title: $r('app.string.settings_site_info_protection_summary'),
+          value: $r('app.string.settings_site_info_item_count', this.snapshot.session.protection.blockedCount),
           rowPosition: 'middle',
           primaryTextColor: this.storedPrimaryTextColor,
           secondaryTextColor: this.storedSecondaryTextColor,
@@ -709,8 +721,8 @@ export struct BrowserSiteInfoSheet {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsNavigationRow({
-          title: '连接与证书',
-          value: this.snapshot.connectionTitle.length > 0 ? this.snapshot.connectionTitle : '站点信息',
+          title: $r('app.string.settings_site_info_connection_certificate'),
+          value: this.snapshot.connectionTitle,
           rowPosition: 'middle',
           primaryTextColor: this.storedPrimaryTextColor,
           secondaryTextColor: this.storedSecondaryTextColor,
@@ -721,8 +733,8 @@ export struct BrowserSiteInfoSheet {
         })
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsNavigationRow({
-          title: '站点设置',
-          value: '权限、数据、脚本',
+          title: $r('app.string.settings_site_info_site_settings'),
+          value: $r('app.string.settings_site_info_site_settings_value'),
           rowPosition: 'last',
           primaryTextColor: this.storedPrimaryTextColor,
           secondaryTextColor: this.storedSecondaryTextColor,
@@ -750,7 +762,7 @@ export struct BrowserSiteInfoSheet {
           this.buildAdBlockLogSummaryRow()
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
           SettingsStaticValueRow({
-            title: '请求拦截',
+            title: $r('app.string.settings_site_info_request_blocking'),
             value: `${this.snapshot.session.protection.requestBlockingCount}`,
             rowPosition: 'middle',
             primaryTextColor: this.storedPrimaryTextColor,
@@ -758,7 +770,7 @@ export struct BrowserSiteInfoSheet {
           })
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
           SettingsStaticValueRow({
-            title: '链接清理',
+            title: $r('app.string.settings_site_info_link_cleaning'),
             value: `${this.snapshot.session.protection.linkCleaningCount}`,
             rowPosition: 'middle',
             primaryTextColor: this.storedPrimaryTextColor,
@@ -766,7 +778,7 @@ export struct BrowserSiteInfoSheet {
           })
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
           SettingsStaticValueRow({
-            title: '元素隐藏',
+            title: $r('app.string.settings_site_info_element_hiding'),
             value: `${this.snapshot.session.protection.elementHidingCount}`,
             rowPosition: 'last',
             primaryTextColor: this.storedPrimaryTextColor,
@@ -774,7 +786,7 @@ export struct BrowserSiteInfoSheet {
           })
         }
 
-        Text('保护活动仅对当前网页汇总，不展示资源地址、规则或选择器。')
+        Text($r('app.string.settings_site_info_log_note'))
           .width('100%')
           .padding({ left: 4, right: 4 })
           .fontSize(12)
@@ -806,7 +818,7 @@ export struct BrowserSiteInfoSheet {
   @Builder
   private buildAdBlockLogSummaryRow() {
     SettingsStaticValueRow({
-      title: '本页保护动作',
+      title: $r('app.string.settings_site_info_metric_actions'),
       value: `${this.snapshot.session.protection.blockedCount}`,
       rowPosition: 'first',
       primaryTextColor: this.storedPrimaryTextColor,
@@ -814,57 +826,59 @@ export struct BrowserSiteInfoSheet {
     })
   }
 
-  private getProtectionHeaderTitle(): string {
+  private getProtectionHeaderTitle(): ResourceStr {
     const state = this.snapshot.session.protection.availabilityState;
     if (state === 'active_with_actions') {
-      return this.snapshot.isPrivateMode ? '网页保护 · 仅本次私密会话' : '网页保护 · 本页已生效';
+      return this.snapshot.isPrivateMode
+        ? $r('app.string.settings_site_info_header_protection_private')
+        : $r('app.string.settings_site_info_header_protection_active');
     }
     if (state === 'active_without_actions') {
-      return '网页保护 · 已开启';
+      return $r('app.string.settings_site_info_header_protection_enabled');
     }
     if (state === 'site_disabled') {
-      return '网页保护 · 本站已关闭';
+      return $r('app.string.settings_site_info_header_protection_site_off');
     }
     if (state === 'global_disabled_or_unconfigured') {
-      return '网页保护 · 未配置';
+      return $r('app.string.settings_site_info_header_protection_unconfigured');
     }
-    return '网页保护 · 暂不可用';
+    return $r('app.string.settings_site_info_header_protection_unavailable');
   }
 
-  private getProtectionActionMetricLabel(): string {
+  private getProtectionActionMetricLabel(): ResourceStr {
     const state = this.snapshot.session.protection.availabilityState;
     if (state === 'active_with_actions') {
-      return '本页保护动作';
+      return $r('app.string.settings_site_info_metric_actions');
     }
     if (state === 'active_without_actions') {
-      return '网页保护已开启，本页暂无触发';
+      return $r('app.string.settings_site_info_metric_label_no_trigger');
     }
     if (state === 'site_disabled') {
-      return '本站网页保护已关闭';
+      return $r('app.string.settings_site_info_metric_label_site_off');
     }
     if (state === 'global_disabled_or_unconfigured') {
-      return '网页保护未配置';
+      return $r('app.string.settings_site_info_metric_label_unconfigured');
     }
-    return '网页保护暂不可用';
+    return $r('app.string.settings_site_info_metric_label_unavailable');
   }
 
-  private getPrivacyCoverageValue(): string {
+  private getPrivacyCoverageValue(): ResourceStr {
     if (this.snapshot.session.protection.privacyCoverageState === 'enabled') {
-      return '已开启';
+      return $r('app.string.settings_site_info_coverage_on');
     }
     if (this.snapshot.session.protection.privacyCoverageState === 'preparing') {
-      return '准备中';
+      return $r('app.string.settings_site_info_coverage_preparing');
     }
     if (this.snapshot.session.protection.privacyCoverageState === 'failed') {
-      return '需要处理';
+      return $r('app.string.settings_site_info_coverage_attention');
     }
     if (this.snapshot.session.protection.privacyCoverageState === 'site_disabled') {
-      return '本站已关闭';
+      return $r('app.string.settings_site_info_coverage_site_off');
     }
     if (this.snapshot.session.protection.privacyCoverageState === 'unavailable') {
-      return '不可用';
+      return $r('app.string.settings_site_info_coverage_unavailable');
     }
-    return '未开启';
+    return $r('app.string.settings_site_info_coverage_off');
   }
 
 
@@ -873,23 +887,33 @@ export struct BrowserSiteInfoSheet {
     Scroll(this.sheetBlurScroller4) {
       Column() {
         SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
-          this.buildCertificateDetailRow('连接状态', this.snapshot.session.certificate.detailStatus, 0, 9)
+          this.buildCertificateDetailRow(
+            $r('app.string.settings_site_info_certificate_connection_status'),
+            this.snapshot.session.certificate.detailStatus, 0, 9)
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
-          this.buildCertificateDetailRow('网站', this.getSiteHostText(), 1, 9)
+          this.buildCertificateDetailRow(
+            $r('app.string.settings_site_info_certificate_site'), this.getSiteHostText(), 1, 9)
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
-          this.buildCertificateDetailRow('颁发给', this.snapshot.session.certificate.subject, 2, 9)
+          this.buildCertificateDetailRow(
+            $r('app.string.settings_site_info_certificate_subject'), this.snapshot.session.certificate.subject, 2, 9)
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
-          this.buildCertificateDetailRow('签发者', this.snapshot.session.certificate.issuer, 3, 9)
+          this.buildCertificateDetailRow(
+            $r('app.string.settings_site_info_certificate_issuer'), this.snapshot.session.certificate.issuer, 3, 9)
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
-          this.buildCertificateDetailRow('有效期开始', this.snapshot.session.certificate.validFrom, 4, 9)
+          this.buildCertificateDetailRow(
+            $r('app.string.settings_site_info_certificate_valid_from'), this.snapshot.session.certificate.validFrom, 4, 9)
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
-          this.buildCertificateDetailRow('有效期结束', this.snapshot.session.certificate.validTo, 5, 9)
+          this.buildCertificateDetailRow(
+            $r('app.string.settings_site_info_certificate_valid_to'), this.snapshot.session.certificate.validTo, 5, 9)
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
-          this.buildCertificateDetailRow('证书链', this.snapshot.certificateChainText, 6, 9)
+          this.buildCertificateDetailRow(
+            $r('app.string.settings_site_info_certificate_chain'), this.snapshot.certificateChainText, 6, 9)
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
-          this.buildCertificateDetailRow('签名算法', this.snapshot.session.certificate.signatureAlgorithm, 7, 9)
+          this.buildCertificateDetailRow(
+            $r('app.string.settings_site_info_certificate_signature'), this.snapshot.session.certificate.signatureAlgorithm, 7, 9)
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
-          this.buildCertificateDetailRow('序列号', this.snapshot.session.certificate.serialNumber, 8, 9)
+          this.buildCertificateDetailRow(
+            $r('app.string.settings_site_info_certificate_serial'), this.snapshot.session.certificate.serialNumber, 8, 9)
         }
       }
       .width('100%')
@@ -918,10 +942,10 @@ export struct BrowserSiteInfoSheet {
   }
 
   @Builder
-  private buildCertificateDetailRow(label: string, value: string, index: number, total: number) {
+  private buildCertificateDetailRow(label: ResourceStr, value: ResourceStr, index: number, total: number) {
     SettingsStaticValueRow({
       title: label,
-      value: value.length > 0 ? value : '暂无',
+      value: this.resolveDetailValue(value),
       valueMaxLines: 2,
       rowPosition: this.resolveRowPosition(index, total),
       primaryTextColor: this.storedPrimaryTextColor,
@@ -930,7 +954,7 @@ export struct BrowserSiteInfoSheet {
   }
 
   @Builder
-  private buildSinglePrimaryAction(label: string) {
+  private buildSinglePrimaryAction(label: ResourceStr) {
     Row() {
       BrowserSheetActionButton({
         label: label,
@@ -945,18 +969,20 @@ export struct BrowserSiteInfoSheet {
     .alignItems(VerticalAlign.Center)
   }
 
-  private resolveFeatureHeaderTitle(): string {
+  private resolveFeatureHeaderTitle(): ResourceStr {
     if (this.snapshot.session.mode === 'security') {
-      return this.snapshot.isSecureSite ? '访问安全' : '连接未验证';
+      return this.snapshot.isSecureSite
+        ? $r('app.string.settings_site_info_header_secure')
+        : $r('app.string.settings_site_info_header_unverified');
     }
     if (this.snapshot.session.mode === 'certificate') {
-      return '证书详情';
+      return $r('app.string.settings_site_info_header_certificate');
     }
     if (this.snapshot.session.mode === 'adblock_log') {
-      return '保护活动';
+      return $r('app.string.settings_site_info_header_protection');
     }
     if (this.isPermissionPageMode(this.snapshot.session.mode)) {
-      return `${this.getPermissionKindLabel(this.resolvePermissionKindFromMode(this.snapshot.session.mode))}权限`;
+      return this.resolvePermissionHeaderTitle(this.resolvePermissionKindFromMode(this.snapshot.session.mode));
     }
     return this.getProtectionHeaderTitle();
   }
@@ -974,16 +1000,30 @@ export struct BrowserSiteInfoSheet {
     return this.shouldShowPageFooter() ? SITE_INFO_CONTENT_BOTTOM_PADDING : BROWSER_SHEET_IMMERSIVE_BOTTOM_PADDING;
   }
 
-  private getSiteHostText(): string {
-    return this.snapshot.siteHost.length > 0 ? this.snapshot.siteHost : '当前页面';
+  private getSiteHostText(): ResourceStr {
+    return this.snapshot.siteHost.length > 0
+      ? this.snapshot.siteHost
+      : $r('app.string.settings_site_info_current_page');
   }
 
-  private getProtectionSummaryText(): string {
+  private getProtectionSummaryText(): ResourceStr {
     const blockedCount = this.resolveSecurityBlockedCount();
     if (blockedCount > 0) {
-      return `已拦截 ${blockedCount} 项`;
+      return $r('app.string.settings_site_info_blocked_count', blockedCount);
     }
     return this.snapshot.session.protection.summary;
+  }
+
+  /** 证书/站点明细里空值统一显示“暂无”，这里只对字符串做空判断，资源值原样透传。 */
+  private resolveDetailValue(value: ResourceStr): ResourceStr {
+    if (typeof value === 'string') {
+      return value.length > 0 ? value : $r('app.string.settings_site_info_none');
+    }
+    return value;
+  }
+
+  private usesChineseNumberUnits(): boolean {
+    return i18n.System.getSystemLanguage().toLowerCase().startsWith('zh');
   }
 
   private resolveSecurityBlockedCount(): number {
@@ -994,15 +1034,23 @@ export struct BrowserSiteInfoSheet {
     return Math.max(0, Math.round(this.snapshot.siteGuardianDays));
   }
 
-  private formatMetricCount(value: number): string {
+  /**
+   * 中文习惯用「万 / 亿」缩写，其他语言直接给出原数值，避免把中文数量级单位带出去。
+   */
+  private formatMetricCount(value: number): ResourceStr {
     const normalized = Math.max(0, Math.floor(value));
+    if (!this.usesChineseNumberUnits()) {
+      return `${normalized}`;
+    }
     if (normalized >= 100000000) {
-      return `${Math.floor(normalized / 100000000)}亿`;
+      return $r('app.string.settings_site_info_metric_yi', Math.floor(normalized / 100000000));
     }
     if (normalized >= 10000) {
       const whole = Math.floor(normalized / 10000);
       const decimal = Math.floor((normalized % 10000) / 1000);
-      return decimal > 0 ? `${whole}.${decimal}万` : `${whole}万`;
+      return decimal > 0
+        ? $r('app.string.settings_site_info_metric_wan_decimal', whole, decimal)
+        : $r('app.string.settings_site_info_metric_wan', whole);
     }
     return `${normalized}`;
   }
@@ -1034,16 +1082,24 @@ export struct BrowserSiteInfoSheet {
     return this.capabilityCatalog.listDevicePermissionKinds();
   }
 
-  private getPermissionRuleLabel(kind: SitePermissionKind): string {
+  private getPermissionRuleLabel(kind: SitePermissionKind): ResourceStr {
     return this.capabilityCatalog.getPermissionRuleLabel(this.getPermissionRule(kind));
   }
 
-  private getPermissionRuleDescription(kind: SitePermissionKind): string {
+  private getPermissionRuleDescription(kind: SitePermissionKind): ResourceStr {
     return this.capabilityCatalog.getPermissionRuleDescription(kind, this.getPermissionRule(kind));
   }
 
-  private getPermissionKindLabel(kind: SitePermissionKind): string {
+  private getPermissionKindLabel(kind: SitePermissionKind): ResourceStr {
     return this.capabilityCatalog.getPermissionTitle(kind);
+  }
+
+  /** 权限页标题沿用「X 权限」的组合，权限名本身由能力目录提供。 */
+  private resolvePermissionHeaderTitle(kind: SitePermissionKind): ResourceStr {
+    return resolveAppResourceText(
+      $r('app.string.settings_site_info_permission_header'),
+      this.capabilityCatalog.getPermissionTitle(kind)
+    );
   }
 
   private getPermissionOptions(kind: SitePermissionKind): SitePermissionRuleOption[] {

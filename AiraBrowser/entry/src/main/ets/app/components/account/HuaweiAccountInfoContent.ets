@@ -6,7 +6,6 @@ import { BrowserThemeViewState } from '../../../core/theme/BrowserThemeViewState
 import {
   SettingsAccountRecognitionBadge,
   SettingsActionButton,
-  SettingsInfoTooltipButton,
   SettingsNavigationRow,
   SettingsStaticValueRow
 } from '../settings/SettingsRows';
@@ -29,6 +28,7 @@ export struct HuaweiAccountInfoContent {
   @Prop isBusy: boolean = false;
   @Prop contentMode: HuaweiAccountInfoContentMode = 'page';
   @Prop showAiraProEntry: boolean = false;
+  @State private recognitionInfoVisible: boolean = false;
   onCopyAccountId: () => void = () => {};
   onRequestSignOut: () => void = () => {};
   onOpenAiraPro: () => void = () => {};
@@ -48,7 +48,7 @@ export struct HuaweiAccountInfoContent {
 
   @Builder
   private buildAiraProSection() {
-    SettingsSection({ title: '会员', secondaryTextColor: this.theme.textSecondary }) {
+    SettingsSection({ title: $r('app.string.settings_account_membership'), secondaryTextColor: this.theme.textSecondary }) {
       SettingsGroupCard({ surfaceColor: this.theme.surfaceBackground }) {
         SettingsNavigationRow({
           title: 'Aira Pro',
@@ -117,23 +117,17 @@ export struct HuaweiAccountInfoContent {
           .textAlign(TextAlign.Center)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .constraintSize({ maxWidth: this.state.recognitionInfoText.length > 0 ? '82%' : '100%' })
+          .constraintSize({ maxWidth: this.state.showRecognitionInfo ? '82%' : '100%' })
 
-        if (this.state.recognitionInfoText.length > 0 && this.contentMode === 'page') {
-          SettingsInfoTooltipButton({
-            tooltipMessage: this.state.recognitionInfoText,
-            tooltipAccessibilityLabel: '查看 Insider 身份说明',
-            tooltipIconColor: this.theme.textSecondary,
-            tooltipBackgroundColor: this.theme.surfaceBackground,
-            tooltipTextColor: this.theme.textSecondary
-          })
+        if (this.state.showRecognitionInfo && this.contentMode === 'page') {
+          this.buildRecognitionInfoButton()
         }
       }
       .width('100%')
       .justifyContent(FlexAlign.Center)
       .alignItems(VerticalAlign.Center)
 
-      if (this.state.recognitionInfoText.length > 0 && this.contentMode === 'embedded_popup') {
+      if (this.state.showRecognitionInfo && this.contentMode === 'embedded_popup') {
         Text(this.state.recognitionInfoText)
           .width('100%')
           .fontSize(12)
@@ -152,7 +146,7 @@ export struct HuaweiAccountInfoContent {
   private buildActivitySection() {
     Column({ space: 10 }) {
       Row() {
-        Text('活跃')
+        Text($r('app.string.settings_account_activity'))
           .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.theme.textSecondary)
@@ -174,7 +168,7 @@ export struct HuaweiAccountInfoContent {
 
   @Builder
   private buildInfoSection() {
-    SettingsSection({ title: '个人信息', secondaryTextColor: this.theme.textSecondary }) {
+    SettingsSection({ title: $r('app.string.settings_account_profile'), secondaryTextColor: this.theme.textSecondary }) {
       SettingsGroupCard({ surfaceColor: this.theme.surfaceBackground }) {
         ForEach(this.state.rows, (row: HuaweiAccountInfoRowState, index: number) => {
           SettingsStaticValueRow({
@@ -203,7 +197,7 @@ export struct HuaweiAccountInfoContent {
   @Builder
   private buildSignOutSection() {
     SettingsActionButton({
-      title: '退出华为账号',
+      title: $r('app.string.settings_account_sign_out_action'),
       emphasis: 'danger',
       isEnabled: this.state.canSignOut && !this.isBusy,
       pressedBackgroundColor: this.theme.pressedBackground,
@@ -231,7 +225,52 @@ export struct HuaweiAccountInfoContent {
       `${this.theme.textSecondary}:${this.theme.divider}`;
   }
 
-  private resolveMembershipValue(): string {
-    return this.state.rows.find((row: HuaweiAccountInfoRowState): boolean => row.id === 'membership')?.value ?? '';
+  private resolveMembershipValue(): ResourceStr {
+    const row = this.state.rows.find((item: HuaweiAccountInfoRowState): boolean => item.id === 'membership');
+    return row !== undefined ? row.value : '';
+  }
+
+  @Builder
+  private buildRecognitionInfoButton() {
+    Button() {
+      SymbolGlyph($r('sys.symbol.info_circle'))
+        .fontSize(17)
+        .fontColor([this.theme.textSecondary])
+    }
+    .width(28)
+    .height(28)
+    .type(ButtonType.Circle)
+    .buttonStyle(ButtonStyleMode.TEXTUAL)
+    .stateEffect(true)
+    .accessibilityText($r('app.string.settings_account_insider_a11y'))
+    .onClick(() => {
+      if (this.state.showRecognitionInfo) {
+        this.recognitionInfoVisible = !this.recognitionInfoVisible;
+      }
+    })
+    .bindPopup(this.recognitionInfoVisible, {
+      builder: this.buildRecognitionInfoPopup,
+      placement: Placement.Top,
+      enableArrow: true,
+      autoCancel: true,
+      mask: false,
+      targetSpace: 8,
+      popupColor: this.theme.surfaceBackground,
+      radius: 14,
+      width: 246,
+      onStateChange: (event: PopupStateChangeParam) => {
+        if (!event.isVisible) {
+          this.recognitionInfoVisible = false;
+        }
+      }
+    })
+  }
+
+  @Builder
+  private buildRecognitionInfoPopup() {
+    Text(this.state.recognitionInfoText)
+      .fontSize(13)
+      .fontColor(this.theme.textSecondary)
+      .padding(12)
   }
 }

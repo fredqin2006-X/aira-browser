@@ -214,7 +214,7 @@ export struct UserScriptManagementHost {
     if (this.activeSurface === 'install' && this.activeSurfaceVisible) {
       if (!this.isInstallCommitBusy()) {
         this.dismissActiveSurface(this.manualSourceInstallClaimToken);
-        this.showToast('浏览边界已切换，请重新添加脚本。');
+        this.showToast($r('app.string.user_script_boundary_changed'));
       }
       return;
     }
@@ -439,7 +439,7 @@ export struct UserScriptManagementHost {
       return;
     }
     if (sharedUserScriptInstallSessionCoordinator.hasManualSourceInstallClaim()) {
-      this.showToast('另一个脚本正在等待安装，请先完成或关闭当前安装。');
+      this.showToast($r('app.string.user_script_other_install_pending'));
       return;
     }
     if (envelope.status === 'failed') {
@@ -448,7 +448,7 @@ export struct UserScriptManagementHost {
       return;
     }
     if (sharedUserScriptInstallSessionCoordinator.getState().source.trim().length === 0) {
-      this.showToast('用户脚本预览状态不可用。');
+      this.showToast($r('app.string.user_script_preview_unavailable'));
       return;
     }
     this.openInstallSurface();
@@ -506,7 +506,7 @@ export struct UserScriptManagementHost {
           this.showToast(result.message);
         })
         .catch((_error: Error) => {
-          this.showToast('导出脚本失败，请稍后重试。');
+          this.showToast($r('app.string.user_script_export_failed'));
         });
     }
   }
@@ -533,7 +533,7 @@ export struct UserScriptManagementHost {
   private loadManualUrl(): void {
     const url = this.manualUrlDraft.trim();
     if (url.length <= 0) {
-      this.showToast('请输入脚本 URL。');
+      this.showToast($r('app.string.user_script_enter_url'));
       return;
     }
     this.loadManualSource({ type: 'url', url: url });
@@ -553,7 +553,7 @@ export struct UserScriptManagementHost {
         this.handleManualSourceResult(result);
       })
       .catch((error: Error) => {
-        this.showToast(error.message.length > 0 ? error.message : '读取脚本失败。');
+        this.showToast(error.message.length > 0 ? error.message : $r('app.string.user_script_read_failed'));
       });
   }
 
@@ -575,14 +575,14 @@ export struct UserScriptManagementHost {
       return;
     }
     if (!this.refreshManualSourceHostBoundaryIfIdle()) {
-      this.showToast('脚本编辑或安装仍属于之前的浏览边界，请先完成或关闭。');
+      this.showToast($r('app.string.user_script_edit_boundary_stale'));
       return;
     }
     const editToken = sharedUserScriptInstallSessionCoordinator.beginManualSourceEdit(
       this.buildManualSourceEditOwner()
     );
     if (editToken.length === 0) {
-      this.showToast('另一个窗口正在编辑或安装脚本，请稍后重试。');
+      this.showToast($r('app.string.user_script_busy_another_window_edit'));
       return;
     }
     if (this.presentationMode === 'native_tab') {
@@ -625,7 +625,7 @@ export struct UserScriptManagementHost {
       this.sourceEditToken,
       this.sourceEditDraft
     )) {
-      this.showToast('脚本编辑会话已失效，请返回后重试。');
+      this.showToast($r('app.string.user_script_edit_session_expired'));
       return;
     }
     this.closeManualSourceEditor();
@@ -836,15 +836,15 @@ export struct UserScriptManagementHost {
 
   private confirmDeleteScript(scriptId: string, scriptName: string): void {
     showCenteredAlertDialog({
-      title: '删除用户脚本',
-      message: `确定删除“${scriptName}”吗？`,
+      title: $r('app.string.user_script_delete_dialog_title'),
+      message: $r('app.string.user_script_delete_dialog_message', scriptName),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.user_script_action_cancel'),
         action: () => {}
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.user_script_action_delete'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.managementSession.action(UserScriptManagementAction.deleteScript(scriptId));
@@ -865,7 +865,7 @@ export struct UserScriptManagementHost {
     return false;
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

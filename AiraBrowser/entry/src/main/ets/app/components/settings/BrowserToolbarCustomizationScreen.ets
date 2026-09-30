@@ -31,6 +31,8 @@ import {
   BrowserToolbarSlotInteractionState,
   BrowserToolbarSlotId
 } from '../../../core/browser/BrowserToolbarCustomizationViewModel';
+import { bottomPanelPinnedAs } from '../../../core/browser/BrowserBottomPanelText';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BrowserSplitToolbarCustomizationViewModel,
   BrowserSplitToolbarSlotDetail
@@ -328,7 +330,7 @@ export struct BrowserToolbarCustomizationScreen {
   private scrollBehaviorOptions: BrowserToolbarScrollBehaviorOptionState[] =
     this.scrollBehaviorViewModel.buildState(
       sharedPreferencesRepository.getPreferences().appearance).options;
-  private scrollBehaviorFooterText: string =
+  private scrollBehaviorFooterText: ResourceStr =
     this.scrollBehaviorViewModel.buildState(
       sharedPreferencesRepository.getPreferences().appearance).footerText;
   /**
@@ -390,7 +392,7 @@ export struct BrowserToolbarCustomizationScreen {
   @Builder
   private buildTouchPage() {
     SettingsHdsScaffold({
-      title: '工具栏设置',
+      title: $r('app.string.toolbar_settings_title'),
       backIconKind: 'back',
       showTitleBar: this.showTitleBar,
       showBackButton: this.showBackButton,
@@ -414,7 +416,7 @@ export struct BrowserToolbarCustomizationScreen {
     Column() {
       if (this.showDesktopHeader) {
         SettingsDesktopWorkspaceHeader({
-          title: this.desktopView === 'scroll_behavior' ? '滚动时' : '工具栏设置',
+          title: this.desktopView === 'scroll_behavior' ? $r('app.string.toolbar_settings_scroll_title') : $r('app.string.toolbar_settings_title'),
           showBackButton: this.desktopView === 'scroll_behavior',
           primaryTextColor: this.storedPrimaryTextColor,
           iconColor: this.storedSecondaryTextColor,
@@ -467,7 +469,7 @@ export struct BrowserToolbarCustomizationScreen {
       bottomPadding: 28
     }) {
       SettingsSection({
-        title: '浏览网页时',
+        title: $r('app.string.toolbar_settings_browsing_section'),
         secondaryTextColor: this.storedSecondaryTextColor
       }) {
         SettingsDesktopGroup({ surfaceColor: this.storedSurfaceBackgroundColor }) {
@@ -505,13 +507,13 @@ export struct BrowserToolbarCustomizationScreen {
   @Builder
   private buildToolbarStyleSection() {
     SettingsSection({
-      title: '工具栏样式',
+      title: $r('app.string.toolbar_settings_style_section'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       if (this.desktopPresentation) {
         SettingsDesktopGroup({ surfaceColor: this.storedSurfaceBackgroundColor }) {
           SettingsDesktopOptionRow({
-            title: '悬浮工具栏',
+            title: $r('app.string.toolbar_settings_style_floating'),
             isSelected: this.toolbarChromeStyle === 'floating',
             isEnabled: !this.saving,
             radioGroup: 'browser-toolbar-chrome-style',
@@ -526,7 +528,7 @@ export struct BrowserToolbarCustomizationScreen {
           })
           SettingsDesktopDivider({ dividerColor: this.storedDividerColor })
           SettingsDesktopOptionRow({
-            title: '上下分栏',
+            title: $r('app.string.toolbar_settings_style_split'),
             isSelected: this.toolbarChromeStyle === 'split',
             isEnabled: !this.saving,
             radioGroup: 'browser-toolbar-chrome-style',
@@ -543,7 +545,7 @@ export struct BrowserToolbarCustomizationScreen {
       } else {
         SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
           SettingsOptionRow({
-            title: '悬浮工具栏',
+            title: $r('app.string.toolbar_settings_style_floating'),
             isSelected: this.toolbarChromeStyle === 'floating',
             radioGroup: 'browser-toolbar-chrome-style',
             radioValue: 'floating',
@@ -557,7 +559,7 @@ export struct BrowserToolbarCustomizationScreen {
           })
           SettingsGroupDivider({ dividerColor: this.storedDividerColor })
           SettingsOptionRow({
-            title: '上下分栏',
+            title: $r('app.string.toolbar_settings_style_split'),
             isSelected: this.toolbarChromeStyle === 'split',
             radioGroup: 'browser-toolbar-chrome-style',
             radioValue: 'split',
@@ -572,7 +574,7 @@ export struct BrowserToolbarCustomizationScreen {
         }
       }
       SettingsFooterText({
-        text: '上下分栏把地址栏放在顶部、导航放在底部。',
+        text: $r('app.string.toolbar_settings_style_footer'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -581,13 +583,13 @@ export struct BrowserToolbarCustomizationScreen {
   @Builder
   private buildToolbarBehaviorSection() {
     SettingsSection({
-      title: '工具栏行为',
+      title: $r('app.string.toolbar_settings_behavior_section'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       if (this.desktopPresentation) {
         SettingsDesktopGroup({ surfaceColor: this.storedSurfaceBackgroundColor }) {
           SettingsDesktopNavigationRow({
-            title: '滚动时',
+            title: $r('app.string.toolbar_settings_scroll_title'),
             value: this.scrollBehaviorViewModel.formatBehaviorTitle(
               this.scrollBehavior,
               this.toolbarChromeStyle
@@ -605,7 +607,7 @@ export struct BrowserToolbarCustomizationScreen {
       } else {
         SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
           SettingsNavigationRow({
-            title: '滚动时',
+            title: $r('app.string.toolbar_settings_scroll_title'),
             value: this.scrollBehaviorViewModel.formatBehaviorTitle(
               this.scrollBehavior,
               this.toolbarChromeStyle
@@ -623,8 +625,8 @@ export struct BrowserToolbarCustomizationScreen {
       }
       SettingsFooterText({
         text: this.toolbarChromeStyle === 'split' ?
-          '向下滚动网页时，可以选择保持上下分栏，或同时收起地址栏和底部工具栏。' :
-          '向下滚动网页时，工具栏可以保持显示、收起为胶囊或完全隐藏。',
+          $r('app.string.toolbar_settings_behavior_footer_split') :
+          $r('app.string.toolbar_settings_behavior_footer_floating'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -633,12 +635,12 @@ export struct BrowserToolbarCustomizationScreen {
   @Builder
   private buildTopImmersionSection() {
     SettingsSection({
-      title: '顶部沉浸',
+      title: $r('app.string.toolbar_settings_top_immersion_section'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsSwitchRow({
-          title: '滚动时顶部沉浸',
+          title: $r('app.string.toolbar_settings_scroll_top_immersion'),
           checked: this.globalImmersionEnabled,
           rowPosition: 'single',
           isEnabled: !this.saving && this.isScrollTopImmersionSwitchEnabled(),
@@ -657,7 +659,7 @@ export struct BrowserToolbarCustomizationScreen {
       if (this.shouldShowAlwaysTopImmersionSwitch()) {
         SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
           SettingsSwitchRow({
-            title: '始终顶部沉浸',
+            title: $r('app.string.toolbar_settings_always_top_immersion'),
             checked: this.alwaysTopImmersionEnabled,
             rowPosition: 'single',
             isEnabled: !this.saving,
@@ -670,7 +672,7 @@ export struct BrowserToolbarCustomizationScreen {
           })
         }
         SettingsFooterText({
-          text: '网页内容始终延伸到屏幕顶部，不单独保留顶部安全区域。',
+          text: $r('app.string.toolbar_settings_always_top_immersion_footer'),
           secondaryTextColor: this.storedSecondaryTextColor
         })
       }
@@ -680,12 +682,12 @@ export struct BrowserToolbarCustomizationScreen {
   @Builder
   private buildWebBottomSafeAreaSection() {
     SettingsSection({
-      title: '网页适配',
+      title: $r('app.string.toolbar_settings_web_fit_section'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
         SettingsSwitchRow({
-          title: '网页底栏防遮挡',
+          title: $r('app.string.toolbar_settings_web_bottom_safe_area'),
           titleBadge: 'Beta',
           checked: this.webBottomSafeAreaEnabled,
           rowPosition: 'single',
@@ -699,7 +701,7 @@ export struct BrowserToolbarCustomizationScreen {
         })
       }
       SettingsFooterText({
-        text: '自动留出空间，避免悬浮工具栏挡住网页底部按钮。部分网站可能无法识别。',
+        text: $r('app.string.toolbar_settings_web_bottom_safe_area_footer'),
         secondaryTextColor: this.storedSecondaryTextColor
       })
     }
@@ -708,7 +710,7 @@ export struct BrowserToolbarCustomizationScreen {
   @Builder
   private buildToolbarPreviewSection() {
     SettingsSection({
-      title: '工具栏预览',
+      title: $r('app.string.toolbar_settings_preview_section'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({
@@ -791,8 +793,8 @@ export struct BrowserToolbarCustomizationScreen {
   @Builder
   private buildSplitSceneSwitch() {
     Row() {
-      this.buildSplitSceneChip('home', '主页')
-      this.buildSplitSceneChip('web', '网页')
+      this.buildSplitSceneChip('home', $r('app.string.bottom_panel_scene_home'))
+      this.buildSplitSceneChip('web', $r('app.string.bottom_panel_scene_web'))
     }
     .width('100%')
     .height(36)
@@ -803,7 +805,7 @@ export struct BrowserToolbarCustomizationScreen {
   }
 
   @Builder
-  private buildSplitSceneChip(scene: BrowserSplitToolbarScene, title: string) {
+  private buildSplitSceneChip(scene: BrowserSplitToolbarScene, title: ResourceStr) {
     Button() {
       Text(title)
         .fontSize(14)
@@ -863,7 +865,7 @@ export struct BrowserToolbarCustomizationScreen {
       iconSize: 20,
       buttonSize: 40,
       iconColor: this.storedPrimaryTextColor,
-      accessibilityLabel: '关闭',
+      accessibilityLabel: $r('app.string.ui_close'),
       immersiveMaterialEnabled: true,
       onAction: (): void => {
         this.sheetVisible = false;
@@ -903,7 +905,7 @@ export struct BrowserToolbarCustomizationScreen {
   }
 
   @Builder
-  private buildToolbarSheetPage(title: string, showBack: boolean, backLabel: string, kind: string) {
+  private buildToolbarSheetPage(title: ResourceStr, showBack: boolean, backLabel: ResourceStr, kind: string) {
     BrowserImmersiveSheetLayout({
       horizontalPadding: 0,
       headerTopInset: TOOLBAR_SHEET_MODAL_TOP_PADDING,
@@ -917,7 +919,7 @@ export struct BrowserToolbarCustomizationScreen {
   }
 
   @Builder
-  private buildToolbarSheetHeader(title: string, showBack: boolean, backLabel: string) {
+  private buildToolbarSheetHeader(title: ResourceStr, showBack: boolean, backLabel: ResourceStr) {
     BrowserPhoneSettingsSheetHeader({
       title: title,
       showBackButton: showBack,
@@ -974,7 +976,7 @@ export struct BrowserToolbarCustomizationScreen {
    */
   @Builder
   private buildCenterCapsuleSwipeUpSheetContent() {
-    this.buildToolbarSheetPage('中间区域上滑', false, '', 'capsule')
+    this.buildToolbarSheetPage($r('app.string.toolbar_settings_capsule_swipe_title'), false, '', 'capsule')
   }
 
   @Builder
@@ -1017,7 +1019,7 @@ export struct BrowserToolbarCustomizationScreen {
     }
 
     SettingsActionButton({
-      title: '恢复此按钮默认设置',
+      title: $r('app.string.toolbar_settings_reset_slot'),
       variant: 'tonal',
       isEnabled: this.isSplitSlotResetEnabled(),
       onAction: (): void => {
@@ -1037,7 +1039,8 @@ export struct BrowserToolbarCustomizationScreen {
         .fontWeight(this.desktopPresentation ? FontWeight.Regular : FontWeight.Medium)
         .fontColor(this.storedPrimaryTextColor)
         .layoutWeight(1)
-      Text(`固定为${interaction.action.title}`)
+      Text(bottomPanelPinnedAs())
+      Text(interaction.action.title)
         .fontSize(this.desktopPresentation ? 13 : 14)
         .fontColor(this.storedSecondaryTextColor)
         .maxLines(1)
@@ -1079,7 +1082,7 @@ export struct BrowserToolbarCustomizationScreen {
     }
 
     SettingsActionButton({
-      title: '恢复此按钮默认设置',
+      title: $r('app.string.toolbar_settings_reset_slot'),
       variant: 'tonal',
       isEnabled: this.isSlotResetEnabled(),
       onAction: (): void => {
@@ -1113,20 +1116,20 @@ export struct BrowserToolbarCustomizationScreen {
 
   @Builder
   private buildInteractionActionPicker() {
-    this.buildToolbarSheetPage(this.resolveSelectedInteraction().title, true, '返回', 'picker')
+    this.buildToolbarSheetPage(this.resolveSelectedInteraction().title, true, $r('app.string.bottom_panel_back'), 'picker')
   }
 
   @Builder
   private buildPickerBody() {
     if (this.resolvePickerGroup('none').length > 0) {
-      this.buildPickerActionGroup('无动作', this.resolvePickerGroup('none'))
+      this.buildPickerActionGroup($r('app.string.bottom_panel_none'), this.resolvePickerGroup('none'))
     }
-    this.buildPickerActionGroup('浏览器', this.resolvePickerGroup('header'))
-    this.buildPickerActionGroup('工具栏', this.resolvePickerGroup('panel'))
+    this.buildPickerActionGroup($r('app.string.bottom_panel_picker_browser'), this.resolvePickerGroup('header'))
+    this.buildPickerActionGroup($r('app.string.bottom_panel_picker_toolbar'), this.resolvePickerGroup('panel'))
   }
 
   @Builder
-  private buildPickerActionGroup(title: string, actions: BrowserToolbarInteractionActionState[]) {
+  private buildPickerActionGroup(title: ResourceStr, actions: BrowserToolbarInteractionActionState[]) {
     Column({ space: 6 }) {
       Text(title)
         .width('100%')
@@ -1171,7 +1174,7 @@ export struct BrowserToolbarCustomizationScreen {
     if (this.desktopPresentation) {
       Row() {
         SettingsDesktopActionButton({
-          title: '恢复默认',
+          title: $r('app.string.toolbar_settings_reset'),
           emphasis: 'danger',
           isEnabled: !this.saving,
           hoverBackgroundColor: this.resolvePressedBackgroundColor(),
@@ -1184,7 +1187,7 @@ export struct BrowserToolbarCustomizationScreen {
       .width('100%')
       .justifyContent(FlexAlign.End)
     } else {
-      Button('恢复默认')
+      Button($r('app.string.toolbar_settings_reset'))
         .width('100%')
         .height(44)
         .fontSize(16)
@@ -1220,7 +1223,7 @@ export struct BrowserToolbarCustomizationScreen {
         this.saving = false;
         this.toolbarChromeStyle = previousStyle;
         this.refreshScrollBehaviorCopy();
-        this.showToast('工具栏样式更新失败。');
+        this.showToast($r('app.string.toolbar_settings_error_style'));
       });
   }
 
@@ -1275,7 +1278,7 @@ export struct BrowserToolbarCustomizationScreen {
         this.saving = false;
         this.globalImmersionEnabled = previousGlobal;
         this.alwaysTopImmersionEnabled = previousAlways;
-        this.showToast('顶部沉浸更新失败。');
+        this.showToast($r('app.string.toolbar_settings_error_immersion'));
       });
   }
 
@@ -1298,7 +1301,7 @@ export struct BrowserToolbarCustomizationScreen {
       .catch((_error: Error) => {
         this.saving = false;
         this.webBottomSafeAreaEnabled = previousEnabled;
-        this.showToast('网页底栏防遮挡更新失败。');
+        this.showToast($r('app.string.toolbar_settings_error_safe_area'));
       });
   }
 
@@ -1322,7 +1325,7 @@ export struct BrowserToolbarCustomizationScreen {
       .catch((_error: Error) => {
         this.saving = false;
         this.scrollBehavior = previousBehavior;
-        this.showToast('滚动时的显示更新失败。');
+        this.showToast($r('app.string.toolbar_settings_error_scroll'));
       });
   }
 
@@ -1331,18 +1334,18 @@ export struct BrowserToolbarCustomizationScreen {
       return;
     }
     showCenteredAlertDialog({
-      title: '恢复默认工具栏',
+      title: $r('app.string.toolbar_settings_reset_dialog_title'),
       message: this.toolbarChromeStyle === 'split' ?
-        '会恢复上下分栏底部按钮的单击和长按设置，不会改变悬浮工具栏。' :
-        '会恢复四个按钮的单击、长按和上滑设置，不会改变展开工具栏的快捷入口顺序。',
+        $r('app.string.toolbar_settings_reset_dialog_split') :
+        $r('app.string.toolbar_settings_reset_dialog_floating'),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_account_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '恢复默认',
+        value: $r('app.string.toolbar_settings_reset'),
         action: () => {
           this.applySettings(this.toolbarChromeStyle === 'split' ?
             this.splitViewModel.resetAll(this.settings) :
@@ -1371,7 +1374,7 @@ export struct BrowserToolbarCustomizationScreen {
       panelExpansionEnabled: true,
       addressInput: 'https://aira.cool',
       addressDisplayText: 'aira.cool',
-      placeholder: '搜索或输入网址',
+      placeholder: resolveAppResourceText($r('app.string.aira_search_card_placeholder')),
       toolbarSlotActions: this.state.slotActions,
       toolbarInteractionProfileActive: true,
       customizationPreview: true,
@@ -1384,14 +1387,14 @@ export struct BrowserToolbarCustomizationScreen {
     return presentation;
   }
 
-  private resolvePreviewFooterText(): string {
+  private resolvePreviewFooterText(): ResourceStr {
     if (this.toolbarChromeStyle !== 'split') {
-      return '点击按钮可分别设置单击、长按和两侧按钮上滑动作。';
+      return $r('app.string.toolbar_settings_preview_footer_floating');
     }
     if (this.splitPreviewScene === 'home') {
-      return '左侧两个按钮可自定义单击和长按。标签页和菜单的单击固定。';
+      return $r('app.string.toolbar_settings_preview_footer_split_home');
     }
-    return '主页按钮可自定义。返回、前进、标签页和菜单的单击固定，长按仍可设置。';
+    return $r('app.string.toolbar_settings_preview_footer_split_web');
   }
 
   private selectSplitPreviewScene(scene: BrowserSplitToolbarScene): void {
@@ -1441,7 +1444,7 @@ export struct BrowserToolbarCustomizationScreen {
     const after = this.splitViewModel.resolveActionId(nextSettings, this.selectedSplitSlotId, kind);
     if (after !== actionId) {
       this.popSheetNavigation();
-      this.showToast('这个动作已经在这条栏上了。');
+      this.showToast($r('app.string.toolbar_settings_action_already_on_bar'));
       return;
     }
     this.commitInteractionSelection(nextSettings);
@@ -1547,7 +1550,7 @@ export struct BrowserToolbarCustomizationScreen {
     return this.viewModel.findSlotAction(this.state, this.selectedSlotId) as BrowserToolbarSlotActionState;
   }
 
-  private resolveSelectedSlotTitle(): string {
+  private resolveSelectedSlotTitle(): ResourceStr {
     if (this.sheetQuestion === 'split_slot') {
       return this.resolveSplitSheetTitle();
     }
@@ -1787,11 +1790,11 @@ export struct BrowserToolbarCustomizationScreen {
       .catch((_error: Error) => {
         this.saving = false;
         this.refreshState();
-        this.showToast('底部工具栏更新失败。');
+        this.showToast($r('app.string.bottom_panel_toolbar_update_failed'));
       });
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

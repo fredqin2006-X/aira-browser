@@ -28,8 +28,8 @@ export class BrowserWebSurfaceActionEntryViewModel {
       (input.activeTabIsWebPage || input.webPageVisible || this.hasNetworkTargetUrl(input.targetUrls ?? []));
   }
 
-  resolveDisabledMessage(input: BrowserWebSurfaceActionEntryInput): string {
-    return this.canShowWebPageAction(input) ? '' : '请先打开网页';
+  resolveDisabledMessage(input: BrowserWebSurfaceActionEntryInput): ResourceStr {
+    return this.canShowWebPageAction(input) ? '' : $r('app.string.bottom_panel_open_page_first');
   }
 
   resolveTarget(input: BrowserWebSurfaceActionTargetInput): BrowserWebSurfaceActionTarget {

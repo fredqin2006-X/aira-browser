@@ -22,8 +22,8 @@ export struct SyncContentSwitchCard {
     DEFAULT_THEME_PALETTE.light.textPrimary;
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string =
     DEFAULT_THEME_PALETTE.light.textSecondary;
-  @Prop title: string = '';
-  @Prop status: string = '';
+  @Prop title: ResourceStr = '';
+  @Prop status: ResourceStr = '';
   @Prop checked: boolean = false;
   @Prop isEnabled: boolean = true;
   @Prop icon: Resource = $r('sys.symbol.gearshape_fill');
@@ -130,7 +130,7 @@ export struct SyncContentSwitchCard {
     .type(ButtonType.Circle)
     .buttonStyle(ButtonStyleMode.TEXTUAL)
     .stateEffect(true)
-    .accessibilityText(`查看${this.title}同步说明`)
+    .accessibilityText($r('app.string.settings_sync_info_a11y'))
     .onClick(() => {
       this.infoPopupVisible = !this.infoPopupVisible;
     })

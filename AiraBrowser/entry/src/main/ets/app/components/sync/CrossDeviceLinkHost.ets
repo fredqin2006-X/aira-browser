@@ -35,8 +35,16 @@ import {
   sharedSyncExperienceCoordinator,
   sharedAiraSyncConfigStore,
   sharedHuaweiAccountMutationCoordinator,
-  sharedMembershipFeature
+  sharedMembershipFeature,
+  sharedCrossDeviceLinkGuideRepository
 } from '../../bootstrap/BrowserAppRuntime';
+import {
+  createHiddenCrossDeviceLinkGuideSnapshot,
+  CrossDeviceLinkGuideAction,
+  CrossDeviceLinkGuideCoordinator,
+  CrossDeviceLinkGuideSnapshot
+} from '../../../core/onboarding/CrossDeviceLinkGuideCoordinator';
+import { CrossDeviceLinkGuideOverlay } from '../onboarding/CrossDeviceLinkGuideOverlay';
 import {
   SYNC_SETTINGS_REFRESH_REVISION_KEY,
   SyncSettingsRefreshSignal
@@ -60,7 +68,6 @@ import { CrossDeviceLinkScreen } from './CrossDeviceLinkScreen';
 import { CrossDeviceLinkSetupScreen } from './CrossDeviceLinkSetupScreen';
 import { applyDesktopDialogSheetChrome } from '../common/DesktopDialogSheetChrome';
 
-const DEVICE_TABS_SHEET_TITLE: string = '跨设备标签页';
 const CROSS_DEVICE_LINK_LOG_DOMAIN: number = 0x0A1A;
 const CROSS_DEVICE_LINK_LOG_TAG: string = 'CrossDeviceLink';
 
@@ -71,6 +78,8 @@ export struct CrossDeviceLinkHost {
   @Prop @Watch('handlePageShowRefresh') refreshToken: number = 0;
   /** False while the scan UI covers this page, so a returning sheet waits until we are foreground. */
   @Prop @Watch('handlePageVisibility') pageVisible: boolean = true;
+  @Prop @Watch('handleGuideDismissToken') guideDismissToken: number = 0;
+  onGuideVisibility?: (visible: boolean) => void;
   /** Embedded in the large-screen settings workspace instead of its own routed page. */
   @Prop showBackButton: boolean = true;
   @Prop showTitleBar: boolean = true;
@@ -92,6 +101,8 @@ export struct CrossDeviceLinkHost {
   @State private syncSwitchRevision: number = 0;
   /** Large-screen workspace shows the install/pairing recipe inline instead of routing. */
   @State private showSetupInline: boolean = false;
+  @State private guideSnapshot: CrossDeviceLinkGuideSnapshot = createHiddenCrossDeviceLinkGuideSnapshot();
+  private guideCoordinator?: CrossDeviceLinkGuideCoordinator;
   /** Remembered so the install sub-page can show the right recipe. */
   @State private providerKind: CrossDeviceLinkProviderKind = 'none';
   @State private confirmSheetVisible: boolean = false;
@@ -160,7 +171,25 @@ export struct CrossDeviceLinkHost {
 
   aboutToAppear(): void {
     this.boundary = readBrowserBoundaryRouteState();
+    this.guideCoordinator = new CrossDeviceLinkGuideCoordinator(
+      sharedCrossDeviceLinkGuideRepository,
+      {
+        publishState: (snapshot: CrossDeviceLinkGuideSnapshot): void => {
+          this.publishGuideSnapshot(snapshot);
+        },
+        openGuide: (): void => {
+          this.openInterconnectGuide();
+        }
+      }
+    );
     void this.refresh();
+    this.considerCrossDeviceLinkGuide();
+  }
+
+  aboutToDisappear(): void {
+    if (this.guideCoordinator !== undefined) {
+      this.guideCoordinator.handlePageLeft();
+    }
   }
 
   private handlePageShowRefresh(): void {
@@ -173,6 +202,48 @@ export struct CrossDeviceLinkHost {
       this.loginSheetVisible = true;
     }
     this.flushPendingForegroundSheet();
+    this.considerCrossDeviceLinkGuide();
+  }
+
+  private handleGuideDismissToken(): void {
+    if (this.guideDismissToken <= 0 || !this.guideSnapshot.visible) {
+      return;
+    }
+    if (this.guideCoordinator !== undefined) {
+      this.guideCoordinator.handleAction('dismiss');
+    }
+  }
+
+  private considerCrossDeviceLinkGuide(): void {
+    if (this.guideCoordinator === undefined) {
+      return;
+    }
+    if (!this.pageVisible || this.showSetupInline) {
+      this.guideCoordinator.handlePageLeft();
+      return;
+    }
+    this.guideCoordinator.handlePageEntered();
+  }
+
+  private publishGuideSnapshot(snapshot: CrossDeviceLinkGuideSnapshot): void {
+    this.guideSnapshot = snapshot;
+    if (this.onGuideVisibility !== undefined) {
+      this.onGuideVisibility(snapshot.visible);
+    }
+  }
+
+  private handleGuideAction(action: CrossDeviceLinkGuideAction): void {
+    if (this.guideCoordinator !== undefined) {
+      this.guideCoordinator.handleAction(action);
+    }
+  }
+
+  private openInterconnectGuide(): void {
+    if (this.desktopPresentation) {
+      this.showSetupInline = true;
+      return;
+    }
+    this.navigationCoordinator.openCrossDeviceLinkSetup(this.boundary, this.providerKind);
   }
 
   build() {
@@ -208,11 +279,7 @@ export struct CrossDeviceLinkHost {
             this.navigationCoordinator.back();
           },
           onOpenSetup: (): void => {
-            if (this.desktopPresentation) {
-              this.showSetupInline = true;
-              return;
-            }
-            this.navigationCoordinator.openCrossDeviceLinkSetup(this.boundary, this.providerKind);
+            this.openInterconnectGuide();
           },
           onOpenDeviceTabs: (deviceId: string): void => {
             this.openDeviceTabs(deviceId);
@@ -261,10 +328,19 @@ export struct CrossDeviceLinkHost {
       .bindSheet($$this.deviceTabsSheetVisible, this.buildDeviceTabsSheet(), applyDesktopDialogSheetChrome({
         preferType: this.desktopPresentation ? SheetType.CENTER : SheetType.BOTTOM,
         height: SheetSize.LARGE,
-        title: { title: DEVICE_TABS_SHEET_TITLE },
+        title: { title: $r('app.string.settings_link_tabs') },
         dragBar: !this.desktopPresentation,
         showClose: true
       }, 'm', this.desktopPresentation))
+
+    CrossDeviceLinkGuideOverlay({
+      visible: this.guideSnapshot.visible,
+      state: this.guideSnapshot,
+      desktopPresentation: this.desktopPresentation,
+      onAction: (action: CrossDeviceLinkGuideAction): void => {
+        this.handleGuideAction(action);
+      }
+    })
     }
     .width('100%')
     .height('100%')
@@ -334,11 +410,7 @@ export struct CrossDeviceLinkHost {
       return true;
     }
     if (action === 'open_setup') {
-      if (this.desktopPresentation) {
-        this.showSetupInline = true;
-        return true;
-      }
-      this.navigationCoordinator.openCrossDeviceLinkSetup(this.boundary, this.providerKind);
+      this.openInterconnectGuide();
       return true;
     }
     if (action === 'open_guide') {
@@ -386,7 +458,7 @@ export struct CrossDeviceLinkHost {
       CROSS_DEVICE_LINK_LOG_TAG,
       'refresh loaded=%{public}s activeProvider=%{public}s bookmark=%{public}s history=%{public}s historySupported=%{public}s devices=%{public}d status=%{public}s',
       syncState !== undefined ? '1' : '0',
-      syncState !== undefined && syncState.hasActiveProvider ? syncState.goalLabel : 'none',
+      providerKind,
       syncState !== undefined && syncState.bookmarkSelected ? '1' : '0',
       syncState !== undefined && syncState.historySelected ? '1' : '0',
       syncState !== undefined && syncState.historySupported ? '1' : '0',
@@ -588,7 +660,7 @@ export struct CrossDeviceLinkHost {
 
   private requestHuaweiLoginSheet(): boolean {
     if (!sharedHuaweiAccountMutationCoordinator.canSignIn(this.buildBoundaryInput())) {
-      this.showToast('请回到普通会话后登录华为账号。');
+      this.showToast($r('app.string.settings_pro_sign_in_private'));
       return true;
     }
     this.requestForegroundSheet('huawei_login');
@@ -619,12 +691,12 @@ export struct CrossDeviceLinkHost {
   ): void {
     if (error !== undefined) {
       if (error.code !== 1001502012) {
-        this.showToast(error.message.length > 0 ? error.message : '华为账号登录失败');
+        this.showToast(error.message.length > 0 ? error.message : $r('app.string.settings_pro_sign_in_failed'));
       }
       return;
     }
     if (response.authorizationCode.trim().length <= 0 && response.openID.trim().length <= 0) {
-      this.showToast('华为账号登录未完成');
+      this.showToast($r('app.string.settings_pro_sign_in_incomplete'));
       return;
     }
     this.huaweiLoginCompleted = true;
@@ -642,7 +714,7 @@ export struct CrossDeviceLinkHost {
         }
       })
       .catch((): void => {
-        this.showToast('华为账号登录失败');
+        this.showToast($r('app.string.settings_pro_sign_in_failed'));
         this.qrScanCoordinator.cancelPendingDesktopLogin();
       });
   }
@@ -695,7 +767,7 @@ export struct CrossDeviceLinkHost {
     this.navigationCoordinator.openBrowserUrlFromGuide(url, this.boundary);
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     this.getUIContext().getPromptAction().showToast({
       message: message,
       duration: 1800

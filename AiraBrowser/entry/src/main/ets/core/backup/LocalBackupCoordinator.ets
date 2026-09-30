@@ -8,13 +8,14 @@ import {
 import { LocalBackupFileService } from '../../services/backup/LocalBackupFileService';
 import { LocalBackupService } from '../../services/backup/LocalBackupService';
 import { SyncExperienceCoordinator } from '../sync/SyncExperienceCoordinator';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export type LocalBackupActionStatus = 'completed' | 'cancelled' | 'failed';
 
 export interface LocalBackupActionOutcome {
   status: LocalBackupActionStatus;
-  title: string;
-  message: string;
+  title: ResourceStr;
+  message: ResourceStr;
   inspection?: LocalBackupInspection;
   importResult?: LocalBackupImportResult;
 }
@@ -46,7 +47,8 @@ export class LocalBackupCoordinator {
     boundary: BrowserBoundaryRouteState
   ): Promise<LocalBackupActionOutcome> {
     if (!this.isBoundaryAllowed(boundary)) {
-      return this.failure('当前隐私会话不能导出普通资料。');
+      return this.failure($r('app.string.settings_advanced_backup_private_blocked',
+        resolveAppResourceText($r('app.string.settings_advanced_backup_private_export'))));
     }
     try {
       const uri = await this.fileService.pickExportUri(context);
@@ -57,8 +59,8 @@ export class LocalBackupCoordinator {
       await this.fileService.writePayload(uri, payload);
       return {
         status: 'completed',
-        title: '导出完成',
-        message: '本地备份文件已保存。'
+        title: $r('app.string.settings_advanced_backup_export_done_title'),
+        message: $r('app.string.settings_advanced_backup_export_done_message')
       };
     } catch (error) {
       return this.failure(this.stringifyError(error));
@@ -70,7 +72,8 @@ export class LocalBackupCoordinator {
     boundary: BrowserBoundaryRouteState
   ): Promise<LocalBackupActionOutcome> {
     if (!this.isBoundaryAllowed(boundary)) {
-      return this.failure('当前隐私会话不能导入普通资料。');
+      return this.failure($r('app.string.settings_advanced_backup_private_blocked',
+        resolveAppResourceText($r('app.string.settings_advanced_backup_private_import'))));
     }
     try {
       const uri = await this.fileService.pickImportUri(context);
@@ -95,7 +98,8 @@ export class LocalBackupCoordinator {
     boundary: BrowserBoundaryRouteState
   ): Promise<LocalBackupActionOutcome> {
     if (!this.isBoundaryAllowed(boundary)) {
-      return this.failure('当前隐私会话不能导入普通资料。');
+      return this.failure($r('app.string.settings_advanced_backup_private_blocked',
+        resolveAppResourceText($r('app.string.settings_advanced_backup_private_import'))));
     }
     try {
       const result = await this.syncExperienceCoordinator.runLocalBackupImport(
@@ -114,14 +118,13 @@ export class LocalBackupCoordinator {
       );
       return {
         status: 'completed',
-        title: '导入完成',
+        title: $r('app.string.settings_advanced_backup_import_done_title'),
         message: this.buildImportSummary(result),
         importResult: result
       };
     } catch (error) {
-      return this.failure(
-        `${this.stringifyError(error)} 已完成的内容不会自动回滚，请检查后重试。`
-      );
+      return this.failure($r('app.string.settings_advanced_backup_incomplete_suffix',
+        this.stringifyError(error)));
     }
   }
 
@@ -129,39 +132,43 @@ export class LocalBackupCoordinator {
     return !isPrivateBoundaryRoute(boundary.dataScope, boundary.privacyMode);
   }
 
-  private buildImportSummary(result: LocalBackupImportResult): string {
+  private buildImportSummary(result: LocalBackupImportResult): ResourceStr {
+    const separator = resolveAppResourceText($r('app.string.settings_advanced_backup_summary_separator'));
     const parts: string[] = [];
     if (result.bookmarkCount > 0) {
-      parts.push(`${result.bookmarkCount} 个书签节点`);
+      parts.push(resolveAppResourceText($r('app.string.settings_advanced_backup_unit_bookmarks', result.bookmarkCount)));
     }
     if (result.historyCount > 0) {
-      parts.push(`${result.historyCount} 条历史记录`);
+      parts.push(resolveAppResourceText($r('app.string.settings_advanced_backup_unit_history', result.historyCount)));
     }
     if (result.personalizationCount > 0) {
-      parts.push(`${result.personalizationCount} 组常用设置`);
+      parts.push(resolveAppResourceText($r('app.string.settings_advanced_backup_unit_personalization', result.personalizationCount)));
     }
     if (result.userScriptCount > 0) {
-      parts.push(`${result.userScriptCount} 个用户脚本`);
+      parts.push(resolveAppResourceText($r('app.string.settings_advanced_backup_unit_user_scripts', result.userScriptCount)));
     }
     if (result.userScriptValueCount > 0) {
-      parts.push(`${result.userScriptValueCount} 项脚本数据`);
+      parts.push(resolveAppResourceText($r('app.string.settings_advanced_backup_unit_user_script_values', result.userScriptValueCount)));
     }
-    const restored = parts.length > 0 ? `已恢复${parts.join('、')}。` : '所选内容已经存在，无需更改。';
+    const restored = parts.length > 0
+      ? $r('app.string.settings_advanced_backup_restored', parts.join(separator))
+      : $r('app.string.settings_advanced_backup_nothing_to_do');
     if (result.skippedUserScriptCount <= 0) {
       return restored;
     }
-    return `${restored} 另有 ${result.skippedUserScriptCount} 个脚本未能恢复。`;
+    return `${resolveAppResourceText(restored)} ${resolveAppResourceText(
+      $r('app.string.settings_advanced_backup_skipped_suffix', result.skippedUserScriptCount))}`;
   }
 
   private cancelled(): LocalBackupActionOutcome {
     return { status: 'cancelled', title: '', message: '' };
   }
 
-  private failure(message: string): LocalBackupActionOutcome {
+  private failure(message: ResourceStr): LocalBackupActionOutcome {
     return {
       status: 'failed',
-      title: '操作失败',
-      message: message.length > 0 ? message : '未知错误'
+      title: $r('app.string.settings_advanced_backup_failure_title'),
+      message: message
     };
   }
 
@@ -169,6 +176,6 @@ export class LocalBackupCoordinator {
     if (error instanceof Error && error.message.length > 0) {
       return error.message;
     }
-    return '操作失败，请稍后重试。';
+    return resolveAppResourceText($r('app.string.settings_advanced_backup_failure_retry'));
   }
 }

@@ -40,8 +40,8 @@ export interface HistorySiteGroup {
 }
 
 export interface HistoryDetailRow {
-  label: string;
-  value: string;
+  label: ResourceStr;
+  value: ResourceStr;
 }
 
 export interface HistoryViewState {
@@ -50,9 +50,9 @@ export interface HistoryViewState {
   visits: HistoryDisplayVisit[];
   groups: HistoryDateGroup[];
   sites: HistorySiteGroup[];
-  title: string;
-  emptyTitle: string;
-  emptyMessage: string;
+  title: ResourceStr;
+  emptyTitle: ResourceStr;
+  emptyMessage: ResourceStr;
 }
 
 const HISTORY_DIALOG_TITLE_MAX_LENGTH: number = 72;
@@ -84,19 +84,24 @@ export class HistoryViewModel {
       groups: groups,
       sites: sites,
       title: this.buildTitle(mode, visibleCount, normalizedQuery.length > 0),
-      emptyTitle: normalizedQuery.length > 0 ? '没有匹配的历史记录' : '还没有历史记录',
-      emptyMessage: normalizedQuery.length > 0 ? '换个关键词试试。' : '从搜索栏打开网页后，这里会自动记录。'
+      emptyTitle: normalizedQuery.length > 0 ? $r('app.string.history_no_match') : $r('app.string.history_empty'),
+      emptyMessage: normalizedQuery.length > 0 ? $r('app.string.history_try_another') : $r('app.string.history_empty_message')
     };
   }
 
   buildDetailRows(visit: HistoryDisplayVisit): HistoryDetailRow[] {
     return [
-      { label: '标题', value: this.buildReadableVisitTitle(visit) },
-      { label: '网址', value: this.buildReadableVisitUrl(visit.url) },
-      { label: '站点', value: visit.host.length > 0 ? visit.host : '未知站点' },
-      { label: '访问时间', value: this.formatFullTime(visit.visitedAt) },
-      { label: '站点访问', value: `${visit.visitCount} 次` },
-      { label: '展示合并', value: visit.duplicateCount > 1 ? `${visit.duplicateCount} 次同页访问` : '单次访问' }
+      { label: $r('app.string.ui_title'), value: this.buildReadableVisitTitle(visit) },
+      { label: $r('app.string.ui_url'), value: this.buildReadableVisitUrl(visit.url) },
+      { label: $r('app.string.history_detail_site'), value: visit.host.length > 0 ? visit.host : $r('app.string.history_unknown_site') },
+      { label: $r('app.string.history_detail_time'), value: this.formatFullTime(visit.visitedAt) },
+      { label: $r('app.string.history_detail_site_visits'), value: $r('app.string.history_duplicate_count', visit.visitCount) },
+      {
+        label: $r('app.string.history_detail_merged'),
+        value: visit.duplicateCount > 1
+          ? $r('app.string.history_duplicate_visits', visit.duplicateCount)
+          : $r('app.string.history_single_visit')
+      }
     ];
   }
 
@@ -117,8 +122,8 @@ export class HistoryViewModel {
     });
   }
 
-  buildDeleteVisitMessage(visit: HistoryDisplayVisit): string {
-    return `确定删除“${this.buildReadableVisitTitle(visit)}”吗？`;
+  buildDeleteVisitMessage(visit: HistoryDisplayVisit): ResourceStr {
+    return $r('app.string.history_delete_one', this.buildReadableVisitTitle(visit));
   }
 
   getVisitSourceIds(visit: HistoryDisplayVisit): string[] {
@@ -388,11 +393,11 @@ export class HistoryViewModel {
     return normalized;
   }
 
-  private buildTitle(mode: HistoryViewMode, count: number, filtered: boolean): string {
+  private buildTitle(mode: HistoryViewMode, count: number, filtered: boolean): ResourceStr {
     if (mode === 'sites') {
-      return filtered ? `站点 · ${count}` : '按站点';
+      return filtered ? $r('app.string.history_site_count', count) : $r('app.string.history_by_site');
     }
-    return filtered ? `搜索结果 · ${count}` : '历史记录';
+    return filtered ? $r('app.string.history_search_count', count) : $r('app.string.app_shortcut_history');
   }
 
   private buildDateGroupKey(label: string): string {

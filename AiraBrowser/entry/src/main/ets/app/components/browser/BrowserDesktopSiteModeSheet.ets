@@ -46,7 +46,7 @@ export struct BrowserDesktopSiteModeSheet {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string = '#5F6875';
   @Prop state: BrowserDesktopSiteModeSheetState = {
     options: [],
-    defaultUserAgentSummary: 'Aira默认'
+    defaultUserAgentSummary: 'Aira'
   };
   @Prop layoutMode: 'phone' | 'large_screen' = 'phone';
   onClose: () => void = () => {};
@@ -68,7 +68,7 @@ export struct BrowserDesktopSiteModeSheet {
       if (this.layoutMode === 'phone') {
         BrowserImmersiveSheetLayout({
           closeVisible: true,
-          closeAccessibilityLabel: '关闭网站版本',
+          closeAccessibilityLabel: $r('app.string.site_version_close'),
           onClose: (): void => {
             this.onClose();
           },
@@ -88,7 +88,7 @@ export struct BrowserDesktopSiteModeSheet {
   @Builder
   private buildHeader() {
     BrowserFeatureSheetHeader({
-      title: '网站版本',
+      title: $r('app.string.site_version_title'),
       titleColor: this.storedPrimaryTextColor
     })
   }
@@ -118,7 +118,7 @@ export struct BrowserDesktopSiteModeSheet {
       Column({ space: 16 }) {
         Column({ space: 8 }) {
           SettingsSectionTitle({
-            title: '当前站点',
+            title: $r('app.string.site_version_current_site'),
             secondaryTextColor: this.storedSecondaryTextColor
           })
 
@@ -136,7 +136,7 @@ export struct BrowserDesktopSiteModeSheet {
 
         Row() {
           BrowserSheetActionButton({
-            label: '默认网页标识：' + this.state.defaultUserAgentSummary,
+            label: $r('app.string.site_version_default_identity', this.state.defaultUserAgentSummary),
             onAction: () => {
               this.onOpenDefaultUserAgent();
             }

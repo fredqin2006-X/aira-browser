@@ -18,6 +18,7 @@ import {
   BrowserMediaDiscoveryHost,
   BrowserMediaDiscoverySurfaceState
 } from './media/BrowserMediaDiscoveryModels';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   BrowserTransientSurfaceCoordinator,
   BrowserTransientSurfaceUpdate
@@ -148,7 +149,9 @@ export class BrowserMediaResourceSessionCoordinator {
     const runtime = this.mediaDiscoveryHost.buildRuntimeContext();
     if (!runtime.fullAppServiceMode) {
       this.mediaDiscoveryCoordinator.refreshActiveMediaDiscoverySurface(this.mediaDiscoveryHost);
-      this.mediaDiscoveryHost.showToast('页面资源嗅探需切换到全量模式后使用。');
+      this.mediaDiscoveryHost.showToast(
+        resolveAppResourceText($r('app.string.media_resource_toast_full_mode'))
+      );
       return;
     }
     this.mediaDiscoveryCoordinator.refreshActiveMediaDiscoverySurface(this.mediaDiscoveryHost);
@@ -189,14 +192,16 @@ export class BrowserMediaResourceSessionCoordinator {
 
   async requestActivePlaybackDownload(tabId: string, playbackTargetId: string): Promise<void> {
     if (this.activePlaybackDownloadInFlight) {
-      this.mediaDiscoveryHost.showToast('正在识别当前视频资源。');
+      this.mediaDiscoveryHost.showToast(resolveAppResourceText($r('app.string.media_resource_toast_identifying')));
       return;
     }
     this.activePlaybackDownloadInFlight = true;
     try {
       await this.mediaDiscoveryCoordinator.runTakeoverLaunchProbeForTab(tabId, this.mediaDiscoveryHost);
       if (this.mediaDiscoveryHost.resolveActiveTabId() !== tabId) {
-        this.mediaDiscoveryHost.showToast('当前网页视频会话已经失效。');
+        this.mediaDiscoveryHost.showToast(
+          resolveAppResourceText($r('app.string.media_resource_toast_session_expired'))
+        );
         return;
       }
       const resolution = this.mediaDiscoveryCoordinator.resolveActivePlaybackDownload({
@@ -283,16 +288,16 @@ export class BrowserMediaResourceSessionCoordinator {
   private copyHlsTakeoverUrl(): void {
     this.shell.copyText(
       this.snapshot.hlsTakeoverTarget?.url ?? '',
-      '当前没有可复制的 m3u8 链接。',
-      'm3u8 链接已复制。'
+      resolveAppResourceText($r('app.string.media_resource_toast_no_m3u8')),
+      resolveAppResourceText($r('app.string.media_resource_toast_m3u8_copied'))
     );
   }
 
   private copyHlsTakeoverContext(): void {
     this.shell.copyText(
       this.hlsTakeoverViewModel.buildCopyableRequestContext(this.snapshot.hlsTakeoverTarget),
-      '当前没有可复制的请求上下文。',
-      '请求上下文已复制。'
+      resolveAppResourceText($r('app.string.media_resource_toast_no_request_context')),
+      resolveAppResourceText($r('app.string.media_resource_toast_request_context_copied'))
     );
   }
 
@@ -328,8 +333,8 @@ export class BrowserMediaResourceSessionCoordinator {
       case 'copy':
         this.shell.copyText(
           resolution.copyUrl ?? '',
-          '当前没有可复制的资源链接。',
-          '资源链接已复制。'
+          resolveAppResourceText($r('app.string.media_resource_toast_no_resource_link')),
+          resolveAppResourceText($r('app.string.media_resource_toast_resource_link_copied'))
         );
         return;
       default:
@@ -346,15 +351,17 @@ export class BrowserMediaResourceSessionCoordinator {
         this.snapshot.hlsTakeoverParsingCandidateId :
         this.snapshot.resourceManifestParsingCandidateId;
       this.applyManifestParseState(kind, currentParsingCandidateId, undefined);
-      this.mediaDiscoveryHost.showToast(
-        kind === 'hls' ? '当前没有可解析的 m3u8 链接。' : '当前没有可解析的清单链接。'
-      );
+      this.mediaDiscoveryHost.showToast(resolveAppResourceText(kind === 'hls'
+        ? $r('app.string.media_resource_toast_no_m3u8_parse')
+        : $r('app.string.media_resource_toast_no_manifest_parse')));
       return;
     }
     this.applyManifestParseState(kind, target.candidateId, undefined);
     const result = await this.parseManifest(
       target,
-      kind === 'hls' ? 'HLS 清单解析失败。' : '清单解析失败。'
+      resolveAppResourceText(kind === 'hls'
+        ? $r('app.string.media_resource_toast_hls_parse_failed')
+        : $r('app.string.media_resource_toast_manifest_parse_failed'))
     );
     const currentParsingCandidateId = kind === 'hls' ?
       this.snapshot.hlsTakeoverParsingCandidateId :
@@ -364,7 +371,11 @@ export class BrowserMediaResourceSessionCoordinator {
     }
     this.applyManifestParseState(kind, '', result);
     this.mediaDiscoveryHost.showToast(
-      result.ok ? (kind === 'hls' ? 'HLS 清单解析完成。' : '清单解析完成。') : result.errorMessage
+      result.ok
+        ? resolveAppResourceText(kind === 'hls'
+          ? $r('app.string.media_resource_toast_hls_parse_done')
+          : $r('app.string.media_resource_toast_manifest_parse_done'))
+        : result.errorMessage
     );
   }
 

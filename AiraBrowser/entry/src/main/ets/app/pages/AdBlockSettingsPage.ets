@@ -269,16 +269,16 @@ struct AdBlockSettingsPage {
 
   private confirmClearStats(): void {
     showCenteredAlertDialog({
-      title: '清空拦截统计',
-      message: '清空后不会影响网页内容过滤规则和站点例外。',
+      title: $r('app.string.settings_privacy_protection_adblock_clear_title'),
+      message: $r('app.string.settings_privacy_protection_adblock_clear_message'),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_privacy_protection_dialog_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '清空',
+        value: $r('app.string.settings_privacy_protection_adblock_clear_confirm'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.clearStats();

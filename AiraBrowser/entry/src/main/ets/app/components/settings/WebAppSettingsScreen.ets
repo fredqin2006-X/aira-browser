@@ -36,7 +36,7 @@ export struct WebAppSettingsScreen {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string = '#5F6875';
   @Prop state: WebAppSettingsListState = {
     items: [],
-    emptyTitle: '还没有网页应用',
+    emptyTitle: $r('app.string.settings_web_apps_empty_title'),
     emptyMessage: ''
   };
   @Prop dataScope: string = '';
@@ -58,7 +58,7 @@ export struct WebAppSettingsScreen {
       .height('100%')
     } else if (this.presentationMode === 'standalone') {
       SettingsHdsScaffold({
-        title: '网页应用',
+        title: $r('app.string.settings_web_apps'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -80,7 +80,7 @@ export struct WebAppSettingsScreen {
   @Builder
   private buildEmbeddedHeader() {
     Row() {
-      Text('网页应用')
+      Text($r('app.string.settings_web_apps'))
         .fontSize(22)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.storedPrimaryTextColor)
@@ -110,7 +110,7 @@ export struct WebAppSettingsScreen {
 
   @Builder
   private buildInstalledSection() {
-    SettingsSection({ title: '已添加到桌面' }) {
+    SettingsSection({ title: $r('app.string.settings_web_apps_installed') }) {
       Column({ space: 12 }) {
         ForEach(this.state.items, (item: WebAppSettingsListItemState) => {
           this.buildWebAppRow(item)
@@ -123,7 +123,7 @@ export struct WebAppSettingsScreen {
   @Builder
   private buildLimitNotice() {
     SettingsFooterText({
-      text: '受鸿蒙系统桌面入口能力限制，网页应用最多只能添加 2 个；这是系统限制，不是 Aira 的限制。',
+      text: $r('app.string.settings_web_apps_limit_note'),
       secondaryTextColor: this.storedSecondaryTextColor
     })
   }

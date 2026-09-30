@@ -1,3 +1,4 @@
+import { hasAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   ExternalNavigationAppOpenPolicy,
   SitePermissionKind,
@@ -216,7 +217,7 @@ export struct SettingsWebAppsDetailPanel {
       topPadding: 0,
       bottomPadding: 22
     }) {
-      SettingsSection({ title: '站点权限', secondaryTextColor: this.secondaryTextColor }) {
+      SettingsSection({ title: $r('app.string.settings_web_apps_permissions'), secondaryTextColor: this.secondaryTextColor }) {
         SettingsGroupCard({
           surfaceColor: this.surfaceBackground,
           desktopPresentation: this.desktopPresentation
@@ -255,7 +256,7 @@ export struct SettingsWebAppsDetailPanel {
   private buildDesktopSitePanel() {
     Column() {
       if (!this.desktopPresentation) {
-        this.buildEmbeddedBackHeader('网页标识')
+        this.buildEmbeddedBackHeader($r('app.string.site_version_preset_title'))
       }
       this.buildDesktopSiteContent()
     }
@@ -270,16 +271,16 @@ export struct SettingsWebAppsDetailPanel {
       topPadding: 0,
       bottomPadding: 22
     }) {
-      SettingsSection({ title: '当前站点', secondaryTextColor: this.secondaryTextColor }) {
+      SettingsSection({ title: $r('app.string.settings_site_customization_current_site'), secondaryTextColor: this.secondaryTextColor }) {
         SettingsGroupCard({
           surfaceColor: this.surfaceBackground,
           desktopPresentation: this.desktopPresentation
         }) {
-          this.buildDesktopModeRow('跟随全局', 'default', 'first')
+          this.buildDesktopModeRow($r('app.string.settings_site_customization_follow_global'), 'default', 'first')
           SettingsGroupDivider({ dividerColor: this.dividerColor })
-          this.buildDesktopModeRow('移动版', 'mobile', 'middle')
+          this.buildDesktopModeRow($r('app.string.site_version_mode_mobile'), 'mobile', 'middle')
           SettingsGroupDivider({ dividerColor: this.dividerColor })
-          this.buildDesktopModeRow('桌面版', 'desktop', 'last')
+          this.buildDesktopModeRow($r('app.string.site_version_mode_desktop'), 'desktop', 'last')
         }
       }
     }
@@ -287,7 +288,7 @@ export struct SettingsWebAppsDetailPanel {
 
   @Builder
   private buildDesktopModeRow(
-    title: string,
+    title: ResourceStr,
     mode: BrowserDesktopSiteMode,
     rowPosition: 'single' | 'first' | 'middle' | 'last'
   ) {
@@ -315,7 +316,7 @@ export struct SettingsWebAppsDetailPanel {
   private buildErrorPanel() {
     if (this.panelMode === 'compact') {
       SettingsHdsScaffold({
-        title: '网页应用',
+        title: $r('app.string.settings_web_apps'),
         backIconKind: 'back',
         pageBackground: this.pageBackground,
         headerButtonBackground: this.headerButtonBackground,
@@ -332,7 +333,7 @@ export struct SettingsWebAppsDetailPanel {
       this.buildErrorContent()
     } else {
       Column() {
-        this.buildEmbeddedBackHeader('网页应用')
+        this.buildEmbeddedBackHeader($r('app.string.settings_web_apps'))
         this.buildErrorContent()
       }
       .width('100%')
@@ -359,7 +360,7 @@ export struct SettingsWebAppsDetailPanel {
   }
 
   @Builder
-  private buildEmbeddedBackHeader(title: string) {
+  private buildEmbeddedBackHeader(title: ResourceStr) {
     Row({ space: 10 }) {
       Stack({ alignContent: Alignment.Center }) {
         if (isHdsMaterialAvailable()) {
@@ -489,16 +490,16 @@ export struct SettingsWebAppsDetailPanel {
       return;
     }
     showCenteredAlertDialog({
-      title: '重置站点设置',
-      message: '将清除这个网页应用对应站点的网页标识、关闭后清除、打开应用和权限自定义规则。',
+      title: $r('app.string.settings_web_apps_reset_title'),
+      message: $r('app.string.settings_web_apps_reset_message'),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_web_app_install_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '重置',
+        value: $r('app.string.settings_site_customization_reset_confirm'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.runAction(new WebAppSettingsSessionAction('reset_site'));
@@ -507,10 +508,10 @@ export struct SettingsWebAppsDetailPanel {
     });
   }
 
-  private resolveErrorMessage(): string {
-    return this.sessionSnapshot.errorMessage.length > 0
+  private resolveErrorMessage(): ResourceStr {
+    return hasAppResourceText(this.sessionSnapshot.errorMessage)
       ? this.sessionSnapshot.errorMessage
-      : '这个设置页面暂时无法打开';
+      : $r('app.string.settings_web_apps_open_failed');
   }
 
   private buildBoundaryState(): BrowserBoundaryRouteState {

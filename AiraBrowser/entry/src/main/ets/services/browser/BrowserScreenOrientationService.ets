@@ -4,7 +4,7 @@ import { BrowserScreenOrientationMode } from '../../core/browser/BrowserScreenOr
 
 export interface BrowserScreenOrientationApplyResult {
   mode: BrowserScreenOrientationMode;
-  message: string;
+  message: ResourceStr;
 }
 
 export class BrowserScreenOrientationService {
@@ -30,13 +30,13 @@ export class BrowserScreenOrientationService {
     return window.Orientation.AUTO_ROTATION_UNSPECIFIED;
   }
 
-  private resolveSuccessMessage(mode: BrowserScreenOrientationMode): string {
+  private resolveSuccessMessage(mode: BrowserScreenOrientationMode): ResourceStr {
     if (mode === 'portrait') {
-      return '已切换为竖屏。';
+      return $r('app.string.settings_screen_orientation_applied_portrait');
     }
     if (mode === 'landscape') {
-      return '已切换为横屏。';
+      return $r('app.string.settings_screen_orientation_applied_landscape');
     }
-    return '已切换为跟随系统方向。';
+    return $r('app.string.settings_screen_orientation_applied_system');
   }
 }

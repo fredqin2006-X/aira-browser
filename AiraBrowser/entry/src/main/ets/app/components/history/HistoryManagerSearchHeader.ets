@@ -49,7 +49,7 @@ export struct HistoryManagerSearchHeader {
         .type(ButtonType.Normal)
         .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
         .borderRadius(20)
-        .accessibilityText('退出历史搜索')
+        .accessibilityText($r('app.string.history_exit_search'))
         .stateEffect(true)
         .onClick(() => {
           this.onClose();
@@ -69,7 +69,7 @@ export struct HistoryManagerSearchHeader {
               .fontWeight(FontWeight.Medium)
               .fontColor([this.storedSecondaryTextColor])
 
-            TextInput({ text: this.query, placeholder: '搜索历史记录' })
+            TextInput({ text: this.query, placeholder: $r('app.string.history_search') })
               .id(HISTORY_SEARCH_INPUT_FOCUS_ID)
               .layoutWeight(1)
               .height(40)
@@ -102,7 +102,7 @@ export struct HistoryManagerSearchHeader {
               .type(ButtonType.Circle)
               .buttonStyle(ButtonStyleMode.TEXTUAL)
               .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
-              .accessibilityText('清除历史搜索')
+              .accessibilityText($r('app.string.history_clear_search'))
               .stateEffect(true)
               .onClick(() => {
                 this.onQueryChange('');

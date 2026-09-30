@@ -98,8 +98,9 @@ export type SyncExperienceRetryAction = 'sync' | 'reload';
 
 export interface SyncExperienceActionOutcome {
   type: SyncExperienceActionOutcomeType;
-  title: string;
-  message: string;
+  title: ResourceStr;
+  message: ResourceStr;
+  messageLines?: ResourceStr[];
   remoteKind?: AiraSyncProviderKind;
   membershipDecision?: EntitlementDecision;
   enableDefaultContent?: boolean;
@@ -118,8 +119,9 @@ export type SyncAdditionalBackupActionOutcomeType = 'completed' | 'blocked' | 'f
 
 export interface SyncAdditionalBackupActionOutcome {
   type: SyncAdditionalBackupActionOutcomeType;
-  title: string;
-  message: string;
+  title: ResourceStr;
+  message: ResourceStr;
+  messageLines?: ResourceStr[];
   requiresOptions?: boolean;
 }
 
@@ -144,18 +146,18 @@ export type SyncExperienceProviderSelectionPresentation = SyncProviderSelectionP
 export interface SyncExperienceAdvancedProviderReadiness {
   remoteKind: AiraSyncProviderKind;
   ready: boolean;
-  missingConfigurationMessage: string;
+  missingConfigurationMessage: ResourceStr;
 }
 
 export interface SyncExperienceAdvancedState {
   status: SyncAdvancedStatusViewState;
   providerActions: SyncAdvancedProviderActionState;
-  mergeActionLabel: string;
+  mergeActionLabel: ResourceStr;
   activeRemoteKind: AiraSyncRemoteKind;
   activeSyncServiceKey: AiraFeatureKey;
   activeSyncServiceName: string;
   activeSyncReady: boolean;
-  activeSyncMissingConfigurationMessage: string;
+  activeSyncMissingConfigurationMessage: ResourceStr;
   providerReadiness: SyncExperienceAdvancedProviderReadiness[];
 }
 
@@ -393,23 +395,23 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         !firstActivationSelection.personalizationSelected && !firstActivationSelection.historySelected) {
         return {
           type: 'blocked',
-          title: '请选择同步内容',
-          message: '至少开启书签、历史记录、主页收藏、小说书架或一项常用设置后再继续。'
+          title: $r('app.string.settings_sync_choose_content'),
+          message: $r('app.string.settings_sync_choose_content_required')
         };
       }
       if (needsInitialDomainActivation && remoteKind === 'webdav' &&
         !firstActivationSelection.bookmarkSelected && !firstActivationSelection.personalizationSelected) {
         return {
           type: 'blocked',
-          title: '请选择 WebDAV 支持的同步内容',
-          message: 'WebDAV 不同步历史记录，请至少选择书签、主页收藏、小说书架或一项常用设置。'
+          title: $r('app.string.settings_sync_choose_webdav_required_title'),
+          message: $r('app.string.settings_sync_choose_webdav_required')
         };
       }
       if (remoteKind === 'webdav' && context.settings.webdav.endpoint.trim().length <= 0) {
         return {
           type: 'configuration-required',
-          title: '配置 WebDAV',
-          message: '请先填写 WebDAV 服务器信息。',
+          title: $r('app.string.settings_sync_configure_webdav'),
+          message: $r('app.string.settings_sync_configure_webdav_message'),
           remoteKind: 'webdav',
           enableDefaultContent: needsInitialDomainActivation
         };
@@ -420,8 +422,8 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
           selfHosted.credentialId.trim().length <= 0 || selfHosted.deviceToken.trim().length <= 0) {
           return {
             type: 'configuration-required',
-            title: '连接私有化部署',
-            message: '请先填写服务器地址并使用一次性配对码连接。',
+            title: $r('app.string.settings_sync_connect_self_host'),
+            message: $r('app.string.settings_sync_connect_self_host_message'),
             remoteKind: 'self_hosted',
             enableDefaultContent: needsInitialDomainActivation
           };
@@ -430,8 +432,8 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       if (!hasNoActiveProvider && context.activeProvider !== remoteKind && !confirmed) {
         return {
           type: 'confirmation-required',
-          title: '更改同步方式？',
-          message: `将改为“${this.viewModel.resolveGoalLabel(remoteKind)}”。现有数据会安全合并；当前同步方式不会自动变成备份。需要备份时请单独开启。`,
+          title: $r('app.string.settings_sync_change_method_title'),
+          message: this.resolveGoalChangeConfirmMessage(remoteKind),
           remoteKind: remoteKind
         };
       }
@@ -446,8 +448,8 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       if (requestOutcome.type === 'no-action' && !needsInitialDomainActivation) {
         return {
           type: 'completed',
-          title: '同步方式未更改',
-          message: `当前正在使用“${this.viewModel.resolveGoalLabel(remoteKind, context.settings)}”。`,
+          title: $r('app.string.settings_sync_method_unchanged'),
+          message: this.resolveGoalUnchangedMessage(remoteKind, context.settings),
           remoteKind: remoteKind
         };
       }
@@ -462,29 +464,34 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         }
         providerSwitchMessage = switchOutcome.message;
       }
+      const switchLines = providerSwitchMessage.length > 0
+        ? this.syncFailurePresentationService.localizeProviderMessageLines(providerSwitchMessage)
+        : [];
       if (needsInitialDomainActivation) {
         const activationOutcome = await this.activateFirstSelection(
           remoteKind,
           firstActivationSelection
         );
-        if (providerSwitchMessage.length > 0 && activationOutcome.type === 'completed') {
-          activationOutcome.message = `${providerSwitchMessage}\n${activationOutcome.message}`;
+        if (switchLines.length > 0 && activationOutcome.type === 'completed') {
+          const activationLines = activationOutcome.messageLines !== undefined &&
+            activationOutcome.messageLines.length > 0
+            ? activationOutcome.messageLines
+            : [activationOutcome.message];
+          return this.withMessageLines(activationOutcome, switchLines.concat(activationLines));
         }
         return activationOutcome;
       }
       if (!this.isHuaweiBookmarkInitializationPending(this.syncService.getAiraSyncSettings())) {
         await this.refreshBookmarkRemoteStatus(remoteKind);
       }
-      return {
+      return this.withMessageLines({
         type: 'completed',
-        title: '同步方式已更改',
-        message: providerSwitchMessage.length > 0
-          ? providerSwitchMessage
-          : `现在会在“${this.viewModel.resolveGoalLabel(remoteKind)}”保持数据一致。`,
+        title: $r('app.string.settings_sync_method_changed'),
+        message: switchLines.length > 0 ? switchLines[0] : this.resolveGoalChangedMessage(remoteKind),
         remoteKind: remoteKind
-      };
+      }, switchLines);
     } catch (error) {
-      return this.failure('更改同步方式失败', error as Error, remoteKind);
+      return this.failure($r('app.string.settings_sync_change_failed'), error as Error, remoteKind);
     }
   }
 
@@ -524,7 +531,7 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
     try {
       return await this.requestGoalChange(remoteKind, true);
     } catch (error) {
-      return this.failure('同步未完全开启', error as Error, remoteKind);
+      return this.failure($r('app.string.settings_sync_open_incomplete'), error as Error, remoteKind);
     }
   }
 
@@ -536,8 +543,8 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       if (context.activeProvider !== 'none') {
         return {
           type: 'blocked',
-          title: '同步状态已更新',
-          message: '当前设备已经选择了同步方式，请返回同步页面确认后再编辑 WebDAV 配置。',
+          title: $r('app.string.settings_sync_state_updated'),
+          message: $r('app.string.settings_sync_state_updated_message'),
           remoteKind: 'webdav'
         };
       }
@@ -546,20 +553,20 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       if (!selection.bookmarkSelected && !selection.personalizationSelected && !selection.historySelected) {
         return {
           type: 'blocked',
-          title: '请选择同步内容',
-          message: '至少开启书签、历史记录、主页收藏、小说书架或一项常用设置后再继续。',
+          title: $r('app.string.settings_sync_choose_content'),
+          message: $r('app.string.settings_sync_choose_content_required'),
           remoteKind: 'webdav'
         };
       }
       return {
         type: 'configuration-required',
-        title: '配置 WebDAV',
-        message: '请先填写 WebDAV 服务器信息。',
+        title: $r('app.string.settings_sync_configure_webdav'),
+        message: $r('app.string.settings_sync_configure_webdav_message'),
         remoteKind: 'webdav',
         enableDefaultContent: true
       };
     } catch (error) {
-      return this.failure('WebDAV 同步未开启', this.normalizeError(error), 'webdav');
+      return this.failure($r('app.string.settings_sync_webdav_not_started'), this.normalizeError(error), 'webdav');
     }
   }
 
@@ -587,7 +594,7 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         remoteKind: 'webdav'
       };
     } catch (error) {
-      return this.failure('WebDAV 同步未开启', this.normalizeError(error), 'webdav');
+      return this.failure($r('app.string.settings_sync_webdav_not_started'), this.normalizeError(error), 'webdav');
     }
   }
 
@@ -693,15 +700,18 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       if (enabled && context.activeProvider === 'none') {
         return {
           type: 'configuration-required',
-          title: '请选择同步方式',
-          message: '先选择希望数据出现在哪些设备上。'
+          title: $r('app.string.settings_sync_choose_method_title'),
+          message: $r('app.string.settings_sync_choose_devices')
         };
       }
       return enabled
         ? await this.resumeExperience(context.experienceState)
         : await this.suspendExperience(context.settings, context.experienceState);
     } catch (error) {
-      return this.failure(enabled ? '恢复同步失败' : '暂停同步失败', error as Error);
+      return this.failure(
+        enabled ? $r('app.string.settings_sync_resume_failed') : $r('app.string.settings_sync_pause_failed'),
+        error as Error
+      );
     }
   }
 
@@ -712,10 +722,12 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         await this.experienceStateStore.setBookmarkSelected(selected);
         return {
           type: 'completed',
-          title: selected ? '已选择书签' : '已暂停书签',
+          title: selected
+            ? $r('app.string.settings_sync_bookmarks_selected')
+            : $r('app.string.settings_sync_bookmarks_paused_choice'),
           message: context.experienceState.suspended
-            ? '重新开启同步后会按此选择恢复。'
-            : '开启同步后会按此选择同步。'
+            ? $r('app.string.settings_sync_resume_choice')
+            : $r('app.string.settings_sync_apply_choice')
         };
       }
       const outcome = await this.providerOperations.setBookmarkDomainEnabled(selected);
@@ -729,8 +741,10 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         await this.experienceStateStore.setBookmarkSelected(selected);
         return {
           type: 'completed',
-          title: selected ? '书签同步已开启' : '书签同步已暂停',
-          message: outcome.message
+          title: selected
+            ? $r('app.string.settings_sync_bookmarks_on')
+            : $r('app.string.settings_sync_bookmarks_paused'),
+          message: this.syncFailurePresentationService.localizeKnownProviderMessage(outcome.message)
         };
       }
       return this.mapProviderSelectionFailure(outcome);
@@ -738,8 +752,10 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       const activeProvider = this.syncService.getAiraSyncSettings().remoteKind;
       return {
         type: 'failed',
-        title: selected ? '书签同步未开启' : '书签同步未关闭',
-        message: this.syncFailurePresentationService.buildBookmarkFailureMessage({
+        title: selected
+          ? $r('app.string.settings_sync_bookmarks_not_on')
+          : $r('app.string.settings_sync_bookmarks_not_off'),
+        message: this.syncFailurePresentationService.buildBookmarkFailureResource({
           remoteKind: activeProvider,
           operationName: selected ? '开启书签同步' : '暂停书签同步',
           failure: this.syncService.resolveBookmarkSyncFailure(error as Error)
@@ -756,31 +772,32 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         this.automaticRuntime.cancelHistoryAutomaticSync();
         return {
           type: 'completed',
-          title: '历史记录同步已暂停',
-          message: `本机和${this.resolveHistoryProviderLabel(context.activeProvider)}` +
-            '已有历史记录都已保留。'
+          title: $r('app.string.settings_sync_history_paused'),
+          message: this.resolveHistoryPausedMessage(context.activeProvider)
         };
       }
       if (context.activeProvider === 'none') {
         return {
           type: 'configuration-required',
-          title: '请先选择同步方式',
-          message: '历史记录会跟随当前同步方式。'
+          title: $r('app.string.settings_sync_choose_method_before_history'),
+          message: $r('app.string.settings_sync_history_follows')
         };
       }
       if (context.activeProvider === 'webdav') {
         return {
           type: 'blocked',
-          title: 'WebDAV 不支持历史记录同步',
-          message: '本机历史记录已保留。切换到 Aira 云或华为云空间后，可以重新开启历史记录同步。'
+          title: $r('app.string.settings_sync_webdav_no_history'),
+          message: $r('app.string.settings_sync_webdav_no_history_message')
         };
       }
       const accountUid = this.resolveHistoryAccountUid(context.settings);
       if (accountUid.length <= 0) {
         return {
           type: 'configuration-required',
-          title: context.activeProvider === 'self_hosted' ? '请先连接私有化部署' : '请先登录华为账号',
-          message: '历史记录按当前选择的同步位置在设备之间保持一致。',
+          title: context.activeProvider === 'self_hosted'
+            ? $r('app.string.settings_sync_connect_self_host_first')
+            : $r('app.string.settings_sync_sign_in_huawei'),
+          message: $r('app.string.settings_sync_history_location'),
           remoteKind: context.activeProvider === 'self_hosted' ? 'self_hosted' : undefined
         };
       }
@@ -793,7 +810,7 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         if (!decision.allowed) {
           return {
             type: 'membership-required',
-            title: decision.title.length > 0 ? decision.title : 'Aira 云同步需要 Aira Pro',
+            title: decision.title.length > 0 ? decision.title : $r('app.string.settings_sync_cloud_needs_pro'),
             message: decision.message,
             membershipDecision: decision
           };
@@ -803,18 +820,18 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       if (context.experienceState.suspended) {
         return {
           type: 'completed',
-          title: '已选择历史记录',
-          message: '重新开启同步后会自动继续。'
+          title: $r('app.string.settings_sync_history_selected'),
+          message: $r('app.string.settings_sync_history_resume')
         };
       }
       this.automaticRuntime.scheduleEnabledHistorySync();
       return {
         type: 'completed',
-        title: '历史记录同步已开启',
-        message: '历史记录会在后台同步。离开此页面、断网或下次打开应用都会继续。'
+        title: $r('app.string.settings_sync_history_on'),
+        message: $r('app.string.settings_sync_history_on_message')
       };
     } catch (error) {
-      return this.failure('历史记录同步设置失败', this.normalizeError(error));
+      return this.failure($r('app.string.settings_sync_history_failed'), this.normalizeError(error));
     }
   }
 
@@ -829,6 +846,91 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       return '私有化部署';
     }
     return '云端';
+  }
+
+  private resolveHistoryPausedMessage(provider: AiraSyncRemoteKind): ResourceStr {
+    if (provider === 'huawei_space') {
+      return $r('app.string.settings_sync_history_kept_huawei');
+    }
+    if (provider === 'aira_cloud') {
+      return $r('app.string.settings_sync_history_kept_cloud');
+    }
+    if (provider === 'self_hosted') {
+      return $r('app.string.settings_sync_history_kept_self_host');
+    }
+    return $r('app.string.settings_sync_history_kept_remote');
+  }
+
+  private resolveGoalChangeConfirmMessage(remoteKind: AiraSyncProviderKind): ResourceStr {
+    return this.resolveNamedGoalMessage(
+      remoteKind,
+      $r('app.string.settings_sync_change_to_cloud'),
+      $r('app.string.settings_sync_change_to_huawei'),
+      $r('app.string.settings_sync_change_to_webdav'),
+      $r('app.string.settings_sync_change_to_self_host'),
+      'settings_sync_change_to_named'
+    );
+  }
+
+  private resolveGoalUnchangedMessage(
+    remoteKind: AiraSyncProviderKind,
+    settings: AiraSyncSettings
+  ): ResourceStr {
+    return this.resolveNamedGoalMessage(
+      remoteKind,
+      $r('app.string.settings_sync_using_cloud'),
+      $r('app.string.settings_sync_using_huawei'),
+      $r('app.string.settings_sync_using_webdav'),
+      $r('app.string.settings_sync_using_self_host'),
+      'settings_sync_using_named',
+      settings
+    );
+  }
+
+  private resolveGoalChangedMessage(remoteKind: AiraSyncProviderKind): ResourceStr {
+    return this.resolveNamedGoalMessage(
+      remoteKind,
+      $r('app.string.settings_sync_now_using_cloud'),
+      $r('app.string.settings_sync_now_using_huawei'),
+      $r('app.string.settings_sync_now_using_webdav'),
+      $r('app.string.settings_sync_now_using_self_host'),
+      'settings_sync_now_using_named'
+    );
+  }
+
+  private resolveNamedGoalMessage(
+    remoteKind: AiraSyncProviderKind,
+    cloud: ResourceStr,
+    huawei: ResourceStr,
+    webdav: ResourceStr,
+    selfHosted: ResourceStr,
+    namedKey: string,
+    settings?: AiraSyncSettings
+  ): ResourceStr {
+    if (remoteKind === 'huawei_space') {
+      return huawei;
+    }
+    if (remoteKind === 'self_hosted') {
+      return selfHosted;
+    }
+    if (remoteKind === 'webdav') {
+      const label = this.viewModel.resolveGoalLabel(remoteKind, settings);
+      if (label === 'WebDAV 同步') {
+        return webdav;
+      }
+      if (namedKey === 'settings_sync_change_to_named') {
+        return $r('app.string.settings_sync_change_to_named', label);
+      }
+      if (namedKey === 'settings_sync_using_named') {
+        return $r('app.string.settings_sync_using_named', label);
+      }
+      return $r('app.string.settings_sync_now_using_named', label);
+    }
+    return cloud;
+  }
+
+  private readableOutcomeText(value: ResourceStr): string {
+    return typeof value === 'string' ? value : '';
   }
 
   async setPersonalizationItemSelected(
@@ -865,10 +967,10 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         await this.experienceStateStore.setPersonalizationSelected(hasSelectedItems);
         return {
           type: 'completed',
-          title: '同步内容已保存',
+          title: $r('app.string.settings_sync_content_saved'),
           message: context.experienceState.suspended
-            ? '重新开启同步后会按当前选择恢复。'
-            : '选择同步方式后会按当前选择同步。',
+            ? $r('app.string.settings_sync_content_resume')
+            : $r('app.string.settings_sync_content_after_method'),
           personalizationConfig: updateOutcome.config
         };
       }
@@ -886,10 +988,12 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       }
       return {
         type: 'completed',
-        title: selected ? '同步内容已开启' : '同步内容已关闭',
+        title: selected
+          ? $r('app.string.settings_sync_content_on')
+          : $r('app.string.settings_sync_content_off'),
         message: hasSelectedItems
-          ? '已保存选择，并会自动保持一致。'
-          : '主页收藏、小说书架和所有常用设置同步均已暂停，已有数据不会删除。',
+          ? $r('app.string.settings_sync_content_saved_sync')
+          : $r('app.string.settings_sync_content_all_paused'),
         personalizationConfig: updateOutcome.config
       };
     } catch (_error) {
@@ -905,13 +1009,13 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       if (!restored) {
         return {
           type: 'failed',
-          title: '同步选择状态待确认',
-          message: '同步内容没有完成更改，本机选择状态也未能完整恢复。请重新进入同步页面确认后再试。',
+          title: $r('app.string.settings_sync_selection_unconfirmed'),
+          message: $r('app.string.settings_sync_selection_unconfirmed_message'),
           personalizationConfig: this.personalizationConfigStore.getConfig()
         };
       }
       return this.personalizationContentFailure(
-        selected ? '同步内容未开启' : '同步内容未关闭',
+        selected ? $r('app.string.settings_sync_content_not_on') : $r('app.string.settings_sync_content_not_off'),
         this.personalizationConfigStore.getConfig()
       );
     }
@@ -926,7 +1030,7 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       }
       return this.runEnabledDomains('sync');
     } catch (error) {
-      return this.failure('立即同步失败', error as Error, undefined, undefined, 'sync');
+      return this.failure($r('app.string.settings_sync_now_failed'), error as Error, undefined, undefined, 'sync');
     }
   }
 
@@ -954,19 +1058,23 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       if (enabled && backupKinds.length <= 0) {
         return {
           type: 'blocked',
-          title: '请先设置 WebDAV 备份',
-          message: '额外备份只会覆盖写入你的 WebDAV，请先填写并开启后再试。',
+          title: $r('app.string.settings_sync_backup_setup_title'),
+          message: $r('app.string.settings_sync_backup_setup_message'),
           requiresOptions: true
         };
       }
       await this.syncConfigStore.setAdditionalBackupEnabled(enabled);
       return {
         type: 'completed',
-        title: enabled ? '额外备份已开启' : '额外备份已暂停',
-        message: enabled ? '后续会按设定频率更新额外副本。' : '备份位置和已有数据都已保留。'
+        title: enabled
+          ? $r('app.string.settings_sync_backup_enabled')
+          : $r('app.string.settings_sync_backup_paused_done'),
+        message: enabled
+          ? $r('app.string.settings_sync_backup_enabled_message')
+          : $r('app.string.settings_sync_backup_paused_message')
       };
     } catch (error) {
-      return this.additionalBackupFailure('额外备份设置失败', error as Error);
+      return this.additionalBackupFailure($r('app.string.settings_sync_backup_settings_failed'), error as Error);
     }
   }
 
@@ -975,14 +1083,15 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
   ): Promise<SyncAdditionalBackupActionOutcome> {
     try {
       await this.syncConfigStore.setAdditionalBackupIntervalDays(days);
-      const intervalLabel = days === 1 ? '每天一次' : `每 ${days} 天一次`;
       return {
         type: 'completed',
-        title: '备份频率已更新',
-        message: `额外备份将按${intervalLabel}执行。`
+        title: $r('app.string.settings_sync_backup_frequency_updated'),
+        message: days === 1
+          ? $r('app.string.settings_sync_backup_frequency_daily_message')
+          : $r('app.string.settings_sync_backup_frequency_days_message', days)
       };
     } catch (error) {
-      return this.additionalBackupFailure('备份频率未更新', error as Error);
+      return this.additionalBackupFailure($r('app.string.settings_sync_backup_frequency_failed'), error as Error);
     }
   }
 
@@ -1014,10 +1123,11 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       return {
         type: outcome.type === 'completed' ? 'completed' : outcome.type === 'blocked' ? 'blocked' : 'failed',
         title: outcome.title,
-        message: outcome.message
+        message: outcome.message,
+        messageLines: outcome.messageLines
       };
     } catch (error) {
-      return this.additionalBackupFailure('立即备份失败', error as Error);
+      return this.additionalBackupFailure($r('app.string.settings_sync_backup_now_failed'), error as Error);
     }
   }
 
@@ -1028,22 +1138,26 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       if (!isBackup && context.experienceState.suspended) {
         return {
           type: 'blocked',
-          title: '同步已暂停',
-          message: '重新开启同步后再试。'
+          title: $r('app.string.settings_sync_paused_title'),
+          message: $r('app.string.settings_sync_paused_retry_message')
         };
       }
       const networkSnapshot = this.networkAvailabilityService.refresh();
       if (networkSnapshot.reliable && !networkSnapshot.available) {
         return {
           type: 'blocked',
-          title: '当前没有网络连接',
+          title: $r('app.string.settings_sync_offline'),
           message: isBackup
-            ? '设备当前没有可用的网络连接，本次备份没有执行。请连接网络后再试。'
-            : '设备当前没有可用的网络连接，本次同步没有执行。请连接网络后再试。'
+            ? $r('app.string.settings_sync_backup_offline')
+            : $r('app.string.settings_sync_offline_sync')
         };
       }
-      const messages: string[] = [];
       const issues: SyncExperienceDomainIssue[] = [];
+      let bookmarkFinished = false;
+      let personalizationFinished = false;
+      let historyFinished = false;
+      let bookmarkBackedUp = false;
+      let personalizationBackedUp = false;
       const runResult: SyncExperienceRuntimeRunResult = await this.automaticRuntime.runManual(mode);
       if (context.settings.bookmarkSyncEnabled === true && runResult.bookmark !== undefined) {
         const bookmarkOutcome = runResult.bookmark;
@@ -1054,8 +1168,10 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
             message: bookmarkOutcome.message,
             failure: bookmarkOutcome.failure
           });
+        } else if (isBackup) {
+          bookmarkBackedUp = true;
         } else {
-          messages.push(isBackup ? '书签备份：已完成' : '书签同步：已完成');
+          bookmarkFinished = true;
         }
       }
       if (context.settings.personalizationSyncEnabled === true && runResult.personalization !== undefined) {
@@ -1066,8 +1182,10 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
             type: 'failed',
             message: personalizationOutcome.message
           });
+        } else if (isBackup) {
+          personalizationBackedUp = true;
         } else {
-          messages.push(isBackup ? '常用设置：已备份' : '常用设置：已同步');
+          personalizationFinished = true;
         }
       }
       if (!isBackup && context.experienceState.historySelected && runResult.history !== undefined) {
@@ -1078,49 +1196,69 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
             message: runResult.history.message
           });
         } else {
-          messages.push('历史记录：已完成');
+          historyFinished = true;
         }
       }
       if (issues.length > 0) {
-        const issueMessages = issues.map((issue: SyncExperienceDomainIssue): string => {
-          return this.buildDomainIssueMessage(issue, isBackup, context.activeProvider);
-        });
+        if (isBackup) {
+          return this.withMessageLines({
+            type: issues.some((issue: SyncExperienceDomainIssue): boolean => issue.type === 'failed')
+              ? 'failed'
+              : 'blocked',
+            title: $r('app.string.settings_sync_backup_attention'),
+            message: $r('app.string.settings_sync_backup_attention'),
+            remoteKind: context.activeProvider === 'none' ? undefined : context.activeProvider,
+            requiresBookmarkResolution: issues.some((issue: SyncExperienceDomainIssue): boolean => {
+              return issue.domain === 'bookmark' && issue.type === 'blocked';
+            })
+          }, this.resolveBackupIssueLines(
+            issues,
+            context.activeProvider,
+            bookmarkBackedUp,
+            personalizationBackedUp
+          ));
+        }
         return {
           type: issues.some((issue: SyncExperienceDomainIssue): boolean => issue.type === 'failed')
             ? 'failed'
             : 'blocked',
-          title: isBackup ? '部分备份需要处理' : '部分内容需要处理',
-          message: issueMessages.concat(messages).join(' '),
+          title: $r('app.string.settings_sync_attention'),
+          message: this.resolveManualSyncIssueLines(issues, context.activeProvider)[0],
+          messageLines: this.manualSyncIssueLinesOrUndefined(issues, context.activeProvider),
           remoteKind: context.activeProvider === 'none' ? undefined : context.activeProvider,
-          retryAction: isBackup ? undefined : 'sync',
+          retryAction: 'sync',
           requiresBookmarkResolution: issues.some((issue: SyncExperienceDomainIssue): boolean => {
             return issue.domain === 'bookmark' && issue.type === 'blocked';
           })
         };
       }
       if (isBackup) {
-        const backupFailureMessages = this.resolveAdditionalBackupFailureMessages(
+        const backupFailureLines = this.resolveAdditionalBackupFailureLines(
           this.syncConfigStore.getSettings()
         );
-        if (backupFailureMessages.length > 0) {
-          return {
+        if (backupFailureLines.length > 0) {
+          return this.withMessageLines({
             type: 'failed',
-            title: '部分备份需要处理',
-            message: backupFailureMessages.concat(messages).join(' '),
+            title: $r('app.string.settings_sync_backup_attention'),
+            message: backupFailureLines[0],
             remoteKind: context.activeProvider === 'none' ? undefined : context.activeProvider
-          };
+          }, this.appendBackupCompletedLines(
+            backupFailureLines,
+            bookmarkBackedUp,
+            personalizationBackedUp
+          ));
         }
       }
       return {
         type: 'completed',
-        title: isBackup ? '备份完成' : '同步完成',
-        message: messages.length > 0
-          ? messages.join(' ')
-          : isBackup ? '当前没有需要备份的内容。' : '当前没有需要同步的内容。'
+        title: isBackup ? $r('app.string.settings_sync_backup_done') : $r('app.string.settings_sync_done'),
+        message: isBackup
+          ? this.resolveBackupSuccessMessage(bookmarkBackedUp, personalizationBackedUp)
+          : this.resolveManualSyncSuccessMessage(bookmarkFinished, personalizationFinished, historyFinished)
       };
     } catch (error) {
       return this.failure(
-        mode === 'backup' ? '立即备份失败' : '立即同步失败',
+        mode === 'backup' ? $r('app.string.settings_sync_backup_now_failed') : $r('app.string.settings_sync_now_failed'),
         error as Error,
         undefined,
         undefined,
@@ -1129,32 +1267,173 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
     }
   }
 
-  private buildDomainIssueMessage(
-    issue: SyncExperienceDomainIssue,
-    isBackup: boolean,
+  private withMessageLines(
+    outcome: SyncExperienceActionOutcome,
+    lines: ResourceStr[]
+  ): SyncExperienceActionOutcome {
+    if (lines.length === 0) {
+      return outcome;
+    }
+    outcome.message = lines[0];
+    outcome.messageLines = lines.length > 1 ? lines : undefined;
+    return outcome;
+  }
+
+  private manualSyncIssueLinesOrUndefined(
+    issues: SyncExperienceDomainIssue[],
     activeProvider: AiraSyncRemoteKind
-  ): string {
+  ): ResourceStr[] | undefined {
+    const lines = this.resolveManualSyncIssueLines(issues, activeProvider);
+    return lines.length > 1 ? lines : undefined;
+  }
+
+  private resolveManualSyncIssueLines(
+    issues: SyncExperienceDomainIssue[],
+    activeProvider: AiraSyncRemoteKind
+  ): ResourceStr[] {
+    const lines: ResourceStr[] = [];
+    for (let index = 0; index < issues.length; index += 1) {
+      lines.push(this.resolveManualSyncIssueLine(issues[index], activeProvider));
+    }
+    if (lines.length === 0) {
+      lines.push($r('app.string.settings_sync_attention_generic'));
+    }
+    return lines;
+  }
+
+  private resolveManualSyncIssueLine(
+    issue: SyncExperienceDomainIssue,
+    activeProvider: AiraSyncRemoteKind
+  ): ResourceStr {
     if (issue.domain === 'bookmark') {
-      return this.syncFailurePresentationService.buildBookmarkFailureMessage({
+      return this.syncFailurePresentationService.buildBookmarkFailureResource({
         remoteKind: activeProvider,
-        operationName: isBackup ? '书签备份' : '书签同步',
+        operationName: '书签同步',
         failure: issue.failure
       });
     }
+    const detail = issue.message !== undefined ? issue.message.trim() : '';
+    const known = detail.length > 0
+      ? this.syncFailurePresentationService.matchKnownProviderLine(detail)
+      : undefined;
+    if (known !== undefined) {
+      return known;
+    }
     if (issue.domain === 'history') {
-      return issue.message !== undefined && issue.message.length > 0
-        ? `历史记录暂时没有完成同步：${issue.message}`
-        : '历史记录暂时没有完成同步。';
+      return detail.length > 0
+        ? $r('app.string.settings_sync_history_incomplete_detail', detail)
+        : $r('app.string.settings_sync_history_incomplete');
     }
-    const baseMessage = isBackup
-      ? '主页收藏、小说书架和常用设置备份未完成。'
-      : '主页收藏、小说书架和常用设置暂时没有完成同步。';
-    if (activeProvider !== 'huawei_space') {
-      return baseMessage;
+    const guidance = activeProvider === 'huawei_space'
+      ? this.syncFailurePresentationService.buildHuaweiSpacePersonalizationSystemUpdateGuidance(detail)
+      : '';
+    if (guidance.length > 0) {
+      return $r('app.string.settings_sync_personalization_incomplete_update');
     }
-    const guidance = this.syncFailurePresentationService
-      .buildHuaweiSpacePersonalizationSystemUpdateGuidance(issue.message ?? '');
-    return guidance.length > 0 ? `${baseMessage}${guidance}` : baseMessage;
+    return detail.length > 0
+      ? $r('app.string.settings_sync_line_content_raw', detail)
+      : $r('app.string.settings_sync_personalization_incomplete');
+  }
+
+  private localizeLabeledFailure(message: string, labeled: ResourceStr): ResourceStr {
+    const known = this.syncFailurePresentationService.matchKnownProviderLine(message);
+    return known !== undefined ? known : labeled;
+  }
+
+  private resolveBackupSuccessMessage(
+    bookmarkBackedUp: boolean,
+    personalizationBackedUp: boolean
+  ): ResourceStr {
+    if (bookmarkBackedUp && personalizationBackedUp) {
+      return $r('app.string.settings_sync_backup_done_both');
+    }
+    if (bookmarkBackedUp) {
+      return $r('app.string.settings_sync_backup_done_bookmarks');
+    }
+    if (personalizationBackedUp) {
+      return $r('app.string.settings_sync_backup_done_personalization');
+    }
+    return $r('app.string.settings_sync_backup_nothing');
+  }
+
+  private resolveBackupIssueLines(
+    issues: SyncExperienceDomainIssue[],
+    activeProvider: AiraSyncRemoteKind,
+    bookmarkBackedUp: boolean,
+    personalizationBackedUp: boolean
+  ): ResourceStr[] {
+    const lines: ResourceStr[] = [];
+    for (let index = 0; index < issues.length; index += 1) {
+      lines.push(this.resolveBackupIssueLine(issues[index], activeProvider));
+    }
+    return this.appendBackupCompletedLines(lines, bookmarkBackedUp, personalizationBackedUp);
+  }
+
+  private resolveBackupIssueLine(
+    issue: SyncExperienceDomainIssue,
+    activeProvider: AiraSyncRemoteKind
+  ): ResourceStr {
+    if (issue.domain === 'bookmark') {
+      return this.syncFailurePresentationService.buildBookmarkFailureResource({
+        remoteKind: activeProvider,
+        operationName: '书签备份',
+        failure: issue.failure
+      });
+    }
+    const detail = issue.message !== undefined ? issue.message : '';
+    const guidance = activeProvider === 'huawei_space'
+      ? this.syncFailurePresentationService.buildHuaweiSpacePersonalizationSystemUpdateGuidance(detail)
+      : '';
+    return guidance.length > 0
+      ? $r('app.string.settings_sync_backup_personalization_incomplete_update')
+      : $r('app.string.settings_sync_backup_personalization_incomplete');
+  }
+
+  private appendBackupCompletedLines(
+    lines: ResourceStr[],
+    bookmarkBackedUp: boolean,
+    personalizationBackedUp: boolean
+  ): ResourceStr[] {
+    const next = lines.slice(0);
+    if (bookmarkBackedUp) {
+      next.push($r('app.string.settings_sync_backup_done_bookmarks'));
+    }
+    if (personalizationBackedUp) {
+      next.push($r('app.string.settings_sync_backup_done_personalization'));
+    }
+    if (next.length === 0) {
+      next.push($r('app.string.settings_sync_backup_attention'));
+    }
+    return next;
+  }
+
+  private resolveManualSyncSuccessMessage(
+    bookmarkFinished: boolean,
+    personalizationFinished: boolean,
+    historyFinished: boolean
+  ): ResourceStr {
+    if (bookmarkFinished && personalizationFinished && historyFinished) {
+      return $r('app.string.settings_sync_done_all');
+    }
+    if (bookmarkFinished && personalizationFinished) {
+      return $r('app.string.settings_sync_done_bookmarks_personalization');
+    }
+    if (bookmarkFinished && historyFinished) {
+      return $r('app.string.settings_sync_done_bookmarks_history');
+    }
+    if (personalizationFinished && historyFinished) {
+      return $r('app.string.settings_sync_done_personalization_history');
+    }
+    if (bookmarkFinished) {
+      return $r('app.string.settings_sync_done_bookmarks');
+    }
+    if (personalizationFinished) {
+      return $r('app.string.settings_sync_done_personalization');
+    }
+    if (historyFinished) {
+      return $r('app.string.settings_sync_done_history');
+    }
+    return $r('app.string.settings_sync_nothing_to_sync');
   }
 
   async resolveBookmarkConflicts(
@@ -1175,7 +1454,7 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       if (result.blocked) {
         return {
           type: 'blocked',
-          title: '书签仍需处理',
+          title: $r('app.string.settings_sync_conflicts_remain'),
           message: result.summary,
           remoteKind: remoteKind,
           requiresBookmarkResolution: true
@@ -1203,7 +1482,7 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
           const personalizationResult = await this.enablePersonalizationDomain();
           if (!personalizationResult.ok) {
             return this.firstActivationFailure(
-              '同步未完全开启',
+              $r('app.string.settings_sync_open_incomplete'),
               personalizationResult.message,
               remoteKind
             );
@@ -1217,22 +1496,25 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       }
       return {
         type: 'completed',
-        title: '书签冲突已处理',
-        message: result.summary.length > 0 ? result.summary : '书签已按你的选择完成同步。',
+        title: $r('app.string.settings_sync_conflicts_done'),
+        message: result.summary.length > 0
+          ? this.syncFailurePresentationService.localizeBookmarkSummary(result.summary)
+          : $r('app.string.settings_sync_conflicts_done_message'),
         remoteKind: remoteKind
       };
     } catch (error) {
       const bookmarkFailure = this.syncService.resolveBookmarkSyncFailure(error as Error);
-      return this.failure(
-        '书签冲突处理失败',
-        new Error(this.syncFailurePresentationService.buildBookmarkFailureMessage({
+      return {
+        type: 'failed',
+        title: $r('app.string.settings_sync_conflicts_failed'),
+        message: this.syncFailurePresentationService.buildBookmarkFailureResource({
           remoteKind: remoteKind,
           operationName: '处理书签冲突',
           failure: bookmarkFailure
-        })),
-        remoteKind,
-        bookmarkFailure
-      );
+        }),
+        remoteKind: remoteKind,
+        bookmarkFailure: bookmarkFailure
+      };
     }
   }
 
@@ -1250,7 +1532,7 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       if (providerSelectionFailure !== undefined) {
         return providerSelectionFailure;
       }
-      const failures: string[] = [];
+      const failures: ResourceStr[] = [];
       let bookmarkBlockedOutcome: SyncExperienceProviderOutcome | undefined = undefined;
       let completedDomainCount = 0;
       if (selection.bookmarkSelected) {
@@ -1260,7 +1542,13 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         } else if (bookmarkOutcome.type === 'bookmark-domain-blocked') {
           bookmarkBlockedOutcome = bookmarkOutcome;
         } else {
-          failures.push(this.buildProviderBookmarkFailureMessage(bookmarkOutcome, '开启书签同步'));
+          failures.push(bookmarkOutcome.bookmarkFailure === undefined
+            ? this.syncFailurePresentationService.localizeProviderLine(bookmarkOutcome.message)
+            : this.syncFailurePresentationService.buildBookmarkFailureResource({
+              remoteKind: bookmarkOutcome.remoteKind,
+              operationName: '开启书签同步',
+              failure: bookmarkOutcome.bookmarkFailure
+            }));
         }
       }
       if (selection.personalizationSelected) {
@@ -1268,7 +1556,7 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         if (personalizationResult.ok) {
           completedDomainCount += 1;
         } else {
-          failures.push(`主页收藏、小说书架和常用设置：${personalizationResult.message}`);
+          failures.push(this.syncFailurePresentationService.localizePrefixedContentLine(personalizationResult.message));
         }
       }
       if (selection.historySelected && remoteKind !== 'webdav') {
@@ -1276,7 +1564,9 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         if (historyOutcome.type === 'completed') {
           completedDomainCount += 1;
         } else {
-          failures.push(`历史记录：${historyOutcome.message}`);
+          failures.push(typeof historyOutcome.message === 'string'
+            ? this.syncFailurePresentationService.localizePrefixedHistoryLine(historyOutcome.message)
+            : historyOutcome.message);
         }
       }
       if (selection.bookmarkSelected &&
@@ -1291,38 +1581,40 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         historySelected
       );
       if (bookmarkBlockedOutcome !== undefined) {
-        const successMessage = completedDomainCount > 0
-          ? '其他已成功开启的内容会继续自动同步。'
-          : '';
+        const blockedSummary = this.syncFailurePresentationService.localizeBookmarkSummary(
+          bookmarkBlockedOutcome.message
+        );
         return {
           type: 'blocked',
-          title: '书签需要处理',
-          message: [bookmarkBlockedOutcome.message, successMessage].filter((value: string): boolean => {
-            return value.length > 0;
-          }).join('\n'),
+          title: $r('app.string.settings_sync_bookmarks_need_attention'),
+          message: completedDomainCount > 0 && typeof blockedSummary === 'string'
+            ? $r('app.string.settings_sync_bookmarks_blocked_continue', blockedSummary)
+            : blockedSummary,
           remoteKind: remoteKind,
           requiresBookmarkResolution: true
         };
       }
       if (failures.length > 0) {
-        return {
+        const failureLines = failures.slice(0);
+        if (completedDomainCount > 0) {
+          failureLines.push($r('app.string.settings_sync_open_partial_note'));
+        }
+        return this.withMessageLines({
           type: 'failed',
-          title: '同步未完全开启',
-          message: completedDomainCount > 0
-            ? `${failures.join('；')}。已成功开启的内容会继续自动同步，可单独重试其余内容。`
-            : failures.join('；'),
+          title: $r('app.string.settings_sync_open_incomplete'),
+          message: failureLines[0],
           remoteKind: remoteKind
-        };
+        }, failureLines);
       }
       return {
         type: 'completed',
-        title: '同步已开启',
+        title: $r('app.string.settings_sync_opened'),
         message: this.buildFirstActivationSuccessMessage(selection, remoteKind),
         remoteKind: remoteKind
       };
     } catch (error) {
       return this.firstActivationFailure(
-        '同步未完全开启',
+        $r('app.string.settings_sync_open_incomplete'),
         this.normalizeError(error).message,
         remoteKind
       );
@@ -1437,20 +1729,20 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
   private buildFirstActivationSuccessMessage(
     selection: SyncExperiencePersistedState,
     remoteKind: AiraSyncProviderKind
-  ): string {
+  ): ResourceStr {
     if (selection.historySelected && remoteKind !== 'webdav') {
-      return '历史记录和已选择的其他内容会自动在设备之间保持一致。';
+      return $r('app.string.settings_sync_opened_history');
     }
     if (selection.bookmarkSelected && selection.personalizationSelected) {
-      return '书签、主页收藏、小说书架和已选择的常用设置会自动保持一致。';
+      return $r('app.string.settings_sync_opened_both');
     }
     return selection.bookmarkSelected
-      ? '书签会自动在所选范围内保持一致。'
-      : '主页收藏、小说书架和已选择的常用设置会自动在所选范围内保持一致。';
+      ? $r('app.string.settings_sync_opened_bookmarks')
+      : $r('app.string.settings_sync_opened_personalization');
   }
 
   private firstActivationFailure(
-    title: string,
+    title: ResourceStr,
     message: string,
     remoteKind: AiraSyncProviderKind
   ): SyncExperienceActionOutcome {
@@ -1524,22 +1816,39 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       previousState.suspended,
       historySelected
     );
-    const failures: string[] = [];
+    const failures: ResourceStr[] = [];
     if (settings.personalizationSyncEnabled === true) {
       try {
         await this.disablePersonalizationDomain();
       } catch (error) {
-        failures.push(`主页收藏、小说书架和常用设置暂停失败：${this.normalizeError(error as Error).message}`);
+        const message = this.normalizeError(error as Error).message;
+        failures.push(this.localizeLabeledFailure(
+          message,
+          $r('app.string.settings_sync_pause_personalization_raw', message)
+        ));
       }
     }
     if (settings.bookmarkSyncEnabled === true) {
       try {
         const outcome = await this.providerOperations.setBookmarkDomainEnabled(false);
         if (outcome.type !== 'bookmark-domain-disabled') {
-          failures.push(`书签暂停失败：${outcome.message}`);
+          failures.push(outcome.bookmarkFailure === undefined
+            ? this.localizeLabeledFailure(
+              outcome.message,
+              $r('app.string.settings_sync_pause_bookmarks_raw', outcome.message)
+            )
+            : this.syncFailurePresentationService.buildBookmarkFailureResource({
+              remoteKind: outcome.remoteKind,
+              operationName: '暂停书签同步',
+              failure: outcome.bookmarkFailure
+            }));
         }
       } catch (error) {
-        failures.push(`书签暂停失败：${this.normalizeError(error as Error).message}`);
+        const message = this.normalizeError(error as Error).message;
+        failures.push(this.localizeLabeledFailure(
+          message,
+          $r('app.string.settings_sync_pause_bookmarks_raw', message)
+        ));
       }
     }
     this.automaticRuntime.cancelHistoryAutomaticSync();
@@ -1550,17 +1859,19 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         false,
         historySelected
       );
-      return {
+      const failureLines = failures.slice(0);
+      failureLines.push($r('app.string.settings_sync_pause_partial_note'));
+      return this.withMessageLines({
         type: 'failed',
-        title: '同步未完全暂停',
-        message: `${failures.join('；')}。已暂停的内容保持暂停，未完成的内容不会影响另一项。`
-      };
+        title: $r('app.string.settings_sync_pause_incomplete'),
+        message: failureLines[0]
+      }, failureLines);
     }
     await this.experienceStateStore.suspend(bookmarkSelected, personalizationSelected, historySelected);
     return {
       type: 'completed',
-      title: '同步已暂停',
-      message: '本机和云端数据、账号及同步方式都已保留。'
+      title: $r('app.string.settings_sync_paused_title'),
+      message: $r('app.string.settings_sync_pause_kept')
     };
   }
 
@@ -1575,11 +1886,11 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       !historySelected) {
       return {
         type: 'blocked',
-        title: '请选择同步内容',
-        message: '请在下方开启书签、历史记录、主页收藏、小说书架或一项常用设置。'
+        title: $r('app.string.settings_sync_choose_content'),
+        message: $r('app.string.settings_sync_resume_choose_message')
       };
     }
-    const failures: string[] = [];
+    const failures: ResourceStr[] = [];
     let resumedDomainCount: number = 0;
     if (experienceState.bookmarkSelected && current.remoteKind !== 'none') {
       if (current.bookmarkSyncEnabled === true) {
@@ -1588,12 +1899,18 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         try {
           const outcome = await this.providerOperations.setBookmarkDomainEnabled(true);
           if (outcome.type !== 'bookmark-domain-enabled') {
-            failures.push(this.buildProviderBookmarkFailureMessage(outcome, '恢复书签同步'));
+            failures.push(outcome.bookmarkFailure === undefined
+              ? this.syncFailurePresentationService.localizeProviderLine(outcome.message)
+              : this.syncFailurePresentationService.buildBookmarkFailureResource({
+                remoteKind: outcome.remoteKind,
+                operationName: '恢复书签同步',
+                failure: outcome.bookmarkFailure
+              }));
           } else {
             resumedDomainCount += 1;
           }
         } catch (error) {
-          failures.push(this.syncFailurePresentationService.buildBookmarkFailureMessage({
+          failures.push(this.syncFailurePresentationService.buildBookmarkFailureResource({
             remoteKind: current.remoteKind,
             operationName: '恢复书签同步',
             failure: this.syncService.resolveBookmarkSyncFailure(error as Error)
@@ -1609,12 +1926,19 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         try {
           const result = await this.enablePersonalizationDomain();
           if (!result.ok) {
-            failures.push(`主页收藏、小说书架和常用设置恢复失败：${result.message}`);
+            failures.push(this.localizeLabeledFailure(
+              result.message,
+              $r('app.string.settings_sync_resume_personalization_raw', result.message)
+            ));
           } else {
             resumedDomainCount += 1;
           }
         } catch (error) {
-          failures.push(`主页收藏、小说书架和常用设置恢复失败：${this.normalizeError(error as Error).message}`);
+          const message = this.normalizeError(error as Error).message;
+          failures.push(this.localizeLabeledFailure(
+            message,
+            $r('app.string.settings_sync_resume_personalization_raw', message)
+          ));
         }
       }
     }
@@ -1624,10 +1948,19 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         if (historyOutcome.type === 'completed') {
           resumedDomainCount += 1;
         } else {
-          failures.push(`历史记录恢复失败：${historyOutcome.message}`);
+          failures.push(typeof historyOutcome.message === 'string'
+            ? this.localizeLabeledFailure(
+              historyOutcome.message,
+              $r('app.string.settings_sync_resume_history_raw', historyOutcome.message)
+            )
+            : historyOutcome.message);
         }
       } catch (error) {
-        failures.push(`历史记录恢复失败：${this.normalizeError(error as Error).message}`);
+        const message = this.normalizeError(error as Error).message;
+        failures.push(this.localizeLabeledFailure(
+          message,
+          $r('app.string.settings_sync_resume_history_raw', message)
+        ));
       }
     }
     if (resumedDomainCount > 0) {
@@ -1635,18 +1968,20 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       await this.automaticRuntime.notifyAccountChanged();
     }
     if (failures.length > 0) {
-      return {
+      const failureLines = failures.slice(0);
+      failureLines.push(resumedDomainCount > 0
+        ? $r('app.string.settings_sync_resume_partial_note')
+        : $r('app.string.settings_sync_resume_still_paused_note'));
+      return this.withMessageLines({
         type: 'failed',
-        title: '同步未完全恢复',
-        message: resumedDomainCount > 0
-          ? `${failures.join('；')}。已恢复的内容会继续同步，另一项可单独重试。`
-          : `${failures.join('；')}。当前仍保持暂停，可稍后重试。`
-      };
+        title: $r('app.string.settings_sync_resume_incomplete'),
+        message: failureLines[0]
+      }, failureLines);
     }
     return {
       type: 'completed',
-      title: '同步已恢复',
-      message: '已按暂停前的内容选择继续同步。'
+      title: $r('app.string.settings_sync_resumed'),
+      message: $r('app.string.settings_sync_resumed_message')
     };
   }
 
@@ -1655,7 +1990,7 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       return {
         type: 'configuration-required',
         title: outcome.title,
-        message: outcome.message,
+        message: this.syncFailurePresentationService.localizeKnownProviderMessage(outcome.message),
         remoteKind: outcome.remoteKind
       };
     }
@@ -1672,7 +2007,7 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       return {
         type: 'blocked',
         title: outcome.title,
-        message: outcome.message,
+        message: this.syncFailurePresentationService.localizeKnownProviderMessage(outcome.message),
         remoteKind: outcome.remoteKind,
         requiresBookmarkResolution: this.requiresBookmarkResolution(outcome)
       };
@@ -1686,7 +2021,12 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
           remoteKind: outcome.remoteKind
         };
       }
-      return this.failure(outcome.title, new Error(outcome.message), outcome.remoteKind);
+      return {
+        type: 'failed',
+        title: outcome.title,
+        message: this.syncFailurePresentationService.localizeKnownProviderMessage(outcome.message),
+        remoteKind: outcome.remoteKind
+      };
     }
     return undefined;
   }
@@ -1712,7 +2052,7 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
       return {
         type: 'blocked',
         title: outcome.title,
-        message: outcome.message,
+        message: this.syncFailurePresentationService.localizeKnownProviderMessage(outcome.message),
         remoteKind: outcome.remoteKind,
         requiresBookmarkResolution: this.requiresBookmarkResolution(outcome)
       };
@@ -1725,17 +2065,22 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         remoteKind: outcome.remoteKind
       };
     }
-    return this.failure(outcome.title, new Error(outcome.message), outcome.remoteKind);
+    return {
+      type: 'failed',
+      title: outcome.title,
+      message: this.syncFailurePresentationService.localizeKnownProviderMessage(outcome.message),
+      remoteKind: outcome.remoteKind
+    };
   }
 
   private buildProviderBookmarkFailureMessage(
     outcome: SyncExperienceProviderOutcome,
     operationName: string
-  ): string {
+  ): ResourceStr {
     if (outcome.bookmarkFailure === undefined) {
-      return outcome.message;
+      return this.syncFailurePresentationService.localizeKnownProviderMessage(outcome.message);
     }
-    return this.syncFailurePresentationService.buildBookmarkFailureMessage({
+    return this.syncFailurePresentationService.buildBookmarkFailureResource({
       remoteKind: outcome.remoteKind,
       operationName: operationName,
       failure: outcome.bookmarkFailure
@@ -1773,13 +2118,13 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
   }
 
   private personalizationContentFailure(
-    title: string,
+    title: ResourceStr,
     config: PersonalizationSyncConfig
   ): SyncExperienceActionOutcome {
     return {
       type: 'failed',
       title: title,
-      message: '这项常用设置暂时没有更改，本机和云端已有数据都已保留。请稍后再试。',
+      message: $r('app.string.settings_sync_content_unchanged'),
       personalizationConfig: config
     };
   }
@@ -1833,19 +2178,8 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
   private resolveAdvancedMissingConfigurationMessage(
     settings: AiraSyncSettings,
     remoteKind: AiraSyncRemoteKind
-  ): string {
-    if (remoteKind === 'aira_cloud') {
-      return '请先回到同步设置启用 Aira 云同步。';
-    }
-    if (remoteKind === 'huawei_space') {
-      return '请先回到同步设置启用华为云空间同步。';
-    }
-    if (remoteKind === 'webdav') {
-      return settings.webdav.endpoint.trim().length > 0 && settings.webdav.username.trim().length > 0
-        ? '请启用已保存的 WebDAV 配置。'
-        : '请先填写 WebDAV 服务器和账号。';
-    }
-    return '请先开启华为云空间同步、Aira 云同步或 WebDAV。';
+  ): ResourceStr {
+    return this.advancedViewModel.resolveMissingConfigurationMessage(settings, remoteKind);
   }
 
   private buildWebdavConfigurationState(
@@ -1872,54 +2206,56 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
     if (settings.additionalBackupEnabled !== true) {
       return {
         type: 'blocked',
-        title: '额外备份未开启',
-        message: '请先开启额外备份。'
+        title: $r('app.string.settings_sync_backup_not_on'),
+        message: $r('app.string.settings_sync_backup_turn_on')
       };
     }
     if ((settings.additionalBackupRemoteKinds ?? []).length <= 0) {
       return {
         type: 'blocked',
-        title: '请先设置 WebDAV 备份',
-        message: '额外备份只会覆盖写入你的 WebDAV，请先填写并开启后再试。',
+        title: $r('app.string.settings_sync_backup_setup_title'),
+        message: $r('app.string.settings_sync_backup_setup_message'),
         requiresOptions: true
       };
     }
     if (settings.bookmarkSyncEnabled !== true && settings.personalizationSyncEnabled !== true) {
       return {
         type: 'blocked',
-        title: '没有可备份的内容',
-        message: '请先在同步主页开启书签、主页收藏、小说书架或常用设置。'
+        title: $r('app.string.settings_sync_backup_nothing_title'),
+        message: $r('app.string.settings_sync_backup_nothing_message')
       };
     }
     return undefined;
   }
 
-  private resolveAdditionalBackupFailureMessages(settings: AiraSyncSettings): string[] {
+  private resolveAdditionalBackupFailureLines(settings: AiraSyncSettings): ResourceStr[] {
     if (settings.additionalBackupEnabled !== true) {
       return [];
     }
-    const messages: string[] = [];
+    const lines: ResourceStr[] = [];
     const backupKinds = settings.additionalBackupRemoteKinds ?? [];
     for (let index = 0; index < backupKinds.length; index += 1) {
       const remoteKind = backupKinds[index];
-      const providerLabel = this.providerOperations.resolveProviderLabel(remoteKind);
       if (settings.bookmarkSyncEnabled === true && this.isAdditionalBackupDomainUnhealthy(
         resolveAiraSyncDomainRuntimeState(settings, remoteKind, 'bookmark_backup')
       )) {
         const runtime = resolveAiraSyncDomainRuntimeState(settings, remoteKind, 'bookmark_backup');
-        messages.push(this.syncFailurePresentationService.buildBookmarkFailureMessage({
+        lines.push(this.syncFailurePresentationService.buildBookmarkFailureResource({
           remoteKind: remoteKind,
-          operationName: `${providerLabel}额外书签副本`,
+          operationName: '额外书签副本',
           failure: this.resolveRuntimeBookmarkFailure(runtime)
         }));
       }
       if (settings.personalizationSyncEnabled === true && this.isAdditionalBackupDomainUnhealthy(
         resolveAiraSyncDomainRuntimeState(settings, remoteKind, 'personalization_backup')
       )) {
-        messages.push(`${providerLabel}的主页收藏、小说书架和常用设置额外副本未完成。`);
+        lines.push(remoteKind === 'webdav'
+          ? $r('app.string.settings_sync_backup_extra_personalization_webdav')
+          : $r('app.string.settings_sync_backup_extra_personalization_named',
+            this.providerOperations.resolveProviderLabel(remoteKind)));
       }
     }
-    return messages;
+    return lines;
   }
 
   private isAdditionalBackupDomainUnhealthy(state: AiraSyncDomainRuntimeState): boolean {
@@ -1937,18 +2273,18 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
     };
   }
 
-  private additionalBackupFailure(title: string, error: Error): SyncAdditionalBackupActionOutcome {
+  private additionalBackupFailure(title: ResourceStr, error: Error): SyncAdditionalBackupActionOutcome {
     return {
       type: 'failed',
       title: title,
       message: error.message.length > 0
-        ? '请稍后再试；如果问题持续，请返回同步页面重新读取状态。'
-        : '当前操作未完成，请稍后再试。'
+        ? $r('app.string.settings_sync_backup_retry')
+        : $r('app.string.settings_sync_backup_action_incomplete')
     };
   }
 
   private failure(
-    title: string,
+    title: ResourceStr,
     error: Error,
     remoteKind?: AiraSyncProviderKind,
     bookmarkFailure?: AiraBookmarkSyncFailure,

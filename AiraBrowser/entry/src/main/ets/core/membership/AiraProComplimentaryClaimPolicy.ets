@@ -12,11 +12,9 @@ export type AiraProComplimentaryClaimAvailability = 'available' | 'already_membe
 export interface AiraProComplimentaryClaimDecision {
   availability: AiraProComplimentaryClaimAvailability;
   actionEnabled: boolean;
-  actionText: string;
-  statusText: string;
+  actionText: ResourceStr;
+  statusText: ResourceStr;
 }
-
-const AIRA_PRO_COMPLIMENTARY_CLAIM_ACTION_TEXT: string = '领取会员';
 
 /**
  * Who may open the free 15-day claim. A current Pro holder cannot claim: a
@@ -29,33 +27,33 @@ export function resolveAiraProComplimentaryClaimDecision(
   now: number
 ): AiraProComplimentaryClaimDecision {
   if (isPermanentMember(membership, now)) {
-    return blocked('already_member', '你已是长期会员，无法领取。');
+    return blocked('already_member', $r('app.string.settings_pro_claim_blocked_lifetime'));
   }
   if (isCurrentSubscriptionMember(membership, now)) {
-    return blocked('already_member', '你已开通订阅会员，无法领取。');
+    return blocked('already_member', $r('app.string.settings_pro_claim_blocked_subscription'));
   }
   if (membership.plan === 'pro' && membership.planExpiresAt > now) {
     return blocked(
       'claim_active',
-      `当前会员至 ${formatClaimDate(membership.planExpiresAt)} 到期，到期前不能再次领取。`
+      $r('app.string.settings_pro_claim_blocked_until', formatClaimDate(membership.planExpiresAt))
     );
   }
   return {
     availability: 'available',
     actionEnabled: true,
-    actionText: AIRA_PRO_COMPLIMENTARY_CLAIM_ACTION_TEXT,
+    actionText: $r('app.string.settings_pro_claim_action'),
     statusText: ''
   };
 }
 
 function blocked(
   availability: AiraProComplimentaryClaimAvailability,
-  statusText: string
+  statusText: ResourceStr
 ): AiraProComplimentaryClaimDecision {
   return {
     availability: availability,
     actionEnabled: false,
-    actionText: AIRA_PRO_COMPLIMENTARY_CLAIM_ACTION_TEXT,
+    actionText: $r('app.string.settings_pro_claim_action'),
     statusText: statusText
   };
 }

@@ -18,7 +18,7 @@ const SETTINGS_DESKTOP_WORKSPACE_HEADER_BUTTON_SIZE: number = 36;
 
 @Component
 export struct SettingsDesktopWorkspaceHeader {
-  @Prop title: string = '';
+  @Prop title: ResourceStr = '';
   @Prop showTitle: boolean = true;
   @Prop showBackButton: boolean = false;
   @Prop primaryTextColor: ResourceColor = '';
@@ -59,7 +59,7 @@ export struct SettingsDesktopWorkspaceHeader {
             $r('sys.color.ohos_id_color_background_transparent') : this.buttonBackgroundColor)
           .stateEffect(true)
           .focusable(true)
-          .accessibilityText('返回上一级设置')
+          .accessibilityText($r('app.string.settings_back_to_previous'))
           .onClick(() => {
             this.onBack?.();
           })
@@ -141,7 +141,7 @@ export struct SettingsDesktopWorkspaceHeader {
         .backgroundColor(this.buttonBackgroundColor)
         .stateEffect(true)
         .focusable(true)
-        .accessibilityText('更多操作')
+        .accessibilityText($r('app.string.settings_more_actions'))
         .bindMenu(this.buildActionMenu(), buildBrowserDesktopMenuOptions({
           placement: Placement.BottomRight,
           enableArrow: false,

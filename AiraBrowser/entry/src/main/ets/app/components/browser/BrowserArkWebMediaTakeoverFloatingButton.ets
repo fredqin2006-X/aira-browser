@@ -62,14 +62,14 @@ export struct BrowserArkWebMediaTakeoverFloatingButton {
     return isHdsMaterialAvailable();
   }
 
-  private buildAccessibilityText(): string {
+  private buildAccessibilityText(): ResourceStr {
     if (!this.controllable) {
-      return 'ArkWeb 已识别网页视频，当前页面暂未提供可控制的视频会话';
+      return $r('app.string.media_resource_takeover_a11y_uncontrollable');
     }
     if (this.sourceCount > 1) {
-      return `ArkWeb 视频接管，发现 ${this.sourceCount} 个媒体源`;
+      return $r('app.string.media_resource_takeover_a11y_sources', this.sourceCount);
     }
-    return 'ArkWeb 视频接管';
+    return $r('app.string.media_resource_takeover_a11y_default');
   }
 }
 
