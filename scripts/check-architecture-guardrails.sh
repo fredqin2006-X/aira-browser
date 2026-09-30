@@ -296,6 +296,10 @@ HOME_FAVORITES_SECTION_REL="AiraBrowser/entry/src/main/ets/app/components/browse
 HOME_FAVORITES_SECTION="${REPO_ROOT}/${HOME_FAVORITES_SECTION_REL}"
 HOME_CONTENT_SECTIONS_REL="AiraBrowser/entry/src/main/ets/app/components/browser/HomeContentSections.ets"
 HOME_CONTENT_SECTIONS="${REPO_ROOT}/${HOME_CONTENT_SECTIONS_REL}"
+CLASSIC_HOME_FRAME_REL="AiraBrowser/entry/src/main/ets/app/components/browser/ClassicHomeFrame.ets"
+CLASSIC_HOME_FRAME="${REPO_ROOT}/${CLASSIC_HOME_FRAME_REL}"
+CENTERED_HOME_FRAME_REL="AiraBrowser/entry/src/main/ets/app/components/browser/CenteredHomeFrame.ets"
+CENTERED_HOME_FRAME="${REPO_ROOT}/${CENTERED_HOME_FRAME_REL}"
 HOME_RECENTLY_CLOSED_SECTION_REL="AiraBrowser/entry/src/main/ets/app/components/browser/HomeRecentlyClosedSection.ets"
 HOME_RECENTLY_CLOSED_SECTION="${REPO_ROOT}/${HOME_RECENTLY_CLOSED_SECTION_REL}"
 RECENTLY_CLOSED_RECORD_LIST_REL="AiraBrowser/entry/src/main/ets/app/components/browser/RecentlyClosedRecordList.ets"
@@ -3789,15 +3793,27 @@ check_file_contains_rule "${TAB_HOME_COORDINATOR}" "${TAB_HOME_COORDINATOR_REL}"
 check_file_contains_rule "${TAB_HOME_COORDINATOR}" "${TAB_HOME_COORDINATOR_REL}" \
   'private readonly homeChromeScrollCoordinator: BrowserHomeChromeScrollCoordinator' \
   "Home Scroll policy, native offset state, and decisions must stay inside one coordinator under the Tab Home owner."
-check_file_contains_rule "${HOME_CONTENT_SECTIONS}" "${HOME_CONTENT_SECTIONS_REL}" \
-  "scrollAtEnd: this\.homeContentScroller\.isAtEnd\(\)" \
-  "Native Home content must forward raw offset/end samples instead of owning chrome policy or bounce state."
-check_file_contains_rule "${HOME_CONTENT_SECTIONS}" "${HOME_CONTENT_SECTIONS_REL}" \
+check_file_contains_rule "${CLASSIC_HOME_FRAME}" "${CLASSIC_HOME_FRAME_REL}" \
+  "scrollAtEnd: this\.scroller\.isAtEnd\(\)" \
+  "Classic Home must forward raw offset/end samples instead of owning chrome policy or bounce state."
+check_file_contains_rule "${CENTERED_HOME_FRAME}" "${CENTERED_HOME_FRAME_REL}" \
+  "scrollAtEnd: this\.scroller\.isAtEnd\(\)" \
+  "Centered Home must forward raw offset/end samples instead of owning chrome policy or bounce state."
+check_file_contains_rule "${CLASSIC_HOME_FRAME}" "${CLASSIC_HOME_FRAME_REL}" \
   "type: 'scroll_stop'" \
-  "Native Home content must tell the Home Chrome Scroll owner when native scrolling stops."
+  "Classic Home must tell the Home Chrome Scroll owner when native scrolling stops."
+check_file_contains_rule "${CENTERED_HOME_FRAME}" "${CENTERED_HOME_FRAME_REL}" \
+  "type: 'scroll_stop'" \
+  "Centered Home must tell the Home Chrome Scroll owner when native scrolling stops."
 check_file_not_contains_rule "${HOME_CONTENT_SECTIONS}" "${HOME_CONTENT_SECTIONS_REL}" \
+  'BrowserHomeChromeScrollCoordinator|BrowserHomeScrollChromeViewModel|resolveNativeHomeScrollOffset|finishNativeHomeScroll|private scroller: Scroller' \
+  "Home content host must only mount one frame and must not own a scroller or Home Chrome Scroll policy."
+check_file_not_contains_rule "${CLASSIC_HOME_FRAME}" "${CLASSIC_HOME_FRAME_REL}" \
   'BrowserHomeChromeScrollCoordinator|BrowserHomeScrollChromeViewModel|resolveNativeHomeScrollOffset|finishNativeHomeScroll' \
-  "Home content must remain a raw Scroll adapter and must not regain Home Chrome Scroll ownership."
+  "Classic Home must remain a raw Scroll adapter and must not regain Home Chrome Scroll ownership."
+check_file_not_contains_rule "${CENTERED_HOME_FRAME}" "${CENTERED_HOME_FRAME_REL}" \
+  'BrowserHomeChromeScrollCoordinator|BrowserHomeScrollChromeViewModel|resolveNativeHomeScrollOffset|finishNativeHomeScroll' \
+  "Centered Home must remain a raw Scroll adapter and must not regain Home Chrome Scroll ownership."
 check_file_not_contains_rule "${HOME_CONTENT_SECTIONS}" "${HOME_CONTENT_SECTIONS_REL}" \
   '^  on(ExitPrivateMode|ShortcutAction|OpenShortcutAddEntry|RecentlyClosedAction|RestoreRecentlyClosedRecord|OpenHomeSettings|HomeScroll):' \
   "Home content must not regain peer action callbacks."

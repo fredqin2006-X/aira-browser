@@ -139,6 +139,9 @@ export struct HomeShortcutSurface {
   build() {
     Column() {
       if (this.liveShortcuts.length > 0 || this.showAddEntry || this.showPinnedSettingsEntry) {
+        // Recreate the lanes list when the add tile's place in the grid changes. A lanes List
+        // can keep a layout that never picks up the trailing add item after the grid updates.
+        ForEach([this.resolveShortcutGridIdentity()], (_identity: string) => {
         List({ space: this.metrics.rowGap }) {
           ForEach(this.liveShortcuts, (shortcut: ShortcutRecord, index: number) => {
             ListItem() {
@@ -234,6 +237,10 @@ export struct HomeShortcutSurface {
         .lanes(this.resolveShortcutLaneCount(), this.resolveShortcutColumnGap())
         .scrollBar(BarState.Off)
         .clip(false)
+        .nestedScroll({
+          scrollForward: NestedScrollMode.PARENT_FIRST,
+          scrollBackward: NestedScrollMode.PARENT_FIRST
+        })
         .responseRegion({
           x: -this.contentInset,
           y: 0,
@@ -241,6 +248,7 @@ export struct HomeShortcutSurface {
           height: this.getGridContentHeight()
         })
         .translate({ y: this.contentOffsetY })
+        }, (identity: string) => identity)
       } else {
         AppEmptyState({
           showIcon: false,
@@ -378,11 +386,7 @@ export struct HomeShortcutSurface {
           .textAlign(TextAlign.Center)
       }
     }
-    .width(Math.max(
-      this.viewModel.getShortcutTileSize(this.gridWidth, this.metrics),
-      HOME_SHORTCUT_MIN_INTERACTION_WIDTH_VP,
-      this.metrics.minimumTileSize
-    ))
+    .width(this.resolveShortcutCardWidth())
     .height(this.resolveShortcutRowHeight())
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Center)
@@ -432,11 +436,7 @@ export struct HomeShortcutSurface {
           .textAlign(TextAlign.Center)
       }
     }
-    .width(Math.max(
-      this.viewModel.getShortcutTileSize(this.gridWidth, this.metrics),
-      HOME_SHORTCUT_MIN_INTERACTION_WIDTH_VP,
-      this.metrics.minimumTileSize
-    ))
+    .width(this.resolveShortcutCardWidth())
     .height(this.resolveShortcutRowHeight())
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Center)
@@ -692,11 +692,36 @@ export struct HomeShortcutSurface {
   }
 
   private resolveShortcutCardWidth(): number {
-    return Math.max(
+    const preferred = Math.max(
       this.viewModel.getShortcutTileSize(this.gridWidth, this.metrics),
       HOME_SHORTCUT_MIN_INTERACTION_WIDTH_VP,
       this.metrics.minimumTileSize
     );
+    // The add tile is last. A card wider than its lane overflows the clipped icon region
+    // and is the tile that gets cut off.
+    return Math.max(1, Math.min(preferred, this.resolveShortcutLaneWidth()));
+  }
+
+  private resolveShortcutLaneWidth(): number {
+    const columns = Math.max(1, this.resolveShortcutLaneCount());
+    const gap = this.resolveShortcutColumnGap();
+    const listWidth = this.resolveShortcutListWidth();
+    return Math.max(1, (listWidth - gap * Math.max(0, columns - 1)) / columns);
+  }
+
+  /**
+   * Changes when the add tile would move to a different lane. The lanes List is recreated
+   * so a previous layout cannot keep that trailing item undisplayed.
+   */
+  private resolveShortcutGridIdentity(): string {
+    return [
+      this.resolveShortcutLaneCount(),
+      this.resolvePresentationItemCount(),
+      this.showAddEntry ? 1 : 0,
+      this.showPinnedSettingsEntry ? 1 : 0,
+      Math.round(this.gridWidth),
+      Math.round(this.metrics.columns)
+    ].join('|');
   }
 
   private resolveShortcutRowHeight(): number {

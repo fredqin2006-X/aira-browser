@@ -9,6 +9,7 @@ import {
   CENTERED_HOME_SEARCH_CENTER_LIFT_VP,
   resolveCenteredHomeFrame,
   resolveCenteredHomeSearchFieldWidth,
+  resolveMeasuredCenteredSurfaceHeight,
   shouldCenterCenteredHomePartialRows
 } from '../main/ets/features/newtab/CenteredHomeShortcutLayoutPolicy';
 import { HomeResponsiveLayoutState } from '../main/ets/features/newtab/HomeResponsiveLayoutViewModel';
@@ -74,6 +75,14 @@ export default function centeredHomeShortcutLayoutPolicyTest(): void {
       expect(CENTERED_HOME_SEARCH_CENTER_LIFT_VP > 0).assertTrue();
       expect(frame.headerTop > 47).assertTrue();
       expect(frame.iconRegionHeight > 0).assertTrue();
+    });
+
+    it('does not let a stale surface height push the icon region off the window', 0, () => {
+      expect(resolveMeasuredCenteredSurfaceHeight(0, 844)).assertEqual(844);
+      expect(resolveMeasuredCenteredSurfaceHeight(800, 844)).assertEqual(800);
+      expect(resolveMeasuredCenteredSurfaceHeight(2400, 844)).assertEqual(844);
+      expect(resolveMeasuredCenteredSurfaceHeight(Number.NaN, 844)).assertEqual(844);
+      expect(resolveMeasuredCenteredSurfaceHeight(900, 0)).assertEqual(900);
     });
 
     it('packs an incomplete shortcut row from the leading edge in touch mode', 0, () => {

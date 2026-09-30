@@ -31,6 +31,14 @@ export function usesCenteredHomeFrame(style: BrowserHomePageStyle): boolean {
   return style === 'centered' || style === 'minimal';
 }
 
+/**
+ * The frame that must be mounted for a style. Each value is a different component.
+ * Centered and minimal share a wordmark, but they are not the same frame.
+ */
+export function resolveMountedSystemHomeFrame(style: string | undefined): BrowserHomePageStyle {
+  return normalizeBrowserHomePageStyle(style);
+}
+
 export interface HomePagePresentationSettings {
   showFavoritesTitle: boolean;
   showShortcutNames: boolean;

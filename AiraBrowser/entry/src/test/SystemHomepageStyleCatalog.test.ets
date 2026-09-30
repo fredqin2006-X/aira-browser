@@ -2,6 +2,7 @@ import { describe, expect, it } from '@ohos/hypium';
 import { CustomHomepageRepositorySnapshot } from '../main/ets/common/models/CustomHomepageModels';
 import { CustomHomepagePreviewViewModel } from '../main/ets/core/customhome/CustomHomepagePreviewViewModel';
 import { CustomHomepageSettingsViewModel } from '../main/ets/core/customhome/CustomHomepageSettingsViewModel';
+import { resolveMountedSystemHomeFrame } from '../main/ets/common/models/HomePagePresentationSettingsModels';
 import {
   resolveSystemHomepageToolbarChrome,
   SYSTEM_HOMEPAGE_STYLE_CATALOG
@@ -26,6 +27,13 @@ function buildSnapshot(mode: 'system' | 'custom_html', selectedItemId: string): 
 
 export default function systemHomepageStyleCatalogTest(): void {
   describe('SystemHomepageStyleCatalog', () => {
+    it('mounts_each_built_in_style_as_its_own_frame', 0, () => {
+      expect(resolveMountedSystemHomeFrame('classic')).assertEqual('classic');
+      expect(resolveMountedSystemHomeFrame('centered')).assertEqual('centered');
+      expect(resolveMountedSystemHomeFrame('minimal')).assertEqual('minimal');
+      expect(resolveMountedSystemHomeFrame('centered') === resolveMountedSystemHomeFrame('minimal')).assertFalse();
+    });
+
     it('lists_every_built_in_homepage_style', 0, () => {
       expect(SYSTEM_HOMEPAGE_STYLE_CATALOG.length).assertEqual(3);
       expect(SYSTEM_HOMEPAGE_STYLE_CATALOG[0].style).assertEqual('classic');

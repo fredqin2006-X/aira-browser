@@ -22,6 +22,14 @@ const homeContentPath = path.join(
   repoRoot,
   'AiraBrowser/entry/src/main/ets/app/components/browser/HomeContentSections.ets'
 );
+const classicHomeFramePath = path.join(
+  repoRoot,
+  'AiraBrowser/entry/src/main/ets/app/components/browser/ClassicHomeFrame.ets'
+);
+const centeredHomeFramePath = path.join(
+  repoRoot,
+  'AiraBrowser/entry/src/main/ets/app/components/browser/CenteredHomeFrame.ets'
+);
 const shellPagePath = path.join(
   repoRoot,
   'AiraBrowser/entry/src/main/ets/app/pages/BrowserShellPage.ets'
@@ -252,20 +260,30 @@ function checkNativeScrollBehavior() {
     'native system Home downward movement must restore the bottom chrome');
 }
 
+function assertFrameForwardsRawScroll(framePath, label) {
+  const source = fs.readFileSync(framePath, 'utf8');
+  assert(source.includes('.onDidScroll(') &&
+    source.includes('this.scroller.currentOffset().yOffset') &&
+    source.includes('scrollAtEnd: this.scroller.isAtEnd()'),
+  `${label} must forward raw offset/end samples`);
+  assert(source.includes("type: 'scroll_stop'"),
+    `${label} must forward native scroll-stop events`);
+  assert(!source.includes('BrowserHomeChromeScrollCoordinator') &&
+    !source.includes('resolveNativeHomeScrollOffset'),
+  `${label} must not own chrome-scroll policy or bounce state`);
+}
+
 function checkRawAdapterAndOwnerSeam() {
   const homeContentSource = fs.readFileSync(homeContentPath, 'utf8');
   const surfaceProfileSource = fs.readFileSync(homeSurfaceProfilePath, 'utf8');
   const shellPageSource = fs.readFileSync(shellPagePath, 'utf8');
   const tabHomeSource = fs.readFileSync(tabHomePath, 'utf8');
-  assert(homeContentSource.includes('.onDidScroll(') &&
-    homeContentSource.includes('this.homeContentScroller.currentOffset().yOffset') &&
-    homeContentSource.includes('scrollAtEnd: this.homeContentScroller.isAtEnd()'),
-  'native Home content must forward raw offset/end samples');
-  assert(homeContentSource.includes("type: 'scroll_stop'"),
-    'native Home content must forward native scroll-stop events');
-  assert(!homeContentSource.includes('BrowserHomeChromeScrollCoordinator') &&
+  assertFrameForwardsRawScroll(classicHomeFramePath, 'classic Home');
+  assertFrameForwardsRawScroll(centeredHomeFramePath, 'centered Home');
+  assert(!homeContentSource.includes('private scroller: Scroller') &&
+    !homeContentSource.includes('BrowserHomeChromeScrollCoordinator') &&
     !homeContentSource.includes('resolveNativeHomeScrollOffset'),
-  'native Home content must not own chrome-scroll policy or bounce state');
+  'native Home content host must not own a scroller or chrome-scroll policy');
   assert(!surfaceProfileSource.includes('homeScrollHideAllowed') &&
     !surfaceProfileSource.includes('hideToolbarOnScroll') &&
     !surfaceProfileSource.includes('buildSystemChromePolicy'),

@@ -1123,11 +1123,11 @@ import { HomeContentSections } from '../components/browser/HomeContentSections';
 import { HOME_PAGE_PRESENTATION_HOME_PAGE_STYLE_KEY } from '../../common/constants/HomePagePresentationStorageKeys';
 import {
   normalizeBrowserHomePageStyle,
+  resolveMountedSystemHomeFrame,
   usesCenteredHomeFrame
 } from '../../common/models/HomePagePresentationSettingsModels';
 import {
-  applyCenteredHomeShortcutLayout,
-  CENTERED_HOME_ICON_CORNER_RADIUS_RATIO
+  applyCenteredHomeShortcutLayout
 } from '../../features/newtab/CenteredHomeShortcutLayoutPolicy';
 import { HomeSystemSurface } from '../components/browser/HomeSystemSurface';
 import { PrivateHomeWatermark } from '../components/browser/PrivateHomeWatermark';
@@ -9717,6 +9717,7 @@ struct BrowserShellPage {
   @Builder
   private buildHomeScrollableContent() {
     HomeContentSections({
+      homePageStyle: resolveMountedSystemHomeFrame(this.storedHomePageStyle),
       showShortcuts: this.showHomeShortcuts,
       recentlyClosedExpanded: this.recentlyClosedApplicationSnapshot.homeSectionExpanded,
       presentation: this.browserTabHomeCoordinator.buildContentPresentation({
@@ -9738,15 +9739,9 @@ struct BrowserShellPage {
         accentColor: this.themedHomeAccentColor
       }),
       contextMenuShortcutId: $contextMenuHomeShortcutId,
-      centeredStyle: this.isCenteredHomePageStyleActive(),
       largeScreenShell: this.isLargeScreenShellFamilyActive(),
-      centeredFavoritesVisible: normalizeBrowserHomePageStyle(this.storedHomePageStyle) !== 'minimal',
-      centeredScanButtonVisible: normalizeBrowserHomePageStyle(this.storedHomePageStyle) !== 'minimal',
-      softenCenteredSearchBorder: normalizeBrowserHomePageStyle(this.storedHomePageStyle) === 'minimal',
-      centeredSearchMatchesToolbar: normalizeBrowserHomePageStyle(this.storedHomePageStyle) === 'minimal',
-      centeredWordmarkOpensSettings: this.isCenteredHomePageStyleActive(),
-      centeredSearchPresented: this.centeredHomeSearchGeometryOpen,
-      centeredSearchGeometryEnabled: !shouldRouteCenteredHomeSearchToFloatingToolbar(
+      searchPresented: this.centeredHomeSearchGeometryOpen,
+      searchGeometryEnabled: !shouldRouteCenteredHomeSearchToFloatingToolbar(
         this.toolbarChromeStyle,
         this.isCenteredHomePageStyleActive(),
         this.isLargeScreenShellFamilyActive()
@@ -9755,11 +9750,9 @@ struct BrowserShellPage {
       inlineSearchActive: this.isCenteredHomeInlineSearchActive(),
       searchSuggestions: this.browserSearchSuggestionSnapshot.searchSuggestions,
       searchDismissVersion: this.splitToolbarSearchDismissVersion,
-      centeredViewportHeight: this.rootViewportHeight,
-      centeredTopSafeInset: this.resolveHomeContentTopSafeInsetVp(),
-      centeredBottomReserve: this.resolveCenteredHomeBottomReserveVp(),
-      shortcutIconCornerRadiusRatio: this.isCenteredHomePageStyleActive() ?
-        CENTERED_HOME_ICON_CORNER_RADIUS_RATIO : -1,
+      viewportHeight: this.rootViewportHeight,
+      topSafeInset: this.resolveHomeContentTopSafeInsetVp(),
+      bottomReserve: this.resolveCenteredHomeBottomReserveVp(),
       onAction: (action) => {
         this.browserTabHomeCoordinator.handleContentAction(action);
       },

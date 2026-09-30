@@ -111,6 +111,25 @@ export function resolveCenteredHomeFrame(input: CenteredHomeFrameInput): Centere
   };
 }
 
+/**
+ * Height of the centered frame used to place the search field.
+ *
+ * A measurement larger than the window (a px reading, or a height captured while another
+ * homepage or sheet was covering the page) pushes the icon region below the clipped frame.
+ * The add tile sits on the last row of that region, so it is the first thing to disappear.
+ */
+export function resolveMeasuredCenteredSurfaceHeight(measuredHeight: number, viewportHeight: number): number {
+  const measured = Number.isFinite(measuredHeight) && measuredHeight > 0 ? measuredHeight : 0;
+  const viewport = Number.isFinite(viewportHeight) && viewportHeight > 0 ? viewportHeight : 0;
+  if (measured <= 0) {
+    return viewport;
+  }
+  if (viewport <= 0) {
+    return measured;
+  }
+  return Math.min(measured, viewport);
+}
+
 export function applyCenteredHomeShortcutLayout(
   state: HomeResponsiveLayoutState
 ): HomeResponsiveLayoutState {
