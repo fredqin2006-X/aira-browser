@@ -12,6 +12,8 @@ import {
   CrossDeviceLinkDeviceRowState,
   CrossDeviceLinkViewState
 } from '../../../core/sync/CrossDeviceLinkViewModel';
+import { CrossDeviceBrowserIconKind } from '../../../core/sync/CrossDeviceBrowserIcon';
+import { CrossDeviceBrowserIconResources } from '../../../core/resources/CrossDeviceBrowserIconResources';
 import { AiraRenderableIconId } from '../../../core/resources/GeneratedAiraIconCatalog';
 import { AiraIcon } from '../common/AiraIcon';
 import { SettingsContentKind } from '../../../core/settings/SettingsContentLayoutPolicy';
@@ -48,6 +50,9 @@ const STATUS_PANEL_VERTICAL_PADDING: number = 18;
 
 /** The header is phone → account → computer, so the avatar is the anchor in the middle. */
 const HEADER_PEER_GLYPH_SIZE: number = 30;
+/** Same 34 slot as the phone row and the add-device row, so the brand mark is not smaller than those badges. */
+const DEVICE_BROWSER_ICON_SLOT: number = 34;
+const DEVICE_BROWSER_ICON_SIZE: number = 34;
 const HEADER_GLYPH_STAGE_SIZE: number = 56;
 const HEADER_AVATAR_SIZE: number = 62;
 const HEADER_AVATAR_BORDER_WIDTH: number = 2;
@@ -358,9 +363,7 @@ export struct CrossDeviceLinkScreen {
             SettingsNavigationRow({
               title: row.title,
               description: row.subtitle,
-              airaIconId: DEVICE_GLYPH,
-              iconBackgroundColor: this.settingsIconBackgrounds.userAgent,
-              iconColor: this.storedSettingsIconForegroundColor,
+              useCustomLeading: true,
               rowPosition: this.resolveRowPosition(index + 1, this.state.devices.length + 2),
               isEnabled: !this.isBusy,
               primaryTextColor: this.storedPrimaryTextColor,
@@ -369,6 +372,9 @@ export struct CrossDeviceLinkScreen {
               desktopPresentation: this.desktopPresentation,
               onAction: (): void => {
                 this.onOpenDeviceTabs(row.deviceId);
+              },
+              customLeading: (): void => {
+                this.buildBrowserBrandLeading(row.browserIconKind);
               }
             })
           }, (row: CrossDeviceLinkDeviceRowState): string => row.deviceId)
@@ -488,6 +494,18 @@ export struct CrossDeviceLinkScreen {
       .lineHeight(19)
       .fontColor(this.storedSecondaryTextColor)
       .padding({ left: 4, right: 4 })
+  }
+
+  @Builder
+  private buildBrowserBrandLeading(kind: CrossDeviceBrowserIconKind) {
+    Stack({ alignContent: Alignment.Center }) {
+      Image(CrossDeviceBrowserIconResources.icon(kind))
+        .width(DEVICE_BROWSER_ICON_SIZE)
+        .height(DEVICE_BROWSER_ICON_SIZE)
+        .objectFit(ImageFit.Contain)
+    }
+    .width(DEVICE_BROWSER_ICON_SLOT)
+    .height(DEVICE_BROWSER_ICON_SLOT)
   }
 
   private resolveRowPosition(index: number, total: number): SettingsRowPosition {

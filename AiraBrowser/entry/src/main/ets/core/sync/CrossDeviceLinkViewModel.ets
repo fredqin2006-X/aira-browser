@@ -1,5 +1,6 @@
 import { AiraSyncProviderKind } from '../../common/models/AiraSyncModels';
 import { CrossDeviceTabPresencePanelStatus } from '../deviceTabs/CrossDeviceTabPresenceModels';
+import { CrossDeviceBrowserIconKind, resolveCrossDeviceBrowserIconKind } from './CrossDeviceBrowserIcon';
 
 /**
  * What a row on the 跨设备互联 page does when tapped. The page is a read-only
@@ -35,6 +36,8 @@ export interface CrossDeviceLinkDeviceRowState {
   deviceId: string;
   title: string;
   subtitle: string;
+  /** Brand mark for a desktop row. The phone row ignores this and keeps its own glyph. */
+  browserIconKind: CrossDeviceBrowserIconKind;
 }
 
 export interface CrossDeviceLinkViewState {
@@ -368,7 +371,8 @@ export class CrossDeviceLinkViewModel {
     return {
       deviceId: '',
       title: name.length > 0 ? name : (platform.length > 0 ? platform : LOCAL_DEVICE_NAME_FALLBACK),
-      subtitle: LOCAL_DEVICE_VALUE
+      subtitle: LOCAL_DEVICE_VALUE,
+      browserIconKind: 'generic'
     };
   }
 
@@ -378,7 +382,8 @@ export class CrossDeviceLinkViewModel {
       rows.push({
         deviceId: device.deviceId,
         title: this.resolveDeviceTitle(device),
-        subtitle: ''
+        subtitle: '',
+        browserIconKind: resolveCrossDeviceBrowserIconKind(device.browserName, device.deviceName)
       });
     });
     return rows;

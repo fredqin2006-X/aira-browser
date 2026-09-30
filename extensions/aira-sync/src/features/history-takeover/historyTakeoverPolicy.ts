@@ -71,6 +71,10 @@ type HistoryBrowserNavigator = {
 type GeckoBrowserInfo = {
   name?: string;
   vendor?: string;
+  zen?: unknown;
+  floorp?: unknown;
+  librewolf?: unknown;
+  waterfox?: unknown;
 };
 
 type GeckoBrowserRuntime = {
@@ -80,6 +84,10 @@ type GeckoBrowserRuntime = {
 export async function readInstalledHistoryBrowser(
   navigatorObject: HistoryBrowserNavigator | null = globalThis.navigator ?? null,
 ): Promise<HistoryBrowserKind> {
+  // Zen reports name "Firefox" and keeps its identity in info.zen. A Chrome-like
+  // user agent must not override that Gecko result.
+  const geckoKind = await readGeckoBrowserKind();
+  if (geckoKind) return rememberSpecificBrowser(geckoKind);
   let isBrave = false;
   try {
     if (typeof navigatorObject?.brave?.isBrave === 'function') {
@@ -97,8 +105,7 @@ export async function readInstalledHistoryBrowser(
     isBrave,
     isVivaldi: await detectInstalledVivaldi(navigatorObject, brands, isBrave),
   });
-  const browserName = await readGeckoBrowserName();
-  return rememberSpecificBrowser(kindFromGeckoBrowserName(browserName) ?? detected);
+  return rememberSpecificBrowser(detected);
 }
 
 async function rememberSpecificBrowser(detected: HistoryBrowserKind): Promise<HistoryBrowserKind> {
@@ -245,6 +252,22 @@ async function queryHasVivaldiTab(): Promise<boolean> {
   }
 }
 
+function hasGeckoForkMarker(value: unknown): boolean {
+  if (typeof value === 'string') return value.trim().length > 0;
+  return Boolean(value) && typeof value === 'object';
+}
+
+export function kindFromGeckoBrowserInfo(info: GeckoBrowserInfo | null | undefined): HistoryBrowserKind | null {
+  if (!info) return null;
+  if (hasGeckoForkMarker(info.zen)) return 'zen';
+  if (hasGeckoForkMarker(info.floorp)) return 'floorp';
+  if (hasGeckoForkMarker(info.librewolf)) return 'librewolf';
+  if (hasGeckoForkMarker(info.waterfox)) return 'waterfox';
+  const named = kindFromGeckoBrowserName(`${info.name || ''} ${info.vendor || ''}`);
+  if (named) return named;
+  return /firefox/i.test(`${info.name || ''} ${info.vendor || ''}`) ? 'firefox' : null;
+}
+
 function kindFromGeckoBrowserName(name: string): HistoryBrowserKind | null {
   if (/zen/i.test(name)) return 'zen';
   if (/floorp/i.test(name)) return 'floorp';
@@ -253,7 +276,12 @@ function kindFromGeckoBrowserName(name: string): HistoryBrowserKind | null {
   return null;
 }
 
-async function readGeckoBrowserName(): Promise<string> {
+async function readGeckoBrowserKind(): Promise<HistoryBrowserKind | null> {
+  const info = await readGeckoBrowserInfo();
+  return kindFromGeckoBrowserInfo(info);
+}
+
+async function readGeckoBrowserInfo(): Promise<GeckoBrowserInfo | null> {
   const runtimeScopes = globalThis as typeof globalThis & {
     browser?: { runtime?: GeckoBrowserRuntime };
     chrome?: { runtime?: GeckoBrowserRuntime };
@@ -262,13 +290,12 @@ async function readGeckoBrowserName(): Promise<string> {
   for (const scope of scopes) {
     if (typeof scope?.runtime?.getBrowserInfo !== 'function') continue;
     try {
-      const info = await scope.runtime.getBrowserInfo();
-      return `${info?.name || ''} ${info?.vendor || ''}`.trim();
+      return await scope.runtime.getBrowserInfo() || null;
     } catch {
-      return '';
+      // Try the other namespace. Firefox exposes both, and one can throw.
     }
   }
-  return '';
+  return null;
 }
 
 export function detectHistoryPlatform(platform: string, userAgent = ''): HistoryPlatform {

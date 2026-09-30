@@ -7,6 +7,7 @@ import {
   CrossDeviceLinkViewModel,
   canEnableCrossDeviceLinkSwitch
 } from '../main/ets/core/sync/CrossDeviceLinkViewModel';
+import { resolveCrossDeviceBrowserIconKind } from '../main/ets/core/sync/CrossDeviceBrowserIcon';
 
 function buildDevice(deviceId: string, platform: string, browserName: string, tabCount: number,
   ageMs: number): CrossDeviceLinkDeviceFact {
@@ -254,6 +255,27 @@ export default function crossDeviceLinkViewModelTest(): void {
       expect(state.accountSubtitle.indexOf('账号 ID') < 0).assertTrue();
       expect(state.accountSignedIn).assertFalse();
       expect(state.accountAvatarUri).assertEqual('file://local.png');
+    });
+
+    it('picks a browser mark from the published name and falls back to Chromium', 0, () => {
+      expect(resolveCrossDeviceBrowserIconKind('Chrome')).assertEqual('chrome');
+      expect(resolveCrossDeviceBrowserIconKind('Google Chrome')).assertEqual('chrome');
+      expect(resolveCrossDeviceBrowserIconKind('Microsoft Edge')).assertEqual('edge');
+      expect(resolveCrossDeviceBrowserIconKind('Zen')).assertEqual('zen');
+      expect(resolveCrossDeviceBrowserIconKind('Floorp')).assertEqual('floorp');
+      expect(resolveCrossDeviceBrowserIconKind('LibreWolf')).assertEqual('librewolf');
+      expect(resolveCrossDeviceBrowserIconKind('Waterfox')).assertEqual('waterfox');
+      expect(resolveCrossDeviceBrowserIconKind('Brave')).assertEqual('brave');
+      expect(resolveCrossDeviceBrowserIconKind('Opera')).assertEqual('opera');
+      expect(resolveCrossDeviceBrowserIconKind('Vivaldi')).assertEqual('vivaldi');
+      expect(resolveCrossDeviceBrowserIconKind('Firefox')).assertEqual('firefox');
+      expect(resolveCrossDeviceBrowserIconKind('Chromium')).assertEqual('generic');
+      expect(resolveCrossDeviceBrowserIconKind('')).assertEqual('generic');
+      expect(resolveCrossDeviceBrowserIconKind('Aira-sync')).assertEqual('generic');
+
+      const facts = buildFacts('aira_cloud');
+      facts.devices = [buildDevice('desktop-1', 'macOS', 'Zen', 1, 1000)];
+      expect(buildState(facts).devices[0].browserIconKind).assertEqual('zen');
     });
 
     it('only lights up the computer side when one is really online', 0, () => {

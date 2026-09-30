@@ -124,6 +124,27 @@ describe('history takeover browser detection', () => {
     }
   });
 
+  test('reads Zen from the hidden info.zen field even when the name and user agent look like Chrome', async () => {
+    const runtime = {
+      getBrowserInfo: async () => ({
+        name: 'Firefox',
+        vendor: 'Mozilla',
+        version: '156.0.1',
+        zen: { version: '1.22.3b' },
+      }),
+    };
+    Object.assign(globalThis, { browser: { runtime } });
+    try {
+      const detected = await readInstalledHistoryBrowser({
+        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15) AppleWebKit/537.36 Chrome/146.0.0.0 Safari/537.36',
+        userAgentData: { brands: [{ brand: 'Google Chrome' }, { brand: 'Chromium' }] },
+      });
+      expect(detected).toBe('zen');
+    } finally {
+      delete (globalThis as { browser?: unknown }).browser;
+    }
+  });
+
   test('reads Floorp from the Gecko browser name when the user agent is plain Firefox', async () => {
     const runtime = {
       getBrowserInfo: async () => ({ name: 'Floorp', vendor: 'Ablaze' }),

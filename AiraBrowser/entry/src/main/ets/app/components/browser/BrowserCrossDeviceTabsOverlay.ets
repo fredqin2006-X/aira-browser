@@ -23,6 +23,8 @@ import {
   CrossDeviceTabsEmptyAction,
   CrossDeviceTabsEmptyPresentation
 } from '../../../core/deviceTabs/CrossDeviceTabsEmptyPresentation';
+import { resolveCrossDeviceBrowserIconKind } from '../../../core/sync/CrossDeviceBrowserIcon';
+import { CrossDeviceBrowserIconResources } from '../../../core/resources/CrossDeviceBrowserIconResources';
 import { SyncSettingsRefreshSignal } from '../../../core/sync/SyncSettingsRefreshSignal';
 import { sharedHuaweiAccountMutationCoordinator } from '../../bootstrap/BrowserAppRuntime';
 import { HuaweiLoginSheetContent } from '../account/HuaweiLoginSheetContent';
@@ -333,7 +335,11 @@ export struct BrowserCrossDeviceTabsSheet {
   @Builder
   private buildDeviceGroup(device: CrossDeviceTabPresenceDevice) {
     Column({ space: 8 }) {
-      Row({ space: 12 }) {
+      Row({ space: 8 }) {
+        Image(CrossDeviceBrowserIconResources.icon(resolveCrossDeviceBrowserIconKind(device.browserName, device.deviceName)))
+          .width(18)
+          .height(18)
+          .objectFit(ImageFit.Contain)
         Text(this.resolveDeviceTitle(device))
           .fontSize(13)
           .fontWeight(FontWeight.Medium)
