@@ -7,7 +7,7 @@ import {
   SettingsCenterState
 } from './SettingsCenterViewModel';
 import { AiraRenderableIconId } from '../resources/GeneratedAiraIconCatalog';
-import { localizeSettingsSearchTargetCopy } from './SettingsExperimentsCopy';
+import { localizeSettingsCatalogCopy } from './SettingsCatalogCopy';
 import {
   SettingsDestinationPanelKind,
   SettingsDestinationCatalog,
@@ -452,7 +452,7 @@ export class SettingsDestinationNavigationOwner {
       candidates.push(new SettingsSearchCandidate({
         id: match.target.id,
         destination: match.target.destination,
-        title: localizeSettingsSearchTargetCopy(match.target.title),
+        title: localizeSettingsCatalogCopy(match.target.title),
         isAvailable: sourceRow.isEnabled,
         unavailableReason: unavailableReason,
         icon: presentationRow.icon,

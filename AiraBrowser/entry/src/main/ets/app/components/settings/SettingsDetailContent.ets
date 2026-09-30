@@ -62,6 +62,7 @@ import {
   SettingsTargetRevealRegion
 } from './SettingsTargetReveal';
 import { applyDesktopDialogSheetChrome } from '../common/DesktopDialogSheetChrome';
+import { localizeSettingsCatalogCopy } from '../../../core/settings/SettingsCatalogCopy';
 
 /**
  * Two preview rows plus the switch, with the stacked 应用/取消 footer left clear below them.
@@ -216,7 +217,7 @@ export struct SettingsDetailContent {
       }
     } else {
       SettingsSection({
-        title: group.title,
+        title: localizeSettingsCatalogCopy(group.title),
         secondaryTextColor: this.secondaryTextColor
       }) {
         this.buildGroupSurface(group)
@@ -259,7 +260,7 @@ export struct SettingsDetailContent {
   @Builder
   private buildThemeModePreviewSection(group: SettingsDetailGroupState) {
     SettingsSection({
-      title: group.title,
+      title: localizeSettingsCatalogCopy(group.title),
       secondaryTextColor: this.secondaryTextColor
     }) {
       Column({ space: 16 }) {

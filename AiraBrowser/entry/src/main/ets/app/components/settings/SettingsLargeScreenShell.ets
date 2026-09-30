@@ -15,6 +15,7 @@ import {
 } from './SettingsCenterPresentationContract';
 import { AiraRenderableIconId } from '../../../core/resources/GeneratedAiraIconCatalog';
 import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
+import { localizeSettingsCatalogCopy } from '../../../core/settings/SettingsCatalogCopy';
 import { SitePermissionKind } from '../../../common/models/BrowserModels';
 import { SettingsEmbeddedDetailPanel } from './SettingsEmbeddedDetailPanel';
 import { SettingsWebAppsDetailPanel } from './SettingsWebAppsDetailPanel';
@@ -479,7 +480,7 @@ export struct SettingsLargeScreenShell {
   private buildSearchWorkspaceRow(row: SettingsCenterSearchResultState) {
     SettingsLargeScreenMenuRow({
       title: row.title,
-      value: row.unavailableReason,
+      value: localizeSettingsCatalogCopy(row.unavailableReason),
       icon: row.icon,
       imageIcon: row.imageIcon,
       airaIconId: row.airaIconId,
@@ -512,8 +513,8 @@ export struct SettingsLargeScreenShell {
   @Builder
   private buildMenuRow(row: SettingsCenterRowState) {
     SettingsLargeScreenMenuRow({
-      title: row.title,
-      value: row.value,
+      title: localizeSettingsCatalogCopy(row.title),
+      value: localizeSettingsCatalogCopy(row.value),
       icon: row.icon,
       imageIcon: row.imageIcon,
       airaIconId: row.airaIconId,
@@ -575,53 +576,12 @@ export struct SettingsLargeScreenShell {
     if (destination === 'cross_device_link') {
       return $r('app.string.settings_sync_cross_device');
     }
-    if (destination === 'general' && this.snapshot.navigationSnapshot.workspaceTitle === '通用') {
-      return $r('app.string.settings_general');
-    }
-    if (this.snapshot.navigationSnapshot.workspaceTitle === '外观设置') {
-      return $r('app.string.settings_appearance');
-    }
-    if (this.snapshot.navigationSnapshot.workspaceTitle === '隐私模式') {
-      return $r('app.string.settings_privacy_mode');
-    }
-    if (this.snapshot.navigationSnapshot.workspaceTitle === '隐私防护') {
-      return $r('app.string.settings_privacy_protection_title');
-    }
-    if (this.snapshot.navigationSnapshot.workspaceTitle === '站点设置') {
-      return $r('app.string.settings_site_info_site_settings');
-    }
-    if (this.snapshot.navigationSnapshot.workspaceTitle === '密码管理') {
-      return $r('app.string.settings_privacy_protection_password_management');
-    }
-    if (this.snapshot.navigationSnapshot.workspaceTitle === '安全 DNS') {
-      return $r('app.string.settings_privacy_protection_secure_dns');
-    }
-    if (this.snapshot.navigationSnapshot.workspaceTitle === 'Cookie 管理') {
-      return $r('app.string.settings_privacy_protection_cookie_management');
-    }
-    if (this.snapshot.navigationSnapshot.workspaceTitle === '防跟踪防护') {
-      return $r('app.string.settings_site_info_tracking_protection');
-    }
-    if (this.snapshot.navigationSnapshot.workspaceTitle === '网页内容过滤') {
-      return $r('app.string.settings_site_info_content_filter');
-    }
-    if (this.snapshot.navigationSnapshot.workspaceTitle === '过滤规则') {
-      return $r('app.string.settings_privacy_protection_adblock_rules');
-    }
-    if (this.snapshot.navigationSnapshot.workspaceTitle === '已清理页面元素') {
-      return $r('app.string.element_hide_settings_title');
-    }
-    if (this.snapshot.navigationSnapshot.workspaceTitle === '关于Aira') {
-      return $r('app.string.settings_about');
-    }
-    if (this.snapshot.navigationSnapshot.activeDestination === 'experiments' ||
-      this.snapshot.navigationSnapshot.workspaceTitle === '实验室') {
-      return $r('app.string.settings_experiments_title');
-    }
     if (this.snapshot.navigationSnapshot.activePanelKind === 'keyboard_shortcuts') {
       return $r('app.string.settings_general_keyboard_shortcuts');
     }
-    return this.snapshot.navigationSnapshot.workspaceTitle;
+    // The navigation owner resolves the workspace title through the directory catalog, so
+    // the shell renders what it is handed instead of matching Chinese literals to find it.
+    return localizeSettingsCatalogCopy(this.snapshot.navigationSnapshot.workspaceTitle);
   }
 
   @Builder

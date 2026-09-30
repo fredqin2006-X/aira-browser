@@ -22,6 +22,7 @@ import {
 } from './SettingsLayout';
 import { SettingsAccountCardRow, SettingsNavigationRow } from './SettingsRows';
 import { resourceStrKey } from '../../../core/browser/BrowserBottomPanelText';
+import { localizeSettingsCatalogCopy } from '../../../core/settings/SettingsCatalogCopy';
 import { SettingsEmbeddedDetailPanel } from './SettingsEmbeddedDetailPanel';
 import {
   BROWSER_THEME_STORAGE_DIVIDER_KEY,
@@ -386,14 +387,14 @@ export struct SettingsNavigationScreen {
   @Builder
   private buildDirectorySection(group: SettingsCenterGroupState) {
     SettingsSection({
-      title: group.title,
+      title: localizeSettingsCatalogCopy(group.title),
       secondaryTextColor: this.resolveSecondaryTextColor()
     }) {
       SettingsGroupCard({ surfaceColor: this.resolveSurfaceBackground() }) {
         ForEach(group.rows, (row: SettingsCenterRowState, index: number) => {
           SettingsNavigationRow({
-            title: row.title,
-            value: row.value,
+            title: localizeSettingsCatalogCopy(row.title),
+            value: localizeSettingsCatalogCopy(row.value),
             icon: row.icon,
             imageIcon: row.imageIcon,
             airaIconId: row.airaIconId,
