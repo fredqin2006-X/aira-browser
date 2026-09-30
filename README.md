@@ -5,6 +5,11 @@
 <h1 align="center">Aira</h1>
 
 <p align="center">
+  <strong>中文</strong> |
+  <a href="README.en.md">English</a>
+</p>
+
+<p align="center">
   <a href="https://appgallery.huawei.com/app/detail?id=com.aira.browser&channelId=SHARE&source=appshare"><img src="docs/app-gallery.png" alt="在华为应用市场下载 Aira" width="240"></a>
 </p>
 
