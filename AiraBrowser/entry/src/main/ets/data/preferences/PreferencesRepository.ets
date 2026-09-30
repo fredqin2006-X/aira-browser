@@ -54,6 +54,7 @@ import {
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { DEFAULT_BROWSER_THEME_PALETTE_ID } from '../../features/theme/BrowserThemePalettes';
 import { SiteIdentityService } from '../../services/web/SiteIdentityService';
+import { isSupportedAppLanguage } from '../../core/resources/AppLanguageCatalog';
 
 const PREFERENCES_LOG_DOMAIN: number = 0x0000;
 const PREFERENCES_LOG_TAG: string = 'PreferencesRepository';
@@ -178,6 +179,11 @@ export const DEFAULT_BROWSER_RETENTION_SETTINGS: BrowserRetentionSettings = {
   warmBackgroundMaxAgeMs: HUAWEI_BROWSER_TAB_MAX_LIVE_TIME_MS,
   staleAfterMs: HUAWEI_BROWSER_TAB_MAX_LIVE_TIME_MS
 };
+
+/**
+ * The app follows the system language until the user picks one in 通用.
+ */
+export const DEFAULT_APP_LANGUAGE: string = 'default';
 
 export const DEFAULT_HISTORY_RETENTION_SETTINGS: HistoryRetentionSettings = {
   enabled: true,
@@ -409,6 +415,7 @@ export function buildBrowserRetentionSettingsForProfile(
 }
 
 const DEFAULT_PREFERENCES: BrowserPreferences = {
+  appLanguage: DEFAULT_APP_LANGUAGE,
   appServiceMode: DEFAULT_BROWSER_APP_SERVICE_MODE,
   searchEngineId: DEFAULT_SEARCH_ENGINE_ID,
   searchSuggestions: DEFAULT_SEARCH_SUGGESTION_PREFERENCES,
@@ -477,6 +484,8 @@ export interface PreferencesStorageAdapter {
   writeRetentionSettings(settings: BrowserRetentionSettings): Promise<void>;
   readHistoryRetentionSettings(defaultValue: HistoryRetentionSettings): Promise<HistoryRetentionSettings>;
   writeHistoryRetentionSettings(settings: HistoryRetentionSettings): Promise<void>;
+  readAppLanguage(defaultValue: string): Promise<string>;
+  writeAppLanguage(language: string): Promise<void>;
   readSitePermissionSettings(): Promise<SitePermissionSettings[]>;
   writeSitePermissionSettings(settings: SitePermissionSettings[]): Promise<void>;
   flush?(): Promise<void>;
@@ -498,6 +507,7 @@ class MemoryPreferencesStorageAdapter implements PreferencesStorageAdapter {
   private externalNavigationSettings: ExternalNavigationSettings = DEFAULT_EXTERNAL_NAVIGATION_SETTINGS;
   private retentionSettings: BrowserRetentionSettings = DEFAULT_BROWSER_RETENTION_SETTINGS;
   private historyRetentionSettings: HistoryRetentionSettings = DEFAULT_HISTORY_RETENTION_SETTINGS;
+  private appLanguage: string = DEFAULT_APP_LANGUAGE;
   private sitePermissionSettings: SitePermissionSettings[] = [];
 
   readAppServiceMode(_defaultValue: BrowserAppServiceMode): Promise<BrowserAppServiceMode> {
@@ -635,6 +645,15 @@ class MemoryPreferencesStorageAdapter implements PreferencesStorageAdapter {
     return Promise.resolve();
   }
 
+  readAppLanguage(defaultValue: string): Promise<string> {
+    return Promise.resolve(this.appLanguage === '' ? defaultValue : this.appLanguage);
+  }
+
+  writeAppLanguage(language: string): Promise<void> {
+    this.appLanguage = language;
+    return Promise.resolve();
+  }
+
   readSitePermissionSettings(): Promise<SitePermissionSettings[]> {
     return Promise.resolve(this.sitePermissionSettings);
   }
@@ -713,9 +732,11 @@ export class PreferencesRepository {
     const storedRetentionSettings = await this.storageAdapter.readRetentionSettings(DEFAULT_BROWSER_RETENTION_SETTINGS);
     const storedHistoryRetentionSettings =
       await this.storageAdapter.readHistoryRetentionSettings(DEFAULT_HISTORY_RETENTION_SETTINGS);
+    const storedAppLanguage = await this.storageAdapter.readAppLanguage(DEFAULT_APP_LANGUAGE);
     this.cachedSitePermissionSettings =
       this.normalizeSitePermissionSettings(await this.storageAdapter.readSitePermissionSettings());
     this.cachedPreferences = {
+      appLanguage: this.normalizeAppLanguage(storedAppLanguage),
       appServiceMode: this.normalizeAppServiceMode(storedAppServiceMode),
       searchEngineId: this.normalizeSearchEngineId(storedSearchEngine),
       searchSuggestions: this.normalizeSearchSuggestionPreferences(storedSearchSuggestions),
@@ -771,6 +792,13 @@ export class PreferencesRepository {
     const normalizedHistoryRetentionSettings = this.normalizeHistoryRetentionSettings(settings);
     this.mergeCachedPreferences({ historyRetention: normalizedHistoryRetentionSettings });
     await this.storageAdapter.writeHistoryRetentionSettings(normalizedHistoryRetentionSettings);
+    return this.cachedPreferences;
+  }
+
+  async updateAppLanguage(language: string): Promise<BrowserPreferences> {
+    const normalizedLanguage = this.normalizeAppLanguage(language);
+    this.mergeCachedPreferences({ appLanguage: normalizedLanguage });
+    await this.storageAdapter.writeAppLanguage(normalizedLanguage);
     return this.cachedPreferences;
   }
 
@@ -1968,6 +1996,16 @@ export class PreferencesRepository {
     return buildBrowserRetentionSettingsForProfile(profileId, deviceTierHint);
   }
 
+  /**
+   * Keeps the stored language a value the picker can offer. An unknown value falls back to
+   * following the system, so a removed language cannot leave the app on a language it no
+   * longer ships strings for.
+   */
+  private normalizeAppLanguage(language: string | undefined): string {
+    const normalized = `${language ?? ''}`.trim();
+    return isSupportedAppLanguage(normalized) ? normalized : DEFAULT_APP_LANGUAGE;
+  }
+
   private normalizeHistoryRetentionSettings(settings: HistoryRetentionSettings): HistoryRetentionSettings {
     const fallback = DEFAULT_HISTORY_RETENTION_SETTINGS;
     if (settings.enabled === false) {
@@ -2094,6 +2132,7 @@ export class PreferencesRepository {
 
   private mergeCachedPreferences(patch: Partial<BrowserPreferences>): void {
     this.cachedPreferences = {
+      appLanguage: patch.appLanguage ?? this.cachedPreferences.appLanguage,
       appServiceMode: patch.appServiceMode ?? this.cachedPreferences.appServiceMode,
       searchEngineId: patch.searchEngineId ?? this.cachedPreferences.searchEngineId,
       searchSuggestions: patch.searchSuggestions ?? this.cachedPreferences.searchSuggestions,

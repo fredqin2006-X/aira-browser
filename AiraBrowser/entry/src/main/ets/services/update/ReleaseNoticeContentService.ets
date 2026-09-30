@@ -5,10 +5,10 @@ import {
   ChangelogContentService
 } from '../settings/ChangelogContentService';
 import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../common/config/AiraDistributionCapabilityOwner';
+import { isEnglishSystemLanguage } from '../../core/resources/LocalizedRawFile';
 
 const RELEASE_NOTICE_RAW_FILE_NAME: string = 'release_notice.json';
-const DEFAULT_RELEASE_NOTICE_ACTION_LABEL: string = '查看详细更新日志';
-const RELEASE_NOTICE_FEEDBACK_TEXT: string = '问题反馈QQ群：1049806927';
+const RELEASE_NOTICE_RAW_FILE_NAME_EN: string = 'release_notice_en.json';
 
 interface ReleaseNoticeConfig {
   enabled?: boolean;
@@ -50,18 +50,50 @@ export class ReleaseNoticeContentService {
     const items = this.normalizeItems(config.items, changelogSection.items);
     return {
       noticeId: this.buildNoticeId(config.noticeId, version),
-      title: this.normalizeText(config.title, `Aira 已更新到 ${version.versionName}`),
+      title: this.normalizeText(
+        config.title,
+        this.readResourceText(context, 'release_notice_title_fallback', version.versionName)
+      ),
       updatedAt: this.normalizeText(config.updatedAt, changelogSection.updateDate),
-      summary: summary.length > 0 ? summary : '这一版带来了一些体验优化和问题修复。',
+      summary: summary.length > 0 ? summary : this.readResourceText(context, 'settings_changelog_summary_fallback'),
       items: items,
-      feedbackText: RELEASE_NOTICE_FEEDBACK_TEXT,
-      actionLabel: this.normalizeText(config.actionLabel, DEFAULT_RELEASE_NOTICE_ACTION_LABEL)
+      feedbackText: this.readResourceText(context, 'release_notice_feedback_text'),
+      actionLabel: this.normalizeText(config.actionLabel, this.readResourceText(context, 'release_notice_action_fallback'))
     };
   }
 
-  private readConfig(context: common.Context): ReleaseNoticeConfig | undefined {
+  /**
+   * Reads a notice fallback from the string catalog so it follows the system language
+   * instead of being pinned to the base text.
+   */
+  private readResourceText(context: common.Context, name: string, formatArg?: string): string {
     try {
-      const rawFile = context.resourceManager.getRawFileContentSync(RELEASE_NOTICE_RAW_FILE_NAME);
+      const value = formatArg === undefined
+        ? context.resourceManager.getStringByNameSync(name)
+        : context.resourceManager.getStringByNameSync(name, formatArg);
+      return value.length > 0 ? value : '';
+    } catch (_error) {
+      return '';
+    }
+  }
+
+  /**
+   * The notice JSON ships in base and English. English reads the English file and every
+   * other language reads the base file; a missing English file falls back to the base one
+   * rather than dropping the notice.
+   */
+  private readConfig(context: common.Context): ReleaseNoticeConfig | undefined {
+    const baseConfig = this.readConfigFile(context, RELEASE_NOTICE_RAW_FILE_NAME);
+    if (!isEnglishSystemLanguage()) {
+      return baseConfig;
+    }
+    const englishConfig = this.readConfigFile(context, RELEASE_NOTICE_RAW_FILE_NAME_EN);
+    return englishConfig !== undefined ? englishConfig : baseConfig;
+  }
+
+  private readConfigFile(context: common.Context, rawFileName: string): ReleaseNoticeConfig | undefined {
+    try {
+      const rawFile = context.resourceManager.getRawFileContentSync(rawFileName);
       return JSON.parse(buffer.from(rawFile.buffer).toString('utf8')) as ReleaseNoticeConfig;
     } catch (_error) {
       return undefined;

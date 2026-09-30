@@ -6521,10 +6521,6 @@
       "value": "清除失败，请稍后再试。"
     },
     {
-      "name": "settings_link_online_devices",
-      "value": "在线设备"
-    },
-    {
       "name": "settings_link_setup_section",
       "value": "安装与连接"
     },
@@ -15435,6 +15431,3850 @@
     {
       "name": "settings_advanced_service_mode_update_failed",
       "value": "应用服务模式更新失败。"
+    },
+    {
+      "name": "settings_catalog_360_search",
+      "value": "360 搜索"
+    },
+    {
+      "name": "settings_catalog_aira_pro",
+      "value": "Aira Pro"
+    },
+    {
+      "name": "settings_catalog_baidu",
+      "value": "Baidu"
+    },
+    {
+      "name": "settings_catalog_bing",
+      "value": "Bing"
+    },
+    {
+      "name": "settings_catalog_brave_search",
+      "value": "Brave Search"
+    },
+    {
+      "name": "settings_catalog_duckduckgo",
+      "value": "DuckDuckGo"
+    },
+    {
+      "name": "settings_catalog_ecosia",
+      "value": "Ecosia"
+    },
+    {
+      "name": "settings_catalog_google",
+      "value": "Google"
+    },
+    {
+      "name": "settings_catalog_startpage",
+      "value": "Startpage"
+    },
+    {
+      "name": "settings_catalog_yandex",
+      "value": "Yandex"
+    },
+    {
+      "name": "settings_catalog_home_style",
+      "value": "主页样式"
+    },
+    {
+      "name": "settings_catalog_refresh_site_icons",
+      "value": "刷新站点图标"
+    },
+    {
+      "name": "settings_catalog_icon",
+      "value": "图标"
+    },
+    {
+      "name": "settings_catalog_look",
+      "value": "外观样式"
+    },
+    {
+      "name": "settings_catalog_media_enhancements",
+      "value": "媒体增强"
+    },
+    {
+      "name": "settings_catalog_storage",
+      "value": "存储"
+    },
+    {
+      "name": "settings_catalog_app",
+      "value": "应用"
+    },
+    {
+      "name": "settings_catalog_sogou",
+      "value": "搜狗"
+    },
+    {
+      "name": "settings_catalog_search_history",
+      "value": "搜索历史"
+    },
+    {
+      "name": "settings_catalog_search_settings",
+      "value": "搜索设置"
+    },
+    {
+      "name": "settings_catalog_local_backup",
+      "value": "本地备份"
+    },
+    {
+      "name": "settings_catalog_tabs",
+      "value": "标签页"
+    },
+    {
+      "name": "settings_catalog_tab_runtime_policy",
+      "value": "标签页运行策略"
+    },
+    {
+      "name": "settings_catalog_clear_browsing_data",
+      "value": "清除浏览数据"
+    },
+    {
+      "name": "settings_catalog_user_scripts",
+      "value": "用户脚本"
+    },
+    {
+      "name": "settings_catalog_shenma",
+      "value": "神马"
+    },
+    {
+      "name": "settings_catalog_site_settings",
+      "value": "站点设置"
+    },
+    {
+      "name": "settings_catalog_page_identity",
+      "value": "网页标识"
+    },
+    {
+      "name": "settings_catalog_page_translation",
+      "value": "网页翻译"
+    },
+    {
+      "name": "settings_catalog_custom",
+      "value": "自定义"
+    },
+    {
+      "name": "settings_catalog_account_sync",
+      "value": "账号与同步"
+    },
+    {
+      "name": "settings_catalog_reading_enhancements",
+      "value": "阅读增强"
+    },
+    {
+      "name": "settings_catalog_privacy",
+      "value": "隐私"
+    },
+    {
+      "name": "settings_catalog_privacy_security",
+      "value": "隐私与安全"
+    },
+    {
+      "name": "settings_catalog_private_mode",
+      "value": "隐私模式"
+    },
+    {
+      "name": "settings_catalog_advanced",
+      "value": "高级"
+    },
+    {
+      "name": "settings_catalog_advanced_settings",
+      "value": "高级设置"
+    },
+    {
+      "name": "settings_catalog_default",
+      "value": "默认"
+    },
+    {
+      "name": "settings_catalog_default_site_permissions",
+      "value": "默认站点权限"
+    },
+    {
+      "name": "settings_catalog_sync_backup",
+      "value": "同步与备份"
+    },
+    {
+      "name": "settings_catalog_web_app_detail",
+      "value": "网页应用详情"
+    },
+    {
+      "name": "settings_destination_unavailable",
+      "value": "当前不可用"
+    },
+    {
+      "name": "settings_destination_title",
+      "value": "设置"
+    },
+    {
+      "name": "settings_search_field_placeholder",
+      "value": "搜索设置项"
+    },
+    {
+      "name": "settings_changelog_summary_fallback",
+      "value": "这一版带来了一些体验优化和问题修复。"
+    },
+    {
+      "name": "settings_changelog_updated_fallback",
+      "value": "Aira 已更新到新版本。"
+    },
+    {
+      "name": "settings_about_changelog_title",
+      "value": "更新日志"
+    },
+    {
+      "name": "release_notice_feedback_text",
+      "value": "问题反馈QQ群：1049806927"
+    },
+    {
+      "name": "release_notice_title_fallback",
+      "value": "Aira 已更新到 %1$s"
+    },
+    {
+      "name": "release_notice_action_fallback",
+      "value": "查看详细更新日志"
+    },
+    {
+      "name": "settings_general_language",
+      "value": "语言"
+    },
+    {
+      "name": "settings_general_language_section",
+      "value": "显示语言"
+    },
+    {
+      "name": "settings_general_language_follow_system",
+      "value": "跟随系统"
+    },
+    {
+      "name": "settings_general_language_chinese",
+      "value": "简体中文"
+    },
+    {
+      "name": "settings_general_language_english",
+      "value": "English"
+    },
+    {
+      "name": "settings_general_language_footer",
+      "value": "更改语言后需要重启 Aira 才会生效。"
+    },
+    {
+      "name": "settings_general_language_footer_follow_system",
+      "value": "Aira 会跟随系统语言。更改系统语言后重启 Aira 即可生效。"
+    },
+    {
+      "name": "settings_general_language_footer_restart",
+      "value": "重启后生效。"
+    },
+    {
+      "name": "settings_general_language_failed",
+      "value": "暂时无法切换语言，请稍后重试。"
+    },
+    {
+      "name": "settings_general_language_detail",
+      "value": "默认跟随系统语言"
+    },
+    {
+      "name": "settings_app_icon_01",
+      "value": "图标管理服务暂不可用。"
+    },
+    {
+      "name": "settings_app_icon_02",
+      "value": "应用图标更新失败。"
+    },
+    {
+      "name": "settings_desktop_interface_01",
+      "value": "继续切换"
+    },
+    {
+      "name": "settings_desktop_login_01",
+      "value": "正在确认登录"
+    },
+    {
+      "name": "settings_desktop_login_02",
+      "value": "确认登录"
+    },
+    {
+      "name": "settings_desktop_login_03",
+      "value": "Aira 账号"
+    },
+    {
+      "name": "settings_desktop_login_04",
+      "value": "当前华为账号"
+    },
+    {
+      "name": "settings_home_01",
+      "value": "跟随主题色"
+    },
+    {
+      "name": "settings_about_01",
+      "value": "查看更多"
+    },
+    {
+      "name": "settings_center_01",
+      "value": "账号与会员需切换到全量模式后使用。"
+    },
+    {
+      "name": "settings_center_02",
+      "value": "代理设置暂时无法打开，请稍后重试。"
+    },
+    {
+      "name": "settings_center_03",
+      "value": "自定义 DNS 编辑页暂时无法打开，请稍后重试。"
+    },
+    {
+      "name": "settings_center_04",
+      "value": "设置页面"
+    },
+    {
+      "name": "settings_center_05",
+      "value": "设置页面导航失败，请重试"
+    },
+    {
+      "name": "settings_scaffold_01",
+      "value": "返回设置"
+    },
+    {
+      "name": "settings_detail_01",
+      "value": "搜索引擎已更新。"
+    },
+    {
+      "name": "settings_detail_02",
+      "value": "搜索引擎更新失败。"
+    },
+    {
+      "name": "settings_detail_03",
+      "value": "站点默认权限更新失败。"
+    },
+    {
+      "name": "settings_theme_palette_01",
+      "value": "主题色更新失败。"
+    },
+    {
+      "name": "settings_app_icon_03",
+      "value": "图标管理服务暂不可用。"
+    },
+    {
+      "name": "settings_app_icon_04",
+      "value": "应用图标更新失败。"
+    },
+    {
+      "name": "settings_detail_04",
+      "value": "查看更多"
+    },
+    {
+      "name": "settings_detail_05",
+      "value": "搜索引擎已更新。"
+    },
+    {
+      "name": "settings_detail_06",
+      "value": "搜索引擎更新失败。"
+    },
+    {
+      "name": "settings_sync_01",
+      "value": "覆盖书签"
+    },
+    {
+      "name": "settings_sync_webdav_01",
+      "value": "启用 WebDAV 同步"
+    },
+    {
+      "name": "settings_sync_webdav_02",
+      "value": "WebDAV 服务商"
+    },
+    {
+      "name": "settings_sync_webdav_03",
+      "value": "WebDAV 用户名"
+    },
+    {
+      "name": "settings_sync_webdav_04",
+      "value": "WebDAV 密码"
+    },
+    {
+      "name": "settings_sync_webdav_05",
+      "value": "关闭 WebDAV 额外备份"
+    },
+    {
+      "name": "settings_sync_webdav_06",
+      "value": "关闭 WebDAV 同步"
+    },
+    {
+      "name": "settings_sync_webdav_07",
+      "value": "WebDAV 地址"
+    },
+    {
+      "name": "settings_sync_webdav_08",
+      "value": "正在更新 WebDAV 备份"
+    },
+    {
+      "name": "settings_sync_webdav_09",
+      "value": "正在开启 WebDAV 额外备份"
+    },
+    {
+      "name": "settings_sync_webdav_10",
+      "value": "正在同步 WebDAV"
+    },
+    {
+      "name": "settings_sync_webdav_11",
+      "value": "正在启用 WebDAV 同步"
+    },
+    {
+      "name": "settings_sync_webdav_12",
+      "value": "正在保存配置，并用本机内容覆盖 WebDAV"
+    },
+    {
+      "name": "settings_sync_webdav_13",
+      "value": "正在保存配置并检查连接"
+    },
+    {
+      "name": "settings_sync_webdav_14",
+      "value": "正在保存配置并开启书签和全部常用设置"
+    },
+    {
+      "name": "settings_sync_webdav_15",
+      "value": "开启同步"
+    },
+    {
+      "name": "settings_sync_webdav_16",
+      "value": "正在覆盖写入 WebDAV 额外备份"
+    },
+    {
+      "name": "settings_sync_webdav_17",
+      "value": "正在处理 WebDAV 同步状态"
+    },
+    {
+      "name": "settings_sync_webdav_18",
+      "value": "WebDAV 额外备份"
+    },
+    {
+      "name": "settings_sync_webdav_19",
+      "value": "开启 WebDAV 额外备份"
+    },
+    {
+      "name": "settings_sync_webdav_20",
+      "value": "关闭 WebDAV 额外备份吗"
+    },
+    {
+      "name": "settings_sync_webdav_21",
+      "value": "关闭 WebDAV 同步吗"
+    },
+    {
+      "name": "settings_sync_webdav_22",
+      "value": "关闭后会停止向 WebDAV 覆盖写入额外副本，当前同步方式和已填写的 WebDAV 配置都不会删除。"
+    },
+    {
+      "name": "settings_sync_webdav_23",
+      "value": "关闭后会停止通过 WebDAV 同步书签，本机书签和已填写的 WebDAV 配置不会删除。"
+    },
+    {
+      "name": "settings_sync_webdav_24",
+      "value": "关闭失败"
+    },
+    {
+      "name": "settings_sync_webdav_25",
+      "value": "暂时没能关闭 WebDAV 额外备份，请稍后再试。"
+    },
+    {
+      "name": "settings_sync_webdav_26",
+      "value": "暂时没能关闭 WebDAV 同步，请检查网络后再试。"
+    },
+    {
+      "name": "settings_sync_webdav_27",
+      "value": "同步"
+    },
+    {
+      "name": "settings_sync_webdav_28",
+      "value": "WebDAV 服务商"
+    },
+    {
+      "name": "settings_theme_palette_02",
+      "value": "主题色更新失败。"
+    },
+    {
+      "name": "settings_activity_01",
+      "value": "Aira 活跃"
+    },
+    {
+      "name": "settings_activity_02",
+      "value": "开始使用 Aira 后，这里会点亮你的活跃日历"
+    },
+    {
+      "name": "settings_app_icon_05",
+      "value": "夜色"
+    },
+    {
+      "name": "settings_app_icon_06",
+      "value": "海蓝"
+    },
+    {
+      "name": "settings_app_icon_07",
+      "value": "缤纷"
+    },
+    {
+      "name": "settings_app_icon_08",
+      "value": "磨砂"
+    },
+    {
+      "name": "settings_app_icon_09",
+      "value": "正在读取应用图标..."
+    },
+    {
+      "name": "settings_app_icon_10",
+      "value": "应用图标由华为应用市场图标管理服务提供，审核通过后会在这里显示。"
+    },
+    {
+      "name": "settings_app_icon_11",
+      "value": "经典"
+    },
+    {
+      "name": "settings_app_icon_12",
+      "value": "暂无可用的应用图标。"
+    },
+    {
+      "name": "settings_app_icon_13",
+      "value": "切换后桌面图标会由系统更新；如果系统正在使用自定义主题图标，切换可能会失败。"
+    },
+    {
+      "name": "settings_app_icon_14",
+      "value": "需要先在 AppGallery Connect 图标管理中创建图标并通过审核，审核通过后会自动出现在这里。"
+    },
+    {
+      "name": "settings_app_icon_15",
+      "value": "图标管理服务暂不可用。"
+    },
+    {
+      "name": "settings_app_service_mode_01",
+      "value": "切换到基本模式？"
+    },
+    {
+      "name": "settings_app_service_mode_02",
+      "value": "基本模式会关闭账号登录、同步、会员、翻译、脚本、网页内容过滤、壁纸、远程建议和实验功能。大部分增强能力将不可用，App 会重启以应用更改；已保存的数据不会删除。"
+    },
+    {
+      "name": "settings_app_service_mode_03",
+      "value": "切换到基本模式"
+    },
+    {
+      "name": "settings_desktop_interface_02",
+      "value": "手机使用桌面界面可能出现内容过密、按钮过小或部分布局不适配。切换到桌面界面前需要再次确认。"
+    },
+    {
+      "name": "settings_desktop_interface_03",
+      "value": "小折叠屏展开后仍使用触屏界面，因为展开后的屏幕较窄；手动选择桌面界面时除外。"
+    },
+    {
+      "name": "settings_desktop_interface_04",
+      "value": "自动模式会在设备展开时使用桌面界面，收起时恢复触屏界面；半折叠或状态未知时保持当前界面。"
+    },
+    {
+      "name": "settings_desktop_interface_05",
+      "value": "自动模式会在连接鼠标或触控板时使用桌面界面，断开后恢复触屏界面。物理键盘仍可在触屏界面中使用快捷键。"
+    },
+    {
+      "name": "settings_user_agent_01",
+      "value": "站点网页标识引用回退失败。"
+    },
+    {
+      "name": "settings_general_01",
+      "value": "15 天"
+    },
+    {
+      "name": "settings_general_02",
+      "value": "7 天"
+    },
+    {
+      "name": "settings_general_03",
+      "value": "3 天"
+    },
+    {
+      "name": "settings_general_04",
+      "value": "1 天"
+    },
+    {
+      "name": "settings_home_logo_01",
+      "value": "支持 PNG、JPG、GIF、WebP、BMP、SVG、HEIC、AVIF 等格式"
+    },
+    {
+      "name": "settings_home_logo_02",
+      "value": "这个 Logo 不可用。"
+    },
+    {
+      "name": "settings_home_02",
+      "value": "不显示"
+    },
+    {
+      "name": "settings_about_05",
+      "value": "查看更多"
+    },
+    {
+      "name": "settings_account_card_01",
+      "value": "本地浏览功能已全部开启"
+    },
+    {
+      "name": "settings_account_card_02",
+      "value": "华为账号已登录，当前使用华为云空间同步"
+    },
+    {
+      "name": "settings_account_card_03",
+      "value": "华为账号已登录，当前使用 Aira 云同步"
+    },
+    {
+      "name": "settings_account_card_04",
+      "value": "华为账号已登录，当前使用 WebDAV 同步"
+    },
+    {
+      "name": "settings_account_card_05",
+      "value": "华为账号已登录，当前为 Aira Club"
+    },
+    {
+      "name": "settings_detail_07",
+      "value": "搜索和书签"
+    },
+    {
+      "name": "settings_detail_08",
+      "value": "90 天 / 10000 条"
+    },
+    {
+      "name": "settings_detail_09",
+      "value": "尚无已保存站点权限"
+    },
+    {
+      "name": "settings_detail_10",
+      "value": "当前私密会话"
+    },
+    {
+      "name": "settings_detail_11",
+      "value": "私密入口"
+    },
+    {
+      "name": "settings_detail_12",
+      "value": "仅限本次会话"
+    },
+    {
+      "name": "settings_detail_13",
+      "value": "不改常规浏览资料"
+    },
+    {
+      "name": "settings_detail_14",
+      "value": "地址栏显示本地建议"
+    },
+    {
+      "name": "settings_detail_15",
+      "value": "即将推出"
+    },
+    {
+      "name": "settings_detail_16",
+      "value": "后续补充"
+    },
+    {
+      "name": "settings_detail_17",
+      "value": "暂未开放设置项"
+    },
+    {
+      "name": "settings_detail_18",
+      "value": "适合中文内容搜索"
+    },
+    {
+      "name": "settings_detail_19",
+      "value": "更注重隐私"
+    },
+    {
+      "name": "settings_detail_20",
+      "value": "国际搜索补充"
+    },
+    {
+      "name": "settings_detail_21",
+      "value": "使用 Google 搜索"
+    },
+    {
+      "name": "settings_detail_22",
+      "value": "使用 Bing 搜索"
+    },
+    {
+      "name": "settings_detail_23",
+      "value": "15 天未使用"
+    },
+    {
+      "name": "settings_detail_24",
+      "value": "7 天未使用"
+    },
+    {
+      "name": "settings_detail_25",
+      "value": "3 天未使用"
+    },
+    {
+      "name": "settings_detail_26",
+      "value": "1 天未使用"
+    },
+    {
+      "name": "settings_detail_27",
+      "value": "30 天 / 3000 条"
+    },
+    {
+      "name": "settings_detail_28",
+      "value": "关闭后不进入下次启动恢复"
+    },
+    {
+      "name": "settings_detail_29",
+      "value": "会降低隐私边界，请谨慎开启"
+    },
+    {
+      "name": "settings_external_navigation_01",
+      "value": "当前会话不可更改全局外部应用策略。"
+    },
+    {
+      "name": "settings_external_navigation_02",
+      "value": "已阻止网站打开外部应用。"
+    },
+    {
+      "name": "settings_external_navigation_03",
+      "value": "已允许网站直接打开外部应用。"
+    },
+    {
+      "name": "settings_external_navigation_04",
+      "value": "打开外部应用前会先询问。"
+    },
+    {
+      "name": "settings_general_05",
+      "value": "快捷方式"
+    },
+    {
+      "name": "settings_general_06",
+      "value": "仅搜索"
+    },
+    {
+      "name": "settings_legal_01",
+      "value": "自动续费说明"
+    },
+    {
+      "name": "settings_legal_02",
+      "value": "更新日期：2026-05-20"
+    },
+    {
+      "name": "settings_legal_03",
+      "value": "本说明用于帮助你理解 Aira Pro 订阅的续费、扣款、取消和权益变化规则。实际价格、周期、优惠和支付结果以华为支付或订阅管理页面展示为准。"
+    },
+    {
+      "name": "settings_legal_04",
+      "value": "订阅与续费"
+    },
+    {
+      "name": "settings_legal_05",
+      "value": "Aira Pro 可能提供月度、季度、年度等订阅周期。你选择并确认支付后，对应 Pro 权益会在订阅有效期内生效。"
+    },
+    {
+      "name": "settings_legal_06",
+      "value": "如果你在支付页面开通连续订阅，系统会在每个订阅周期到期前按照平台规则自动续费。"
+    },
+    {
+      "name": "settings_legal_07",
+      "value": "扣款与价格"
+    },
+    {
+      "name": "settings_legal_08",
+      "value": "订阅价格、优惠、试用、税费、扣款时间和扣款方式以华为支付页面或订阅管理页面展示的信息为准。"
+    },
+    {
+      "name": "settings_legal_09",
+      "value": "如果支付失败、账号状态异常或平台未能确认订阅状态，Pro 权益可能无法立即生效。你可以稍后返回会员页恢复购买。"
+    },
+    {
+      "name": "settings_legal_10",
+      "value": "取消续费"
+    },
+    {
+      "name": "settings_legal_11",
+      "value": "你可以通过华为官方订阅管理页面取消自动续费。取消后，已购买周期内的 Pro 权益通常会保留到当前周期结束。"
+    },
+    {
+      "name": "settings_legal_12",
+      "value": "为避免下个周期继续扣款，请在平台要求的时间前完成取消操作。具体取消路径、截止时间和生效规则以华为订阅管理页面为准。"
+    },
+    {
+      "name": "settings_legal_13",
+      "value": "权益变化"
+    },
+    {
+      "name": "settings_legal_14",
+      "value": "如果订阅到期、取消、退款或支付状态异常，Aira Pro 权益可能会停止或回到当前账号可用的基础权益。"
+    },
+    {
+      "name": "settings_legal_15",
+      "value": "会员权益、订阅周期和价格如有调整，我们会在应用内或支付页面以适当方式提示。"
+    },
+    {
+      "name": "settings_site_icon_01",
+      "value": "没有需要刷新的网站图标。"
+    },
+    {
+      "name": "settings_site_icon_02",
+      "value": "网站图标暂时无法刷新，请稍后再试。"
+    },
+    {
+      "name": "settings_user_agent_02",
+      "value": "站点网页标识引用回退失败。"
+    },
+    {
+      "name": "settings_home_logo_03",
+      "value": "这个 Logo 不可用。"
+    },
+    {
+      "name": "settings_home_04",
+      "value": "选择 Logo 失败，请稍后重试。"
+    },
+    {
+      "name": "settings_site_icon_03",
+      "value": "已刷新 %1$d 个网站图标。"
+    },
+    {
+      "name": "settings_site_icon_04",
+      "value": "已检查 %1$d 个网站图标，当前缓存已经是更高清版本。"
+    },
+    {
+      "name": "settings_site_icon_05",
+      "value": "，%1$d 个已保留更高清缓存"
+    },
+    {
+      "name": "settings_site_icon_06",
+      "value": "，%1$d 个暂时无法获取"
+    },
+    {
+      "name": "settings_site_icon_07",
+      "value": "已刷新 %1$d 个网站图标%2$s%3$s。"
+    },
+    {
+      "name": "settings_site_icon_08",
+      "value": "%1$s 已清理 %2$d 个旧图标缓存。"
+    },
+    {
+      "name": "settings_about_version_title",
+      "value": "当前版本"
+    },
+    {
+      "name": "settings_about_more",
+      "value": "查看更多"
+    },
+    {
+      "name": "settings_app_icon_16",
+      "value": "图标管理服务暂不可用，错误码 %1$d。"
+    },
+    {
+      "name": "settings_activity_03",
+      "value": "过去 %1$d 周活跃 %2$d 天"
+    },
+    {
+      "name": "settings_sync_webdav_29",
+      "value": "保存并开启为额外备份"
+    },
+    {
+      "name": "settings_sync_webdav_30",
+      "value": "保存并更新额外备份"
+    },
+    {
+      "name": "settings_sync_webdav_31",
+      "value": "启用 WebDAV 书签同步"
+    },
+    {
+      "name": "settings_sync_webdav_32",
+      "value": "正在关闭 WebDAV 同步"
+    },
+    {
+      "name": "settings_sync_webdav_33",
+      "value": "正在关闭 WebDAV 额外备份"
+    },
+    {
+      "name": "settings_sync_webdav_34",
+      "value": "设为当前同步方式并开启"
+    },
+    {
+      "name": "settings_sync_webdav_35",
+      "value": "已保存，未开启"
+    },
+    {
+      "name": "settings_sync_webdav_36",
+      "value": "当前为额外备份位置"
+    },
+    {
+      "name": "settings_sync_webdav_37",
+      "value": "当前同步方式，书签同步未开启"
+    },
+    {
+      "name": "settings_sync_webdav_38",
+      "value": "正在关闭"
+    },
+    {
+      "name": "settings_sync_webdav_39",
+      "value": "正在开启"
+    },
+    {
+      "name": "settings_sync_webdav_40",
+      "value": "正在保存 WebDAV 额外备份"
+    },
+    {
+      "name": "settings_sync_webdav_41",
+      "value": "WebDAV 额外备份"
+    },
+    {
+      "name": "settings_sync_webdav_42",
+      "value": "WebDAV 同步"
+    },
+    {
+      "name": "settings_desktop_login_05",
+      "value": "用户ID：%1$s"
+    },
+    {
+      "name": "settings_home_05",
+      "value": "%1$d 条"
+    },
+    {
+      "name": "settings_sync_progress_timeout_bookmark_file",
+      "value": "书签文件处理时间过长，请稍后再试。"
+    },
+    {
+      "name": "settings_sync_progress_timeout_download",
+      "value": "下载时间过长，请检查网络或云端数据后再试。"
+    },
+    {
+      "name": "settings_sync_progress_timeout_sync",
+      "value": "同步等待时间过长，请检查网络或稍后再试。"
+    },
+    {
+      "name": "settings_sync_progress_timeout_upload",
+      "value": "上传时间过长，请检查网络或 WebDAV 服务后再试。"
+    },
+    {
+      "name": "settings_sync_progress_tip_applying",
+      "value": "正在处理新增和更新内容"
+    },
+    {
+      "name": "settings_sync_progress_tip_checking_bookmarks",
+      "value": "正在检查书签内容"
+    },
+    {
+      "name": "settings_sync_progress_tip_checking_cloud",
+      "value": "正在确认云端同步状态"
+    },
+    {
+      "name": "settings_sync_progress_tip_checking_integrity",
+      "value": "正在检查数据完整性"
+    },
+    {
+      "name": "settings_sync_progress_tip_collecting_content",
+      "value": "正在整理本机内容"
+    },
+    {
+      "name": "settings_sync_progress_tip_collecting_info",
+      "value": "正在整理本机信息"
+    },
+    {
+      "name": "settings_sync_progress_tip_collecting_local",
+      "value": "正在整理本机数据"
+    },
+    {
+      "name": "settings_sync_progress_tip_comparing",
+      "value": "正在比较本机和云端变化"
+    },
+    {
+      "name": "settings_sync_progress_tip_confirming_saved",
+      "value": "正在确认文件保存结果"
+    },
+    {
+      "name": "settings_sync_progress_tip_connecting_cloud",
+      "value": "正在连接云端空间"
+    },
+    {
+      "name": "settings_sync_progress_tip_finishing_export",
+      "value": "正在完成导出"
+    },
+    {
+      "name": "settings_sync_progress_tip_finishing_import",
+      "value": "正在完成导入"
+    },
+    {
+      "name": "settings_sync_progress_tip_generating_file",
+      "value": "正在生成书签文件"
+    },
+    {
+      "name": "settings_sync_progress_tip_preparing_cloud",
+      "value": "正在准备云端目录"
+    },
+    {
+      "name": "settings_sync_progress_tip_preparing_local_write",
+      "value": "正在准备写入本机"
+    },
+    {
+      "name": "settings_sync_progress_tip_preparing_restore",
+      "value": "正在准备恢复数据"
+    },
+    {
+      "name": "settings_sync_progress_tip_protecting",
+      "value": "正在保护现有数据"
+    },
+    {
+      "name": "settings_sync_progress_tip_reading_cloud",
+      "value": "正在读取云端数据"
+    },
+    {
+      "name": "settings_sync_progress_tip_reading_file",
+      "value": "正在读取书签文件"
+    },
+    {
+      "name": "settings_sync_progress_tip_reading_state",
+      "value": "正在读取当前状态"
+    },
+    {
+      "name": "settings_sync_progress_tip_updating_display",
+      "value": "正在更新显示内容"
+    },
+    {
+      "name": "settings_sync_progress_tip_updating_local_bookmarks",
+      "value": "正在更新本地书签"
+    },
+    {
+      "name": "settings_sync_progress_tip_updating_record",
+      "value": "正在更新同步记录"
+    },
+    {
+      "name": "settings_sync_progress_tip_uploading_bookmarks",
+      "value": "正在上传本地书签"
+    },
+    {
+      "name": "settings_sync_progress_tip_verifying_cloud_write",
+      "value": "正在校验云端写入结果"
+    },
+    {
+      "name": "settings_sync_progress_tip_wrapping_up",
+      "value": "正在收尾，请稍候"
+    },
+    {
+      "name": "settings_sync_progress_tip_writing_file",
+      "value": "正在写入书签文件"
+    },
+    {
+      "name": "settings_sync_progress_tip_writing_local_bookmarks",
+      "value": "正在写入本地书签"
+    },
+    {
+      "name": "settings_sync_progress_tip_writing_record",
+      "value": "正在写入同步记录"
+    },
+    {
+      "name": "settings_sync_progress_title_download",
+      "value": "下载"
+    },
+    {
+      "name": "settings_sync_progress_title_export",
+      "value": "导出"
+    },
+    {
+      "name": "settings_sync_progress_title_import",
+      "value": "导入"
+    },
+    {
+      "name": "settings_sync_progress_title_sync",
+      "value": "同步"
+    },
+    {
+      "name": "settings_sync_progress_title_upload",
+      "value": "上传"
+    },
+    {
+      "name": "browser_shell_001",
+      "value": "Aira Community 版本下载"
+    },
+    {
+      "name": "browser_shell_002",
+      "value": "举报已发送"
+    },
+    {
+      "name": "browser_shell_003",
+      "value": "云同步已暂停"
+    },
+    {
+      "name": "browser_shell_004",
+      "value": "保留"
+    },
+    {
+      "name": "browser_shell_005",
+      "value": "再按一次返回关闭应用"
+    },
+    {
+      "name": "browser_shell_006",
+      "value": "在这里输入网址或关键词，直接开始浏览。"
+    },
+    {
+      "name": "browser_shell_007",
+      "value": "已加入等待打开队列"
+    },
+    {
+      "name": "browser_shell_008",
+      "value": "已回到主页"
+    },
+    {
+      "name": "browser_shell_009",
+      "value": "已在新窗口中打开书签。"
+    },
+    {
+      "name": "browser_shell_010",
+      "value": "已清空搜索历史。"
+    },
+    {
+      "name": "browser_shell_011",
+      "value": "当前没有可查看的文件信息。"
+    },
+    {
+      "name": "browser_shell_012",
+      "value": "当前版本仍可正常浏览和使用本机书签。升级 Aira 后，Aira 云书签同步才会恢复。"
+    },
+    {
+      "name": "browser_shell_013",
+      "value": "打开互联教程失败"
+    },
+    {
+      "name": "browser_shell_014",
+      "value": "打开跨设备使用指南失败"
+    },
+    {
+      "name": "browser_shell_015",
+      "value": "新标签页"
+    },
+    {
+      "name": "browser_shell_016",
+      "value": "新窗口打开失败，请重试。"
+    },
+    {
+      "name": "browser_shell_017",
+      "value": "暂时无法打开升级页面"
+    },
+    {
+      "name": "browser_shell_018",
+      "value": "标签页动画快照导出失败，请稍后重试。"
+    },
+    {
+      "name": "browser_shell_019",
+      "value": "标签页动画快照还没有生成。"
+    },
+    {
+      "name": "browser_shell_020",
+      "value": "这个网页已经在书签里，要取消收藏吗？"
+    },
+    {
+      "name": "browser_shell_021",
+      "value": "这篇文章已经在书签里，要取消收藏吗？"
+    },
+    {
+      "name": "browser_shell_022",
+      "value": "页面加载完成后将保存离线。"
+    },
+    {
+      "name": "bookmark_icon_preview_001",
+      "value": "文件夹图标预览"
+    },
+    {
+      "name": "bookmark_icon_preview_002",
+      "value": "有文件"
+    },
+    {
+      "name": "bookmark_icon_preview_003",
+      "value": "空文件夹"
+    },
+    {
+      "name": "bookmark_icon_preview_004",
+      "value": "自定义黄"
+    },
+    {
+      "name": "bookmark_icon_preview_005",
+      "value": "跟随主题"
+    },
+    {
+      "name": "bookmark_icon_preview_006",
+      "value": "进入动画"
+    },
+    {
+      "name": "bookmark_icon_preview_007",
+      "value": "重播有文件动画"
+    },
+    {
+      "name": "custom_home_guide_001",
+      "value": "分享文档"
+    },
+    {
+      "name": "custom_home_guide_002",
+      "value": "开发文档加载失败"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_001",
+      "value": "删除后需要重新导入才能恢复。"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_002",
+      "value": "删除自定义规则"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_003",
+      "value": "当前会话不可修改网页内容过滤设置"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_004",
+      "value": "更新策略保存失败"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_005",
+      "value": "正在下载并解析远程规则，请稍候。"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_006",
+      "value": "正在下载规则"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_007",
+      "value": "正在导入规则"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_008",
+      "value": "正在导入订阅"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_009",
+      "value": "正在更新规则"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_010",
+      "value": "正在解析并保存本地规则，请稍候。"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_011",
+      "value": "正在重新拉取并解析规则，请稍候。"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_012",
+      "value": "自定义规则更新失败"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_013",
+      "value": "规则下载失败"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_014",
+      "value": "请输入规则链接"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_screen_001",
+      "value": "URL 订阅导入"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_screen_002",
+      "value": "更新失败"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_screen_003",
+      "value": "本地导入"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_screen_004",
+      "value": "第三方规则"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_screen_005",
+      "value": "粘贴 HTTPS 规则订阅地址"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_screen_006",
+      "value": "自定义规则"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_screen_007",
+      "value": "订阅规则自动更新"
+    },
+    {
+      "name": "adblock_ui_ad_block_rule_notice_card_001",
+      "value": "第三方规则仅在你确认后联网下载，自定义规则由你自行导入和管理。规则过多可能拖慢网页或误拦内容，请遵守网站条款与法律法规。"
+    },
+    {
+      "name": "adblock_ui_ad_block_rule_notice_card_002",
+      "value": "规则不是越多越好"
+    },
+    {
+      "name": "adblock_ui_ad_block_risk_consent_sheet_001",
+      "value": "关闭广告拦截风险提示"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_001",
+      "value": "书签更新未完成"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_002",
+      "value": "从云端同步一份完整书签"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_003",
+      "value": "导出本机书签备份到你选择的位置"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_004",
+      "value": "更新 Aira 云书签"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_005",
+      "value": "本机书签备份已经保存。请重试，用云端书签覆盖本机。"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_006",
+      "value": "正在备份并更新书签"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_007",
+      "value": "此版本使用全新的 Aira 云书签基线。请先把本机书签导出为本地备份；备份成功后会清空本机书签，再从云端同步一份。"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_008",
+      "value": "清空本机书签"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_009",
+      "value": "请保持 Aira 在前台。完成前不会启动自动书签同步。"
+    },
+    {
+      "name": "sync_ui_huawei_space_bookmark_upgrade_prompt_presenter_001",
+      "value": "书签同步方式已经升级。请重新开启一次，以便将本机书签真正同步到华为云空间。本机书签、主页收藏、小说书架、常用设置和其他同步方式都不会受到影响。"
+    },
+    {
+      "name": "sync_ui_huawei_space_bookmark_upgrade_prompt_presenter_002",
+      "value": "前往重新开启"
+    },
+    {
+      "name": "sync_ui_huawei_space_bookmark_upgrade_prompt_presenter_003",
+      "value": "稍后处理"
+    },
+    {
+      "name": "sync_ui_huawei_space_bookmark_upgrade_prompt_presenter_004",
+      "value": "重新开启华为云空间书签同步"
+    },
+    {
+      "name": "sync_ui_sync_result_dialog_001",
+      "value": "操作已完成。"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_001",
+      "value": "仅显示译文"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_002",
+      "value": "内容较多时会慢一点"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_003",
+      "value": "双语对照"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_004",
+      "value": "取消翻译"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_005",
+      "value": "已显示原文"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_006",
+      "value": "已翻译当前网页"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_007",
+      "value": "已翻译部分内容"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_008",
+      "value": "是否翻译此页面"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_009",
+      "value": "显示原文"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_010",
+      "value": "正在使用所选翻译服务翻译此页面"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_011",
+      "value": "翻译"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_012",
+      "value": "翻译失败"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_013",
+      "value": "重新翻译"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_001",
+      "value": "使用必应壁纸"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_002",
+      "value": "图片与视频"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_003",
+      "value": "壁纸颜色"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_004",
+      "value": "必应壁纸加载失败"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_005",
+      "value": "更换"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_006",
+      "value": "更换自定义壁纸"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_007",
+      "value": "更换视频壁纸"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_008",
+      "value": "正在加载必应壁纸"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_009",
+      "value": "添加自定义壁纸"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_010",
+      "value": "添加视频壁纸"
+    },
+    {
+      "name": "update_ui_community_update_sheet_001",
+      "value": "前往下载"
+    },
+    {
+      "name": "update_ui_community_update_sheet_002",
+      "value": "发现新版本"
+    },
+    {
+      "name": "update_ui_community_update_sheet_003",
+      "value": "稍后再说"
+    },
+    {
+      "name": "update_ui_client_update_required_sheet_001",
+      "value": "需要升级 Aira"
+    },
+    {
+      "name": "update_ui_community_update_overlay_001",
+      "value": "软件更新"
+    },
+    {
+      "name": "update_ui_release_notice_sheet_001",
+      "value": "关闭更新通知"
+    },
+    {
+      "name": "onboarding_ui_feature_intro_gate_001",
+      "value": "做最纯粹的鸿蒙浏览器"
+    },
+    {
+      "name": "onboarding_ui_feature_intro_gate_002",
+      "value": "继续操作即表示您同意"
+    },
+    {
+      "name": "onboarding_ui_feature_intro_gate_003",
+      "value": "隐私政策"
+    },
+    {
+      "name": "onboarding_ui_bottom_toolbar_guide_overlay_001",
+      "value": "底部工具条提示"
+    },
+    {
+      "name": "onboarding_ui_feature_intro_skip_control_001",
+      "value": "跳过"
+    },
+    {
+      "name": "membership_ui_aira_pro_national_day_offer_dialog_001",
+      "value": "¥48 立即购买长期会员"
+    },
+    {
+      "name": "membership_ui_aira_pro_national_day_offer_dialog_002",
+      "value": "原价¥68.8，10月7日前"
+    },
+    {
+      "name": "membership_ui_aira_pro_national_day_offer_dialog_003",
+      "value": "国庆特惠长期会员"
+    },
+    {
+      "name": "membership_ui_aira_pro_national_day_offer_dialog_004",
+      "value": "折"
+    },
+    {
+      "name": "custom_home_ui_custom_homepage_unavailable_surface_001",
+      "value": "重新设置"
+    },
+    {
+      "name": "custom_home_ui_system_homepage_live_preview_001",
+      "value": "暂无最近关闭"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_015",
+      "value": "无法下载“%1$s”。请检查网络连接和规则服务器后重试。%2$s"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_015",
+      "value": "正在翻译，已完成 %1$s/%2$s 段"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_016",
+      "value": "正在使用 %1$s 翻译此页面"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_017",
+      "value": "翻译为%1$s"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_018",
+      "value": "目标语言：%1$s"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_001",
+      "value": "不是安全上下文"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_002",
+      "value": "事件"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_003",
+      "value": "会话存储"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_004",
+      "value": "停止在页面上选择"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_005",
+      "value": "元素"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_006",
+      "value": "关闭审查元素"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_007",
+      "value": "创建副本"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_008",
+      "value": "删除元素"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_009",
+      "value": "协议"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_010",
+      "value": "只在 HTTPS 页面检查混合内容。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_011",
+      "value": "只能看当前网站。HttpOnly Cookie 看不到，密码和令牌这类名称已隐藏。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_012",
+      "value": "只读。这次不能改样式。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_013",
+      "value": "在页面上选择元素"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_014",
+      "value": "复制 JS 路径"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_015",
+      "value": "复制 XPath"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_016",
+      "value": "复制 outerHTML"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_017",
+      "value": "复制样式"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_018",
+      "value": "复制选择器"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_019",
+      "value": "存为全局变量"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_020",
+      "value": "安全上下文"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_021",
+      "value": "属性"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_022",
+      "value": "属性值"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_023",
+      "value": "属性值为空时会删除该属性。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_024",
+      "value": "属性名"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_025",
+      "value": "已隐藏"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_026",
+      "value": "布局"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_027",
+      "value": "布局这次先留空。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_028",
+      "value": "当前网站没有会话存储。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_029",
+      "value": "当前网站没有本地存储。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_030",
+      "value": "当前页面没有可显示的元素"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_031",
+      "value": "执行"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_032",
+      "value": "执行 JavaScript"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_033",
+      "value": "拖动调整网页和审查元素窗口的宽度"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_034",
+      "value": "控制台"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_035",
+      "value": "无法读取这段源代码。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_036",
+      "value": "时间不可用"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_037",
+      "value": "时间来自页面资源计时。蓝色是等待，绿色是下载。状态只在脚本请求里能看到。请求头和响应体看不到。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_038",
+      "value": "显示元素"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_039",
+      "value": "本地存储"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_040",
+      "value": "样式"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_041",
+      "value": "正在准备元素审查…"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_042",
+      "value": "正在读取 HTML…"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_043",
+      "value": "正在读取代码…"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_044",
+      "value": "正在读取属性…"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_045",
+      "value": "正在读取页面安全信息。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_046",
+      "value": "没有看到 HTTP 资源。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_047",
+      "value": "没有看到数据库。只显示库名，不读取里面的数据。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_048",
+      "value": "没有读到内联事件。审查开始之后新绑定的监听会出现在这里。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_049",
+      "value": "混合内容"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_050",
+      "value": "添加属性"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_051",
+      "value": "源代码"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_052",
+      "value": "滚动到可视区域"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_053",
+      "value": "点外面或按 Ctrl+Enter 应用，Esc 取消。只改当前页面。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_054",
+      "value": "点选已有属性再修改。改名会删掉旧属性，值为空时会删除该属性。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_055",
+      "value": "监听"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_056",
+      "value": "空"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_057",
+      "value": "编辑为 HTML"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_058",
+      "value": "编辑属性"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_059",
+      "value": "编辑这段 HTML"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_060",
+      "value": "网页正在刷新，审查还开着，资源会在页面准备好后出现。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_061",
+      "value": "聚焦"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_062",
+      "value": "警告"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_063",
+      "value": "计算后"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_064",
+      "value": "证书"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_065",
+      "value": "证书链、有效期和请求头看不到。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_066",
+      "value": "过滤"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_067",
+      "value": "还没有可显示的源代码。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_068",
+      "value": "还没有日志。页面里的 console 输出和未捕获错误会出现在这里。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_069",
+      "value": "还没有看到资源。打开审查之后的新请求，以及页面已经加载的资源，会出现在这里。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_070",
+      "value": "还没有选中元素。点击页面，或点击上面的树。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_071",
+      "value": "这个元素没有可编辑的属性。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_072",
+      "value": "这个网站的主框架证书校验失败过。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_073",
+      "value": "这个页签没有内容。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_074",
+      "value": "这次没有看到证书错误。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_075",
+      "value": "选择一项查看源代码。跨域脚本和样式只能显示地址。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_076",
+      "value": "错误"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_077",
+      "value": "隐藏元素"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_078",
+      "value": "需要保留一个根元素。"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_079",
+      "value": "页面读不到 Cookie。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_001",
+      "value": "下载任务已删除，文件已保留。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_002",
+      "value": "下载任务已删除，文件已移入回收站。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_003",
+      "value": "下载任务已重新开始。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_004",
+      "value": "下载列表加载失败"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_005",
+      "value": "下载已取消并删除。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_006",
+      "value": "下载已暂停。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_007",
+      "value": "下载已继续。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_008",
+      "value": "下载管理仅限当前私密会话"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_009",
+      "value": "下载管理入口来自私密会话；此页不会读取或展示常规浏览资料。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_010",
+      "value": "下载记录已移除。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_011",
+      "value": "下载链接已复制。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_012",
+      "value": "仅删除下载任务？"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_013",
+      "value": "仅删除任务"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_014",
+      "value": "删除下载"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_015",
+      "value": "删除任务和文件"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_016",
+      "value": "删除任务和文件？"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_017",
+      "value": "取消下载？"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_018",
+      "value": "已保存到系统下载目录。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_019",
+      "value": "开始下载后，这里会显示文件、进度和完成状态。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_020",
+      "value": "当前下载"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_021",
+      "value": "当前下载任务暂时不能删除。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_022",
+      "value": "当前下载暂时不能保存到系统下载目录。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_023",
+      "value": "当前下载暂时不能删除。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_024",
+      "value": "当前下载暂时不能取消。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_025",
+      "value": "当前下载暂时不能定位。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_026",
+      "value": "当前下载暂时不能打开。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_027",
+      "value": "当前下载暂时不能暂停。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_028",
+      "value": "当前下载暂时不能继续。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_029",
+      "value": "当前下载暂时不能重试。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_030",
+      "value": "当前下载记录已发生变化，请刷新后重试。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_031",
+      "value": "当前下载记录暂时不能删除。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_032",
+      "value": "当前下载记录暂时不能移除。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_033",
+      "value": "当前只显示这个私密窗口里的下载。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_034",
+      "value": "当前没有可复制的下载链接。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_035",
+      "value": "当前没有可多选的下载任务。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_036",
+      "value": "当前页只显示这个私密窗口里的下载任务；下载设置为设备范围。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_037",
+      "value": "打开下载设置"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_038",
+      "value": "搜索下载"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_039",
+      "value": "文件删除失败，下载任务已保留。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_040",
+      "value": "文件已不存在，下载任务已删除。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_041",
+      "value": "正在打开下载文件。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_042",
+      "value": "正在打开文件位置。"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_043",
+      "value": "没有下载内容"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_044",
+      "value": "确认取消"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_045",
+      "value": "继续下载"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_001",
+      "value": "个 ·"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_002",
+      "value": "项"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_003",
+      "value": "DASH 清单"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_004",
+      "value": "HLS m3u8 清单"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_005",
+      "value": "HLS 接管准备"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_006",
+      "value": "iframe/子框架"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_007",
+      "value": "会探测 master/media、清晰度、分片、Key 和请求上下文。"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_008",
+      "value": "刷新解析"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_009",
+      "value": "复制上下文"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_010",
+      "value": "已发现流媒体清单"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_011",
+      "value": "提示"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_012",
+      "value": "暂无资源"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_013",
+      "value": "未选择清单"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_014",
+      "value": "样例分片"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_015",
+      "value": "正在解析 m3u8 清单"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_016",
+      "value": "没有可处理的 HLS 清单"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_017",
+      "value": "清单解析失败"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_018",
+      "value": "点击浮窗后会自动解析；也可以手动刷新清单。"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_019",
+      "value": "等待解析"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_020",
+      "value": "请求上下文"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_001",
+      "value": "1.0x（正常）"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_002",
+      "value": "下载当前视频"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_003",
+      "value": "关闭视频播放器"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_004",
+      "value": "切换画面比例"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_005",
+      "value": "后退 10 秒"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_006",
+      "value": "左右滑动可微调速度"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_007",
+      "value": "快进 10 秒"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_008",
+      "value": "拉伸填满"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_009",
+      "value": "拖动进度"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_010",
+      "value": "播放"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_011",
+      "value": "播放速度"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_012",
+      "value": "旋转画面"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_013",
+      "value": "暂停"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_014",
+      "value": "裁剪填满"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_015",
+      "value": "视频打开失败。"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_016",
+      "value": "解锁播放器控制"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_017",
+      "value": "适应屏幕"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_018",
+      "value": "锁定播放器控制"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_001",
+      "value": "全屏查看代码"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_002",
+      "value": "关闭元素审查"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_003",
+      "value": "复制 HTML"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_004",
+      "value": "审"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_005",
+      "value": "当前元素没有可显示的 HTML。"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_006",
+      "value": "收起全屏代码预览"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_007",
+      "value": "更多元素操作"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_008",
+      "value": "正在启动元素审查"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_009",
+      "value": "选择网页元素"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_010",
+      "value": "重新选择元素"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_download_popover_001",
+      "value": "在文件夹中显示"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_download_popover_002",
+      "value": "完整的下载记录"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_download_popover_003",
+      "value": "当前没有可显示的下载"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_download_popover_004",
+      "value": "暂时不能在文件夹中显示。"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_download_popover_005",
+      "value": "近期的下载记录"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_001",
+      "value": "关闭其他标签页"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_002",
+      "value": "关闭右侧标签页"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_003",
+      "value": "取消固定"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_004",
+      "value": "固定垂直标签页"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_005",
+      "value": "在右侧新增标签页"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_006",
+      "value": "将标签页移至新窗口"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_007",
+      "value": "将此网站静音"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_008",
+      "value": "收起垂直标签页"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_009",
+      "value": "解除静音"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_010",
+      "value": "重新加载"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_strip_surface_001",
+      "value": "拖动窗口"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_list_popover_001",
+      "value": "展开最近关闭的标签页"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_list_popover_002",
+      "value": "打开的标签页"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_list_popover_003",
+      "value": "收起最近关闭的标签页"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_list_popover_004",
+      "value": "暂无打开的标签页"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_list_popover_005",
+      "value": "暂无最近关闭的标签页"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_list_popover_006",
+      "value": "最近关闭的标签页"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_list_popover_007",
+      "value": "标签页列表"
+    },
+    {
+      "name": "browser_ui_browser_download_management_row_001",
+      "value": "压缩"
+    },
+    {
+      "name": "browser_ui_browser_download_management_row_002",
+      "value": "文件"
+    },
+    {
+      "name": "browser_ui_browser_download_management_row_003",
+      "value": "文本"
+    },
+    {
+      "name": "browser_ui_browser_download_management_row_004",
+      "value": "演示"
+    },
+    {
+      "name": "browser_ui_browser_download_management_row_005",
+      "value": "网页代码"
+    },
+    {
+      "name": "browser_ui_browser_download_management_row_006",
+      "value": "表格"
+    },
+    {
+      "name": "browser_ui_browser_shell_dialogs_001",
+      "value": "备注（选填）"
+    },
+    {
+      "name": "browser_ui_browser_shell_dialogs_002",
+      "value": "登录"
+    },
+    {
+      "name": "browser_ui_browser_shell_dialogs_003",
+      "value": "编辑快捷方式"
+    },
+    {
+      "name": "browser_ui_browser_shell_dialogs_004",
+      "value": "网页提示"
+    },
+    {
+      "name": "browser_ui_browser_shell_dialogs_005",
+      "value": "网页身份验证"
+    },
+    {
+      "name": "browser_ui_browser_wifi_qr_result_overlay_001",
+      "value": "Wi-Fi 信息"
+    },
+    {
+      "name": "browser_ui_browser_wifi_qr_result_overlay_002",
+      "value": "可将密码复制到电脑或其他设备使用"
+    },
+    {
+      "name": "browser_ui_browser_wifi_qr_result_overlay_003",
+      "value": "复制密码"
+    },
+    {
+      "name": "browser_ui_browser_wifi_qr_result_overlay_004",
+      "value": "未包含密码"
+    },
+    {
+      "name": "browser_ui_browser_wifi_qr_result_overlay_005",
+      "value": "网络名称"
+    },
+    {
+      "name": "browser_ui_home_page_settings_sheet_001",
+      "value": "上传 Logo 失败，请稍后重试。"
+    },
+    {
+      "name": "browser_ui_home_page_settings_sheet_002",
+      "value": "关闭主页设置"
+    },
+    {
+      "name": "browser_ui_home_page_settings_sheet_003",
+      "value": "返回主页设置"
+    },
+    {
+      "name": "browser_ui_home_page_settings_sheet_004",
+      "value": "选择壁纸失败，请稍后重试。"
+    },
+    {
+      "name": "browser_ui_home_page_settings_sheet_005",
+      "value": "选择视频壁纸失败，请稍后重试。"
+    },
+    {
+      "name": "browser_ui_home_shortcut_selection_sheet_001",
+      "value": "关闭添加至首页"
+    },
+    {
+      "name": "browser_ui_home_shortcut_selection_sheet_002",
+      "value": "正在加载书签…"
+    },
+    {
+      "name": "browser_ui_home_shortcut_selection_sheet_003",
+      "value": "添加至首页"
+    },
+    {
+      "name": "browser_ui_home_shortcut_selection_sheet_004",
+      "value": "系统入口"
+    },
+    {
+      "name": "browser_ui_home_shortcut_selection_sheet_005",
+      "value": "返回上一级"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_omnibox_search_surface_001",
+      "value": "切换搜索引擎"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_omnibox_search_surface_002",
+      "value": "暂无搜索历史"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_omnibox_search_surface_003",
+      "value": "暂无搜索建议"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_omnibox_search_surface_004",
+      "value": "清空搜索历史"
+    },
+    {
+      "name": "browser_ui_browser_private_mode_lock_overlay_001",
+      "value": "回到普通模式"
+    },
+    {
+      "name": "browser_ui_browser_private_mode_lock_overlay_002",
+      "value": "正在验证"
+    },
+    {
+      "name": "browser_ui_browser_private_mode_lock_overlay_003",
+      "value": "解锁"
+    },
+    {
+      "name": "browser_ui_browser_private_mode_lock_overlay_004",
+      "value": "隐私模式已锁定"
+    },
+    {
+      "name": "browser_ui_browser_site_permission_prompt_host_001",
+      "value": "不允许"
+    },
+    {
+      "name": "browser_ui_browser_site_permission_prompt_host_002",
+      "value": "仅使用期间允许"
+    },
+    {
+      "name": "browser_ui_browser_site_permission_prompt_host_003",
+      "value": "本次使用允许"
+    },
+    {
+      "name": "browser_ui_browser_site_permission_prompt_host_004",
+      "value": "站点权限请求"
+    },
+    {
+      "name": "browser_ui_browser_tabs_overview_bottom_chrome_001",
+      "value": "0 个标签页"
+    },
+    {
+      "name": "browser_ui_browser_tabs_overview_bottom_chrome_002",
+      "value": "回到主页"
+    },
+    {
+      "name": "browser_ui_browser_tabs_overview_bottom_chrome_003",
+      "value": "返回进入标签管理前的网页"
+    },
+    {
+      "name": "browser_ui_browser_tabs_overview_bottom_chrome_004",
+      "value": "隐私标签页"
+    },
+    {
+      "name": "browser_ui_browser_web_error_surface_001",
+      "value": "再试一次"
+    },
+    {
+      "name": "browser_ui_browser_web_error_surface_002",
+      "value": "转到系统设置"
+    },
+    {
+      "name": "browser_ui_browser_web_error_surface_003",
+      "value": "错误详情"
+    },
+    {
+      "name": "browser_ui_recently_closed_record_list_001",
+      "value": "关闭网页后，这里会显示可恢复的会话记录。"
+    },
+    {
+      "name": "browser_ui_recently_closed_record_list_002",
+      "value": "删除记录"
+    },
+    {
+      "name": "browser_ui_recently_closed_record_list_003",
+      "value": "还没有最近关闭的标签页"
+    },
+    {
+      "name": "browser_ui_recently_closed_record_list_004",
+      "value": "重新打开"
+    },
+    {
+      "name": "browser_ui_browser_cross_device_tabs_overlay_001",
+      "value": "暂时无法打开该页面"
+    },
+    {
+      "name": "browser_ui_browser_cross_device_tabs_overlay_002",
+      "value": "正在读取在线电脑..."
+    },
+    {
+      "name": "browser_ui_browser_cross_device_tabs_overlay_003",
+      "value": "电脑"
+    },
+    {
+      "name": "browser_ui_browser_tabs_overview_empty_state_001",
+      "value": "新打开的网页会使用独立的临时会话，不写入常规浏览历史。关闭全部隐私标签页后，本次会话数据会按你的隐私设置处理。"
+    },
+    {
+      "name": "browser_ui_browser_tabs_overview_empty_state_002",
+      "value": "暂无标签页"
+    },
+    {
+      "name": "browser_ui_browser_tabs_overview_empty_state_003",
+      "value": "这里是你的隐私空间"
+    },
+    {
+      "name": "browser_ui_browser_address_bar_tab_swipe_surface_001",
+      "value": "正在恢复页面…"
+    },
+    {
+      "name": "browser_ui_browser_download_confirm_sheet_001",
+      "value": "文件名"
+    },
+    {
+      "name": "browser_ui_browser_quick_search_switch_bar_001",
+      "value": "，当前搜索引擎"
+    },
+    {
+      "name": "browser_ui_browser_search_suggestions_panel_001",
+      "value": "收起搜索"
+    },
+    {
+      "name": "browser_ui_browser_split_toolbar_chrome_001",
+      "value": "当前"
+    },
+    {
+      "name": "browser_ui_browser_tab_overview_card_001",
+      "value": "关闭标签页"
+    },
+    {
+      "name": "browser_ui_home_shortcut_surface_001",
+      "value": "从首页移除"
+    },
+    {
+      "name": "browser_ui_new_user_gift_overlay_001",
+      "value": "新用户礼包"
+    },
+    {
+      "name": "browser_ui_private_home_watermark_001",
+      "value": "当前处于隐私模式"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_001",
+      "value": "HTML 不能为空。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_002",
+      "value": "HTML 已复制。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_003",
+      "value": "HTML 已复制，但无法删除元素。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_004",
+      "value": "HTML 已复制，超长部分已截断。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_005",
+      "value": "HTML 已更新。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_006",
+      "value": "HTML 无法应用。请保留一个根元素。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_007",
+      "value": "JS 路径已复制。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_008",
+      "value": "XPath 已复制。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_009",
+      "value": "元素已删除。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_010",
+      "value": "元素操作失败，请稍后重试。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_011",
+      "value": "剪切失败，请稍后重试。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_012",
+      "value": "剪贴板是空的。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_013",
+      "value": "复制 HTML 失败，请稍后重试。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_014",
+      "value": "复制选择器失败，请稍后重试。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_015",
+      "value": "属性名无效。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_016",
+      "value": "属性已更新。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_017",
+      "value": "已剪切。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_018",
+      "value": "已剪切，超长部分已截断。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_019",
+      "value": "已在页面上创建副本。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_020",
+      "value": "已存为全局变量。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_021",
+      "value": "已滚动到元素。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_022",
+      "value": "已粘贴。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_023",
+      "value": "已聚焦元素。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_024",
+      "value": "已选中当前元素"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_025",
+      "value": "当前元素没有可剪切的 HTML。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_026",
+      "value": "当前元素没有可复制的 HTML。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_027",
+      "value": "当前元素没有可复制的样式。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_028",
+      "value": "当前元素没有可复制的路径。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_029",
+      "value": "当前元素没有可复制的选择器。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_030",
+      "value": "当前页面已变化，元素审查已结束。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_031",
+      "value": "当前页面无法启动元素审查。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_032",
+      "value": "当前页面暂不可审查元素。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_033",
+      "value": "找不到这个元素。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_034",
+      "value": "无法修改这个属性。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_035",
+      "value": "无法切换到该元素。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_036",
+      "value": "无法存为全局变量。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_037",
+      "value": "无法执行脚本。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_038",
+      "value": "无法清空控制台。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_039",
+      "value": "无法读取源代码。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_040",
+      "value": "无法选择当前元素。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_041",
+      "value": "无法重新选择元素。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_042",
+      "value": "正在准备 HTML…"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_043",
+      "value": "正在切换元素…"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_044",
+      "value": "正在复制选择器…"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_045",
+      "value": "正在等待重新选择…"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_046",
+      "value": "正在结束元素审查…"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_047",
+      "value": "没有可复制的内容。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_048",
+      "value": "点击网页上的元素查看代码"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_049",
+      "value": "网页正在刷新，审查会继续。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_050",
+      "value": "读取剪贴板失败，请稍后重试。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_051",
+      "value": "这个元素不能聚焦。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_052",
+      "value": "这个元素不能这样修改。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_053",
+      "value": "这段 HTML 太长，暂时不能整段编辑。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_054",
+      "value": "选择器已复制。"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_055",
+      "value": "页面已变化，元素审查已结束。"
+    },
+    {
+      "name": "browser_browser_shell_view_model_001",
+      "value": "主框架加载失败，标签页已进入保护态"
+    },
+    {
+      "name": "browser_browser_shell_view_model_002",
+      "value": "后台保热"
+    },
+    {
+      "name": "browser_browser_shell_view_model_003",
+      "value": "后台待命"
+    },
+    {
+      "name": "browser_browser_shell_view_model_004",
+      "value": "后台温态"
+    },
+    {
+      "name": "browser_browser_shell_view_model_005",
+      "value": "导航异常"
+    },
+    {
+      "name": "browser_browser_shell_view_model_006",
+      "value": "已冷却"
+    },
+    {
+      "name": "browser_browser_shell_view_model_007",
+      "value": "已冷却待恢复"
+    },
+    {
+      "name": "browser_browser_shell_view_model_008",
+      "value": "已切换标签页"
+    },
+    {
+      "name": "browser_browser_shell_view_model_009",
+      "value": "已回收"
+    },
+    {
+      "name": "browser_browser_shell_view_model_010",
+      "value": "已回收待恢复"
+    },
+    {
+      "name": "browser_browser_shell_view_model_011",
+      "value": "已挂起"
+    },
+    {
+      "name": "browser_browser_shell_view_model_012",
+      "value": "已过期冷却"
+    },
+    {
+      "name": "browser_browser_shell_view_model_013",
+      "value": "快照恢复不可用，正在重新加载页面"
+    },
+    {
+      "name": "browser_browser_shell_view_model_014",
+      "value": "恢复异常"
+    },
+    {
+      "name": "browser_browser_shell_view_model_015",
+      "value": "控制器已接管，正在恢复标签页内容"
+    },
+    {
+      "name": "browser_browser_shell_view_model_016",
+      "value": "标签页上次加载失败"
+    },
+    {
+      "name": "browser_browser_shell_view_model_017",
+      "value": "标签页保留在热运行态"
+    },
+    {
+      "name": "browser_browser_shell_view_model_018",
+      "value": "标签页后台停留过久，已正式回收 live runtime，切回时会恢复"
+    },
+    {
+      "name": "browser_browser_shell_view_model_019",
+      "value": "标签页导航失败，等待重新恢复"
+    },
+    {
+      "name": "browser_browser_shell_view_model_020",
+      "value": "标签页已冷却，切回时会重新恢复"
+    },
+    {
+      "name": "browser_browser_shell_view_model_021",
+      "value": "标签页已被后台回收释放 live runtime，切回时会恢复"
+    },
+    {
+      "name": "browser_browser_shell_view_model_022",
+      "value": "标签页已被后台回收，切回时会重新恢复"
+    },
+    {
+      "name": "browser_browser_shell_view_model_023",
+      "value": "标签页已降为温态，切回时会优先恢复"
+    },
+    {
+      "name": "browser_browser_shell_view_model_024",
+      "value": "标签页快照恢复失败，等待重新加载"
+    },
+    {
+      "name": "browser_browser_shell_view_model_025",
+      "value": "标签页正在加载"
+    },
+    {
+      "name": "browser_browser_shell_view_model_026",
+      "value": "标签页渲染进程已终止，等待恢复"
+    },
+    {
+      "name": "browser_browser_shell_view_model_027",
+      "value": "标签页超出后台保活预算，切回时会恢复"
+    },
+    {
+      "name": "browser_browser_shell_view_model_028",
+      "value": "标签页运行时异常，等待恢复"
+    },
+    {
+      "name": "browser_browser_shell_view_model_029",
+      "value": "标签页连续恢复失败，已回到首页"
+    },
+    {
+      "name": "browser_browser_shell_view_model_030",
+      "value": "标签页长时间后台停留，已主动冷却释放内存"
+    },
+    {
+      "name": "browser_browser_shell_view_model_031",
+      "value": "正在从异常状态恢复标签页"
+    },
+    {
+      "name": "browser_browser_shell_view_model_032",
+      "value": "正在从页面快照恢复标签页"
+    },
+    {
+      "name": "browser_browser_shell_view_model_033",
+      "value": "正在切回标签页内容"
+    },
+    {
+      "name": "browser_browser_shell_view_model_034",
+      "value": "正在加载"
+    },
+    {
+      "name": "browser_browser_shell_view_model_035",
+      "value": "正在处理系统交给浏览器的链接"
+    },
+    {
+      "name": "browser_browser_shell_view_model_036",
+      "value": "正在恢复上次浏览会话"
+    },
+    {
+      "name": "browser_browser_shell_view_model_037",
+      "value": "正在恢复已回收标签页"
+    },
+    {
+      "name": "browser_browser_shell_view_model_038",
+      "value": "正在恢复标签页内容"
+    },
+    {
+      "name": "browser_browser_shell_view_model_039",
+      "value": "正在恢复页面"
+    },
+    {
+      "name": "browser_browser_shell_view_model_040",
+      "value": "正在重新加载页面"
+    },
+    {
+      "name": "browser_browser_shell_view_model_041",
+      "value": "渲染中断"
+    },
+    {
+      "name": "browser_browser_shell_view_model_042",
+      "value": "渲染异常"
+    },
+    {
+      "name": "browser_browser_shell_view_model_043",
+      "value": "状态未知"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_001",
+      "value": "书签栏切换失败，请稍后重试。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_002",
+      "value": "已停止加载。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_003",
+      "value": "已关闭当前标签页。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_004",
+      "value": "已关闭标签页列表。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_005",
+      "value": "已关闭页内查找。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_006",
+      "value": "已刷新页面。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_007",
+      "value": "已前进。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_008",
+      "value": "已打开下载管理。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_009",
+      "value": "已打开书签管理。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_010",
+      "value": "已打开历史记录。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_011",
+      "value": "已打开新标签页。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_012",
+      "value": "已打开标签页列表。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_013",
+      "value": "已打开设置。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_014",
+      "value": "已显示书签栏。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_015",
+      "value": "已经在首页。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_016",
+      "value": "已聚焦地址栏。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_017",
+      "value": "已退出地址栏。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_018",
+      "value": "已隐藏书签栏。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_019",
+      "value": "当前没有可关闭的标签页。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_020",
+      "value": "当前没有可切换的标签页。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_021",
+      "value": "当前没有可刷新的网页。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_022",
+      "value": "当前页面无法保存离线。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_023",
+      "value": "当前页面无法收藏。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_024",
+      "value": "当前页面暂不可查找。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_025",
+      "value": "当前页面暂时无法打印。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_026",
+      "value": "打开网页后可进入全屏模式。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_027",
+      "value": "没有其他可切换的标签页。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_028",
+      "value": "没有可前进的页面。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_029",
+      "value": "没有对应的标签页。"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_030",
+      "value": "没有最近关闭的标签页。"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_001",
+      "value": "EasyPrivacy 隐私规则加载失败"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_002",
+      "value": "EasyPrivacy 隐私规则未开启"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_003",
+      "value": "EasyPrivacy 隐私规则正在准备"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_004",
+      "value": "EasyPrivacy 隐私规则正在生效"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_005",
+      "value": "已关闭本站网页保护，仅本次私密会话生效"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_006",
+      "value": "已关闭本站网页内容过滤"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_007",
+      "value": "已关闭，仅本次私密会话生效"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_008",
+      "value": "已开启本站网页保护，仅本次私密会话生效"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_009",
+      "value": "已开启本站网页内容过滤"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_010",
+      "value": "已开启，仅本次私密会话生效"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_011",
+      "value": "已开启，暂无拦截"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_012",
+      "value": "当前设备暂不支持网页内容过滤"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_013",
+      "value": "当前设备暂不支持隐私规则保护"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_014",
+      "value": "当前页面暂不支持本站网页内容过滤"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_015",
+      "value": "本次私密会话已关闭本站保护"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_016",
+      "value": "本次私密会话已关闭本站网页保护"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_017",
+      "value": "此站点已关闭网页内容过滤"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_018",
+      "value": "网页内容过滤引擎暂不可用"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_019",
+      "value": "请先开启网页内容过滤"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_001",
+      "value": "已推送到电脑。"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_002",
+      "value": "当前没有可推送的网址。"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_003",
+      "value": "当前没有在线的已配对电脑。"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_004",
+      "value": "当前页面不能推送到电脑。"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_005",
+      "value": "推送太频繁了，请稍后再试。"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_006",
+      "value": "推送失败，请稍后重试。"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_007",
+      "value": "正在推送到电脑..."
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_008",
+      "value": "电脑待打开的网页太多了，请先处理一部分。"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_009",
+      "value": "请先使用华为账号登录后再推送网页。不必先开启数据同步。"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_010",
+      "value": "请先连接私有化部署。"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_011",
+      "value": "请重新登录华为账号后再推送。"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_012",
+      "value": "请重新连接私有化部署后再推送网页。"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_013",
+      "value": "这页刚刚已经在电脑打开过。"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_014",
+      "value": "这页已经在电脑待打开队列里。"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_015",
+      "value": "通过 Aira 云推送网页需要 Pro；连接私有化部署后可免费使用。"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_001",
+      "value": "打开 Aira Pro 失败"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_002",
+      "value": "打开下载管理失败"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_003",
+      "value": "打开历史记录失败"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_004",
+      "value": "打开同步设置失败"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_005",
+      "value": "打开应用内代理设置失败"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_006",
+      "value": "打开我的书架失败"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_007",
+      "value": "打开搜索设置失败"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_008",
+      "value": "打开更新日志失败"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_009",
+      "value": "打开用户脚本失败"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_010",
+      "value": "打开站点自定义失败"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_011",
+      "value": "打开网页内容过滤设置失败"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_012",
+      "value": "打开脚本详情失败"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_013",
+      "value": "打开设置失败"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_014",
+      "value": "打开设置详情失败"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_015",
+      "value": "打开防跟踪设置失败"
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_001",
+      "value": "临时放宽 warm 保活槽位，避免继续扩大后台回收候选。"
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_002",
+      "value": "前台活动标签页不可回收。"
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_003",
+      "value": "前台活动标签页，保留 live runtime。"
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_004",
+      "value": "后台停留时间过长，主动冷却释放内存预算。"
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_005",
+      "value": "后台标签页仍在加载或恢复保护窗口内，暂不回收 live runtime。"
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_006",
+      "value": "后台标签页超过温态保留时长，主动冷却释放内存预算。"
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_007",
+      "value": "处于温态保留区，保留 live runtime；切回时直接重新挂载，不走恢复。"
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_008",
+      "value": "异常后台标签页超过保护时长，不再占用保活预算。"
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_009",
+      "value": "异常标签页仍在保护窗口内，保留故障状态等待用户处理。"
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_010",
+      "value": "最近活跃的后台标签页，保留热态 runtime 直接切回。"
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_011",
+      "value": "超出后台保活预算，已释放 live runtime，仅保留快照。"
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_012",
+      "value": "超出后台保活预算，已释放 live runtime，切回时重新恢复。"
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_013",
+      "value": "超过强制 mounted runtime 阈值，按 retention score 释放 live runtime。"
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_001",
+      "value": "Web 控制器不存在，跳过快照保存。"
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_002",
+      "value": "Web 控制器未附着，跳过快照保存。"
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_003",
+      "value": "Web 状态为空，跳过快照保存。"
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_004",
+      "value": "Web 状态序列化失败。"
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_005",
+      "value": "仅当前会话标签页不保存 Web 快照。"
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_006",
+      "value": "已释放冷却标签页的 live Web 节点"
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_007",
+      "value": "快照保存失败。"
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_008",
+      "value": "快照保存完成时活动标签页已变化，已取消提交。"
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_009",
+      "value": "快照保存未返回有效结果。"
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_010",
+      "value": "正在加载标签页"
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_011",
+      "value": "没有活动标签页，跳过快照保存。"
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_012",
+      "value": "首页标签页不需要保存 Web 快照。"
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_013",
+      "value": "首页正在展示，跳过快照保存。"
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_001",
+      "value": "Aira-sync 扩展登录失败"
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_002",
+      "value": "Aira-sync 扩展登录确认失败，请刷新二维码后重试。"
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_003",
+      "value": "Wi-Fi 密码已复制"
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_004",
+      "value": "二维码未包含 Wi-Fi 密码。"
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_005",
+      "value": "二维码登录凭证不完整，请刷新电脑端二维码。"
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_006",
+      "value": "二维码登录凭证已失效，请重新扫码。"
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_007",
+      "value": "可以回到电脑继续使用 Aira-sync。"
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_008",
+      "value": "复制 Wi-Fi 密码失败，请稍后重试。"
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_009",
+      "value": "无法识别 Wi-Fi 二维码。"
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_010",
+      "value": "登录失败"
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_001",
+      "value": "关闭普通标签页"
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_002",
+      "value": "已关闭普通标签页。"
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_003",
+      "value": "已焚烧隐私标签页。"
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_004",
+      "value": "已返回普通标签页。"
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_005",
+      "value": "已返回隐私标签页。"
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_006",
+      "value": "已进入隐私模式"
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_007",
+      "value": "没有普通标签页可关闭。"
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_008",
+      "value": "没有隐私标签页可焚烧。"
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_009",
+      "value": "焚烧"
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_010",
+      "value": "焚烧隐私标签页"
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_001",
+      "value": "Web 控制器已重新挂载，保留当前页面现场。"
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_002",
+      "value": "Web 控制器已附着，准备恢复标签页。"
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_003",
+      "value": "Web 控制器激活失败。"
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_004",
+      "value": "Web 控制器附着失败。"
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_005",
+      "value": "runtime 已冷却并写入快照"
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_006",
+      "value": "web controller 已附着"
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_007",
+      "value": "后台 Web 控制器已附着。"
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_008",
+      "value": "新窗口 Web 控制器已接管，准备加载目标页面。"
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_009",
+      "value": "超过强制 discard 阈值"
+    },
+    {
+      "name": "browser_browser_tab_close_coordinator_001",
+      "value": "已关闭标签页。"
+    },
+    {
+      "name": "browser_browser_tab_close_coordinator_002",
+      "value": "已关闭网页并回到主页。"
+    },
+    {
+      "name": "browser_browser_tab_close_coordinator_003",
+      "value": "已将标签页移至新窗口。"
+    },
+    {
+      "name": "browser_browser_tab_close_coordinator_004",
+      "value": "已恢复最近关闭的标签页。"
+    },
+    {
+      "name": "browser_browser_tab_close_coordinator_005",
+      "value": "已返回原标签页。"
+    },
+    {
+      "name": "browser_browser_tab_close_coordinator_006",
+      "value": "这个标签页已经无法恢复。"
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_001",
+      "value": "HTTPS-First HTTP 回退提示等待用户处理，暂不回收 runtime。 auth=https_first_http_fallback"
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_002",
+      "value": "正在打开文件选择器"
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_003",
+      "value": "网页 SSL 证书风险提示等待用户处理，暂不回收 runtime。 auth=ssl"
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_004",
+      "value": "网页文件选择器打开中，暂不回收 runtime。"
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_005",
+      "value": "网页确认"
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_006",
+      "value": "网页认证对话框等待用户处理，暂不回收 runtime。 auth=http"
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_007",
+      "value": "网页选择文件失败"
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_008",
+      "value": "选择文件失败，请稍后重试。"
+    },
+    {
+      "name": "browser_browser_window_launch_application_001",
+      "value": "已在新的隐私窗口中打开链接。"
+    },
+    {
+      "name": "browser_browser_window_launch_application_002",
+      "value": "已在新窗口中打开链接。"
+    },
+    {
+      "name": "browser_browser_window_launch_application_003",
+      "value": "已打开隐私窗口"
+    },
+    {
+      "name": "browser_browser_window_launch_application_004",
+      "value": "新窗口已接收标签页。"
+    },
+    {
+      "name": "browser_browser_window_launch_application_005",
+      "value": "新窗口无法保存这个标签页。"
+    },
+    {
+      "name": "browser_browser_window_launch_application_006",
+      "value": "无法接续此页面"
+    },
+    {
+      "name": "browser_browser_window_launch_application_007",
+      "value": "正在打开外部链接"
+    },
+    {
+      "name": "browser_browser_window_launch_application_008",
+      "value": "系统已交给Aira打开链接"
+    },
+    {
+      "name": "browser_browser_hls_takeover_view_model_001",
+      "value": "个 Key"
+    },
+    {
+      "name": "browser_browser_hls_takeover_view_model_002",
+      "value": "个分片"
+    },
+    {
+      "name": "browser_browser_hls_takeover_view_model_003",
+      "value": "个清晰度"
+    },
+    {
+      "name": "browser_browser_hls_takeover_view_model_004",
+      "value": "分片"
+    },
+    {
+      "name": "browser_browser_hls_takeover_view_model_005",
+      "value": "分片约"
+    },
+    {
+      "name": "browser_browser_hls_takeover_view_model_006",
+      "value": "清晰度"
+    },
+    {
+      "name": "browser_browser_hls_takeover_view_model_007",
+      "value": "页面"
+    },
+    {
+      "name": "browser_browser_private_tab_coordinator_001",
+      "value": "已退出隐私模式"
+    },
+    {
+      "name": "browser_browser_private_tab_coordinator_002",
+      "value": "清除隐私数据"
+    },
+    {
+      "name": "browser_browser_private_tab_coordinator_003",
+      "value": "进入后，新打开的网页将使用独立的隐私会话。是否进入隐私模式？"
+    },
+    {
+      "name": "browser_browser_private_tab_coordinator_004",
+      "value": "进入隐私模式"
+    },
+    {
+      "name": "browser_browser_private_tab_coordinator_005",
+      "value": "退出后将回到普通首页。私密标签页和隐私会话数据默认保留。"
+    },
+    {
+      "name": "browser_browser_private_tab_coordinator_006",
+      "value": "隐私窗口打开失败，请重试。"
+    },
+    {
+      "name": "browser_browser_recently_closed_application_coordinator_001",
+      "value": "删除最近记录"
+    },
+    {
+      "name": "browser_browser_recently_closed_application_coordinator_002",
+      "value": "当前私密会话不会展示、恢复或修改常规最近关闭记录。"
+    },
+    {
+      "name": "browser_browser_recently_closed_application_coordinator_003",
+      "value": "当前私密会话不可修改常规首页快捷方式。"
+    },
+    {
+      "name": "browser_browser_recently_closed_application_coordinator_004",
+      "value": "最近关闭操作可访问当前常规浏览资料。"
+    },
+    {
+      "name": "browser_browser_recently_closed_application_coordinator_005",
+      "value": "记录已删除。"
+    },
+    {
+      "name": "browser_browser_recently_closed_application_coordinator_006",
+      "value": "这个记录已经不存在。"
+    },
+    {
+      "name": "browser_browser_large_screen_shell_intent_application_001",
+      "value": "已关闭其他标签页。"
+    },
+    {
+      "name": "browser_browser_large_screen_shell_intent_application_002",
+      "value": "已关闭右侧标签页。"
+    },
+    {
+      "name": "browser_browser_large_screen_shell_intent_application_003",
+      "value": "已关闭所有标签页。"
+    },
+    {
+      "name": "browser_browser_large_screen_shell_intent_application_004",
+      "value": "已在新的隐私窗口中打开书签。"
+    },
+    {
+      "name": "browser_browser_url_threat_protection_coordinator_001",
+      "value": "检测到网站安全风险"
+    },
+    {
+      "name": "browser_browser_url_threat_protection_coordinator_002",
+      "value": "请留意页面内容和信息输入"
+    },
+    {
+      "name": "browser_browser_url_threat_protection_coordinator_003",
+      "value": "请谨慎下载或安装内容"
+    },
+    {
+      "name": "browser_browser_url_threat_protection_coordinator_004",
+      "value": "请谨慎输入账号或付款信息"
+    },
+    {
+      "name": "browser_browser_user_agent_runtime_transition_coordinator_001",
+      "value": "UA 过渡快照已恢复，交由浏览器导航链刷新网页标识"
+    },
+    {
+      "name": "browser_browser_user_agent_runtime_transition_coordinator_002",
+      "value": "UA 运行时已替换，等待 Web 访问栈恢复"
+    },
+    {
+      "name": "browser_browser_user_agent_runtime_transition_coordinator_003",
+      "value": "UA 运行时过渡在释放旧 Controller 后异常"
+    },
+    {
+      "name": "browser_browser_user_agent_runtime_transition_coordinator_004",
+      "value": "UA 运行时过渡未能创建替换 Controller"
+    },
+    {
+      "name": "browser_browser_app_url_open_coordinator_001",
+      "value": "已在后台打开链接。"
+    },
+    {
+      "name": "browser_browser_app_url_open_coordinator_002",
+      "value": "已在新标签页中打开链接。"
+    },
+    {
+      "name": "browser_browser_app_url_open_coordinator_003",
+      "value": "当前没有可打开的链接。"
+    },
+    {
+      "name": "browser_browser_fullscreen_session_coordinator_001",
+      "value": "已退出全屏模式。"
+    },
+    {
+      "name": "browser_browser_fullscreen_session_coordinator_002",
+      "value": "网页全屏失败。"
+    },
+    {
+      "name": "browser_browser_large_screen_overflow_flyout_view_model_001",
+      "value": "无痕模式不显示历史记录"
+    },
+    {
+      "name": "browser_browser_large_screen_overflow_flyout_view_model_002",
+      "value": "未命名"
+    },
+    {
+      "name": "browser_browser_large_screen_overflow_flyout_view_model_003",
+      "value": "正在读取历史记录"
+    },
+    {
+      "name": "browser_browser_root_bottom_panel_action_application_001",
+      "value": "剪贴板中没有可打开的内容。"
+    },
+    {
+      "name": "browser_browser_root_bottom_panel_action_application_002",
+      "value": "无法获取剪贴板临时授权，请重试。"
+    },
+    {
+      "name": "browser_browser_tabs_overview_session_coordinator_001",
+      "value": "网页截图生成失败，请重试。"
+    },
+    {
+      "name": "browser_site_report_dialog_view_model_001",
+      "value": "干扰内容太多"
+    },
+    {
+      "name": "browser_site_report_dialog_view_model_002",
+      "value": "这是危险网站"
+    },
+    {
+      "name": "browser_site_report_dialog_view_model_003",
+      "value": "页面显示不正确"
+    },
+    {
+      "name": "browser_browser_fullscreen_exit_hint_policy_001",
+      "value": "已进入全屏模式，按 Esc 退出。"
+    },
+    {
+      "name": "browser_browser_fullscreen_exit_hint_policy_002",
+      "value": "已进入全屏模式，按系统返回键可退出。"
+    },
+    {
+      "name": "browser_browser_gesture_onboarding_prompt_coordinator_001",
+      "value": "两侧上滑回主页 · 中间上滑打开工具"
+    },
+    {
+      "name": "browser_browser_gesture_onboarding_prompt_coordinator_002",
+      "value": "底部手势提示"
+    },
+    {
+      "name": "browser_browser_large_screen_tab_strip_blank_area_policy_001",
+      "value": "关闭所有的标签页"
+    },
+    {
+      "name": "browser_browser_large_screen_tab_strip_blank_area_policy_002",
+      "value": "重新打开关闭的标签页"
+    },
+    {
+      "name": "browser_browser_restore_coordinator_001",
+      "value": "正在刷新页面"
+    },
+    {
+      "name": "browser_browser_shell_lifecycle_coordinator_001",
+      "value": "已退出始终保持隐私模式"
+    },
+    {
+      "name": "browser_browser_shell_lifecycle_coordinator_002",
+      "value": "正在打开脚本市场"
+    },
+    {
+      "name": "browser_browser_tab_home_coordinator_001",
+      "value": "当前标签页恢复异常，已回到首页保护其他标签页。"
+    },
+    {
+      "name": "browser_browser_tab_home_coordinator_002",
+      "value": "当前标签页连续恢复失败，已回到首页。"
+    },
+    {
+      "name": "browser_browser_tab_transition_coordinator_001",
+      "value": "已切换标签页。"
+    },
+    {
+      "name": "browser_browser_web_protection_feedback_session_coordinator_001",
+      "value": "· 私密"
+    },
+    {
+      "name": "browser_browser_web_protection_feedback_session_coordinator_002",
+      "value": "，仅本次私密会话"
+    },
+    {
+      "name": "browser_browser_background_open_prompt_coordinator_001",
+      "value": "正在后台打开"
+    },
+    {
+      "name": "browser_browser_download_confirm_overlay_coordinator_001",
+      "value": "当前下载暂时不能开始。"
+    },
+    {
+      "name": "browser_browser_private_boundary_navigation_service_001",
+      "value": "同步操作可访问当前常规浏览资料中的书签、配置和同步基线。"
+    },
+    {
+      "name": "browser_browser_recently_closed_tabs_service_001",
+      "value": "页面加载中"
+    },
+    {
+      "name": "browser_browser_shell_state_coordinator_001",
+      "value": "已恢复标签页"
+    },
+    {
+      "name": "browser_browser_tab_background_manager_coordinator_001",
+      "value": "后台回收保护：缺少 WebState 且没有可靠 reload target。 gate=no_web_state"
+    },
+    {
+      "name": "browser_browser_tablet_interface_mode_policy_001",
+      "value": "华为"
+    },
+    {
+      "name": "browser_browser_top_floating_prompt_coordinator_001",
+      "value": "已在后台打开"
+    },
+    {
+      "name": "browser_browser_user_return_home_coordinator_001",
+      "value": "已关闭网页并回到主页"
+    },
+    {
+      "name": "browser_browser_web_history_command_runtime_coordinator_001",
+      "value": "已后退。"
+    },
+    {
+      "name": "browser_browser_web_page_lifecycle_application_coordinator_001",
+      "value": "检测到网络协议抖动，正在重新尝试恢复页面"
+    },
+    {
+      "name": "browser_external_navigation_prompt_view_model_001",
+      "value": "其他应用"
+    },
+    {
+      "name": "browser_recently_closed_record_time_view_model_001",
+      "value": "刚刚"
+    },
+    {
+      "name": "settings_link_online_devices",
+      "value": "在线设备"
     }
   ]
 }

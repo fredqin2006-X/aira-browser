@@ -92,6 +92,7 @@ const SITE_PERMISSION_DEFAULTS_KEY = 'site_permission_defaults';
 const EXTERNAL_NAVIGATION_SETTINGS_KEY = 'external_navigation_settings';
 const RETENTION_SETTINGS_KEY = 'retention_settings';
 const HISTORY_RETENTION_SETTINGS_KEY = 'history_retention_settings';
+const APP_LANGUAGE_KEY = 'app_language';
 const SITE_PERMISSIONS_KEY = 'site_permissions';
 
 export class ArkPreferencesStorageAdapter implements PreferencesStorageAdapter {
@@ -289,6 +290,17 @@ export class ArkPreferencesStorageAdapter implements PreferencesStorageAdapter {
   async writeHistoryRetentionSettings(settings: HistoryRetentionSettings): Promise<void> {
     const store = await this.getStore();
     store.putSync(HISTORY_RETENTION_SETTINGS_KEY, JSON.stringify(settings));
+    store.flushSync();
+  }
+
+  async readAppLanguage(defaultValue: string): Promise<string> {
+    const store = await this.getStore();
+    return String(store.getSync(APP_LANGUAGE_KEY, defaultValue));
+  }
+
+  async writeAppLanguage(language: string): Promise<void> {
+    const store = await this.getStore();
+    store.putSync(APP_LANGUAGE_KEY, language);
     store.flushSync();
   }
 

@@ -1297,6 +1297,11 @@ export interface BrowserAppProxyProfile {
 export type BrowserAppServiceMode = 'full' | 'basic';
 
 export interface BrowserPreferences {
+  /**
+   * The language the app renders in. `default` follows the system language, which is the
+   * default; any other value is one of the languages the string catalogs ship.
+   */
+  appLanguage: string;
   appServiceMode: BrowserAppServiceMode;
   searchEngineId: SearchEngineId;
   searchSuggestions: SearchSuggestionPreferences;

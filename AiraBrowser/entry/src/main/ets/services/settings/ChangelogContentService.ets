@@ -6,9 +6,12 @@ import {
   APP_PREVIEW_VERSION_NAME
 } from '../../common/constants/AppVersionInfo';
 import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../common/config/AiraDistributionCapabilityOwner';
+import { isEnglishSystemLanguage } from '../../core/resources/LocalizedRawFile';
 
 const CHANGELOG_RAW_FILE_NAME: string = 'changelog.md';
+const CHANGELOG_RAW_FILE_NAME_EN: string = 'changelog_en.md';
 const COMMUNITY_CHANGELOG_RAW_FILE_NAME: string = 'community-changelog.md';
+const COMMUNITY_CHANGELOG_RAW_FILE_NAME_EN: string = 'community-changelog_en.md';
 
 export interface AppVersionIdentity {
   versionName: string;
@@ -23,7 +26,21 @@ export interface CurrentChangelogSection {
   items: string[];
   markdown: string;
   available: boolean;
+  /** True when the section was rendered in the base (Chinese) text. */
+  fellBackToBase: boolean;
 }
+
+class ChangelogSectionBlock {
+  heading: string;
+  body: string;
+
+  constructor(heading: string, body: string) {
+    this.heading = heading;
+    this.body = body;
+  }
+}
+
+const VERSION_SECTION_HEADING: RegExp = /^##\s+\S+\s+\(\d+\)\s*$/;
 
 export class ChangelogContentService {
   buildFullMarkdown(context: common.Context): string {
@@ -32,8 +49,7 @@ export class ChangelogContentService {
 
   buildCurrentSection(context: common.Context): CurrentChangelogSection {
     const version = this.resolveCurrentVersion();
-    const markdown = this.readMarkdown(context);
-    return this.parseCurrentSection(markdown, version);
+    return this.parseCurrentSection(this.readMarkdown(context), version);
   }
 
   resolveCurrentVersion(): AppVersionIdentity {
@@ -53,23 +69,121 @@ export class ChangelogContentService {
   }
 
   private readMarkdown(context: common.Context): string {
+    const baseMarkdown = this.readRawMarkdown(context, this.resolveBaseRawFileName());
+    if (!isEnglishSystemLanguage()) {
+      return baseMarkdown;
+    }
+    const englishMarkdown = this.readRawMarkdown(context, this.resolveEnglishRawFileName());
+    return this.mergeEnglishSections(baseMarkdown, englishMarkdown);
+  }
+
+  private readRawMarkdown(context: common.Context, rawFileName: string): string {
     try {
-      const rawFile = context.resourceManager.getRawFileContentSync(this.resolveRawFileName());
+      const rawFile = context.resourceManager.getRawFileContentSync(rawFileName);
       return this.applyRuntimePlaceholders(buffer.from(rawFile.buffer).toString('utf8'));
     } catch (error) {
       const detail = this.stringifyError(error);
       return [
         `# ${this.readLocalizedName(context, 'settings_about_changelog', '更新日志')}`,
         '',
-        this.readLocalizedName(context, 'settings_about_changelog_load_failed_detail', `更新日志加载失败：${detail}`, detail)
+        this.readLocalizedName(
+          context,
+          'settings_about_changelog_load_failed_detail',
+          `更新日志加载失败：${detail}`,
+          detail
+        )
       ].join('\n');
     }
   }
 
-  private resolveRawFileName(): string {
+  /**
+   * Overlays the English sections on the base document, keeping the base order and keeping
+   * every base section the English file does not translate.
+   */
+  private mergeEnglishSections(baseMarkdown: string, englishMarkdown: string): string {
+    const baseSections = this.splitVersionSections(baseMarkdown);
+    const englishSections = this.splitVersionSections(englishMarkdown);
+    if (baseSections.length <= 0) {
+      return englishMarkdown;
+    }
+    const englishHeader = this.extractDocumentHeader(englishMarkdown);
+    const header = englishHeader.length > 0 ? englishHeader : this.extractDocumentHeader(baseMarkdown);
+    const englishByHeading = new Map<string, string>();
+    for (let index = 0; index < englishSections.length; index += 1) {
+      const section = englishSections[index];
+      if (!englishByHeading.has(section.heading)) {
+        englishByHeading.set(section.heading, section.body);
+      }
+    }
+    const merged: string[] = [];
+    for (let index = 0; index < baseSections.length; index += 1) {
+      const section = baseSections[index];
+      const englishBody = englishByHeading.get(section.heading);
+      merged.push(englishBody !== undefined ? englishBody : section.body);
+    }
+    for (let index = 0; index < englishSections.length; index += 1) {
+      const section = englishSections[index];
+      if (!this.hasSectionHeading(baseSections, section.heading)) {
+        merged.push(section.body);
+      }
+    }
+    return [header, ...merged].join('\n');
+  }
+
+  private hasSectionHeading(sections: ChangelogSectionBlock[], heading: string): boolean {
+    for (let index = 0; index < sections.length; index += 1) {
+      if (sections[index].heading === heading) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private extractDocumentHeader(markdown: string): string {
+    const match = /^([\s\S]*?)(?=^##\s)/m.exec(markdown);
+    return match === null ? '' : match[1].trim();
+  }
+
+  /**
+   * Splits a changelog into `## <version> (<code>)` blocks. A heading that does not carry a
+   * version stays in the preceding block, so prose between versions is never dropped.
+   */
+  private splitVersionSections(markdown: string): ChangelogSectionBlock[] {
+    const lines = markdown.split(/\r?\n/);
+    const blocks: ChangelogSectionBlock[] = [];
+    let heading = '';
+    let body: string[] = [];
+    for (let index = 0; index < lines.length; index += 1) {
+      const line = lines[index];
+      const trimmedLine = line.trim();
+      if (VERSION_SECTION_HEADING.test(trimmedLine)) {
+        if (body.length > 0) {
+          blocks.push(new ChangelogSectionBlock(heading, body.join('\n').trim()));
+        }
+        heading = trimmedLine.replace(/^##\s+/, '');
+        body = [line];
+        continue;
+      }
+      if (body.length > 0) {
+        body.push(line);
+      }
+    }
+    if (body.length > 0) {
+      blocks.push(new ChangelogSectionBlock(heading, body.join('\n').trim()));
+    }
+    return blocks;
+  }
+
+  private resolveBaseRawFileName(): string {
     return AIRA_DISTRIBUTION_CAPABILITY_OWNER.isCommunity()
       ? COMMUNITY_CHANGELOG_RAW_FILE_NAME
       : CHANGELOG_RAW_FILE_NAME;
+  }
+
+  private resolveEnglishRawFileName(): string {
+    return AIRA_DISTRIBUTION_CAPABILITY_OWNER.isCommunity()
+      ? COMMUNITY_CHANGELOG_RAW_FILE_NAME_EN
+      : CHANGELOG_RAW_FILE_NAME_EN;
   }
 
   private applyRuntimePlaceholders(markdown: string): string {
@@ -95,7 +209,8 @@ export class ChangelogContentService {
       summary: summary.length > 0 ? summary : '这一版带来了一些体验优化和问题修复。',
       items: items,
       markdown: sectionLines.join('\n').trim(),
-      available: true
+      available: true,
+      fellBackToBase: false
     };
   }
 
@@ -165,7 +280,8 @@ export class ChangelogContentService {
       summary: 'Aira 已更新到新版本。',
       items: [],
       markdown: '',
-      available: false
+      available: false,
+      fellBackToBase: true
     };
   }
 

@@ -21,6 +21,7 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 APP_CONFIG="${REPO_ROOT}/AiraBrowser/AppScope/app.json5"
 COMMUNITY_CHANGELOG="${REPO_ROOT}/AiraBrowser/entry/src/main/resources/rawfile/community-changelog.md"
+COMMUNITY_CHANGELOG_EN="${REPO_ROOT}/AiraBrowser/entry/src/main/resources/rawfile/community-changelog_en.md"
 DEFAULT_HAP="${REPO_ROOT}/AiraBrowser/entry/build/default/outputs/default/entry-default-unsigned.hap"
 RELEASE_STAGING_DIR="${REPO_ROOT}/dist/packages"
 NOTES_DIR="${REPO_ROOT}/.tmp/community-release"
@@ -123,7 +124,7 @@ process.stdin.on("end", () => {
 # Prints the newest `## <versionName> (<versionCode>)` section of the changelog,
 # stopping at the next `## ` heading, so a release body can only ever carry one.
 read_current_changelog_section() {
-  node - "${COMMUNITY_CHANGELOG}" <<'NODE'
+  node - "$1" <<'NODE'
 const fs = require('fs');
 const path = process.argv[2];
 const lines = fs.readFileSync(path, 'utf8').split(/\r?\n/);
@@ -151,7 +152,9 @@ sha256_of() {
 }
 
 # A published body is correct when the `更新日志` section holds exactly one version
-# heading, that heading is the release's own version, and the section has bullets.
+# heading, that heading is the release's own version, and the section has bullets. The
+# `## Changelog` section that follows carries the same version in English; its presence and
+# version are checked too, but it is not merged into the Chinese section's count.
 verify_body() {
   local tag="$1"
   command -v gh >/dev/null 2>&1 || fail "gh is required for --verify."
@@ -169,7 +172,19 @@ const problems = [];
 if (changelogIndex < 0) {
   problems.push('the body has no "## 更新日志" section');
 }
-const sectionLines = changelogIndex < 0 ? [] : lines.slice(changelogIndex + 1);
+// The body now carries a `## Changelog` section right after the Chinese one, so the scan
+// stops at the next `## ` heading. Without that bound the English version heading would
+// look like a second version inside the same section.
+let changelogEndIndex = lines.length;
+if (changelogIndex >= 0) {
+  for (let index = changelogIndex + 1; index < lines.length; index += 1) {
+    if (/^##\s+/.test(lines[index].trim())) {
+      changelogEndIndex = index;
+      break;
+    }
+  }
+}
+const sectionLines = changelogIndex < 0 ? [] : lines.slice(changelogIndex + 1, changelogEndIndex);
 const versionHeadings = sectionLines
   .filter((line) => /^#{2,4}\s+\d+\.\d+\.\d+\s*[（(]\s*\d+\s*[)）]\s*$/.test(line.trim()))
   .map((line) => line.trim());
@@ -225,10 +240,21 @@ read -r HAP_BUNDLE_NAME HAP_VERSION_NAME HAP_VERSION_CODE <<<"${HAP_IDENTITY}"
 [ "${HAP_VERSION_NAME}" = "${APP_VERSION_NAME}" ] && [ "${HAP_VERSION_CODE}" = "${APP_VERSION_CODE}" ] ||
   fail "${HAP_PATH} is ${HAP_VERSION_NAME} (${HAP_VERSION_CODE}) while ${APP_CONFIG} is ${APP_VERSION_NAME} (${APP_VERSION_CODE})."
 
-CHANGELOG_SECTION="$(read_current_changelog_section)" ||
+CHANGELOG_SECTION="$(read_current_changelog_section "${COMMUNITY_CHANGELOG}")" ||
   fail "Could not read the current section of $(basename "${COMMUNITY_CHANGELOG}") (see the error above)."
 [ -n "${CHANGELOG_SECTION}" ] ||
   fail "$(basename "${COMMUNITY_CHANGELOG}") has no readable current section."
+
+# The release body carries both languages: the English section sits beside the Chinese one
+# so an English reader gets the same release notes without leaving GitHub. The English
+# section is required to exist and to describe the same version.
+CHANGELOG_SECTION_EN="$(read_current_changelog_section "${COMMUNITY_CHANGELOG_EN}")" ||
+  fail "Could not read the current section of $(basename "${COMMUNITY_CHANGELOG_EN}") (see the error above)."
+[ -n "${CHANGELOG_SECTION_EN}" ] ||
+  fail "$(basename "${COMMUNITY_CHANGELOG_EN}") has no readable current section."
+CHANGELOG_HEADING_EN="$(printf '%s\n' "${CHANGELOG_SECTION_EN}" | sed -n '1p' | sed 's/^##[[:space:]]*//')"
+[ "${CHANGELOG_HEADING_EN}" = "${EXPECTED_HEADING}" ] ||
+  fail "the newest section of $(basename "${COMMUNITY_CHANGELOG_EN}") is '${CHANGELOG_HEADING_EN}' while the app is ${EXPECTED_HEADING}. Keep the English changelog in step with the Chinese one."
 CHANGELOG_HEADING="$(printf '%s\n' "${CHANGELOG_SECTION}" | sed -n '1p' | sed 's/^##[[:space:]]*//')"
 EXPECTED_HEADING="${APP_VERSION_NAME} (${APP_VERSION_CODE})"
 [ "${CHANGELOG_HEADING}" = "${EXPECTED_HEADING}" ] ||
@@ -265,8 +291,10 @@ if [ -z "${TAG}" ]; then
 fi
 
 # The changelog is demoted one level so the body keeps `## 安装 / ## 产物 /
-# ## 更新日志` as its own sections.
+# ## 更新日志` as its own sections. The English section is demoted the same way and
+# follows the Chinese one under the same heading.
 SECTION_FOR_BODY="$(printf '%s\n' "${CHANGELOG_SECTION}" | sed 's/^##[[:space:]]/### /')"
+SECTION_FOR_BODY_EN="$(printf '%s\n' "${CHANGELOG_SECTION_EN}" | sed 's/^##[[:space:]]/### /')"
 
 {
   printf '# %s\n\n' "${RELEASE_TITLE}"
@@ -284,7 +312,9 @@ SECTION_FOR_BODY="$(printf '%s\n' "${CHANGELOG_SECTION}" | sed 's/^##[[:space:]]
   printf -- '- versionCode：`%s`\n' "${APP_VERSION_CODE}"
   printf -- '- SHA-256：`%s`\n\n' "${ASSET_SHA256}"
   printf '## 更新日志\n\n'
-  printf '%s\n' "${SECTION_FOR_BODY}"
+  printf '%s\n\n' "${SECTION_FOR_BODY}"
+  printf '## Changelog\n\n'
+  printf '%s\n' "${SECTION_FOR_BODY_EN}"
 } > "${OUT_PATH}"
 
 printf 'Release notes: %s\n' "${OUT_PATH}"

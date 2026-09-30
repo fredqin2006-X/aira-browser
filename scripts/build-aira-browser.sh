@@ -64,6 +64,9 @@ SAME_DOCUMENT_RESTORABLE_STATE_GUARD_SCRIPT="${REPO_ROOT}/scripts/check-aira-sam
 DOWNLOAD_REWIND_GUARD_SCRIPT="${REPO_ROOT}/scripts/check-aira-download-rewind-does-not-move-page.cjs"
 NATIVE_NAV_REQUEST_TOKEN_GUARD_SCRIPT="${REPO_ROOT}/scripts/check-aira-native-navigation-request-token.cjs"
 QUICK_SEARCH_CONTINUATION_GUARD_SCRIPT="${REPO_ROOT}/scripts/check-aira-quick-search-continuation.cjs"
+SETTINGS_CATALOG_LOCALIZATION_GUARD_SCRIPT="${REPO_ROOT}/scripts/check-aira-settings-catalog-localization.cjs"
+CHANGELOG_LOCALIZATION_GUARD_SCRIPT="${REPO_ROOT}/scripts/check-aira-changelog-localization.cjs"
+APP_LANGUAGE_GUARD_SCRIPT="${REPO_ROOT}/scripts/check-aira-app-language.cjs"
 HUAWEI_APP_IDENTITY_RESOLVER="${REPO_ROOT}/scripts/huawei-app-identity.js"
 HUAWEI_APP_IDENTITY_TEST="${REPO_ROOT}/scripts/huawei-app-identity.test.js"
 PRODUCTION_BUNDLE_NAME="com.aira.browser"
@@ -415,6 +418,24 @@ if [ ! -f "${QUICK_SEARCH_CONTINUATION_GUARD_SCRIPT}" ]; then
 fi
 node "${QUICK_SEARCH_CONTINUATION_GUARD_SCRIPT}" || \
   fail "Quick Search continuation guard failed: ${QUICK_SEARCH_CONTINUATION_GUARD_SCRIPT}"
+
+if [ ! -f "${SETTINGS_CATALOG_LOCALIZATION_GUARD_SCRIPT}" ]; then
+  fail "Settings catalog localization guard not found: ${SETTINGS_CATALOG_LOCALIZATION_GUARD_SCRIPT}"
+fi
+node "${SETTINGS_CATALOG_LOCALIZATION_GUARD_SCRIPT}" || \
+  fail "Settings catalog localization guard failed: ${SETTINGS_CATALOG_LOCALIZATION_GUARD_SCRIPT}"
+
+if [ ! -f "${CHANGELOG_LOCALIZATION_GUARD_SCRIPT}" ]; then
+  fail "Changelog localization guard not found: ${CHANGELOG_LOCALIZATION_GUARD_SCRIPT}"
+fi
+node "${CHANGELOG_LOCALIZATION_GUARD_SCRIPT}" || \
+  fail "Changelog localization guard failed: ${CHANGELOG_LOCALIZATION_GUARD_SCRIPT}"
+
+if [ ! -f "${APP_LANGUAGE_GUARD_SCRIPT}" ]; then
+  fail "App language guard not found: ${APP_LANGUAGE_GUARD_SCRIPT}"
+fi
+node "${APP_LANGUAGE_GUARD_SCRIPT}" || \
+  fail "App language guard failed: ${APP_LANGUAGE_GUARD_SCRIPT}"
 
 if [ -x "${ICON_GUARD_SCRIPT}" ]; then
   NODE_BIN="${NODE_BIN}" "${ICON_GUARD_SCRIPT}"

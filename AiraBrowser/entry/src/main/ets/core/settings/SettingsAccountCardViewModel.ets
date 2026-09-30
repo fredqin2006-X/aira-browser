@@ -13,8 +13,8 @@ import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../common/config/AiraDist
 export type SettingsAccountMembershipBadgeKind = AiraMembershipBadgeKind;
 
 export interface SettingsAccountCardState {
-  title: string;
-  subtitle: string;
+  title: ResourceStr;
+  subtitle: ResourceStr;
   isLoggedIn: boolean;
   avatarUri: string;
   membershipBadge: SettingsAccountMembershipBadgeKind;
@@ -27,8 +27,8 @@ export class SettingsAccountCardViewModel {
     const signedIn = this.isHuaweiAccountSignedIn(settings);
     const community = AIRA_DISTRIBUTION_CAPABILITY_OWNER.isCommunity();
     return {
-      title: signedIn ? this.resolveHuaweiAccountTitle(settings) : '未登录',
-      subtitle: community ? '本地浏览功能已全部开启' : this.resolveSubtitle(settings, signedIn),
+      title: signedIn ? this.resolveHuaweiAccountTitle(settings) : $r('app.string.settings_account_signed_out'),
+      subtitle: community ? $r('app.string.settings_account_card_01') : this.resolveSubtitle(settings, signedIn),
       isLoggedIn: signedIn,
       avatarUri: this.resolveAvatarUri(settings, avatarUri),
       membershipBadge: community ? 'none' : (signedIn ? 'club' : 'none'),
@@ -50,9 +50,9 @@ export class SettingsAccountCardViewModel {
       : 'none';
     const community = AIRA_DISTRIBUTION_CAPABILITY_OWNER.isCommunity();
     return {
-      title: signedIn ? this.resolveHuaweiAccountTitle(settings) : '未登录',
+      title: signedIn ? this.resolveHuaweiAccountTitle(settings) : $r('app.string.settings_account_signed_out'),
       subtitle: community
-        ? '本地浏览功能已全部开启'
+        ? $r('app.string.settings_account_card_01')
         : this.resolveMembershipSubtitle(membership, isPrivateContext, signedIn),
       isLoggedIn: signedIn,
       avatarUri: this.resolveAvatarUri(settings, avatarUri),
@@ -63,32 +63,32 @@ export class SettingsAccountCardViewModel {
     };
   }
 
-  private resolveSubtitle(settings: AiraSyncSettings, signedIn: boolean): string {
+  private resolveSubtitle(settings: AiraSyncSettings, signedIn: boolean): ResourceStr {
     if (!signedIn) {
-      return '本地浏览功能已全部开启，登录后可使用账号与云服务';
+      return $r('app.string.settings_account_signed_out_note');
     }
     if (settings.remoteKind === 'huawei_space') {
-      return '华为账号已登录，当前使用华为云空间同步';
+      return $r('app.string.settings_account_card_02');
     }
     if (settings.remoteKind === 'aira_cloud') {
-      return '华为账号已登录，当前使用 Aira 云同步';
+      return $r('app.string.settings_account_card_03');
     }
     if (settings.remoteKind === 'webdav') {
-      return '华为账号已登录，当前使用 WebDAV 同步';
+      return $r('app.string.settings_account_card_04');
     }
-    return '华为账号已登录，当前为 Aira Club';
+    return $r('app.string.settings_account_card_05');
   }
 
   private resolveMembershipSubtitle(
     membership: AiraMembershipState,
     isPrivateContext: boolean,
     signedIn: boolean
-  ): string {
+  ): ResourceStr {
     if (isPrivateContext) {
-      return '私密会话不修改账号状态';
+      return $r('app.string.settings_account_private_blocked');
     }
     if (signedIn && membership.plan === 'club') {
-      return '华为账号已登录，当前为 Aira Club';
+      return $r('app.string.settings_account_card_05');
     }
     if (membership.plan === 'pro') {
       return this.membershipPresentationService.resolveAccountSubtitle(membership);

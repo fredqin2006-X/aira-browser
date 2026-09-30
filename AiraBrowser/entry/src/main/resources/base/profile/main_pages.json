@@ -56,6 +56,7 @@
     "app/pages/GeneralTabAutoCloseSettingsPage",
     "app/pages/GeneralPrivateTabsSettingsPage",
     "app/pages/GeneralHistoryRetentionSettingsPage",
+    "app/pages/GeneralLanguageSettingsPage",
     "app/pages/RetentionRuntimePolicySettingsPage",
     "app/pages/KeyboardShortcutsSettingsPage",
     "app/pages/AppProxySettingsPage",

@@ -5,8 +5,9 @@ import {
   MarkdownDocumentViewerService
 } from '../markdown/MarkdownDocumentViewerService';
 import { ChangelogContentService } from './ChangelogContentService';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
-const SETTINGS_CHANGELOG_TITLE: string = '更新日志';
+const SETTINGS_CHANGELOG_TITLE: ResourceStr = $r('app.string.settings_about_changelog');
 const SETTINGS_CHANGELOG_SOURCE_URL: string = 'https://aira.local/settings/changelog.md';
 const SETTINGS_CHANGELOG_BASE_URL: string = 'https://aira.local/settings/';
 
@@ -16,7 +17,7 @@ export class SettingsChangelogMarkdownService {
 
   buildPayload(context: common.Context, theme?: MarkdownDocumentTheme): BrowserWebLoadDataPayload {
     return this.markdownViewerService.buildPayloadFromMarkdown({
-      title: SETTINGS_CHANGELOG_TITLE,
+      title: resolveAppResourceText(SETTINGS_CHANGELOG_TITLE),
       sourceUri: SETTINGS_CHANGELOG_SOURCE_URL,
       markdown: this.changelogContentService.buildFullMarkdown(context),
       baseUrl: SETTINGS_CHANGELOG_BASE_URL,

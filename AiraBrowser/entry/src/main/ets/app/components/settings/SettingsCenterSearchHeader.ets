@@ -66,7 +66,7 @@ export struct SettingsCenterSearchHeader {
         iconColor: this.secondaryTextColor
       })
 
-      TextInput({ text: this.searchState.query, placeholder: '搜索设置项' })
+      TextInput({ text: this.searchState.query, placeholder: $r('app.string.settings_search_field_placeholder') })
         .layoutWeight(1)
         .height(this.useToolbarSearchStyle ? 34 : 40)
         .type(InputType.Normal)

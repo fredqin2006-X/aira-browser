@@ -33,5 +33,12 @@
 - User-facing release notes stay short: one summary line plus a few plain items about what changed for the user. No
   work-report detail, no implementation, file, test, or verification talk. `release-history.json` notes are the exception
   and keep their provenance record.
+- Write every changelog entry twice, once in Chinese and once in English. `changelog.md` and `community-changelog.md` are
+  the Chinese documents; `changelog_en.md` and `community-changelog_en.md` are their English counterparts, and
+  `release_notice.json` / `release_notice_en.json` follow the same pairing. A new `## <version> (<code>)` section, its
+  summary line, and its bullets all land in both languages in the same change, with the same version headings and the
+  same bullet count, because an English device reads the English document and falls back to Chinese only for a version
+  the English file does not carry. The release-notes script and the changelog localization guard both fail closed when the
+  pair disagrees, so a half-translated entry cannot ship.
 - Run proportional contract checks and `AIRA_DISTRIBUTION=community SKIP_INSTALL=1 ./scripts/build-aira-browser.sh` for
   Community changes when a matching local signing profile is available.

@@ -6521,10 +6521,6 @@
       "value": "Clear failed. Try again later."
     },
     {
-      "name": "settings_link_online_devices",
-      "value": "Online devices"
-    },
-    {
       "name": "settings_link_setup_section",
       "value": "Install and connect"
     },
@@ -15435,6 +15431,3850 @@
     {
       "name": "settings_advanced_service_mode_update_failed",
       "value": "Failed to update the app service mode."
+    },
+    {
+      "name": "settings_catalog_360_search",
+      "value": "360 Search"
+    },
+    {
+      "name": "settings_catalog_aira_pro",
+      "value": "Aira Pro"
+    },
+    {
+      "name": "settings_catalog_baidu",
+      "value": "Baidu"
+    },
+    {
+      "name": "settings_catalog_bing",
+      "value": "Bing"
+    },
+    {
+      "name": "settings_catalog_brave_search",
+      "value": "Brave Search"
+    },
+    {
+      "name": "settings_catalog_duckduckgo",
+      "value": "DuckDuckGo"
+    },
+    {
+      "name": "settings_catalog_ecosia",
+      "value": "Ecosia"
+    },
+    {
+      "name": "settings_catalog_google",
+      "value": "Google"
+    },
+    {
+      "name": "settings_catalog_startpage",
+      "value": "Startpage"
+    },
+    {
+      "name": "settings_catalog_yandex",
+      "value": "Yandex"
+    },
+    {
+      "name": "settings_catalog_home_style",
+      "value": "Home style"
+    },
+    {
+      "name": "settings_catalog_refresh_site_icons",
+      "value": "Refresh site icons"
+    },
+    {
+      "name": "settings_catalog_icon",
+      "value": "Icon"
+    },
+    {
+      "name": "settings_catalog_look",
+      "value": "Look"
+    },
+    {
+      "name": "settings_catalog_media_enhancements",
+      "value": "Media enhancements"
+    },
+    {
+      "name": "settings_catalog_storage",
+      "value": "Storage"
+    },
+    {
+      "name": "settings_catalog_app",
+      "value": "App"
+    },
+    {
+      "name": "settings_catalog_sogou",
+      "value": "Sogou"
+    },
+    {
+      "name": "settings_catalog_search_history",
+      "value": "Search history"
+    },
+    {
+      "name": "settings_catalog_search_settings",
+      "value": "Search settings"
+    },
+    {
+      "name": "settings_catalog_local_backup",
+      "value": "Local backup"
+    },
+    {
+      "name": "settings_catalog_tabs",
+      "value": "Tabs"
+    },
+    {
+      "name": "settings_catalog_tab_runtime_policy",
+      "value": "Tab runtime policy"
+    },
+    {
+      "name": "settings_catalog_clear_browsing_data",
+      "value": "Clear browsing data"
+    },
+    {
+      "name": "settings_catalog_user_scripts",
+      "value": "User scripts"
+    },
+    {
+      "name": "settings_catalog_shenma",
+      "value": "Shenma"
+    },
+    {
+      "name": "settings_catalog_site_settings",
+      "value": "Site settings"
+    },
+    {
+      "name": "settings_catalog_page_identity",
+      "value": "Page identity"
+    },
+    {
+      "name": "settings_catalog_page_translation",
+      "value": "Page translation"
+    },
+    {
+      "name": "settings_catalog_custom",
+      "value": "Custom"
+    },
+    {
+      "name": "settings_catalog_account_sync",
+      "value": "Account & sync"
+    },
+    {
+      "name": "settings_catalog_reading_enhancements",
+      "value": "Reading enhancements"
+    },
+    {
+      "name": "settings_catalog_privacy",
+      "value": "Privacy"
+    },
+    {
+      "name": "settings_catalog_privacy_security",
+      "value": "Privacy & security"
+    },
+    {
+      "name": "settings_catalog_private_mode",
+      "value": "Private mode"
+    },
+    {
+      "name": "settings_catalog_advanced",
+      "value": "Advanced"
+    },
+    {
+      "name": "settings_catalog_advanced_settings",
+      "value": "Advanced settings"
+    },
+    {
+      "name": "settings_catalog_default",
+      "value": "Default"
+    },
+    {
+      "name": "settings_catalog_default_site_permissions",
+      "value": "Default site permissions"
+    },
+    {
+      "name": "settings_catalog_sync_backup",
+      "value": "Sync & backup"
+    },
+    {
+      "name": "settings_catalog_web_app_detail",
+      "value": "Web app details"
+    },
+    {
+      "name": "settings_destination_unavailable",
+      "value": "Currently unavailable"
+    },
+    {
+      "name": "settings_destination_title",
+      "value": "Settings"
+    },
+    {
+      "name": "settings_search_field_placeholder",
+      "value": "Search settings"
+    },
+    {
+      "name": "settings_changelog_summary_fallback",
+      "value": "This release brings some experience improvements and fixes."
+    },
+    {
+      "name": "settings_changelog_updated_fallback",
+      "value": "Aira has been updated to a new version."
+    },
+    {
+      "name": "settings_about_changelog_title",
+      "value": "Changelog"
+    },
+    {
+      "name": "release_notice_feedback_text",
+      "value": "Feedback QQ group: 1049806927"
+    },
+    {
+      "name": "release_notice_title_fallback",
+      "value": "Aira has been updated to %1$s"
+    },
+    {
+      "name": "release_notice_action_fallback",
+      "value": "View changelog"
+    },
+    {
+      "name": "settings_general_language",
+      "value": "Language"
+    },
+    {
+      "name": "settings_general_language_section",
+      "value": "Display language"
+    },
+    {
+      "name": "settings_general_language_follow_system",
+      "value": "Follow system"
+    },
+    {
+      "name": "settings_general_language_chinese",
+      "value": "简体中文"
+    },
+    {
+      "name": "settings_general_language_english",
+      "value": "English"
+    },
+    {
+      "name": "settings_general_language_footer",
+      "value": "Restart Aira for the language change to take effect."
+    },
+    {
+      "name": "settings_general_language_footer_follow_system",
+      "value": "Aira follows the system language. Change it in system settings and restart Aira."
+    },
+    {
+      "name": "settings_general_language_footer_restart",
+      "value": "Takes effect after a restart."
+    },
+    {
+      "name": "settings_general_language_failed",
+      "value": "Couldn't change the language. Try again later."
+    },
+    {
+      "name": "settings_general_language_detail",
+      "value": "Follows the system language by default"
+    },
+    {
+      "name": "settings_app_icon_01",
+      "value": "The icon management service is unavailable."
+    },
+    {
+      "name": "settings_app_icon_02",
+      "value": "Couldn't update the app icon."
+    },
+    {
+      "name": "settings_desktop_interface_01",
+      "value": "Continue switching"
+    },
+    {
+      "name": "settings_desktop_login_01",
+      "value": "Confirming sign-in"
+    },
+    {
+      "name": "settings_desktop_login_02",
+      "value": "Confirm sign-in"
+    },
+    {
+      "name": "settings_desktop_login_03",
+      "value": "Aira account"
+    },
+    {
+      "name": "settings_desktop_login_04",
+      "value": "Current HUAWEI ID"
+    },
+    {
+      "name": "settings_home_01",
+      "value": "Follow theme color"
+    },
+    {
+      "name": "settings_about_01",
+      "value": "More"
+    },
+    {
+      "name": "settings_center_01",
+      "value": "Account and membership need full mode."
+    },
+    {
+      "name": "settings_center_02",
+      "value": "Couldn't open the proxy settings. Try again later."
+    },
+    {
+      "name": "settings_center_03",
+      "value": "Couldn't open the custom DNS editor. Try again later."
+    },
+    {
+      "name": "settings_center_04",
+      "value": "Settings"
+    },
+    {
+      "name": "settings_center_05",
+      "value": "Couldn't navigate the settings page. Try again."
+    },
+    {
+      "name": "settings_scaffold_01",
+      "value": "Back to settings"
+    },
+    {
+      "name": "settings_detail_01",
+      "value": "Search engine updated."
+    },
+    {
+      "name": "settings_detail_02",
+      "value": "Couldn't update the search engine."
+    },
+    {
+      "name": "settings_detail_03",
+      "value": "Couldn't update the default site permissions."
+    },
+    {
+      "name": "settings_theme_palette_01",
+      "value": "Couldn't update the theme color."
+    },
+    {
+      "name": "settings_app_icon_03",
+      "value": "The icon management service is unavailable."
+    },
+    {
+      "name": "settings_app_icon_04",
+      "value": "Couldn't update the app icon."
+    },
+    {
+      "name": "settings_detail_04",
+      "value": "More"
+    },
+    {
+      "name": "settings_detail_05",
+      "value": "Search engine updated."
+    },
+    {
+      "name": "settings_detail_06",
+      "value": "Couldn't update the search engine."
+    },
+    {
+      "name": "settings_sync_01",
+      "value": "Overwrite bookmarks"
+    },
+    {
+      "name": "settings_sync_webdav_01",
+      "value": "Turn on WebDAV sync"
+    },
+    {
+      "name": "settings_sync_webdav_02",
+      "value": "WebDAV provider"
+    },
+    {
+      "name": "settings_sync_webdav_03",
+      "value": "WebDAV username"
+    },
+    {
+      "name": "settings_sync_webdav_04",
+      "value": "WebDAV password"
+    },
+    {
+      "name": "settings_sync_webdav_05",
+      "value": "Turn off WebDAV extra backup"
+    },
+    {
+      "name": "settings_sync_webdav_06",
+      "value": "Turn off WebDAV sync"
+    },
+    {
+      "name": "settings_sync_webdav_07",
+      "value": "WebDAV address"
+    },
+    {
+      "name": "settings_sync_webdav_08",
+      "value": "Updating the WebDAV backup"
+    },
+    {
+      "name": "settings_sync_webdav_09",
+      "value": "Turning on WebDAV extra backup"
+    },
+    {
+      "name": "settings_sync_webdav_10",
+      "value": "Syncing WebDAV"
+    },
+    {
+      "name": "settings_sync_webdav_11",
+      "value": "Turning on WebDAV sync"
+    },
+    {
+      "name": "settings_sync_webdav_12",
+      "value": "Saving the settings and overwriting WebDAV with this device"
+    },
+    {
+      "name": "settings_sync_webdav_13",
+      "value": "Saving the settings and checking the connection"
+    },
+    {
+      "name": "settings_sync_webdav_14",
+      "value": "Saving the settings and turning on bookmarks and all common settings"
+    },
+    {
+      "name": "settings_sync_webdav_15",
+      "value": "Turn on sync"
+    },
+    {
+      "name": "settings_sync_webdav_16",
+      "value": "Overwriting the WebDAV extra backup"
+    },
+    {
+      "name": "settings_sync_webdav_17",
+      "value": "Handling the WebDAV sync status"
+    },
+    {
+      "name": "settings_sync_webdav_18",
+      "value": "WebDAV extra backup"
+    },
+    {
+      "name": "settings_sync_webdav_19",
+      "value": "Turn on WebDAV extra backup"
+    },
+    {
+      "name": "settings_sync_webdav_20",
+      "value": "Turn off WebDAV extra backup?"
+    },
+    {
+      "name": "settings_sync_webdav_21",
+      "value": "Turn off WebDAV sync?"
+    },
+    {
+      "name": "settings_sync_webdav_22",
+      "value": "Turning it off stops overwriting the extra copy on WebDAV. The current sync method and the saved WebDAV settings are kept."
+    },
+    {
+      "name": "settings_sync_webdav_23",
+      "value": "Turning it off stops syncing bookmarks over WebDAV. Bookmarks on this device and the saved WebDAV settings are kept."
+    },
+    {
+      "name": "settings_sync_webdav_24",
+      "value": "Couldn't turn it off"
+    },
+    {
+      "name": "settings_sync_webdav_25",
+      "value": "Couldn't turn off the WebDAV extra backup. Try again later."
+    },
+    {
+      "name": "settings_sync_webdav_26",
+      "value": "Couldn't turn off WebDAV sync. Check the network and try again."
+    },
+    {
+      "name": "settings_sync_webdav_27",
+      "value": "Sync"
+    },
+    {
+      "name": "settings_sync_webdav_28",
+      "value": "WebDAV provider"
+    },
+    {
+      "name": "settings_theme_palette_02",
+      "value": "Couldn't update the theme color."
+    },
+    {
+      "name": "settings_activity_01",
+      "value": "Aira activity"
+    },
+    {
+      "name": "settings_activity_02",
+      "value": "Once you start using Aira, your activity calendar lights up here"
+    },
+    {
+      "name": "settings_app_icon_05",
+      "value": "Night"
+    },
+    {
+      "name": "settings_app_icon_06",
+      "value": "Ocean"
+    },
+    {
+      "name": "settings_app_icon_07",
+      "value": "Vivid"
+    },
+    {
+      "name": "settings_app_icon_08",
+      "value": "Frosted"
+    },
+    {
+      "name": "settings_app_icon_09",
+      "value": "Reading app icons…"
+    },
+    {
+      "name": "settings_app_icon_10",
+      "value": "App icons come from HUAWEI AppGallery icon management and appear here once approved."
+    },
+    {
+      "name": "settings_app_icon_11",
+      "value": "Classic"
+    },
+    {
+      "name": "settings_app_icon_12",
+      "value": "No app icons available."
+    },
+    {
+      "name": "settings_app_icon_13",
+      "value": "The system updates the desktop icon after the switch; if a custom themed icon is in use, the switch may fail."
+    },
+    {
+      "name": "settings_app_icon_14",
+      "value": "Create an icon in AppGallery Connect icon management and get it approved; it then appears here automatically."
+    },
+    {
+      "name": "settings_app_icon_15",
+      "value": "The icon management service is unavailable."
+    },
+    {
+      "name": "settings_app_service_mode_01",
+      "value": "Switch to basic mode?"
+    },
+    {
+      "name": "settings_app_service_mode_02",
+      "value": "Basic mode turns off account sign-in, sync, membership, translation, scripts, web content filtering, wallpapers, remote suggestions, and experiments. Most enhancements become unavailable and the app restarts to apply the change; saved data is not deleted."
+    },
+    {
+      "name": "settings_app_service_mode_03",
+      "value": "Switch to basic mode"
+    },
+    {
+      "name": "settings_desktop_interface_02",
+      "value": "The desktop interface on a phone may crowd content, shrink buttons, or not fit some layouts. Confirm again before switching to it."
+    },
+    {
+      "name": "settings_desktop_interface_03",
+      "value": "A small foldable keeps the touch interface when unfolded, because the unfolded screen is narrow; a manually chosen desktop interface is the exception."
+    },
+    {
+      "name": "settings_desktop_interface_04",
+      "value": "Automatic mode uses the desktop interface when the device is unfolded and returns to the touch interface when folded; a half-folded or unknown state keeps the current interface."
+    },
+    {
+      "name": "settings_desktop_interface_05",
+      "value": "Automatic mode uses the desktop interface when a mouse or trackpad is connected and returns to the touch interface when it disconnects. A physical keyboard can still use shortcuts in the touch interface."
+    },
+    {
+      "name": "settings_user_agent_01",
+      "value": "Couldn't fall back to the site's page identity."
+    },
+    {
+      "name": "settings_general_01",
+      "value": "15 days"
+    },
+    {
+      "name": "settings_general_02",
+      "value": "7 days"
+    },
+    {
+      "name": "settings_general_03",
+      "value": "3 days"
+    },
+    {
+      "name": "settings_general_04",
+      "value": "1 day"
+    },
+    {
+      "name": "settings_home_logo_01",
+      "value": "Supports PNG, JPG, GIF, WebP, BMP, SVG, HEIC, AVIF, and more"
+    },
+    {
+      "name": "settings_home_logo_02",
+      "value": "This logo is not available."
+    },
+    {
+      "name": "settings_home_02",
+      "value": "Hidden"
+    },
+    {
+      "name": "settings_about_05",
+      "value": "More"
+    },
+    {
+      "name": "settings_account_card_01",
+      "value": "All local browsing features are on"
+    },
+    {
+      "name": "settings_account_card_02",
+      "value": "Signed in to the HUAWEI ID, using Huawei Cloud Space sync"
+    },
+    {
+      "name": "settings_account_card_03",
+      "value": "Signed in to the HUAWEI ID, using Aira Cloud sync"
+    },
+    {
+      "name": "settings_account_card_04",
+      "value": "Signed in to the HUAWEI ID, using WebDAV sync"
+    },
+    {
+      "name": "settings_account_card_05",
+      "value": "Signed in to the HUAWEI ID, currently Aira Club"
+    },
+    {
+      "name": "settings_detail_07",
+      "value": "Search and bookmarks"
+    },
+    {
+      "name": "settings_detail_08",
+      "value": "90 days / 10000 items"
+    },
+    {
+      "name": "settings_detail_09",
+      "value": "No saved site permissions yet"
+    },
+    {
+      "name": "settings_detail_10",
+      "value": "Current private session"
+    },
+    {
+      "name": "settings_detail_11",
+      "value": "Private entry"
+    },
+    {
+      "name": "settings_detail_12",
+      "value": "This session only"
+    },
+    {
+      "name": "settings_detail_13",
+      "value": "Does not change regular browsing data"
+    },
+    {
+      "name": "settings_detail_14",
+      "value": "Local suggestions in the address bar"
+    },
+    {
+      "name": "settings_detail_15",
+      "value": "Coming soon"
+    },
+    {
+      "name": "settings_detail_16",
+      "value": "To be added"
+    },
+    {
+      "name": "settings_detail_17",
+      "value": "Setting not available yet"
+    },
+    {
+      "name": "settings_detail_18",
+      "value": "Good for Chinese content"
+    },
+    {
+      "name": "settings_detail_19",
+      "value": "More private"
+    },
+    {
+      "name": "settings_detail_20",
+      "value": "International search supplement"
+    },
+    {
+      "name": "settings_detail_21",
+      "value": "Search with Google"
+    },
+    {
+      "name": "settings_detail_22",
+      "value": "Search with Bing"
+    },
+    {
+      "name": "settings_detail_23",
+      "value": "Unused for 15 days"
+    },
+    {
+      "name": "settings_detail_24",
+      "value": "Unused for 7 days"
+    },
+    {
+      "name": "settings_detail_25",
+      "value": "Unused for 3 days"
+    },
+    {
+      "name": "settings_detail_26",
+      "value": "Unused for 1 day"
+    },
+    {
+      "name": "settings_detail_27",
+      "value": "30 days / 3000 items"
+    },
+    {
+      "name": "settings_detail_28",
+      "value": "Not restored on next launch"
+    },
+    {
+      "name": "settings_detail_29",
+      "value": "Lowers the privacy boundary; enable with care"
+    },
+    {
+      "name": "settings_external_navigation_01",
+      "value": "Global external app policy cannot be changed in this session."
+    },
+    {
+      "name": "settings_external_navigation_02",
+      "value": "Blocked the site from opening external apps."
+    },
+    {
+      "name": "settings_external_navigation_03",
+      "value": "Allowed the site to open external apps directly."
+    },
+    {
+      "name": "settings_external_navigation_04",
+      "value": "Ask before opening an external app."
+    },
+    {
+      "name": "settings_general_05",
+      "value": "Shortcuts"
+    },
+    {
+      "name": "settings_general_06",
+      "value": "Search only"
+    },
+    {
+      "name": "settings_legal_01",
+      "value": "About auto-renewal"
+    },
+    {
+      "name": "settings_legal_02",
+      "value": "Updated: 2026-05-20"
+    },
+    {
+      "name": "settings_legal_03",
+      "value": "This explains how Aira Pro renewals, charges, cancellation, and entitlement changes work. The actual price, period, offers, and payment result are those shown by HUAWEI Pay or the subscription management page."
+    },
+    {
+      "name": "settings_legal_04",
+      "value": "Subscription and renewal"
+    },
+    {
+      "name": "settings_legal_05",
+      "value": "Aira Pro may offer monthly, quarterly, or yearly subscription periods. After you choose one and confirm payment, the Pro entitlement applies for that subscription period."
+    },
+    {
+      "name": "settings_legal_06",
+      "value": "If you start a recurring subscription on the payment page, the system renews it automatically before each period ends, under the platform rules."
+    },
+    {
+      "name": "settings_legal_07",
+      "value": "Charges and price"
+    },
+    {
+      "name": "settings_legal_08",
+      "value": "The subscription price, offers, trial, taxes, charge timing, and payment method are those shown on the HUAWEI Pay page or the subscription management page."
+    },
+    {
+      "name": "settings_legal_09",
+      "value": "If a payment fails, the account is abnormal, or the platform cannot confirm the subscription, the Pro entitlement may not apply immediately. You can return to the membership page later to restore the purchase."
+    },
+    {
+      "name": "settings_legal_10",
+      "value": "Cancel renewal"
+    },
+    {
+      "name": "settings_legal_11",
+      "value": "You can cancel auto-renewal on the official Huawei subscription management page. After cancelling, the Pro entitlement for the period you already paid for usually lasts until that period ends."
+    },
+    {
+      "name": "settings_legal_12",
+      "value": "To avoid a charge for the next period, cancel before the deadline the platform requires. The exact path, deadline, and effective rule are those on the Huawei subscription management page."
+    },
+    {
+      "name": "settings_legal_13",
+      "value": "Entitlement changes"
+    },
+    {
+      "name": "settings_legal_14",
+      "value": "If the subscription expires, is cancelled or refunded, or its payment status is abnormal, the Aira Pro entitlement may stop or fall back to the base entitlement available to the account."
+    },
+    {
+      "name": "settings_legal_15",
+      "value": "If membership benefits, subscription periods, or prices change, we will tell you in the app or on the payment page."
+    },
+    {
+      "name": "settings_site_icon_01",
+      "value": "No site icons need refreshing."
+    },
+    {
+      "name": "settings_site_icon_02",
+      "value": "Couldn't refresh the site icons. Try again later."
+    },
+    {
+      "name": "settings_user_agent_02",
+      "value": "Couldn't fall back the site's page identity references."
+    },
+    {
+      "name": "settings_home_logo_03",
+      "value": "This logo is not available."
+    },
+    {
+      "name": "settings_home_04",
+      "value": "Couldn't select the logo. Try again later."
+    },
+    {
+      "name": "settings_site_icon_03",
+      "value": "Refreshed %1$d site icons."
+    },
+    {
+      "name": "settings_site_icon_04",
+      "value": "Checked %1$d site icons; the cache already holds higher-resolution versions."
+    },
+    {
+      "name": "settings_site_icon_05",
+      "value": "; %1$d kept their higher-resolution cache"
+    },
+    {
+      "name": "settings_site_icon_06",
+      "value": "; %1$d could not be fetched"
+    },
+    {
+      "name": "settings_site_icon_07",
+      "value": "Refreshed %1$d site icons%2$s%3$s."
+    },
+    {
+      "name": "settings_site_icon_08",
+      "value": "%1$s Cleared %2$d old icon cache entries."
+    },
+    {
+      "name": "settings_about_version_title",
+      "value": "Current version"
+    },
+    {
+      "name": "settings_about_more",
+      "value": "More"
+    },
+    {
+      "name": "settings_app_icon_16",
+      "value": "The icon management service is unavailable (error %1$d)."
+    },
+    {
+      "name": "settings_activity_03",
+      "value": "Active %2$d days in the past %1$d weeks"
+    },
+    {
+      "name": "settings_sync_webdav_29",
+      "value": "Save and turn on as extra backup"
+    },
+    {
+      "name": "settings_sync_webdav_30",
+      "value": "Save and update the extra backup"
+    },
+    {
+      "name": "settings_sync_webdav_31",
+      "value": "Turn on WebDAV bookmark sync"
+    },
+    {
+      "name": "settings_sync_webdav_32",
+      "value": "Turning off WebDAV sync"
+    },
+    {
+      "name": "settings_sync_webdav_33",
+      "value": "Turning off WebDAV extra backup"
+    },
+    {
+      "name": "settings_sync_webdav_34",
+      "value": "Set as the current sync method and turn on"
+    },
+    {
+      "name": "settings_sync_webdav_35",
+      "value": "Saved, not turned on"
+    },
+    {
+      "name": "settings_sync_webdav_36",
+      "value": "Currently an extra backup location"
+    },
+    {
+      "name": "settings_sync_webdav_37",
+      "value": "Current sync method, bookmark sync is off"
+    },
+    {
+      "name": "settings_sync_webdav_38",
+      "value": "Turning off"
+    },
+    {
+      "name": "settings_sync_webdav_39",
+      "value": "Turning on"
+    },
+    {
+      "name": "settings_sync_webdav_40",
+      "value": "Saving the WebDAV extra backup"
+    },
+    {
+      "name": "settings_sync_webdav_41",
+      "value": "WebDAV extra backup"
+    },
+    {
+      "name": "settings_sync_webdav_42",
+      "value": "WebDAV sync"
+    },
+    {
+      "name": "settings_desktop_login_05",
+      "value": "User ID: %1$s"
+    },
+    {
+      "name": "settings_home_05",
+      "value": "%1$d items"
+    },
+    {
+      "name": "settings_sync_progress_timeout_bookmark_file",
+      "value": "Handling the bookmark file is taking too long. Try again later."
+    },
+    {
+      "name": "settings_sync_progress_timeout_download",
+      "value": "The download is taking too long. Check the network or the cloud data and try again."
+    },
+    {
+      "name": "settings_sync_progress_timeout_sync",
+      "value": "The sync is taking too long. Check the network or try again later."
+    },
+    {
+      "name": "settings_sync_progress_timeout_upload",
+      "value": "The upload is taking too long. Check the network or the WebDAV service and try again."
+    },
+    {
+      "name": "settings_sync_progress_tip_applying",
+      "value": "Applying additions and updates"
+    },
+    {
+      "name": "settings_sync_progress_tip_checking_bookmarks",
+      "value": "Checking the bookmark content"
+    },
+    {
+      "name": "settings_sync_progress_tip_checking_cloud",
+      "value": "Confirming the cloud sync status"
+    },
+    {
+      "name": "settings_sync_progress_tip_checking_integrity",
+      "value": "Checking data integrity"
+    },
+    {
+      "name": "settings_sync_progress_tip_collecting_content",
+      "value": "Collecting content on this device"
+    },
+    {
+      "name": "settings_sync_progress_tip_collecting_info",
+      "value": "Collecting information on this device"
+    },
+    {
+      "name": "settings_sync_progress_tip_collecting_local",
+      "value": "Collecting data on this device"
+    },
+    {
+      "name": "settings_sync_progress_tip_comparing",
+      "value": "Comparing this device with the cloud"
+    },
+    {
+      "name": "settings_sync_progress_tip_confirming_saved",
+      "value": "Confirming the file was saved"
+    },
+    {
+      "name": "settings_sync_progress_tip_connecting_cloud",
+      "value": "Connecting to cloud storage"
+    },
+    {
+      "name": "settings_sync_progress_tip_finishing_export",
+      "value": "Finishing the export"
+    },
+    {
+      "name": "settings_sync_progress_tip_finishing_import",
+      "value": "Finishing the import"
+    },
+    {
+      "name": "settings_sync_progress_tip_generating_file",
+      "value": "Generating the bookmark file"
+    },
+    {
+      "name": "settings_sync_progress_tip_preparing_cloud",
+      "value": "Preparing the cloud directory"
+    },
+    {
+      "name": "settings_sync_progress_tip_preparing_local_write",
+      "value": "Preparing to write locally"
+    },
+    {
+      "name": "settings_sync_progress_tip_preparing_restore",
+      "value": "Preparing to restore"
+    },
+    {
+      "name": "settings_sync_progress_tip_protecting",
+      "value": "Protecting the existing data"
+    },
+    {
+      "name": "settings_sync_progress_tip_reading_cloud",
+      "value": "Reading cloud data"
+    },
+    {
+      "name": "settings_sync_progress_tip_reading_file",
+      "value": "Reading the bookmark file"
+    },
+    {
+      "name": "settings_sync_progress_tip_reading_state",
+      "value": "Reading the current status"
+    },
+    {
+      "name": "settings_sync_progress_tip_updating_display",
+      "value": "Updating the display"
+    },
+    {
+      "name": "settings_sync_progress_tip_updating_local_bookmarks",
+      "value": "Updating local bookmarks"
+    },
+    {
+      "name": "settings_sync_progress_tip_updating_record",
+      "value": "Updating the sync record"
+    },
+    {
+      "name": "settings_sync_progress_tip_uploading_bookmarks",
+      "value": "Uploading local bookmarks"
+    },
+    {
+      "name": "settings_sync_progress_tip_verifying_cloud_write",
+      "value": "Verifying the cloud write"
+    },
+    {
+      "name": "settings_sync_progress_tip_wrapping_up",
+      "value": "Finishing up"
+    },
+    {
+      "name": "settings_sync_progress_tip_writing_file",
+      "value": "Writing the bookmark file"
+    },
+    {
+      "name": "settings_sync_progress_tip_writing_local_bookmarks",
+      "value": "Writing local bookmarks"
+    },
+    {
+      "name": "settings_sync_progress_tip_writing_record",
+      "value": "Writing the sync record"
+    },
+    {
+      "name": "settings_sync_progress_title_download",
+      "value": "Download"
+    },
+    {
+      "name": "settings_sync_progress_title_export",
+      "value": "Export"
+    },
+    {
+      "name": "settings_sync_progress_title_import",
+      "value": "Import"
+    },
+    {
+      "name": "settings_sync_progress_title_sync",
+      "value": "Sync"
+    },
+    {
+      "name": "settings_sync_progress_title_upload",
+      "value": "Upload"
+    },
+    {
+      "name": "browser_shell_001",
+      "value": "Aira Community release download"
+    },
+    {
+      "name": "browser_shell_002",
+      "value": "Report sent"
+    },
+    {
+      "name": "browser_shell_003",
+      "value": "Cloud sync paused"
+    },
+    {
+      "name": "browser_shell_004",
+      "value": "Keep"
+    },
+    {
+      "name": "browser_shell_005",
+      "value": "Press back again to close Aira"
+    },
+    {
+      "name": "browser_shell_006",
+      "value": "Type a URL or keywords here to start browsing."
+    },
+    {
+      "name": "browser_shell_007",
+      "value": "Added to the queue to open"
+    },
+    {
+      "name": "browser_shell_008",
+      "value": "Back to the home page"
+    },
+    {
+      "name": "browser_shell_009",
+      "value": "Opened the bookmark in a new window."
+    },
+    {
+      "name": "browser_shell_010",
+      "value": "Search history cleared."
+    },
+    {
+      "name": "browser_shell_011",
+      "value": "No file information to show."
+    },
+    {
+      "name": "browser_shell_012",
+      "value": "This version still browses normally and uses local bookmarks. Aira Cloud bookmark sync returns after you update Aira."
+    },
+    {
+      "name": "browser_shell_013",
+      "value": "Couldn't open the link guide"
+    },
+    {
+      "name": "browser_shell_014",
+      "value": "Couldn't open the cross-device guide"
+    },
+    {
+      "name": "browser_shell_015",
+      "value": "New tab"
+    },
+    {
+      "name": "browser_shell_016",
+      "value": "Couldn't open a new window. Try again."
+    },
+    {
+      "name": "browser_shell_017",
+      "value": "Couldn't open the update page right now"
+    },
+    {
+      "name": "browser_shell_018",
+      "value": "Couldn't export the tab animation snapshot. Try again later."
+    },
+    {
+      "name": "browser_shell_019",
+      "value": "The tab animation snapshot is not ready yet."
+    },
+    {
+      "name": "browser_shell_020",
+      "value": "This page is already bookmarked. Remove it?"
+    },
+    {
+      "name": "browser_shell_021",
+      "value": "This article is already bookmarked. Remove it?"
+    },
+    {
+      "name": "browser_shell_022",
+      "value": "Saved offline once the page finishes loading."
+    },
+    {
+      "name": "bookmark_icon_preview_001",
+      "value": "Folder icon preview"
+    },
+    {
+      "name": "bookmark_icon_preview_002",
+      "value": "Has files"
+    },
+    {
+      "name": "bookmark_icon_preview_003",
+      "value": "Empty folder"
+    },
+    {
+      "name": "bookmark_icon_preview_004",
+      "value": "Custom yellow"
+    },
+    {
+      "name": "bookmark_icon_preview_005",
+      "value": "Follow theme"
+    },
+    {
+      "name": "bookmark_icon_preview_006",
+      "value": "Entrance animation"
+    },
+    {
+      "name": "bookmark_icon_preview_007",
+      "value": "Replay the has-files animation"
+    },
+    {
+      "name": "custom_home_guide_001",
+      "value": "Share document"
+    },
+    {
+      "name": "custom_home_guide_002",
+      "value": "Couldn't load the developer documentation"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_001",
+      "value": "You will need to import it again to restore it."
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_002",
+      "value": "Delete custom rules"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_003",
+      "value": "Web content filtering cannot be changed in this session"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_004",
+      "value": "Couldn't save the update policy"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_005",
+      "value": "Downloading and parsing the remote rules…"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_006",
+      "value": "Downloading rules"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_007",
+      "value": "Importing rules"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_008",
+      "value": "Importing subscription"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_009",
+      "value": "Updating rules"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_010",
+      "value": "Parsing and saving the local rules…"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_011",
+      "value": "Fetching and parsing the rules again…"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_012",
+      "value": "Couldn't update the custom rules"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_013",
+      "value": "Couldn't download the rules"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_014",
+      "value": "Enter a rule link"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_screen_001",
+      "value": "Import from a URL subscription"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_screen_002",
+      "value": "Couldn't update"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_screen_003",
+      "value": "Import locally"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_screen_004",
+      "value": "Third-party rules"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_screen_005",
+      "value": "Paste an HTTPS rule subscription address"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_screen_006",
+      "value": "Custom rules"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_screen_007",
+      "value": "Automatically update subscription rules"
+    },
+    {
+      "name": "adblock_ui_ad_block_rule_notice_card_001",
+      "value": "Third-party rules are downloaded only after you confirm, and you import and manage custom rules yourself. Too many rules can slow pages down or block content by mistake; follow each site's terms and the law."
+    },
+    {
+      "name": "adblock_ui_ad_block_rule_notice_card_002",
+      "value": "More rules are not always better"
+    },
+    {
+      "name": "adblock_ui_ad_block_risk_consent_sheet_001",
+      "value": "Close the ad blocking risk notice"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_001",
+      "value": "Bookmark update unfinished"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_002",
+      "value": "Sync a full set of bookmarks from the cloud"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_003",
+      "value": "Export a backup of this device's bookmarks to a location you choose"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_004",
+      "value": "Update Aira Cloud bookmarks"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_005",
+      "value": "The local bookmark backup is saved. Try again to overwrite this device with the cloud bookmarks."
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_006",
+      "value": "Backing up and updating bookmarks"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_007",
+      "value": "This version uses a new Aira Cloud bookmark baseline. First export this device's bookmarks as a local backup; once that succeeds, the local bookmarks are cleared and a set is synced from the cloud."
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_008",
+      "value": "Clear local bookmarks"
+    },
+    {
+      "name": "sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_009",
+      "value": "Keep Aira in the foreground. Automatic bookmark sync does not start until this finishes."
+    },
+    {
+      "name": "sync_ui_huawei_space_bookmark_upgrade_prompt_presenter_001",
+      "value": "Bookmark sync has been upgraded. Turn it on once more so this device's bookmarks actually sync to Huawei Cloud Space. Local bookmarks, home favorites, the novel bookshelf, common settings, and other sync methods are not affected."
+    },
+    {
+      "name": "sync_ui_huawei_space_bookmark_upgrade_prompt_presenter_002",
+      "value": "Turn it on again"
+    },
+    {
+      "name": "sync_ui_huawei_space_bookmark_upgrade_prompt_presenter_003",
+      "value": "Later"
+    },
+    {
+      "name": "sync_ui_huawei_space_bookmark_upgrade_prompt_presenter_004",
+      "value": "Turn Huawei Cloud Space bookmark sync on again"
+    },
+    {
+      "name": "sync_ui_sync_result_dialog_001",
+      "value": "Done."
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_001",
+      "value": "Translated only"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_002",
+      "value": "Slower on content-heavy pages"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_003",
+      "value": "Side by side"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_004",
+      "value": "Stop translating"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_005",
+      "value": "Showing the original"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_006",
+      "value": "This page is translated"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_007",
+      "value": "Part of the page is translated"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_008",
+      "value": "Translate this page?"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_009",
+      "value": "Show the original"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_010",
+      "value": "Translating this page with the selected service"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_011",
+      "value": "Translate"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_012",
+      "value": "Translation failed"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_013",
+      "value": "Translate again"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_001",
+      "value": "Use Bing wallpapers"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_002",
+      "value": "Images and video"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_003",
+      "value": "Wallpaper color"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_004",
+      "value": "Couldn't load Bing wallpapers"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_005",
+      "value": "Change"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_006",
+      "value": "Change the custom wallpaper"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_007",
+      "value": "Change the video wallpaper"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_008",
+      "value": "Loading Bing wallpapers"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_009",
+      "value": "Add a custom wallpaper"
+    },
+    {
+      "name": "wallpaper_ui_wallpaper_settings_screen_010",
+      "value": "Add a video wallpaper"
+    },
+    {
+      "name": "update_ui_community_update_sheet_001",
+      "value": "Go to download"
+    },
+    {
+      "name": "update_ui_community_update_sheet_002",
+      "value": "A new version is available"
+    },
+    {
+      "name": "update_ui_community_update_sheet_003",
+      "value": "Later"
+    },
+    {
+      "name": "update_ui_client_update_required_sheet_001",
+      "value": "Aira needs an update"
+    },
+    {
+      "name": "update_ui_community_update_overlay_001",
+      "value": "Software update"
+    },
+    {
+      "name": "update_ui_release_notice_sheet_001",
+      "value": "Close the update notice"
+    },
+    {
+      "name": "onboarding_ui_feature_intro_gate_001",
+      "value": "The purest HarmonyOS browser"
+    },
+    {
+      "name": "onboarding_ui_feature_intro_gate_002",
+      "value": "By continuing you agree to the"
+    },
+    {
+      "name": "onboarding_ui_feature_intro_gate_003",
+      "value": "Privacy policy"
+    },
+    {
+      "name": "onboarding_ui_bottom_toolbar_guide_overlay_001",
+      "value": "Bottom toolbar tip"
+    },
+    {
+      "name": "onboarding_ui_feature_intro_skip_control_001",
+      "value": "Skip"
+    },
+    {
+      "name": "membership_ui_aira_pro_national_day_offer_dialog_001",
+      "value": "Buy the long-term membership for ¥48"
+    },
+    {
+      "name": "membership_ui_aira_pro_national_day_offer_dialog_002",
+      "value": "Was ¥68.8, until October 7"
+    },
+    {
+      "name": "membership_ui_aira_pro_national_day_offer_dialog_003",
+      "value": "National Day long-term membership offer"
+    },
+    {
+      "name": "membership_ui_aira_pro_national_day_offer_dialog_004",
+      "value": "off"
+    },
+    {
+      "name": "custom_home_ui_custom_homepage_unavailable_surface_001",
+      "value": "Set up again"
+    },
+    {
+      "name": "custom_home_ui_system_homepage_live_preview_001",
+      "value": "No recently closed items"
+    },
+    {
+      "name": "adblock_ui_ad_block_custom_rules_host_015",
+      "value": "Couldn't download \"%1$s\". Check the network connection and the rule server, then try again.%2$s"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_015",
+      "value": "Translating, %1$s/%2$s sections done"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_016",
+      "value": "Translating this page with %1$s"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_017",
+      "value": "Translate into %1$s"
+    },
+    {
+      "name": "translation_ui_webpage_translation_panel_018",
+      "value": "Target language: %1$s"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_001",
+      "value": "Not a secure context"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_002",
+      "value": "Events"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_003",
+      "value": "Session storage"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_004",
+      "value": "Stop picking on the page"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_005",
+      "value": "Element"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_006",
+      "value": "Close element inspection"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_007",
+      "value": "Create a copy"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_008",
+      "value": "Delete element"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_009",
+      "value": "Protocol"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_010",
+      "value": "Mixed content is checked only on HTTPS pages."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_011",
+      "value": "Only the current site is shown. HttpOnly cookies are not visible, and names such as passwords and tokens are hidden."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_012",
+      "value": "Read-only. Styles cannot be changed here."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_013",
+      "value": "Pick an element on the page"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_014",
+      "value": "Copy JS path"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_015",
+      "value": "Copy XPath"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_016",
+      "value": "Copy outerHTML"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_017",
+      "value": "Copy styles"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_018",
+      "value": "Copy selector"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_019",
+      "value": "Store as a global variable"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_020",
+      "value": "Secure context"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_021",
+      "value": "Attributes"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_022",
+      "value": "Attribute value"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_023",
+      "value": "An empty value deletes the attribute."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_024",
+      "value": "Attribute name"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_025",
+      "value": "Hidden"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_026",
+      "value": "Layout"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_027",
+      "value": "Layout is left empty here."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_028",
+      "value": "This site has no session storage."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_029",
+      "value": "This site has no local storage."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_030",
+      "value": "No element to show on this page"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_031",
+      "value": "Run"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_032",
+      "value": "Run JavaScript"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_033",
+      "value": "Drag to resize the page and the element inspector"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_034",
+      "value": "Console"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_035",
+      "value": "Couldn't read this source."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_036",
+      "value": "Timing unavailable"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_037",
+      "value": "Timing comes from the page's resource timing. Blue is waiting, green is downloading. Status is visible only for script requests; request headers and response bodies are not."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_038",
+      "value": "Show element"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_039",
+      "value": "Local storage"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_040",
+      "value": "Styles"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_041",
+      "value": "Preparing element inspection…"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_042",
+      "value": "Reading HTML…"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_043",
+      "value": "Reading code…"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_044",
+      "value": "Reading attributes…"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_045",
+      "value": "Reading page security information."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_046",
+      "value": "No HTTP resources seen."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_047",
+      "value": "No databases seen. Only the database names are listed; their contents are not read."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_048",
+      "value": "No inline events found. Listeners bound after inspection starts appear here."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_049",
+      "value": "Mixed content"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_050",
+      "value": "Add attribute"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_051",
+      "value": "Source"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_052",
+      "value": "Scroll into view"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_053",
+      "value": "Click outside or press Ctrl+Enter to apply, Esc to cancel. Only this page is changed."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_054",
+      "value": "Pick an existing attribute to edit. Renaming deletes the old attribute, and an empty value deletes it."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_055",
+      "value": "Listeners"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_056",
+      "value": "Empty"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_057",
+      "value": "Edit as HTML"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_058",
+      "value": "Edit attribute"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_059",
+      "value": "Edit this HTML"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_060",
+      "value": "The page is refreshing while inspection stays open; resources appear once the page is ready."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_061",
+      "value": "Focus"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_062",
+      "value": "Warnings"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_063",
+      "value": "Computed"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_064",
+      "value": "Certificate"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_065",
+      "value": "The certificate chain, validity, and request headers are not visible."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_066",
+      "value": "Filter"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_067",
+      "value": "No source to show yet."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_068",
+      "value": "No logs yet. The page's console output and uncaught errors appear here."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_069",
+      "value": "No resources seen yet. New requests made after inspection opens, plus resources the page already loaded, appear here."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_070",
+      "value": "No element selected yet. Click the page, or click the tree above."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_071",
+      "value": "This element has no editable attributes."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_072",
+      "value": "This site's main frame failed certificate validation before."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_073",
+      "value": "This tab has no content."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_074",
+      "value": "No certificate errors seen this time."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_075",
+      "value": "Pick an item to view its source. Cross-origin scripts and styles show only their address."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_076",
+      "value": "Errors"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_077",
+      "value": "Hide element"
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_078",
+      "value": "At least one root element must remain."
+    },
+    {
+      "name": "browser_ui_element_inspection_dock_079",
+      "value": "The page cannot read cookies."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_001",
+      "value": "Download removed; the file is kept."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_002",
+      "value": "Download removed; the file moved to the recycle bin."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_003",
+      "value": "Download restarted."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_004",
+      "value": "Couldn't load the download list"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_005",
+      "value": "Download cancelled and deleted."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_006",
+      "value": "Download paused."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_007",
+      "value": "Download resumed."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_008",
+      "value": "Download management is limited to this private session"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_009",
+      "value": "This entry came from a private session; this page does not read or show regular browsing data."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_010",
+      "value": "Download record removed."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_011",
+      "value": "Download link copied."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_012",
+      "value": "Delete only the download task?"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_013",
+      "value": "Delete the task only"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_014",
+      "value": "Delete download"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_015",
+      "value": "Delete the task and the file"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_016",
+      "value": "Delete the task and the file?"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_017",
+      "value": "Cancel the download?"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_018",
+      "value": "Saved to the system Downloads folder."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_019",
+      "value": "Once a download starts, the file, progress, and status appear here."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_020",
+      "value": "Current downloads"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_021",
+      "value": "This download can't be deleted right now."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_022",
+      "value": "This download can't be saved to the system Downloads folder right now."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_023",
+      "value": "This download can't be deleted right now."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_024",
+      "value": "This download can't be cancelled right now."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_025",
+      "value": "This download can't be located right now."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_026",
+      "value": "This download can't be opened right now."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_027",
+      "value": "This download can't be paused right now."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_028",
+      "value": "This download can't be resumed right now."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_029",
+      "value": "This download can't be retried right now."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_030",
+      "value": "The download record changed. Refresh and try again."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_031",
+      "value": "This download record can't be deleted right now."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_032",
+      "value": "This download record can't be removed right now."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_033",
+      "value": "Only downloads from this private window are shown."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_034",
+      "value": "No download link to copy."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_035",
+      "value": "No downloads can be multi-selected."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_036",
+      "value": "This page shows only downloads from this private window; download settings apply to the device."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_037",
+      "value": "Open download settings"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_038",
+      "value": "Search downloads"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_039",
+      "value": "Couldn't delete the file; the download task is kept."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_040",
+      "value": "The file no longer exists; the download task was deleted."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_041",
+      "value": "Opening the downloaded file."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_042",
+      "value": "Opening the file location."
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_043",
+      "value": "No downloads"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_044",
+      "value": "Confirm cancel"
+    },
+    {
+      "name": "browser_ui_browser_download_management_screen_045",
+      "value": "Resume download"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_001",
+      "value": " ·"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_002",
+      "value": "items"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_003",
+      "value": "DASH manifest"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_004",
+      "value": "HLS m3u8 manifest"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_005",
+      "value": "Preparing HLS takeover"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_006",
+      "value": "iframe / subframe"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_007",
+      "value": "Probes master/media, quality levels, segments, keys, and the request context."
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_008",
+      "value": "Refresh parsing"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_009",
+      "value": "Copy context"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_010",
+      "value": "Streaming manifest found"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_011",
+      "value": "Tip"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_012",
+      "value": "No resources"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_013",
+      "value": "No manifest selected"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_014",
+      "value": "Sample segment"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_015",
+      "value": "Parsing the m3u8 manifest"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_016",
+      "value": "No HLS manifest to handle"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_017",
+      "value": "Couldn't parse the manifest"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_018",
+      "value": "Parsing starts when you tap the floating card; you can also refresh the manifest manually."
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_019",
+      "value": "Waiting to parse"
+    },
+    {
+      "name": "browser_ui_browser_hls_takeover_sheet_020",
+      "value": "Request context"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_001",
+      "value": "1.0x (normal)"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_002",
+      "value": "Download this video"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_003",
+      "value": "Close the video player"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_004",
+      "value": "Switch aspect ratio"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_005",
+      "value": "Back 10 seconds"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_006",
+      "value": "Swipe left or right to fine-tune the speed"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_007",
+      "value": "Forward 10 seconds"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_008",
+      "value": "Stretch to fill"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_009",
+      "value": "Drag to seek"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_010",
+      "value": "Play"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_011",
+      "value": "Playback speed"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_012",
+      "value": "Rotate the picture"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_013",
+      "value": "Pause"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_014",
+      "value": "Crop to fill"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_015",
+      "value": "Couldn't open the video."
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_016",
+      "value": "Unlock player controls"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_017",
+      "value": "Fit to screen"
+    },
+    {
+      "name": "browser_ui_browser_video_assistant_player_overlay_018",
+      "value": "Lock player controls"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_001",
+      "value": "View code fullscreen"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_002",
+      "value": "Close element inspection"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_003",
+      "value": "Copy HTML"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_004",
+      "value": "Inspect"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_005",
+      "value": "This element has no HTML to show."
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_006",
+      "value": "Collapse the fullscreen code preview"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_007",
+      "value": "More element actions"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_008",
+      "value": "Starting element inspection"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_009",
+      "value": "Pick a web element"
+    },
+    {
+      "name": "browser_ui_element_inspection_overlay_010",
+      "value": "Pick the element again"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_download_popover_001",
+      "value": "Show in folder"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_download_popover_002",
+      "value": "Full download history"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_download_popover_003",
+      "value": "No downloads to show"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_download_popover_004",
+      "value": "Can't show it in the folder right now."
+    },
+    {
+      "name": "browser_ui_browser_large_screen_download_popover_005",
+      "value": "Recent downloads"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_001",
+      "value": "Close other tabs"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_002",
+      "value": "Close tabs to the right"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_003",
+      "value": "Unpin"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_004",
+      "value": "Pin vertical tab"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_005",
+      "value": "New tab to the right"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_006",
+      "value": "Move tab to a new window"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_007",
+      "value": "Mute this site"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_008",
+      "value": "Collapse vertical tabs"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_009",
+      "value": "Unmute"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_vertical_tabs_sidebar_010",
+      "value": "Reload"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_strip_surface_001",
+      "value": "Drag window"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_list_popover_001",
+      "value": "Expand recently closed tabs"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_list_popover_002",
+      "value": "Open tabs"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_list_popover_003",
+      "value": "Collapse recently closed tabs"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_list_popover_004",
+      "value": "No open tabs"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_list_popover_005",
+      "value": "No recently closed tabs"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_list_popover_006",
+      "value": "Recently closed tabs"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_tab_list_popover_007",
+      "value": "Tab list"
+    },
+    {
+      "name": "browser_ui_browser_download_management_row_001",
+      "value": "Compress"
+    },
+    {
+      "name": "browser_ui_browser_download_management_row_002",
+      "value": "File"
+    },
+    {
+      "name": "browser_ui_browser_download_management_row_003",
+      "value": "Text"
+    },
+    {
+      "name": "browser_ui_browser_download_management_row_004",
+      "value": "Presentation"
+    },
+    {
+      "name": "browser_ui_browser_download_management_row_005",
+      "value": "Web code"
+    },
+    {
+      "name": "browser_ui_browser_download_management_row_006",
+      "value": "Spreadsheet"
+    },
+    {
+      "name": "browser_ui_browser_shell_dialogs_001",
+      "value": "Note (optional)"
+    },
+    {
+      "name": "browser_ui_browser_shell_dialogs_002",
+      "value": "Sign in"
+    },
+    {
+      "name": "browser_ui_browser_shell_dialogs_003",
+      "value": "Edit shortcut"
+    },
+    {
+      "name": "browser_ui_browser_shell_dialogs_004",
+      "value": "Page prompt"
+    },
+    {
+      "name": "browser_ui_browser_shell_dialogs_005",
+      "value": "Page authentication"
+    },
+    {
+      "name": "browser_ui_browser_wifi_qr_result_overlay_001",
+      "value": "Wi-Fi information"
+    },
+    {
+      "name": "browser_ui_browser_wifi_qr_result_overlay_002",
+      "value": "You can copy the password to a computer or another device"
+    },
+    {
+      "name": "browser_ui_browser_wifi_qr_result_overlay_003",
+      "value": "Copy password"
+    },
+    {
+      "name": "browser_ui_browser_wifi_qr_result_overlay_004",
+      "value": "No password included"
+    },
+    {
+      "name": "browser_ui_browser_wifi_qr_result_overlay_005",
+      "value": "Network name"
+    },
+    {
+      "name": "browser_ui_home_page_settings_sheet_001",
+      "value": "Couldn't upload the logo. Try again later."
+    },
+    {
+      "name": "browser_ui_home_page_settings_sheet_002",
+      "value": "Close home settings"
+    },
+    {
+      "name": "browser_ui_home_page_settings_sheet_003",
+      "value": "Back to home settings"
+    },
+    {
+      "name": "browser_ui_home_page_settings_sheet_004",
+      "value": "Couldn't select the wallpaper. Try again later."
+    },
+    {
+      "name": "browser_ui_home_page_settings_sheet_005",
+      "value": "Couldn't select the video wallpaper. Try again later."
+    },
+    {
+      "name": "browser_ui_home_shortcut_selection_sheet_001",
+      "value": "Close add to home"
+    },
+    {
+      "name": "browser_ui_home_shortcut_selection_sheet_002",
+      "value": "Loading bookmarks…"
+    },
+    {
+      "name": "browser_ui_home_shortcut_selection_sheet_003",
+      "value": "Add to home"
+    },
+    {
+      "name": "browser_ui_home_shortcut_selection_sheet_004",
+      "value": "System entry"
+    },
+    {
+      "name": "browser_ui_home_shortcut_selection_sheet_005",
+      "value": "Back one level"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_omnibox_search_surface_001",
+      "value": "Switch search engine"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_omnibox_search_surface_002",
+      "value": "No search history"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_omnibox_search_surface_003",
+      "value": "No suggestions"
+    },
+    {
+      "name": "browser_ui_browser_large_screen_omnibox_search_surface_004",
+      "value": "Clear search history"
+    },
+    {
+      "name": "browser_ui_browser_private_mode_lock_overlay_001",
+      "value": "Back to regular mode"
+    },
+    {
+      "name": "browser_ui_browser_private_mode_lock_overlay_002",
+      "value": "Verifying"
+    },
+    {
+      "name": "browser_ui_browser_private_mode_lock_overlay_003",
+      "value": "Unlock"
+    },
+    {
+      "name": "browser_ui_browser_private_mode_lock_overlay_004",
+      "value": "Private mode is locked"
+    },
+    {
+      "name": "browser_ui_browser_site_permission_prompt_host_001",
+      "value": "Don't allow"
+    },
+    {
+      "name": "browser_ui_browser_site_permission_prompt_host_002",
+      "value": "Allow while in use"
+    },
+    {
+      "name": "browser_ui_browser_site_permission_prompt_host_003",
+      "value": "Allow this time"
+    },
+    {
+      "name": "browser_ui_browser_site_permission_prompt_host_004",
+      "value": "Site permission request"
+    },
+    {
+      "name": "browser_ui_browser_tabs_overview_bottom_chrome_001",
+      "value": "0 tabs"
+    },
+    {
+      "name": "browser_ui_browser_tabs_overview_bottom_chrome_002",
+      "value": "Back to home"
+    },
+    {
+      "name": "browser_ui_browser_tabs_overview_bottom_chrome_003",
+      "value": "Return to the page before the tab manager"
+    },
+    {
+      "name": "browser_ui_browser_tabs_overview_bottom_chrome_004",
+      "value": "Private tabs"
+    },
+    {
+      "name": "browser_ui_browser_web_error_surface_001",
+      "value": "Try again"
+    },
+    {
+      "name": "browser_ui_browser_web_error_surface_002",
+      "value": "Go to system settings"
+    },
+    {
+      "name": "browser_ui_browser_web_error_surface_003",
+      "value": "Error details"
+    },
+    {
+      "name": "browser_ui_recently_closed_record_list_001",
+      "value": "Once you close a page, recoverable sessions appear here."
+    },
+    {
+      "name": "browser_ui_recently_closed_record_list_002",
+      "value": "Delete record"
+    },
+    {
+      "name": "browser_ui_recently_closed_record_list_003",
+      "value": "No recently closed tabs yet"
+    },
+    {
+      "name": "browser_ui_recently_closed_record_list_004",
+      "value": "Reopen"
+    },
+    {
+      "name": "browser_ui_browser_cross_device_tabs_overlay_001",
+      "value": "Couldn't open this page right now"
+    },
+    {
+      "name": "browser_ui_browser_cross_device_tabs_overlay_002",
+      "value": "Reading online computers…"
+    },
+    {
+      "name": "browser_ui_browser_cross_device_tabs_overlay_003",
+      "value": "Computer"
+    },
+    {
+      "name": "browser_ui_browser_tabs_overview_empty_state_001",
+      "value": "Pages you open use a separate temporary session and are not written to regular browsing history. After you close all private tabs, this session's data is handled by your privacy settings."
+    },
+    {
+      "name": "browser_ui_browser_tabs_overview_empty_state_002",
+      "value": "No tabs"
+    },
+    {
+      "name": "browser_ui_browser_tabs_overview_empty_state_003",
+      "value": "This is your private space"
+    },
+    {
+      "name": "browser_ui_browser_address_bar_tab_swipe_surface_001",
+      "value": "Restoring the page…"
+    },
+    {
+      "name": "browser_ui_browser_download_confirm_sheet_001",
+      "value": "File name"
+    },
+    {
+      "name": "browser_ui_browser_quick_search_switch_bar_001",
+      "value": ", current search engine"
+    },
+    {
+      "name": "browser_ui_browser_search_suggestions_panel_001",
+      "value": "Collapse search"
+    },
+    {
+      "name": "browser_ui_browser_split_toolbar_chrome_001",
+      "value": "Current"
+    },
+    {
+      "name": "browser_ui_browser_tab_overview_card_001",
+      "value": "Close tab"
+    },
+    {
+      "name": "browser_ui_home_shortcut_surface_001",
+      "value": "Remove from home"
+    },
+    {
+      "name": "browser_ui_new_user_gift_overlay_001",
+      "value": "New user gift"
+    },
+    {
+      "name": "browser_ui_private_home_watermark_001",
+      "value": "Currently in private mode"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_001",
+      "value": "HTML cannot be empty."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_002",
+      "value": "HTML copied."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_003",
+      "value": "HTML copied, but the element could not be deleted."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_004",
+      "value": "HTML copied; the overlong part was truncated."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_005",
+      "value": "HTML updated."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_006",
+      "value": "Couldn't apply the HTML. Keep at least one root element."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_007",
+      "value": "JS path copied."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_008",
+      "value": "XPath copied."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_009",
+      "value": "Element deleted."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_010",
+      "value": "The element action failed. Try again later."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_011",
+      "value": "Cut failed. Try again later."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_012",
+      "value": "The clipboard is empty."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_013",
+      "value": "Couldn't copy the HTML. Try again later."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_014",
+      "value": "Couldn't copy the selector. Try again later."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_015",
+      "value": "Invalid attribute name."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_016",
+      "value": "Attribute updated."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_017",
+      "value": "Cut."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_018",
+      "value": "Cut; the overlong part was truncated."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_019",
+      "value": "A copy was created on the page."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_020",
+      "value": "Stored as a global variable."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_021",
+      "value": "Scrolled to the element."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_022",
+      "value": "Pasted."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_023",
+      "value": "Element focused."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_024",
+      "value": "Current element selected"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_025",
+      "value": "This element has no HTML to cut."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_026",
+      "value": "This element has no HTML to copy."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_027",
+      "value": "This element has no styles to copy."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_028",
+      "value": "This element has no path to copy."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_029",
+      "value": "This element has no selector to copy."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_030",
+      "value": "The page changed; element inspection ended."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_031",
+      "value": "Element inspection cannot start on this page."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_032",
+      "value": "Elements cannot be inspected on this page yet."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_033",
+      "value": "Element not found."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_034",
+      "value": "This attribute cannot be changed."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_035",
+      "value": "Couldn't switch to that element."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_036",
+      "value": "Couldn't store it as a global variable."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_037",
+      "value": "Couldn't run the script."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_038",
+      "value": "Couldn't clear the console."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_039",
+      "value": "Couldn't read the source."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_040",
+      "value": "Couldn't select the current element."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_041",
+      "value": "Couldn't pick the element again."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_042",
+      "value": "Preparing HTML…"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_043",
+      "value": "Switching element…"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_044",
+      "value": "Copying the selector…"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_045",
+      "value": "Waiting to pick again…"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_046",
+      "value": "Ending element inspection…"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_047",
+      "value": "Nothing to copy."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_048",
+      "value": "Tap an element on the page to see its code"
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_049",
+      "value": "The page is refreshing; inspection continues."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_050",
+      "value": "Couldn't read the clipboard. Try again later."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_051",
+      "value": "This element cannot be focused."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_052",
+      "value": "This element cannot be changed that way."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_053",
+      "value": "This HTML is too long to edit as a whole."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_054",
+      "value": "Selector copied."
+    },
+    {
+      "name": "browser_element_inspection_session_coordinator_055",
+      "value": "The page changed; element inspection ended."
+    },
+    {
+      "name": "browser_browser_shell_view_model_001",
+      "value": "The main frame failed to load; the tab entered a protected state"
+    },
+    {
+      "name": "browser_browser_shell_view_model_002",
+      "value": "Kept warm in the background"
+    },
+    {
+      "name": "browser_browser_shell_view_model_003",
+      "value": "Standing by in the background"
+    },
+    {
+      "name": "browser_browser_shell_view_model_004",
+      "value": "Warm in the background"
+    },
+    {
+      "name": "browser_browser_shell_view_model_005",
+      "value": "Navigation error"
+    },
+    {
+      "name": "browser_browser_shell_view_model_006",
+      "value": "Cooled down"
+    },
+    {
+      "name": "browser_browser_shell_view_model_007",
+      "value": "Cooled down, ready to restore"
+    },
+    {
+      "name": "browser_browser_shell_view_model_008",
+      "value": "Tab switched"
+    },
+    {
+      "name": "browser_browser_shell_view_model_009",
+      "value": "Reclaimed"
+    },
+    {
+      "name": "browser_browser_shell_view_model_010",
+      "value": "Reclaimed, ready to restore"
+    },
+    {
+      "name": "browser_browser_shell_view_model_011",
+      "value": "Suspended"
+    },
+    {
+      "name": "browser_browser_shell_view_model_012",
+      "value": "Expired and cooled down"
+    },
+    {
+      "name": "browser_browser_shell_view_model_013",
+      "value": "Snapshot restore is unavailable; reloading the page"
+    },
+    {
+      "name": "browser_browser_shell_view_model_014",
+      "value": "Restore error"
+    },
+    {
+      "name": "browser_browser_shell_view_model_015",
+      "value": "The controller took over; restoring the tab's content"
+    },
+    {
+      "name": "browser_browser_shell_view_model_016",
+      "value": "The tab failed to load last time"
+    },
+    {
+      "name": "browser_browser_shell_view_model_017",
+      "value": "The tab stays in a hot runtime"
+    },
+    {
+      "name": "browser_browser_shell_view_model_018",
+      "value": "The tab stayed in the background too long; its live runtime was reclaimed and returns when you switch back"
+    },
+    {
+      "name": "browser_browser_shell_view_model_019",
+      "value": "The tab's navigation failed; waiting to restore again"
+    },
+    {
+      "name": "browser_browser_shell_view_model_020",
+      "value": "The tab cooled down and restores when you switch back"
+    },
+    {
+      "name": "browser_browser_shell_view_model_021",
+      "value": "The background reclaimed the tab's live runtime; it restores when you switch back"
+    },
+    {
+      "name": "browser_browser_shell_view_model_022",
+      "value": "The background reclaimed the tab; it restores when you switch back"
+    },
+    {
+      "name": "browser_browser_shell_view_model_023",
+      "value": "The tab dropped to warm state and restores first when you switch back"
+    },
+    {
+      "name": "browser_browser_shell_view_model_024",
+      "value": "The tab's snapshot restore failed; waiting to reload"
+    },
+    {
+      "name": "browser_browser_shell_view_model_025",
+      "value": "Tab loading"
+    },
+    {
+      "name": "browser_browser_shell_view_model_026",
+      "value": "The tab's renderer ended; waiting to restore"
+    },
+    {
+      "name": "browser_browser_shell_view_model_027",
+      "value": "The tab exceeded the background keep-alive budget; it restores when you switch back"
+    },
+    {
+      "name": "browser_browser_shell_view_model_028",
+      "value": "The tab's runtime errored; waiting to restore"
+    },
+    {
+      "name": "browser_browser_shell_view_model_029",
+      "value": "The tab failed to restore repeatedly and returned to the home page"
+    },
+    {
+      "name": "browser_browser_shell_view_model_030",
+      "value": "The tab stayed in the background a long time and was cooled down to free memory"
+    },
+    {
+      "name": "browser_browser_shell_view_model_031",
+      "value": "Restoring the tab from an error state"
+    },
+    {
+      "name": "browser_browser_shell_view_model_032",
+      "value": "Restoring the tab from a page snapshot"
+    },
+    {
+      "name": "browser_browser_shell_view_model_033",
+      "value": "Switching back to the tab's content"
+    },
+    {
+      "name": "browser_browser_shell_view_model_034",
+      "value": "Loading"
+    },
+    {
+      "name": "browser_browser_shell_view_model_035",
+      "value": "Handling the link the system passed to the browser"
+    },
+    {
+      "name": "browser_browser_shell_view_model_036",
+      "value": "Restoring your last browsing session"
+    },
+    {
+      "name": "browser_browser_shell_view_model_037",
+      "value": "Restoring the reclaimed tab"
+    },
+    {
+      "name": "browser_browser_shell_view_model_038",
+      "value": "Restoring the tab's content"
+    },
+    {
+      "name": "browser_browser_shell_view_model_039",
+      "value": "Restoring the page"
+    },
+    {
+      "name": "browser_browser_shell_view_model_040",
+      "value": "Reloading the page"
+    },
+    {
+      "name": "browser_browser_shell_view_model_041",
+      "value": "Rendering interrupted"
+    },
+    {
+      "name": "browser_browser_shell_view_model_042",
+      "value": "Render error"
+    },
+    {
+      "name": "browser_browser_shell_view_model_043",
+      "value": "Unknown state"
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_001",
+      "value": "Couldn't toggle the bookmarks bar. Try again later."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_002",
+      "value": "Loading stopped."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_003",
+      "value": "Current tab closed."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_004",
+      "value": "Tab list closed."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_005",
+      "value": "In-page find closed."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_006",
+      "value": "Page refreshed."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_007",
+      "value": "Went forward."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_008",
+      "value": "Opened download management."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_009",
+      "value": "Opened bookmark management."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_010",
+      "value": "Opened history."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_011",
+      "value": "Opened a new tab."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_012",
+      "value": "Opened the tab list."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_013",
+      "value": "Opened settings."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_014",
+      "value": "Bookmarks bar shown."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_015",
+      "value": "Already on the home page."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_016",
+      "value": "Address bar focused."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_017",
+      "value": "Left the address bar."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_018",
+      "value": "Bookmarks bar hidden."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_019",
+      "value": "No tab to close."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_020",
+      "value": "No tab to switch to."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_021",
+      "value": "No page to refresh."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_022",
+      "value": "This page cannot be saved offline."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_023",
+      "value": "This page cannot be bookmarked."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_024",
+      "value": "Find is not available on this page yet."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_025",
+      "value": "This page cannot be printed right now."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_026",
+      "value": "Open a page to enter fullscreen."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_027",
+      "value": "No other tab to switch to."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_028",
+      "value": "No page to go forward to."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_029",
+      "value": "No matching tab."
+    },
+    {
+      "name": "browser_browser_keyboard_shortcut_coordinator_030",
+      "value": "No recently closed tabs."
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_001",
+      "value": "Couldn't load EasyPrivacy privacy rules"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_002",
+      "value": "EasyPrivacy privacy rules are off"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_003",
+      "value": "EasyPrivacy privacy rules are being prepared"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_004",
+      "value": "EasyPrivacy privacy rules are active"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_005",
+      "value": "Site protection turned off for this private session only"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_006",
+      "value": "Web content filtering turned off for this site"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_007",
+      "value": "Turned off for this private session only"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_008",
+      "value": "Site protection turned on for this private session only"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_009",
+      "value": "Web content filtering turned on for this site"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_010",
+      "value": "On for this private session only"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_011",
+      "value": "On, nothing blocked yet"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_012",
+      "value": "Web content filtering is not supported on this device yet"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_013",
+      "value": "Privacy rule protection is not supported on this device yet"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_014",
+      "value": "Web content filtering is not supported on this page yet"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_015",
+      "value": "This private session turned off site protection"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_016",
+      "value": "This private session turned off site protection"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_017",
+      "value": "Web content filtering is off for this site"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_018",
+      "value": "The web content filtering engine is unavailable"
+    },
+    {
+      "name": "browser_browser_ad_block_coordinator_019",
+      "value": "Turn on web content filtering first"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_001",
+      "value": "Pushed to the computer."
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_002",
+      "value": "No URL to push."
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_003",
+      "value": "No paired computer is online."
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_004",
+      "value": "This page cannot be pushed to the computer."
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_005",
+      "value": "Pushing too often. Try again later."
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_006",
+      "value": "Push failed. Try again later."
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_007",
+      "value": "Pushing to the computer…"
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_008",
+      "value": "The computer has too many pages waiting to open. Handle some first."
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_009",
+      "value": "Sign in with your HUAWEI ID before pushing pages. Data sync does not need to be on first."
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_010",
+      "value": "Connect the private deployment first."
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_011",
+      "value": "Sign in with your HUAWEI ID again before pushing."
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_012",
+      "value": "Reconnect the private deployment before pushing pages."
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_013",
+      "value": "This page was just opened on the computer."
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_014",
+      "value": "This page is already in the computer's open queue."
+    },
+    {
+      "name": "browser_browser_phone_page_push_coordinator_015",
+      "value": "Pushing pages through Aira Cloud needs Pro; connecting a private deployment makes it free."
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_001",
+      "value": "Couldn't open Aira Pro"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_002",
+      "value": "Couldn't open download management"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_003",
+      "value": "Couldn't open history"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_004",
+      "value": "Couldn't open sync settings"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_005",
+      "value": "Couldn't open the in-app proxy settings"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_006",
+      "value": "Couldn't open your bookshelf"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_007",
+      "value": "Couldn't open search settings"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_008",
+      "value": "Couldn't open the changelog"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_009",
+      "value": "Couldn't open userscripts"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_010",
+      "value": "Couldn't open site customization"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_011",
+      "value": "Couldn't open web content filtering settings"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_012",
+      "value": "Couldn't open the script details"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_013",
+      "value": "Couldn't open settings"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_014",
+      "value": "Couldn't open the setting details"
+    },
+    {
+      "name": "browser_browser_shell_route_coordinator_015",
+      "value": "Couldn't open anti-tracking settings"
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_001",
+      "value": "Temporarily widened the warm keep-alive slots to avoid more background reclaim candidates."
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_002",
+      "value": "The foreground active tab cannot be reclaimed."
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_003",
+      "value": "Foreground active tab; its live runtime is kept."
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_004",
+      "value": "Stayed in the background too long; cooled down to free the memory budget."
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_005",
+      "value": "The background tab is still loading or inside the restore protection window; its live runtime is not reclaimed yet."
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_006",
+      "value": "The background tab exceeded the warm retention window; cooled down to free the memory budget."
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_007",
+      "value": "Inside the warm retention zone; the live runtime is kept and remounts directly when you switch back, without a restore."
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_008",
+      "value": "The abnormal background tab exceeded the protection window and no longer uses the keep-alive budget."
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_009",
+      "value": "The abnormal tab is still inside the protection window; its fault state is kept for you to handle."
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_010",
+      "value": "The most recently active background tab keeps its hot runtime for a direct switch back."
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_011",
+      "value": "Exceeded the background keep-alive budget; the live runtime was released and only the snapshot is kept."
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_012",
+      "value": "Exceeded the background keep-alive budget; the live runtime was released and restores when you switch back."
+    },
+    {
+      "name": "browser_browser_memory_pressure_coordinator_013",
+      "value": "Exceeded the forced mounted runtime threshold; the live runtime was released by retention score."
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_001",
+      "value": "No web controller; skipping the snapshot save."
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_002",
+      "value": "The web controller is not attached; skipping the snapshot save."
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_003",
+      "value": "The web state is empty; skipping the snapshot save."
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_004",
+      "value": "Couldn't serialize the web state."
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_005",
+      "value": "A session-only tab does not save a web snapshot."
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_006",
+      "value": "Released the cooled tab's live web node"
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_007",
+      "value": "Couldn't save the snapshot."
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_008",
+      "value": "The active tab changed while the snapshot was saving; the commit was cancelled."
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_009",
+      "value": "The snapshot save returned no valid result."
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_010",
+      "value": "Loading the tab"
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_011",
+      "value": "No active tab; skipping the snapshot save."
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_012",
+      "value": "A home page tab does not need a web snapshot."
+    },
+    {
+      "name": "browser_browser_tab_recovery_coordinator_013",
+      "value": "The home page is showing; skipping the snapshot save."
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_001",
+      "value": "Aira-sync extension sign-in failed"
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_002",
+      "value": "Aira-sync extension sign-in confirmation failed. Refresh the QR code and try again."
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_003",
+      "value": "Wi-Fi password copied"
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_004",
+      "value": "The QR code does not contain a Wi-Fi password."
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_005",
+      "value": "The QR sign-in credential is incomplete. Refresh the QR code on the computer."
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_006",
+      "value": "The QR sign-in credential expired. Scan again."
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_007",
+      "value": "You can return to the computer and keep using Aira-sync."
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_008",
+      "value": "Couldn't copy the Wi-Fi password. Try again later."
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_009",
+      "value": "Couldn't recognize the Wi-Fi QR code."
+    },
+    {
+      "name": "browser_browser_qr_scan_coordinator_010",
+      "value": "Sign-in failed"
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_001",
+      "value": "Close a regular tab"
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_002",
+      "value": "Regular tab closed."
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_003",
+      "value": "Private tab burned."
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_004",
+      "value": "Returned to the regular tab."
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_005",
+      "value": "Returned to the private tab."
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_006",
+      "value": "Entered private mode"
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_007",
+      "value": "No regular tab to close."
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_008",
+      "value": "No private tab to burn."
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_009",
+      "value": "Burn"
+    },
+    {
+      "name": "browser_browser_tabs_overview_action_bar_policy_010",
+      "value": "Burn private tabs"
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_001",
+      "value": "The web controller was remounted and the page's current state is kept."
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_002",
+      "value": "The web controller is attached and ready to restore the tab."
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_003",
+      "value": "Couldn't activate the web controller."
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_004",
+      "value": "Couldn't attach the web controller."
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_005",
+      "value": "The runtime cooled down and was written to a snapshot"
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_006",
+      "value": "Web controller attached"
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_007",
+      "value": "The background web controller is attached."
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_008",
+      "value": "The new window's web controller took over and is ready to load the target page."
+    },
+    {
+      "name": "browser_browser_runtime_lifecycle_coordinator_009",
+      "value": "Exceeded the forced discard threshold"
+    },
+    {
+      "name": "browser_browser_tab_close_coordinator_001",
+      "value": "Tab closed."
+    },
+    {
+      "name": "browser_browser_tab_close_coordinator_002",
+      "value": "Closed the page and returned to the home page."
+    },
+    {
+      "name": "browser_browser_tab_close_coordinator_003",
+      "value": "Tab moved to a new window."
+    },
+    {
+      "name": "browser_browser_tab_close_coordinator_004",
+      "value": "Restored the recently closed tab."
+    },
+    {
+      "name": "browser_browser_tab_close_coordinator_005",
+      "value": "Returned to the original tab."
+    },
+    {
+      "name": "browser_browser_tab_close_coordinator_006",
+      "value": "This tab can no longer be restored."
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_001",
+      "value": "The HTTPS-First HTTP fallback prompt is waiting for you; the runtime is not reclaimed yet. auth=https_first_http_fallback"
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_002",
+      "value": "Opening the file picker"
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_003",
+      "value": "The page's SSL certificate risk prompt is waiting for you; the runtime is not reclaimed yet. auth=ssl"
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_004",
+      "value": "The page's file picker is open; the runtime is not reclaimed yet."
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_005",
+      "value": "Page confirmation"
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_006",
+      "value": "The page's authentication dialog is waiting for you; the runtime is not reclaimed yet. auth=http"
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_007",
+      "value": "The page failed to select a file"
+    },
+    {
+      "name": "browser_browser_web_capability_prompt_application_coordinator_008",
+      "value": "Couldn't select the file. Try again later."
+    },
+    {
+      "name": "browser_browser_window_launch_application_001",
+      "value": "Opened the link in a new private window."
+    },
+    {
+      "name": "browser_browser_window_launch_application_002",
+      "value": "Opened the link in a new window."
+    },
+    {
+      "name": "browser_browser_window_launch_application_003",
+      "value": "Opened a private window"
+    },
+    {
+      "name": "browser_browser_window_launch_application_004",
+      "value": "The new window received the tab."
+    },
+    {
+      "name": "browser_browser_window_launch_application_005",
+      "value": "The new window cannot save this tab."
+    },
+    {
+      "name": "browser_browser_window_launch_application_006",
+      "value": "Couldn't continue this page"
+    },
+    {
+      "name": "browser_browser_window_launch_application_007",
+      "value": "Opening the external link"
+    },
+    {
+      "name": "browser_browser_window_launch_application_008",
+      "value": "The system handed the link to Aira to open"
+    },
+    {
+      "name": "browser_browser_hls_takeover_view_model_001",
+      "value": "keys"
+    },
+    {
+      "name": "browser_browser_hls_takeover_view_model_002",
+      "value": "segments"
+    },
+    {
+      "name": "browser_browser_hls_takeover_view_model_003",
+      "value": "quality levels"
+    },
+    {
+      "name": "browser_browser_hls_takeover_view_model_004",
+      "value": "Segment"
+    },
+    {
+      "name": "browser_browser_hls_takeover_view_model_005",
+      "value": "About %1$s segments"
+    },
+    {
+      "name": "browser_browser_hls_takeover_view_model_006",
+      "value": "Quality"
+    },
+    {
+      "name": "browser_browser_hls_takeover_view_model_007",
+      "value": "Page"
+    },
+    {
+      "name": "browser_browser_private_tab_coordinator_001",
+      "value": "Left private mode"
+    },
+    {
+      "name": "browser_browser_private_tab_coordinator_002",
+      "value": "Clear private data"
+    },
+    {
+      "name": "browser_browser_private_tab_coordinator_003",
+      "value": "Pages you open will use a separate private session. Enter private mode?"
+    },
+    {
+      "name": "browser_browser_private_tab_coordinator_004",
+      "value": "Enter private mode"
+    },
+    {
+      "name": "browser_browser_private_tab_coordinator_005",
+      "value": "Leaving returns to the regular home page. Private tabs and session data are kept by default."
+    },
+    {
+      "name": "browser_browser_private_tab_coordinator_006",
+      "value": "Couldn't open the private window. Try again."
+    },
+    {
+      "name": "browser_browser_recently_closed_application_coordinator_001",
+      "value": "Delete recent records"
+    },
+    {
+      "name": "browser_browser_recently_closed_application_coordinator_002",
+      "value": "This private session does not show, restore, or change regular recently closed records."
+    },
+    {
+      "name": "browser_browser_recently_closed_application_coordinator_003",
+      "value": "This private session cannot change regular home shortcuts."
+    },
+    {
+      "name": "browser_browser_recently_closed_application_coordinator_004",
+      "value": "Recently closed actions can reach your current regular browsing data."
+    },
+    {
+      "name": "browser_browser_recently_closed_application_coordinator_005",
+      "value": "Record deleted."
+    },
+    {
+      "name": "browser_browser_recently_closed_application_coordinator_006",
+      "value": "This record no longer exists."
+    },
+    {
+      "name": "browser_browser_large_screen_shell_intent_application_001",
+      "value": "Closed other tabs."
+    },
+    {
+      "name": "browser_browser_large_screen_shell_intent_application_002",
+      "value": "Closed tabs to the right."
+    },
+    {
+      "name": "browser_browser_large_screen_shell_intent_application_003",
+      "value": "Closed all tabs."
+    },
+    {
+      "name": "browser_browser_large_screen_shell_intent_application_004",
+      "value": "Opened the bookmark in a new private window."
+    },
+    {
+      "name": "browser_browser_url_threat_protection_coordinator_001",
+      "value": "Website security risk detected"
+    },
+    {
+      "name": "browser_browser_url_threat_protection_coordinator_002",
+      "value": "Watch the page content and what you enter"
+    },
+    {
+      "name": "browser_browser_url_threat_protection_coordinator_003",
+      "value": "Be careful downloading or installing content"
+    },
+    {
+      "name": "browser_browser_url_threat_protection_coordinator_004",
+      "value": "Be careful entering account or payment information"
+    },
+    {
+      "name": "browser_browser_user_agent_runtime_transition_coordinator_001",
+      "value": "The UA transition snapshot was restored; the navigation chain refreshes the page identity"
+    },
+    {
+      "name": "browser_browser_user_agent_runtime_transition_coordinator_002",
+      "value": "The UA runtime was replaced; waiting for the web access stack to recover"
+    },
+    {
+      "name": "browser_browser_user_agent_runtime_transition_coordinator_003",
+      "value": "The UA runtime transition errored after releasing the old controller"
+    },
+    {
+      "name": "browser_browser_user_agent_runtime_transition_coordinator_004",
+      "value": "The UA runtime transition couldn't create a replacement controller"
+    },
+    {
+      "name": "browser_browser_app_url_open_coordinator_001",
+      "value": "Opened the link in the background."
+    },
+    {
+      "name": "browser_browser_app_url_open_coordinator_002",
+      "value": "Opened the link in a new tab."
+    },
+    {
+      "name": "browser_browser_app_url_open_coordinator_003",
+      "value": "No link to open."
+    },
+    {
+      "name": "browser_browser_fullscreen_session_coordinator_001",
+      "value": "Left fullscreen."
+    },
+    {
+      "name": "browser_browser_fullscreen_session_coordinator_002",
+      "value": "Web fullscreen failed."
+    },
+    {
+      "name": "browser_browser_large_screen_overflow_flyout_view_model_001",
+      "value": "Incognito mode does not show history"
+    },
+    {
+      "name": "browser_browser_large_screen_overflow_flyout_view_model_002",
+      "value": "Untitled"
+    },
+    {
+      "name": "browser_browser_large_screen_overflow_flyout_view_model_003",
+      "value": "Reading history"
+    },
+    {
+      "name": "browser_browser_root_bottom_panel_action_application_001",
+      "value": "Nothing openable on the clipboard."
+    },
+    {
+      "name": "browser_browser_root_bottom_panel_action_application_002",
+      "value": "Couldn't get temporary clipboard permission. Try again."
+    },
+    {
+      "name": "browser_browser_tabs_overview_session_coordinator_001",
+      "value": "Couldn't capture the page. Try again."
+    },
+    {
+      "name": "browser_site_report_dialog_view_model_001",
+      "value": "Too much clutter"
+    },
+    {
+      "name": "browser_site_report_dialog_view_model_002",
+      "value": "This is a dangerous site"
+    },
+    {
+      "name": "browser_site_report_dialog_view_model_003",
+      "value": "The page displays incorrectly"
+    },
+    {
+      "name": "browser_browser_fullscreen_exit_hint_policy_001",
+      "value": "Entered fullscreen; press Esc to exit."
+    },
+    {
+      "name": "browser_browser_fullscreen_exit_hint_policy_002",
+      "value": "Entered fullscreen; press the system back button to exit."
+    },
+    {
+      "name": "browser_browser_gesture_onboarding_prompt_coordinator_001",
+      "value": "Swipe up on either side for home · swipe up in the middle for tools"
+    },
+    {
+      "name": "browser_browser_gesture_onboarding_prompt_coordinator_002",
+      "value": "Bottom gesture tip"
+    },
+    {
+      "name": "browser_browser_large_screen_tab_strip_blank_area_policy_001",
+      "value": "Close all tabs"
+    },
+    {
+      "name": "browser_browser_large_screen_tab_strip_blank_area_policy_002",
+      "value": "Reopen closed tabs"
+    },
+    {
+      "name": "browser_browser_restore_coordinator_001",
+      "value": "Refreshing the page"
+    },
+    {
+      "name": "browser_browser_shell_lifecycle_coordinator_001",
+      "value": "Left always-on private mode"
+    },
+    {
+      "name": "browser_browser_shell_lifecycle_coordinator_002",
+      "value": "Opening the script market"
+    },
+    {
+      "name": "browser_browser_tab_home_coordinator_001",
+      "value": "This tab failed to restore; returned to the home page to protect the other tabs."
+    },
+    {
+      "name": "browser_browser_tab_home_coordinator_002",
+      "value": "This tab failed to restore repeatedly; returned to the home page."
+    },
+    {
+      "name": "browser_browser_tab_transition_coordinator_001",
+      "value": "Tab switched."
+    },
+    {
+      "name": "browser_browser_web_protection_feedback_session_coordinator_001",
+      "value": " · Private"
+    },
+    {
+      "name": "browser_browser_web_protection_feedback_session_coordinator_002",
+      "value": ", this private session only"
+    },
+    {
+      "name": "browser_browser_background_open_prompt_coordinator_001",
+      "value": "Opening in the background"
+    },
+    {
+      "name": "browser_browser_download_confirm_overlay_coordinator_001",
+      "value": "This download can't start right now."
+    },
+    {
+      "name": "browser_browser_private_boundary_navigation_service_001",
+      "value": "Sync actions can reach bookmarks, settings, and the sync baseline in your current regular browsing data."
+    },
+    {
+      "name": "browser_browser_recently_closed_tabs_service_001",
+      "value": "Page loading"
+    },
+    {
+      "name": "browser_browser_shell_state_coordinator_001",
+      "value": "Tab restored"
+    },
+    {
+      "name": "browser_browser_tab_background_manager_coordinator_001",
+      "value": "Background reclaim protection: no WebState and no reliable reload target. gate=no_web_state"
+    },
+    {
+      "name": "browser_browser_tablet_interface_mode_policy_001",
+      "value": "Huawei"
+    },
+    {
+      "name": "browser_browser_top_floating_prompt_coordinator_001",
+      "value": "Opened in the background"
+    },
+    {
+      "name": "browser_browser_user_return_home_coordinator_001",
+      "value": "Closed the page and returned to the home page"
+    },
+    {
+      "name": "browser_browser_web_history_command_runtime_coordinator_001",
+      "value": "Went back."
+    },
+    {
+      "name": "browser_browser_web_page_lifecycle_application_coordinator_001",
+      "value": "Network protocol jitter detected; retrying the page restore"
+    },
+    {
+      "name": "browser_external_navigation_prompt_view_model_001",
+      "value": "Other apps"
+    },
+    {
+      "name": "browser_recently_closed_record_time_view_model_001",
+      "value": "Just now"
+    },
+    {
+      "name": "settings_link_online_devices",
+      "value": "Online devices"
     }
   ]
 }
