@@ -138,6 +138,11 @@ function verifyZip({
     if (Object.prototype.hasOwnProperty.call(manifest, 'chrome_url_overrides')) {
       throw new Error(`Firefox package must not include unsupported chrome_url_overrides in ${path.basename(zipPath)}.`);
     }
+    const historyCommand = manifest.commands?.['open-aira-history'];
+    const suggestedKey = historyCommand?.suggested_key || {};
+    if (suggestedKey.default !== 'Ctrl+Shift+Y' || suggestedKey.mac !== 'Command+Shift+Y') {
+      throw new Error(`Firefox package must preset open-aira-history to Ctrl+Shift+Y / Command+Shift+Y in ${path.basename(zipPath)}.`);
+    }
   }
   if (packageKind !== 'firefox' && manifest.chrome_url_overrides?.history !== 'history-override.html') {
     throw new Error(`Package must override the browser history page with history-override.html in ${path.basename(zipPath)}.`);

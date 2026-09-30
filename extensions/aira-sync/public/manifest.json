@@ -59,7 +59,11 @@
   ],
   "commands": {
     "open-aira-history": {
-      "description": "__MSG_commandOpenHistory__"
+      "description": "__MSG_commandOpenHistory__",
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      }
     }
   }
 }

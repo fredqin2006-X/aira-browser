@@ -1,4 +1,36 @@
-import { HISTORY_TAKEOVER_OPEN_MESSAGE } from './historyTakeoverPolicy';
+import {
+  HISTORY_TAKEOVER_OPEN_MESSAGE,
+  detectHistoryPlatform,
+  extensionHistoryCommandShortcuts,
+  readInstalledHistoryBrowser,
+  shouldAssignExtensionHistoryShortcut,
+} from './historyTakeoverPolicy';
+
+const AIRA_OPEN_HISTORY_COMMAND = 'open-aira-history';
+
+type HistoryCommandApi = {
+  getAll?: () => Promise<Array<{ name?: string; shortcut?: string }>>;
+  update?: (detail: { name: string; shortcut: string }) => Promise<void>;
+};
+
+export async function ensureExtensionHistoryShortcut(): Promise<void> {
+  const browser = await readInstalledHistoryBrowser();
+  const commands = globalThis.chrome?.commands as HistoryCommandApi | undefined;
+  if (!commands?.getAll || !commands.update) return;
+  const current = (await commands.getAll()).find((command) => command.name === AIRA_OPEN_HISTORY_COMMAND);
+  if (!shouldAssignExtensionHistoryShortcut(browser, current?.shortcut || '')) return;
+  const platform = detectHistoryPlatform(navigator.platform || '', navigator.userAgent || '');
+  let lastError: unknown;
+  for (const shortcut of extensionHistoryCommandShortcuts(platform)) {
+    try {
+      await commands.update({ name: AIRA_OPEN_HISTORY_COMMAND, shortcut });
+      return;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  if (lastError) throw lastError;
+}
 
 type HistoryTakeoverOpenMessage = {
   type?: unknown;
@@ -10,7 +42,7 @@ function isHistoryTakeoverOpenMessage(message: unknown): message is { type: type
     && (message as HistoryTakeoverOpenMessage).type === HISTORY_TAKEOVER_OPEN_MESSAGE;
 }
 
-async function openOrFocusHistoryPage(): Promise<void> {
+export async function openOrFocusAiraHistoryPage(): Promise<void> {
   const runtime = globalThis.chrome?.runtime;
   const tabs = globalThis.chrome?.tabs;
   const windows = globalThis.chrome?.windows;
@@ -37,7 +69,7 @@ async function openOrFocusHistoryPage(): Promise<void> {
 export function bindHistoryTakeoverRuntime(): void {
   globalThis.chrome?.runtime?.onMessage?.addListener((message, _sender, sendResponse) => {
     if (!isHistoryTakeoverOpenMessage(message)) return undefined;
-    void openOrFocusHistoryPage();
+    void openOrFocusAiraHistoryPage();
     sendResponse?.({ ok: true });
     return false;
   });

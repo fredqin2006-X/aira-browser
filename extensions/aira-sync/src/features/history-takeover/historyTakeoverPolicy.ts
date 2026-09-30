@@ -1,4 +1,7 @@
+import { readExtensionStorageRecord, writeExtensionStorageRecord } from '@/platform/extensionStorage';
+
 export const HISTORY_TAKEOVER_OPEN_MESSAGE = 'AIRA_HISTORY_TAKEOVER_OPEN';
+const INSTALLED_BROWSER_STORAGE_KEY = 'airaInstalledBrowserKind';
 
 export type HistoryBrowserKind = 'zen' | 'floorp' | 'librewolf' | 'waterfox' | 'firefox' | 'opera' | 'vivaldi' | 'edge' | 'brave' | 'chrome' | 'chromium';
 export type HistoryPlatform = 'mac' | 'other';
@@ -7,6 +10,7 @@ export type HistoryBrowserSignals = {
   userAgent?: string;
   brands?: readonly string[];
   isBrave?: boolean;
+  isVivaldi?: boolean;
 };
 
 export type HistoryShortcutEvent = {
@@ -35,7 +39,7 @@ export function resolveHistoryBrowserKind(signals: HistoryBrowserSignals = {}): 
   if (/Floorp\//i.test(ua)) return 'floorp';
   if (/Firefox\//i.test(ua)) return 'firefox';
   if (/OPR\/|Opera\//i.test(ua) || hasBrand('opera')) return 'opera';
-  if (/Vivaldi\//i.test(ua) || hasBrand('vivaldi')) return 'vivaldi';
+  if (signals.isVivaldi === true || /Vivaldi\//i.test(ua) || hasBrand('vivaldi')) return 'vivaldi';
   if (/Edg\//i.test(ua) || hasBrand('microsoft edge')) return 'edge';
   if (hasBrand('google chrome')) return 'chrome';
   if (/Chrome\//i.test(ua) && signals.isBrave === false) return 'chrome';
@@ -61,7 +65,7 @@ export function historyBrowserLabel(kind: HistoryBrowserKind): string {
 type HistoryBrowserNavigator = {
   userAgent?: string;
   brave?: { isBrave?: () => Promise<boolean> };
-  userAgentData?: { brands?: Array<{ brand?: string }> };
+  userAgentData?: { brands?: Array<{ brand?: string }>; platform?: string };
 };
 
 type GeckoBrowserInfo = {
@@ -91,9 +95,154 @@ export async function readInstalledHistoryBrowser(
     userAgent: navigatorObject?.userAgent || '',
     brands,
     isBrave,
+    isVivaldi: await detectInstalledVivaldi(navigatorObject, brands, isBrave),
   });
   const browserName = await readGeckoBrowserName();
-  return kindFromGeckoBrowserName(browserName) ?? detected;
+  return rememberSpecificBrowser(kindFromGeckoBrowserName(browserName) ?? detected);
+}
+
+async function rememberSpecificBrowser(detected: HistoryBrowserKind): Promise<HistoryBrowserKind> {
+  const remembered = await readRememberedBrowserKind();
+  const resolved = detected === 'chrome' || detected === 'chromium'
+    ? remembered ?? detected
+    : detected;
+  if (resolved !== 'chrome' && resolved !== 'chromium' && resolved !== remembered) {
+    await writeExtensionStorageRecord({ [INSTALLED_BROWSER_STORAGE_KEY]: resolved }).catch(() => undefined);
+  }
+  return resolved;
+}
+
+async function readRememberedBrowserKind(): Promise<HistoryBrowserKind | null> {
+  try {
+    const record = await readExtensionStorageRecord([INSTALLED_BROWSER_STORAGE_KEY]);
+    const value = String(record[INSTALLED_BROWSER_STORAGE_KEY] || '').trim();
+    return isHistoryBrowserKind(value) && value !== 'chrome' && value !== 'chromium' ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function isHistoryBrowserKind(value: string): value is HistoryBrowserKind {
+  return value === 'zen'
+    || value === 'floorp'
+    || value === 'librewolf'
+    || value === 'waterfox'
+    || value === 'firefox'
+    || value === 'opera'
+    || value === 'vivaldi'
+    || value === 'edge'
+    || value === 'brave'
+    || value === 'chrome'
+    || value === 'chromium';
+}
+
+type VivaldiTabProbe = {
+  query?: (queryInfo: { currentWindow?: boolean }) => Promise<Array<Record<string, unknown>>>;
+};
+
+export function tabHasVivaldiMetadata(tab: object | null | undefined): boolean {
+  return Boolean(tab && ('vivExtData' in tab || Object.prototype.hasOwnProperty.call(tab, 'vivExtData')));
+}
+
+export function vivaldiProbeRejectionMeansInstalled(message: string): boolean {
+  const text = message.trim();
+  if (!text) return false;
+  return !/unexpected property|unknown property|invalid property|not allowed/i.test(text);
+}
+
+export function vivaldiFromExtensionClientHints(options: {
+  protocol?: string;
+  userAgent?: string;
+  brands?: readonly string[];
+  platform?: string;
+}): boolean {
+  if (options.protocol !== 'chrome-extension:') return false;
+  const userAgent = options.userAgent || '';
+  const brands = options.brands || [];
+  if (/Vivaldi/i.test(userAgent) || brands.some((brand) => /vivaldi/i.test(brand))) return true;
+  if (/Edg\/|OPR\/|Firefox\//i.test(userAgent)) return false;
+  if (brands.some((brand) => /brave|edge|opera/i.test(brand))) return false;
+  return brands.length === 0 && !String(options.platform || '').trim() && /Chrome\//.test(userAgent);
+}
+
+async function detectInstalledVivaldi(
+  navigatorObject: HistoryBrowserNavigator | null,
+  brands: string[],
+  isBrave: boolean,
+): Promise<boolean> {
+  const userAgent = navigatorObject?.userAgent || '';
+  if (/Vivaldi/i.test(userAgent) || brands.some((brand) => /vivaldi/i.test(brand))) return true;
+  if (isBrave || /Edg\/|OPR\/|Firefox\//i.test(userAgent)) return false;
+  if (brands.some((brand) => /brave|edge|opera/i.test(brand))) return false;
+  if (await queryHasVivaldiTab()) return true;
+  const clientHints = navigatorObject?.userAgentData;
+  if (vivaldiFromExtensionClientHints({
+    protocol: globalThis.location?.protocol,
+    userAgent,
+    brands: clientHints?.brands?.map((item) => String(item?.brand || '')) || brands,
+    platform: clientHints?.platform,
+  })) return true;
+  if (!/Chrome\//.test(userAgent)) return false;
+  return probeVivaldiExtensionApi();
+}
+
+let vivaldiProbeResult: boolean | null = null;
+
+async function probeVivaldiExtensionApi(): Promise<boolean> {
+  if (vivaldiProbeResult !== null) return vivaldiProbeResult;
+  const tabs = (globalThis.chrome as unknown as {
+    tabs?: {
+      update?: (
+        tabId: number,
+        info: { vivExtData: string },
+        callback?: () => void,
+      ) => Promise<unknown> | void;
+    };
+  } | undefined)?.tabs;
+  if (typeof tabs?.update !== 'function') return false;
+  const update = tabs.update.bind(tabs);
+  try {
+    const result = update(-1, { vivExtData: '' });
+    if (result && typeof (result as Promise<unknown>).then === 'function') {
+      await result;
+      vivaldiProbeResult = true;
+      return true;
+    }
+  } catch (error) {
+    vivaldiProbeResult = vivaldiProbeRejectionMeansInstalled(String((error as Error)?.message || ''));
+    return vivaldiProbeResult;
+  }
+  return await new Promise((resolve) => {
+    try {
+      update(-1, { vivExtData: '' }, () => {
+        const message = String(globalThis.chrome?.runtime?.lastError?.message || '');
+        vivaldiProbeResult = vivaldiProbeRejectionMeansInstalled(message);
+        resolve(vivaldiProbeResult);
+      });
+    } catch (error) {
+      vivaldiProbeResult = vivaldiProbeRejectionMeansInstalled(String((error as Error)?.message || ''));
+      resolve(vivaldiProbeResult);
+    }
+  });
+}
+
+async function queryHasVivaldiTab(): Promise<boolean> {
+  const chromeApi = globalThis.chrome as unknown as {
+    tabs?: VivaldiTabProbe;
+    windows?: { getAll?: () => Promise<Array<Record<string, unknown>>> };
+  } | undefined;
+  try {
+    const tabs = chromeApi?.tabs?.query ? await chromeApi.tabs.query({}) : [];
+    if (tabs.some((tab) => tabHasVivaldiMetadata(tab))) return true;
+  } catch {
+    // Tabs can be unavailable while the service worker is starting.
+  }
+  try {
+    const windows = chromeApi?.windows?.getAll ? await chromeApi.windows.getAll() : [];
+    return windows.some((item) => tabHasVivaldiMetadata(item));
+  } catch {
+    return false;
+  }
 }
 
 function kindFromGeckoBrowserName(name: string): HistoryBrowserKind | null {
@@ -124,6 +273,88 @@ async function readGeckoBrowserName(): Promise<string> {
 
 export function detectHistoryPlatform(platform: string, userAgent = ''): HistoryPlatform {
   return /Mac|iPhone|iPad|iPod/i.test(`${platform} ${userAgent}`) ? 'mac' : 'other';
+}
+
+export function isGeckoHistoryBrowser(browser: HistoryBrowserKind): boolean {
+  return browser === 'firefox'
+    || browser === 'zen'
+    || browser === 'floorp'
+    || browser === 'librewolf'
+    || browser === 'waterfox';
+}
+
+// Firefox and Vivaldi keep their own history UI. The extension command is the
+// shortcut that actually opens Aira, including when focus is not in a page.
+export function usesExtensionHistoryCommand(browser: HistoryBrowserKind): boolean {
+  return isGeckoHistoryBrowser(browser) || browser === 'vivaldi';
+}
+
+export function geckoHistoryCommandShortcut(platform: HistoryPlatform): string {
+  return platform === 'mac' ? 'Command+Shift+Y' : 'Ctrl+Shift+Y';
+}
+
+export function extensionHistoryCommandShortcuts(platform: HistoryPlatform): string[] {
+  const primary = geckoHistoryCommandShortcut(platform);
+  return platform === 'mac' ? [primary, 'Ctrl+Shift+Y'] : [primary];
+}
+
+export function isExtensionHistoryCommandShortcut(
+  platform: HistoryPlatform,
+  event: {
+    code?: string;
+    ctrlKey?: boolean;
+    metaKey?: boolean;
+    altKey?: boolean;
+    shiftKey?: boolean;
+    repeat?: boolean;
+  },
+): boolean {
+  if (event.repeat || event.altKey || event.code !== 'KeyY') return false;
+  if (platform === 'mac') return Boolean(event.metaKey && event.shiftKey && !event.ctrlKey);
+  return Boolean(event.ctrlKey && event.shiftKey && !event.metaKey);
+}
+
+export function shouldAssignExtensionHistoryShortcut(browser: HistoryBrowserKind, currentShortcut: string): boolean {
+  if (!usesExtensionHistoryCommand(browser)) return false;
+  const current = String(currentShortcut || '').trim();
+  if (!current) return true;
+  // Command+Y / Ctrl+Y is the browser's own history key. It does not open Aira.
+  return /^(?:Command|Ctrl)\+Y$/i.test(current);
+}
+
+export function historyShortcutLabel(browser: HistoryBrowserKind, platform: HistoryPlatform): string {
+  if (usesExtensionHistoryCommand(browser)) {
+    return platform === 'mac' ? '⌘⇧Y' : 'Ctrl+Shift+Y';
+  }
+  if (browser === 'opera') {
+    return platform === 'mac' ? '⌘⇧H' : 'Ctrl+H';
+  }
+  if (browser === 'edge' && platform !== 'mac') {
+    return 'Ctrl+Y';
+  }
+  return platform === 'mac' ? '⌘Y' : 'Ctrl+H';
+}
+
+export function formatAssignedHistoryShortcut(shortcut: string, platform: HistoryPlatform): string {
+  const parts = String(shortcut || '').split('+').map((part) => part.trim()).filter(Boolean);
+  const key = parts.at(-1) || '';
+  if (!key) return '';
+  const modifiers = new Set(parts.slice(0, -1));
+  const shift = modifiers.has('Shift');
+  const alt = modifiers.has('Alt');
+  const macControl = modifiers.has('MacCtrl');
+  const command = modifiers.has('Command') || (platform === 'mac' && modifiers.has('Ctrl') && !macControl);
+  const control = macControl || (platform !== 'mac' && modifiers.has('Ctrl'));
+  if (platform === 'mac') {
+    return `${command ? '⌘' : ''}${control ? '⌃' : ''}${alt ? '⌥' : ''}${shift ? '⇧' : ''}${key}`;
+  }
+  const labels = [
+    control ? 'Ctrl' : '',
+    alt ? 'Alt' : '',
+    shift ? 'Shift' : '',
+    key,
+  ].filter(Boolean);
+  return labels.join('+');
 }
 
 function matchesLetter(event: HistoryShortcutEvent, letter: string): boolean {
@@ -162,10 +393,8 @@ export function isHistoryTakeoverShortcut(
     return platform === 'mac' ? event.shiftKey : !event.shiftKey;
   }
 
-  if (browser === 'firefox' || browser === 'zen' || browser === 'floorp' || browser === 'librewolf' || browser === 'waterfox') {
-    if (!matchesLetter(event, 'h')) return false;
-    return platform === 'mac' ? event.shiftKey : true;
-  }
+  // These browsers own their history keys. The extension command opens Aira.
+  if (usesExtensionHistoryCommand(browser)) return false;
 
   if (!matchesLetter(event, 'h') && !(platform === 'mac' && matchesLetter(event, 'y') && !event.shiftKey)) {
     return false;

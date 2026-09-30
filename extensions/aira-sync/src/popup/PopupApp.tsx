@@ -73,6 +73,15 @@ import {
 import { AIRATAB_CAPABILITIES } from '@/config/AiratabDistribution';
 import { resolveCrossDeviceTransportKind } from '@/features/device-tabs/crossDeviceTransport';
 import { resolveCloudFeatureEntryView, shouldAutoSelectAiraCloud } from './featureEntryRouting';
+import {
+  detectHistoryBrowserKind,
+  detectHistoryPlatform,
+  formatAssignedHistoryShortcut,
+  historyShortcutLabel,
+  readInstalledHistoryBrowser,
+  usesExtensionHistoryCommand,
+} from '@/features/history-takeover/historyTakeoverPolicy';
+import { ensureExtensionHistoryShortcut } from '@/features/history-takeover/historyTakeoverRuntime';
 
 type PopupView =
   | 'home'
@@ -745,6 +754,43 @@ function SectionLabel({ children }: { children: ReactNode }) {
   );
 }
 
+const AIRA_OPEN_HISTORY_COMMAND = 'open-aira-history';
+
+function useHistoryShortcutLabel(): string {
+  const platform = detectHistoryPlatform(navigator.platform || '', navigator.userAgent || '');
+  const [label, setLabel] = useState(() => historyShortcutLabel(
+    detectHistoryBrowserKind(navigator.userAgent || ''),
+    platform,
+  ));
+
+  useEffect(() => {
+    let disposed = false;
+    void (async () => {
+      const browser = await readInstalledHistoryBrowser();
+      let assigned = '';
+      if (usesExtensionHistoryCommand(browser)) {
+        try {
+          await ensureExtensionHistoryShortcut();
+          const commands = await globalThis.chrome?.commands?.getAll?.();
+          assigned = commands?.find((command) => command.name === AIRA_OPEN_HISTORY_COMMAND)?.shortcut || '';
+        } catch {
+          assigned = '';
+        }
+      }
+      if (disposed) return;
+      setLabel(
+        (assigned && formatAssignedHistoryShortcut(assigned, platform))
+          || historyShortcutLabel(browser, platform),
+      );
+    })();
+    return () => {
+      disposed = true;
+    };
+  }, [platform]);
+
+  return label;
+}
+
 function QuickActionButton({
   icon,
   title,
@@ -775,7 +821,7 @@ function QuickActionButton({
       </span>
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-medium leading-5 text-foreground">{title}</span>
-        {badge ? <span className="mt-0.5 block text-[10px] font-semibold leading-4 text-muted-foreground">{badge}</span> : null}
+        {badge ? <span className="mt-0.5 block truncate text-[10px] font-semibold leading-4 text-muted-foreground" title={badge}>{badge}</span> : null}
       </span>
     </button>
   );
@@ -974,6 +1020,7 @@ function ConfiguredHome({
   phoneTabCount: number;
 }) {
   const { t } = useTranslation();
+  const historyShortcut = useHistoryShortcutLabel();
   return (
     <section className="min-h-[480px] bg-background">
       <HomeHeader profile={profile} onOpenAccount={onOpenAccount} />
@@ -991,7 +1038,7 @@ function ConfiguredHome({
             <QuickActionButton
               icon={<HistoryIcon className="size-4" aria-hidden="true" />}
               title={t('popup.dashboard.history', { defaultValue: '历史记录' })}
-              badge={crossDeviceFeatures?.requiresPro ? 'PRO' : undefined}
+              badge={historyShortcut}
               onClick={onOpenHistory}
             />
           </div>
@@ -1117,6 +1164,7 @@ function LoggedOutHome({
   onOpenDeviceTabs: () => void;
 }) {
   const { t } = useTranslation();
+  const historyShortcut = useHistoryShortcutLabel();
 
   return (
     <section className="min-h-[480px] bg-background">
@@ -1134,7 +1182,7 @@ function LoggedOutHome({
             <QuickActionButton
               icon={<HistoryIcon className="size-4" aria-hidden="true" />}
               title={t('popup.dashboard.history', { defaultValue: '历史记录' })}
-              badge={AIRATAB_CAPABILITIES.airaCloud ? 'PRO' : undefined}
+              badge={historyShortcut}
               onClick={onOpenHistory}
             />
           </div>
@@ -1191,6 +1239,7 @@ function PersonalServerHome({
   phoneTabCount: number;
 }) {
   const { t } = useTranslation();
+  const historyShortcut = useHistoryShortcutLabel();
   return (
     <section className="min-h-[480px] bg-background">
       <HomeHeader profile={profile} onOpenAccount={onOpenAccount} />
@@ -1207,6 +1256,7 @@ function PersonalServerHome({
             <QuickActionButton
               icon={<HistoryIcon className="size-4" aria-hidden="true" />}
               title={t('popup.dashboard.history', { defaultValue: '历史记录' })}
+              badge={historyShortcut}
               onClick={onOpenHistory}
             />
           </div>

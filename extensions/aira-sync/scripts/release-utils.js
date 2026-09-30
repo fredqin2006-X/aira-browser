@@ -34,6 +34,13 @@ function prepareFirefoxStoreManifest(dirPath) {
     scripts: ['background-sw.js'],
     type: 'module',
   };
+  const historyCommand = manifest.commands?.['open-aira-history'];
+  if (historyCommand && typeof historyCommand === 'object') {
+    historyCommand.suggested_key = {
+      default: 'Ctrl+Shift+Y',
+      mac: 'Command+Shift+Y',
+    };
+  }
   manifest.browser_specific_settings = {
     gecko: {
       id: FIREFOX_EXTENSION_ID,

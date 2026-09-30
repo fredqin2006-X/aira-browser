@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { formatChromeHistoryDay } from './chromeHistorySpec';
 import { resolveHistorySkin } from '../registry';
+import { vivaldiHistoryCopy } from '../vivaldi/vivaldiHistorySpec';
 
 describe('chrome history skin', () => {
   test('formats the native Chinese day heading', () => {
@@ -18,7 +19,9 @@ describe('chrome history skin', () => {
     expect(resolveHistorySkin('firefox')).not.toBeNull();
     expect(resolveHistorySkin('zen')).not.toBeNull();
     expect(resolveHistorySkin('opera')).toBe(resolveHistorySkin('chrome'));
-    expect(resolveHistorySkin('vivaldi')).toBe(resolveHistorySkin('chrome'));
+    expect(resolveHistorySkin('vivaldi')).not.toBe(resolveHistorySkin('chrome'));
+    expect(vivaldiHistoryCopy('zh-CN').history).toBe('Vivaldi 历史记录');
+    expect(vivaldiHistoryCopy('en').history).toBe('Vivaldi History');
     expect(resolveHistorySkin('chromium')).toBe(resolveHistorySkin('chrome'));
     expect(resolveHistorySkin('floorp')).toBe(resolveHistorySkin('firefox'));
     expect(resolveHistorySkin('librewolf')).toBe(resolveHistorySkin('firefox'));

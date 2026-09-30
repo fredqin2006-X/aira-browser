@@ -4,6 +4,7 @@ import { BraveHistoryPage } from './brave/BraveHistoryPage';
 import { ChromeHistoryPage } from './chrome/ChromeHistoryPage';
 import { EdgeHistoryPage } from './edge/EdgeHistoryPage';
 import { FirefoxHistoryPage } from './firefox/FirefoxHistoryPage';
+import { VivaldiHistoryPage } from './vivaldi/VivaldiHistoryPage';
 import { ZenHistoryPage } from './zen/ZenHistoryPage';
 
 // Add a browser by dropping its page into its own folder and registering it here.
@@ -17,6 +18,7 @@ const HISTORY_SKINS: Partial<Record<HistoryBrowserKind, ComponentType>> = {
   floorp: FirefoxHistoryPage,
   librewolf: FirefoxHistoryPage,
   waterfox: FirefoxHistoryPage,
+  vivaldi: VivaldiHistoryPage,
   zen: ZenHistoryPage,
 };
 

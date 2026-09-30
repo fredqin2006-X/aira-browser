@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { HistorySyncVisit } from '@/features/sync/history/HistorySyncModels';
 import {
@@ -15,10 +15,17 @@ import { useChromeOtherDeviceTabs } from './useChromeOtherDeviceTabs';
 import './chrome-history.css';
 
 type ChromeHistorySection = 'history' | 'other-devices';
+type HistoryBrandLogo = (props: { theme: 'light' | 'dark' }) => ReactElement;
 
-export function ChromeHistoryPage() {
+export function ChromeHistoryPage({
+  copyFor = chromeHistoryCopy,
+  Logo = ChromeLogo,
+}: {
+  copyFor?: typeof chromeHistoryCopy;
+  Logo?: HistoryBrandLogo;
+} = {}) {
   const { i18n } = useTranslation();
-  const copy = chromeHistoryCopy(i18n.language);
+  const copy = copyFor(i18n.language);
   const data = useHistorySurfaceData();
   const [section, setSection] = useState<ChromeHistorySection>('history');
   const [theme, setTheme] = useState<'light' | 'dark'>(readChromeTheme);
@@ -27,7 +34,7 @@ export function ChromeHistoryPage() {
   const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 960px)').matches);
   const [navOpen, setNavOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const cardRef = useRef<HTMLElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -89,12 +96,14 @@ export function ChromeHistoryPage() {
   }, [menuVisitId]);
 
   useEffect(() => {
+    const list = listRef.current;
+    if (!list) return undefined;
     const onScroll = () => {
       if (!data.hasMore || data.loading) return;
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 240) data.loadMore();
+      if (list.scrollTop + list.clientHeight >= list.scrollHeight - 240) data.loadMore();
     };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    list.addEventListener('scroll', onScroll, { passive: true });
+    return () => list.removeEventListener('scroll', onScroll);
   }, [data]);
 
   const otherDevices = useChromeOtherDeviceTabs(section === 'other-devices');
@@ -173,7 +182,7 @@ export function ChromeHistoryPage() {
           >
             <MenuIcon />
           </button>
-          <ChromeLogo theme={theme} />
+          <Logo theme={theme} />
           <h1>{copy.title}</h1>
         </div>
         <form className="chrome-history-search" role="search" onSubmit={(event) => event.preventDefault()}>
@@ -202,7 +211,7 @@ export function ChromeHistoryPage() {
           <button type="button" className="chrome-history-scrim" aria-label={copy.title} onClick={closeNav} />
           <aside className="chrome-history-drawer">
             <div className="chrome-history-drawer-brand">
-              <ChromeLogo theme={theme} />
+              <Logo theme={theme} />
               <h1>{copy.title}</h1>
             </div>
             <HistoryNav
@@ -227,7 +236,8 @@ export function ChromeHistoryPage() {
           onSelect={setSection}
           onClear={openClearData}
         />
-        <main className="chrome-history-card" ref={cardRef} onClick={() => setMenuVisitId('')}>
+        <div className="chrome-history-main" ref={listRef}>
+        <main className="chrome-history-card" onClick={() => setMenuVisitId('')}>
           {section === 'other-devices' ? (
             <OtherDeviceTabs
               copy={copy}
@@ -287,6 +297,7 @@ export function ChromeHistoryPage() {
             </section>
           ))}
         </main>
+        </div>
       </div>
     </div>
   );

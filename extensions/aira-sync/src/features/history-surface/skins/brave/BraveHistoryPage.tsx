@@ -27,7 +27,7 @@ export function BraveHistoryPage() {
   const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 960px)').matches);
   const [navOpen, setNavOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const cardRef = useRef<HTMLElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -77,12 +77,14 @@ export function BraveHistoryPage() {
   }, [navOpen, searchOpen]);
 
   useEffect(() => {
+    const list = listRef.current;
+    if (!list) return undefined;
     const onScroll = () => {
       if (!data.hasMore || data.loading) return;
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 240) data.loadMore();
+      if (list.scrollTop + list.clientHeight >= list.scrollHeight - 240) data.loadMore();
     };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    list.addEventListener('scroll', onScroll, { passive: true });
+    return () => list.removeEventListener('scroll', onScroll);
   }, [data]);
 
   const otherDevices = useChromeOtherDeviceTabs(section === 'other-devices');
@@ -215,7 +217,8 @@ export function BraveHistoryPage() {
           onSelect={setSection}
           onClear={openClearData}
         />
-        <main className="brave-history-card" ref={cardRef} onClick={() => setMenuVisitId('')}>
+        <div className="brave-history-main" ref={listRef}>
+        <main className="brave-history-card" onClick={() => setMenuVisitId('')}>
           {section === 'other-devices' ? (
             <OtherDeviceTabs
               copy={copy}
@@ -275,6 +278,7 @@ export function BraveHistoryPage() {
             </section>
           ))}
         </main>
+        </div>
       </div>
     </div>
   );

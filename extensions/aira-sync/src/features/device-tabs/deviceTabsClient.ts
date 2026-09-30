@@ -18,6 +18,11 @@ import { readExtensionStorageRecord } from '@/platform/extensionStorage';
 import { LEAFTAB_SELECTED_SYNC_SOURCE_KEY } from '@/features/sync/app/leafTabSyncStorageKeys';
 import { parseLeafTabSyncRemoteKind } from '@/sync/leaftab/source';
 import { resolveCrossDeviceTransportKind } from './crossDeviceTransport';
+import {
+  historyBrowserLabel,
+  readInstalledHistoryBrowser,
+  type HistoryBrowserKind,
+} from '@/features/history-takeover/historyTakeoverPolicy';
 
 type ApiResponse = {
   ok?: boolean;
@@ -92,7 +97,7 @@ async function readDesktopContext(): Promise<{
     readAiraDesktopConnectionSnapshot(),
   ]);
   const selectedSource = parseLeafTabSyncRemoteKind(sourceRecord[LEAFTAB_SELECTED_SYNC_SOURCE_KEY]);
-  const metadata = resolveBrowserMetadata();
+  const metadata = await resolveBrowserMetadata();
   const accountSignedIn = Boolean(
     session?.uid && session.deviceCredential && snapshot.status !== 'reauth-required',
   );
@@ -181,7 +186,19 @@ function normalizeHttpUrl(value: string): string {
   }
 }
 
-function resolveBrowserMetadata(): { platform: string; browserName: string; browserVersion: string } {
+export function desktopBrowserIdentity(
+  kind: HistoryBrowserKind,
+  userAgent: string,
+  platform: string,
+): { platform: string; browserName: string; browserVersion: string } {
+  return {
+    platform,
+    browserName: historyBrowserLabel(kind),
+    browserVersion: browserVersionFromUserAgent(kind, userAgent),
+  };
+}
+
+async function resolveBrowserMetadata(): Promise<{ platform: string; browserName: string; browserVersion: string }> {
   const userAgent = typeof navigator === 'undefined' ? '' : String(navigator.userAgent || '');
   const userAgentData = typeof navigator === 'undefined'
     ? undefined
@@ -191,11 +208,24 @@ function resolveBrowserMetadata(): { platform: string; browserName: string; brow
       : userAgent.includes('Mac OS X') ? 'macOS'
         : userAgent.includes('Linux') ? 'Linux'
           : 'Desktop');
-  const edge = userAgent.match(/Edg\/([0-9.]+)/);
-  if (edge) return { platform, browserName: 'Microsoft Edge', browserVersion: edge[1] };
-  const chrome = userAgent.match(/Chrome\/([0-9.]+)/);
-  if (chrome) return { platform, browserName: 'Google Chrome', browserVersion: chrome[1] };
-  return { platform, browserName: 'Aira-sync', browserVersion: '' };
+  const kind = await readInstalledHistoryBrowser();
+  return desktopBrowserIdentity(kind, userAgent, platform);
+}
+
+function browserVersionFromUserAgent(kind: HistoryBrowserKind, userAgent: string): string {
+  const token = kind === 'edge' ? 'Edg'
+    : kind === 'opera' ? 'OPR'
+      : kind === 'vivaldi' ? 'Vivaldi'
+        : kind === 'zen' ? 'Zen'
+          : kind === 'floorp' ? 'Floorp'
+            : kind === 'librewolf' ? 'LibreWolf'
+              : kind === 'waterfox' ? 'Waterfox'
+                : kind === 'firefox' ? 'Firefox'
+                  : 'Chrome';
+  return userAgent.match(new RegExp(`${token}/([0-9.]+)`))?.[1]
+    || userAgent.match(/Chrome\/([0-9.]+)/)?.[1]
+    || userAgent.match(/Firefox\/([0-9.]+)/)?.[1]
+    || '';
 }
 
 function parseDevice(value: unknown): CrossDeviceTabDevice | null {

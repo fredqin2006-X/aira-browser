@@ -43,7 +43,11 @@ import {
 import { LEAFTAB_SELECTED_SYNC_SOURCE_KEY } from '@/features/sync/app/leafTabSyncStorageKeys';
 import { parseLeafTabSyncRemoteKind } from '@/sync/leaftab/source';
 import { resolveCrossDeviceTransportKind } from '@/features/device-tabs/crossDeviceTransport';
-import { bindHistoryTakeoverRuntime } from '@/features/history-takeover/historyTakeoverRuntime';
+import {
+  bindHistoryTakeoverRuntime,
+  ensureExtensionHistoryShortcut,
+  openOrFocusAiraHistoryPage,
+} from '@/features/history-takeover/historyTakeoverRuntime';
 import { bindEdgeHistoryDockRuntime } from '@/features/history-surface/skins/edge/edgeHistoryDock';
 
 const WEBDAV_PROXY_MESSAGE_TYPE = 'LEAFTAB_WEBDAV_PROXY';
@@ -716,19 +720,10 @@ function bindHistoryMessageListener(): void {
   });
 }
 
-function openAiraHistoryTab(): void {
-  const historyUrl = globalThis.chrome?.runtime?.getURL?.('history.html');
-  const tabs = globalThis.chrome?.tabs;
-  if (!historyUrl || !tabs?.create) {
-    return;
-  }
-  void tabs.create({ url: historyUrl, active: true }).catch(() => undefined);
-}
-
 function bindAiraHistoryCommandListener(): void {
   getCommandsApi()?.onCommand?.addListener?.((command) => {
     if (command === AIRA_OPEN_HISTORY_COMMAND) {
-      openAiraHistoryTab();
+      void openOrFocusAiraHistoryPage();
     }
   });
 }
@@ -752,3 +747,4 @@ void readPhonePagePushEnabledFromExtensionStorage()
   .catch(() => undefined);
 void reconcilePhonePagePushSchedule(true);
 void pollPhonePagePushOnce();
+void ensureExtensionHistoryShortcut().catch(() => undefined);

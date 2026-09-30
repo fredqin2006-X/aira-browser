@@ -16,10 +16,13 @@
   --ch-drawer: #ffffff;
   --ch-scrim: rgba(32, 33, 36, 0.32);
   --ch-selection: #ffffff;
-  display: block;
+  display: flex;
+  flex-direction: column;
   width: 100vw;
   max-width: 100vw;
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
   box-sizing: border-box;
   background: var(--ch-page);
   color: var(--ch-text);
@@ -58,12 +61,14 @@ html[data-chrome-theme="dark"] {
   --ch-text: #e3e3e3;
 }
 
+html:has(body.chrome-history-body),
 body.chrome-history-body,
 body.chrome-history-body #root {
   width: 100vw;
   max-width: none;
+  height: 100%;
   margin: 0;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 body.chrome-history-body {
@@ -74,10 +79,13 @@ body.chrome-history-body {
 .chrome-history-header,
 .chrome-history-selection {
   position: relative;
+  z-index: 2;
   display: flex;
+  flex: none;
   align-items: center;
   height: 64px;
   padding: 0 24px;
+  background: var(--ch-page);
 }
 
 .chrome-history-selection {
@@ -186,19 +194,30 @@ body.chrome-history-body {
 .chrome-history-body {
   display: grid;
   grid-template-columns: 256px minmax(0, 1fr);
-  align-items: start;
+  align-items: stretch;
+  flex: 1;
   width: 100vw;
   max-width: 100vw;
+  min-height: 0;
   padding: 0 12px 12px 0;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
 .chrome-history-nav {
-  position: sticky;
-  top: 0;
+  align-self: start;
   flex: none;
   width: 256px;
+  max-height: 100%;
   padding: 8px 12px 0;
+  overflow-y: auto;
+}
+
+.chrome-history-main {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: auto;
 }
 
 .chrome-history-nav button {
@@ -250,11 +269,11 @@ body.chrome-history-body {
 
 .chrome-history-card {
   position: relative;
-  width: 100%;
+  width: min(960px, 100%);
   max-width: 960px;
   min-width: 0;
-  min-height: calc(100vh - 76px);
-  justify-self: center;
+  min-height: 100%;
+  margin-inline: auto;
   overflow: visible;
   border: 1px solid var(--ch-card-border);
   border-radius: 16px;
@@ -454,6 +473,10 @@ body.chrome-history-body {
     grid-template-columns: minmax(0, 1fr);
     width: 100vw;
     padding: 0 8px 8px;
+  }
+
+  .chrome-history-main {
+    height: 100%;
   }
 
   .chrome-history-card {

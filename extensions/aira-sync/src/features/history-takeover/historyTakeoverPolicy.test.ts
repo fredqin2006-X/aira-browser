@@ -4,8 +4,16 @@ import {
   detectHistoryPlatform,
   readInstalledHistoryBrowser,
   resolveHistoryBrowserKind,
+  formatAssignedHistoryShortcut,
+  geckoHistoryCommandShortcut,
+  historyShortcutLabel,
+  isExtensionHistoryCommandShortcut,
   isHistoryTakeoverShortcut,
   isNativeHistoryPageUrl,
+  shouldAssignExtensionHistoryShortcut,
+  tabHasVivaldiMetadata,
+  vivaldiFromExtensionClientHints,
+  vivaldiProbeRejectionMeansInstalled,
 } from './historyTakeoverPolicy';
 
 const down = {
@@ -56,6 +64,41 @@ describe('history takeover browser detection', () => {
       brands: ['Chromium', 'Microsoft Edge'],
       isBrave: false,
     })).toBe('edge');
+    expect(resolveHistoryBrowserKind({
+      userAgent: chromeUserAgent,
+      brands: ['Chromium', 'Google Chrome'],
+      isVivaldi: true,
+    })).toBe('vivaldi');
+  });
+
+  test('recognizes Vivaldi when it masks itself as Chrome', () => {
+    expect(tabHasVivaldiMetadata({ vivExtData: '{}' })).toBe(true);
+    expect(tabHasVivaldiMetadata({ id: 1 })).toBe(false);
+    expect(vivaldiProbeRejectionMeansInstalled('No tab with id: -1.')).toBe(true);
+    expect(vivaldiProbeRejectionMeansInstalled("Unexpected property: 'vivExtData'.")).toBe(false);
+    expect(vivaldiProbeRejectionMeansInstalled('')).toBe(false);
+    expect(vivaldiFromExtensionClientHints({
+      protocol: 'chrome-extension:',
+      userAgent: 'Mozilla/5.0 Chrome/128.0 Safari/537.36',
+      brands: [],
+      platform: '',
+    })).toBe(true);
+    expect(vivaldiFromExtensionClientHints({
+      protocol: 'https:',
+      userAgent: 'Mozilla/5.0 Chrome/128.0 Safari/537.36',
+      brands: [],
+      platform: '',
+    })).toBe(false);
+    expect(vivaldiFromExtensionClientHints({
+      protocol: 'chrome-extension:',
+      userAgent: 'Mozilla/5.0 Chrome/128.0 Safari/537.36',
+      brands: ['Google Chrome'],
+      platform: 'macOS',
+    })).toBe(false);
+    expect(shouldAssignExtensionHistoryShortcut('vivaldi', '')).toBe(true);
+    expect(shouldAssignExtensionHistoryShortcut('vivaldi', 'Command+Y')).toBe(true);
+    expect(shouldAssignExtensionHistoryShortcut('vivaldi', 'Command+Shift+Y')).toBe(false);
+    expect(shouldAssignExtensionHistoryShortcut('chrome', '')).toBe(false);
   });
 
   test('reads Brave from the browser object instead of the Chrome-like user agent', async () => {
@@ -111,16 +154,41 @@ describe('history takeover shortcuts', () => {
     expect(isHistoryTakeoverShortcut('opera', 'other', { ...down, ctrlKey: true, code: 'KeyH' })).toBe(true);
     expect(isHistoryTakeoverShortcut('opera', 'mac', { ...down, metaKey: true, shiftKey: true, code: 'KeyH' })).toBe(true);
     expect(isHistoryTakeoverShortcut('opera', 'mac', { ...down, metaKey: true, code: 'KeyH' })).toBe(false);
-    expect(isHistoryTakeoverShortcut('zen', 'other', { ...down, ctrlKey: true, code: 'KeyH' })).toBe(true);
-    expect(isHistoryTakeoverShortcut('zen', 'mac', { ...down, metaKey: true, shiftKey: true, code: 'KeyH' })).toBe(true);
-    expect(isHistoryTakeoverShortcut('firefox', 'other', { ...down, ctrlKey: true, code: 'KeyH' })).toBe(true);
-    expect(isHistoryTakeoverShortcut('firefox', 'other', { ...down, ctrlKey: true, shiftKey: true, code: 'KeyH' })).toBe(true);
-    expect(isHistoryTakeoverShortcut('firefox', 'mac', { ...down, metaKey: true, shiftKey: true, code: 'KeyH' })).toBe(true);
-    expect(isHistoryTakeoverShortcut('firefox', 'mac', { ...down, metaKey: true, code: 'KeyH' })).toBe(false);
-    expect(isHistoryTakeoverShortcut('vivaldi', 'other', { ...down, ctrlKey: true, code: 'KeyH' })).toBe(true);
-    expect(isHistoryTakeoverShortcut('vivaldi', 'other', { ...down, ctrlKey: true, shiftKey: true, code: 'KeyH' })).toBe(true);
-    expect(isHistoryTakeoverShortcut('vivaldi', 'mac', { ...down, metaKey: true, code: 'KeyY' })).toBe(true);
-    expect(isHistoryTakeoverShortcut('vivaldi', 'other', { ...down, ctrlKey: true, altKey: true, code: 'KeyH' })).toBe(false);
+    expect(isHistoryTakeoverShortcut('zen', 'other', { ...down, ctrlKey: true, code: 'KeyH' })).toBe(false);
+    expect(isHistoryTakeoverShortcut('firefox', 'other', { ...down, ctrlKey: true, code: 'KeyH' })).toBe(false);
+    expect(isHistoryTakeoverShortcut('firefox', 'other', { ...down, ctrlKey: true, shiftKey: true, code: 'KeyY' })).toBe(false);
+    expect(isHistoryTakeoverShortcut('firefox', 'mac', { ...down, metaKey: true, shiftKey: true, code: 'KeyH' })).toBe(false);
+    expect(isHistoryTakeoverShortcut('firefox', 'mac', { ...down, metaKey: true, shiftKey: true, code: 'KeyY' })).toBe(false);
+    expect(isHistoryTakeoverShortcut('vivaldi', 'other', { ...down, ctrlKey: true, code: 'KeyH' })).toBe(false);
+    expect(isHistoryTakeoverShortcut('vivaldi', 'other', { ...down, ctrlKey: true, code: 'KeyY' })).toBe(false);
+    expect(isHistoryTakeoverShortcut('vivaldi', 'mac', { ...down, metaKey: true, code: 'KeyY' })).toBe(false);
+    expect(isHistoryTakeoverShortcut('vivaldi', 'mac', { ...down, metaKey: true, shiftKey: true, code: 'KeyY' })).toBe(false);
+    expect(isExtensionHistoryCommandShortcut('mac', { ...down, metaKey: true, shiftKey: true, code: 'KeyY' })).toBe(true);
+    expect(isExtensionHistoryCommandShortcut('other', { ...down, ctrlKey: true, shiftKey: true, code: 'KeyY' })).toBe(true);
+    expect(isExtensionHistoryCommandShortcut('mac', { ...down, metaKey: true, code: 'KeyY' })).toBe(false);
+    expect(isExtensionHistoryCommandShortcut('mac', { ...down, metaKey: true, shiftKey: true, altKey: true, code: 'KeyY' })).toBe(false);
+  });
+});
+
+describe('history shortcut labels', () => {
+  test('uses the shortcut that opens Aira history for each browser and system', () => {
+    expect(historyShortcutLabel('chrome', 'other')).toBe('Ctrl+H');
+    expect(historyShortcutLabel('brave', 'mac')).toBe('⌘Y');
+    expect(historyShortcutLabel('edge', 'other')).toBe('Ctrl+Y');
+    expect(historyShortcutLabel('edge', 'mac')).toBe('⌘Y');
+    expect(historyShortcutLabel('opera', 'mac')).toBe('⌘⇧H');
+    expect(historyShortcutLabel('opera', 'other')).toBe('Ctrl+H');
+    expect(historyShortcutLabel('vivaldi', 'mac')).toBe('⌘⇧Y');
+    expect(historyShortcutLabel('vivaldi', 'other')).toBe('Ctrl+Shift+Y');
+    expect(historyShortcutLabel('firefox', 'other')).toBe('Ctrl+Shift+Y');
+    expect(historyShortcutLabel('firefox', 'mac')).toBe('⌘⇧Y');
+    expect(historyShortcutLabel('zen', 'mac')).toBe('⌘⇧Y');
+    expect(geckoHistoryCommandShortcut('mac')).toBe('Command+Shift+Y');
+    expect(geckoHistoryCommandShortcut('other')).toBe('Ctrl+Shift+Y');
+    expect(formatAssignedHistoryShortcut('Command+Shift+Y', 'mac')).toBe('⌘⇧Y');
+    expect(formatAssignedHistoryShortcut('Ctrl+Shift+Y', 'mac')).toBe('⌘⇧Y');
+    expect(formatAssignedHistoryShortcut('Ctrl+Shift+Y', 'other')).toBe('Ctrl+Shift+Y');
+    expect(formatAssignedHistoryShortcut('MacCtrl+Shift+Y', 'mac')).toBe('⌃⇧Y');
   });
 });
 
