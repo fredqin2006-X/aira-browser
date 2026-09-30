@@ -7,12 +7,17 @@ import {
 import { BottomToolbarGuideRepository } from '../../data/onboarding/BottomToolbarGuideRepository';
 import { BrowserDeviceFormFactor } from '../browser/BrowserDeviceFormFactorCoordinator';
 
-export type BottomToolbarGuideAction = 'acknowledge' | 'never_show_again';
+export type BottomToolbarGuideAction = 'next' | 'acknowledge' | 'never_show_again';
+export type BottomToolbarGuideClipId = 'hide' | 'return_home' | 'tools_panel' | 'tab_switch';
+export type BottomToolbarGuidePrimaryAction = 'next' | 'acknowledge';
 
 export interface BottomToolbarGuideSnapshot {
   visible: boolean;
+  clipId: BottomToolbarGuideClipId;
   title: string;
   message: string;
+  progressLabel: string;
+  primaryAction: BottomToolbarGuidePrimaryAction;
   primaryActionTitle: string;
   secondaryActionTitle: string;
 }
@@ -20,11 +25,20 @@ export interface BottomToolbarGuideSnapshot {
 export function createHiddenBottomToolbarGuideSnapshot(): BottomToolbarGuideSnapshot {
   return {
     visible: false,
+    clipId: 'hide',
     title: '',
     message: '',
+    progressLabel: '',
+    primaryAction: 'acknowledge',
     primaryActionTitle: '',
     secondaryActionTitle: ''
   };
+}
+
+interface BottomToolbarGuideStep {
+  clipId: BottomToolbarGuideClipId;
+  title: string;
+  message: string;
 }
 
 export interface BottomToolbarGuideShellFacts {
@@ -67,14 +81,36 @@ export interface BottomToolbarGuideShell {
 }
 
 const BOTTOM_TOOLBAR_GUIDE_EVALUATION_DELAY_MS: number = 700;
-const BOTTOM_TOOLBAR_GUIDE_TITLE: string = '向下滑动隐藏悬浮工具条';
-const BOTTOM_TOOLBAR_GUIDE_MESSAGE: string = '工具条就会收起来，只看网页内容，浏览更清爽。';
-const BOTTOM_TOOLBAR_GUIDE_PRIMARY_ACTION_TITLE: string = '我知道了';
+const BOTTOM_TOOLBAR_GUIDE_NEXT_TITLE: string = '下一个';
+const BOTTOM_TOOLBAR_GUIDE_DONE_TITLE: string = '我知道了';
 const BOTTOM_TOOLBAR_GUIDE_SECONDARY_ACTION_TITLE: string = '不再提示';
+const BOTTOM_TOOLBAR_GUIDE_STEPS: BottomToolbarGuideStep[] = [
+  {
+    clipId: 'hide',
+    title: '向下滑动隐藏悬浮工具条',
+    message: '工具条就会收起来，只看网页内容，浏览更清爽。'
+  },
+  {
+    clipId: 'return_home',
+    title: '上滑两侧按钮回到主页',
+    message: '按住返回或标签按钮向上滑，松手就会关闭当前页并回到主页。'
+  },
+  {
+    clipId: 'tools_panel',
+    title: '上滑中间搜索区打开工具',
+    message: '按住中间的搜索区向上滑，工具面板会从底部展开。'
+  },
+  {
+    clipId: 'tab_switch',
+    title: '左右滑动切换标签页',
+    message: '在搜索区左右滑动，就能切到旁边的标签页。'
+  }
+];
 
 /**
  * Teaches the phone floating toolbar once per device, the first time that toolbar
- * is actually in front of a Web page. Choosing the centered homepage, or any later
+ * is actually in front of a Web page. The card walks the gestures one at a time;
+ * 下一个 advances the clip, and only the last step closes it. Choosing the centered homepage, or any later
  * switch to the split frame, has no such gesture, so those sessions stay silent and
  * do not spend the lesson. A later switch back to the floating toolbar — from toolbar
  * settings, the homepage choice, or sync — teaches on the next Web page, including
@@ -101,6 +137,7 @@ export class BottomToolbarGuideCoordinator {
   private evaluateTimer: number = -1;
   private evaluationGeneration: number = 0;
   private presentationGeneration: number = 0;
+  private stepIndex: number = 0;
   private snapshot: BottomToolbarGuideSnapshot = createHiddenBottomToolbarGuideSnapshot();
 
   constructor(
@@ -161,6 +198,10 @@ export class BottomToolbarGuideCoordinator {
   }
 
   handleAction(action: BottomToolbarGuideAction): void {
+    if (action === 'next') {
+      this.advanceStep();
+      return;
+    }
     if (action === 'never_show_again') {
       void this.repository.markCompleted().catch((_error: Error): void => {
       });
@@ -256,13 +297,7 @@ export class BottomToolbarGuideCoordinator {
   }
 
   private presentGuide(): void {
-    this.publishState({
-      visible: true,
-      title: BOTTOM_TOOLBAR_GUIDE_TITLE,
-      message: BOTTOM_TOOLBAR_GUIDE_MESSAGE,
-      primaryActionTitle: BOTTOM_TOOLBAR_GUIDE_PRIMARY_ACTION_TITLE,
-      secondaryActionTitle: BOTTOM_TOOLBAR_GUIDE_SECONDARY_ACTION_TITLE
-    });
+    this.publishStep(0);
     this.presentationGeneration += 1;
     const presentationGeneration = this.presentationGeneration;
     this.surface.present({
@@ -271,6 +306,37 @@ export class BottomToolbarGuideCoordinator {
       dismissDurationMs: 0,
       shouldReveal: (): boolean =>
         presentationGeneration === this.presentationGeneration && this.snapshot.visible
+    });
+  }
+
+  private advanceStep(): void {
+    if (!this.snapshot.visible) {
+      return;
+    }
+    const nextIndex = this.stepIndex + 1;
+    if (nextIndex >= BOTTOM_TOOLBAR_GUIDE_STEPS.length) {
+      this.surface.dismiss('bottom_toolbar_guide');
+      return;
+    }
+    this.publishStep(nextIndex);
+  }
+
+  private publishStep(index: number): void {
+    const step: BottomToolbarGuideStep | undefined = BOTTOM_TOOLBAR_GUIDE_STEPS[index];
+    if (step === undefined) {
+      return;
+    }
+    const last = index >= BOTTOM_TOOLBAR_GUIDE_STEPS.length - 1;
+    this.stepIndex = index;
+    this.publishState({
+      visible: true,
+      clipId: step.clipId,
+      title: step.title,
+      message: step.message,
+      progressLabel: `${index + 1}/${BOTTOM_TOOLBAR_GUIDE_STEPS.length}`,
+      primaryAction: last ? 'acknowledge' : 'next',
+      primaryActionTitle: last ? BOTTOM_TOOLBAR_GUIDE_DONE_TITLE : BOTTOM_TOOLBAR_GUIDE_NEXT_TITLE,
+      secondaryActionTitle: BOTTOM_TOOLBAR_GUIDE_SECONDARY_ACTION_TITLE
     });
   }
 

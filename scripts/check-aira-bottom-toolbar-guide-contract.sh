@@ -33,6 +33,13 @@ COORDINATOR_REL="AiraBrowser/entry/src/main/ets/core/onboarding/BottomToolbarGui
 SHEET_REL="AiraBrowser/entry/src/main/ets/app/components/onboarding/BottomToolbarGuideSheet.ets"
 OVERLAY_REL="AiraBrowser/entry/src/main/ets/app/components/onboarding/BottomToolbarGuideOverlay.ets"
 CLIP_REL="AiraBrowser/entry/src/main/resources/rawfile/bottom_toolbar_guide.mp4"
+RETURN_HOME_CLIP_REL="AiraBrowser/entry/src/main/resources/rawfile/return_home_guide.mp4"
+TOOLS_PANEL_CLIP_REL="AiraBrowser/entry/src/main/resources/rawfile/tools_panel_guide.mp4"
+TAB_SWITCH_CLIP_REL="AiraBrowser/entry/src/main/resources/rawfile/tab_switch_guide.mp4"
+CLIP_POSTER_REL="AiraBrowser/entry/src/main/resources/rawfile/bottom_toolbar_guide_poster.jpg"
+RETURN_HOME_POSTER_REL="AiraBrowser/entry/src/main/resources/rawfile/return_home_guide_poster.jpg"
+TOOLS_PANEL_POSTER_REL="AiraBrowser/entry/src/main/resources/rawfile/tools_panel_guide_poster.jpg"
+TAB_SWITCH_POSTER_REL="AiraBrowser/entry/src/main/resources/rawfile/tab_switch_guide_poster.jpg"
 TRANSIENT_REL="AiraBrowser/entry/src/main/ets/core/browser/BrowserTransientSurfaceCoordinator.ets"
 BOTTOM_PANEL_REL="AiraBrowser/entry/src/main/ets/core/browser/BrowserRootBottomPanelSessionCoordinator.ets"
 SHELL_BACK_REL="AiraBrowser/entry/src/main/ets/core/browser/BrowserShellBackCoordinator.ets"
@@ -43,6 +50,8 @@ TEST_REL="AiraBrowser/entry/src/test/BottomToolbarGuideCoordinator.test.ets"
 ADR_REL="docs/adr/0079-the-toolbar-lesson-is-taught-once-per-device.md"
 
 for rel_path in "${REPOSITORY_REL}" "${COORDINATOR_REL}" "${SHEET_REL}" "${OVERLAY_REL}" "${CLIP_REL}" \
+  "${RETURN_HOME_CLIP_REL}" "${TOOLS_PANEL_CLIP_REL}" "${TAB_SWITCH_CLIP_REL}" \
+  "${CLIP_POSTER_REL}" "${RETURN_HOME_POSTER_REL}" "${TOOLS_PANEL_POSTER_REL}" "${TAB_SWITCH_POSTER_REL}" \
   "${TRANSIENT_REL}" "${BOTTOM_PANEL_REL}" "${SHELL_BACK_REL}" "${MAIN_BACK_REL}" "${SHELL_PAGE_REL}" \
   "${RUNTIME_REL}" "${TEST_REL}" "${ADR_REL}"; do
   if [ ! -f "${REPO_ROOT}/${rel_path}" ]; then
@@ -97,14 +106,28 @@ require_pattern "${COORDINATOR_REL}" "scheduleEvaluation\\(\\)" \
   "the lesson must re-decide presentation instead of deciding once."
 require_pattern "${COORDINATOR_REL}" "never_show_again" \
   "the card must offer an explicit opt-out action."
-reject_pattern "${SHELL_PAGE_REL}" "我知道了|不再提示|向下滑动" \
+require_pattern "${COORDINATOR_REL}" "'next'" \
+  "the card must advance to the next gesture instead of closing on the first step."
+reject_pattern "${SHELL_PAGE_REL}" "我知道了|不再提示|下一个|向下滑动" \
   "the shell must not own the lesson copy."
 
 # The card is a shell: it renders the bundled clip and the owner's copy.
 require_pattern "${SHEET_REL}" "\\\$rawfile\\('bottom_toolbar_guide\\.mp4'\\)" \
-  "the card must play the bundled clip at its top."
+  "the card must play the bundled hide clip."
+require_pattern "${SHEET_REL}" "\\\$rawfile\\('return_home_guide\\.mp4'\\)" \
+  "the card must play the bundled return-home clip."
+require_pattern "${SHEET_REL}" "\\\$rawfile\\('tools_panel_guide\\.mp4'\\)" \
+  "the card must play the bundled tools-panel clip."
+require_pattern "${SHEET_REL}" "\\\$rawfile\\('tab_switch_guide\\.mp4'\\)" \
+  "the card must play the bundled tab-switch clip."
 require_pattern "${SHEET_REL}" "autoPlay\\(true\\)" \
   "the clip is decorative and must play on its own."
+require_pattern "${SHEET_REL}" "previewUri:" \
+  "the player must keep a still up so the next step does not flash black."
+require_pattern "${SHEET_REL}" "onStart" \
+  "the clip must stay hidden until playback has a picture."
+require_pattern "${TEST_REL}" "handleAction\\('next'\\)" \
+  "the test must pin that next advances the lesson instead of closing it."
 
 # Shell integration is registration plus a signal, never policy.
 require_pattern "${TRANSIENT_REL}" "'bottom_toolbar_guide'" \

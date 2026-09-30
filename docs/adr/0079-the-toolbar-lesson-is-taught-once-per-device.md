@@ -58,12 +58,14 @@ lesson.
 
 ## Consequences
 
-- The card is a floating surface on the shared theme tokens, so it is white in light mode and black in dark mode: the bundled clip
-  at its top, a title that states the gesture, and two stacked full-width actions: `我知道了` closes it, `不再提示` closes it and
-  records the permanent opt-out. Back and an outside tap close it as an acknowledgement through the same transient-surface
-  dismissal path.
-- The clip is a bundled `rawfile` asset (`bottom_toolbar_guide.mp4`), muted, looping, and control-less. It is decoration:
-  if it fails to load the copy still teaches the gesture.
+- The card is a floating surface on the shared theme tokens, so it is white in light mode and black in dark mode. It walks the
+  floating-toolbar gestures one at a time: hide, return home, open the tool panel, then switch tabs. Each step shows that
+  gesture's bundled clip, a title, and two stacked full-width actions. `下一个` advances the clip without dismissing the card;
+  the last step's `我知道了` closes it. `不再提示` still closes it and records the permanent opt-out. Back and an outside tap
+  close it as an acknowledgement through the same transient-surface dismissal path. Stepping does not re-arm or re-present
+  the surface, and the lesson is still spent once, at the first reveal.
+- Each clip is a bundled `rawfile` asset, muted, looping, and control-less. The clips are decoration: if one fails to load
+  the copy still teaches the gesture.
 - Because the announcement is device-local and presentation-only, it survives provider switches, account changes, and
   Private Browsing Sessions untouched. A Private Browsing Session is refused at presentation, and the pending lesson
   stays armed for a later ordinary session.

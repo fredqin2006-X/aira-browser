@@ -240,6 +240,34 @@ export default function bottomToolbarGuideCoordinatorTest(): void {
       expect(fixture.surface.presentRequests.length).assertEqual(1);
     });
 
+    it('advances through the remaining gestures before the card closes', 0, async () => {
+      const fixture = buildGuideFixture();
+
+      fixture.coordinator.handleWebPageLoadCompleted();
+      await flushEvaluation();
+      expect(fixture.coordinator.getSnapshot().clipId).assertEqual('hide');
+      expect(fixture.coordinator.getSnapshot().primaryActionTitle).assertEqual('下一个');
+      expect(fixture.coordinator.getSnapshot().progressLabel).assertEqual('1/4');
+
+      fixture.coordinator.handleAction('next');
+      expect(fixture.surface.dismissedIds.length).assertEqual(0);
+      expect(fixture.surface.presentRequests.length).assertEqual(1);
+      expect(fixture.coordinator.getSnapshot().clipId).assertEqual('return_home');
+      expect(fixture.coordinator.getSnapshot().visible).assertTrue();
+
+      fixture.coordinator.handleAction('next');
+      expect(fixture.coordinator.getSnapshot().clipId).assertEqual('tools_panel');
+      fixture.coordinator.handleAction('next');
+      expect(fixture.coordinator.getSnapshot().clipId).assertEqual('tab_switch');
+      expect(fixture.coordinator.getSnapshot().primaryAction).assertEqual('acknowledge');
+      expect(fixture.coordinator.getSnapshot().primaryActionTitle).assertEqual('我知道了');
+      expect(fixture.coordinator.getSnapshot().progressLabel).assertEqual('4/4');
+
+      fixture.coordinator.handleAction('acknowledge');
+      expect(fixture.surface.dismissedIds.length).assertEqual(1);
+      expect(fixture.surface.dismissedIds[0]).assertEqual(BOTTOM_TOOLBAR_GUIDE_SURFACE_ID);
+    });
+
     it('honours never_show_again and stays silent afterwards', 0, async () => {
       const fixture = buildGuideFixture();
 

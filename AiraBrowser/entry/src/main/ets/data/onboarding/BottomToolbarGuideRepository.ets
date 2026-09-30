@@ -6,8 +6,8 @@ const STATE_KEY: string = 'state_v1';
 
 /**
  * Device-local memory for the one-time bottom-toolbar guide. It records only
- * presentation facts: that this device already told the user the floating
- * toolbar can be swiped down, and that the user asked not to be told again.
+ * presentation facts: that this device already showed the floating-toolbar
+ * lesson, and that the user asked not to be told again.
  * Nothing here changes how the toolbar itself behaves.
  */
 export interface BottomToolbarGuideState {

@@ -14,7 +14,7 @@ import {
 const BOTTOM_TOOLBAR_GUIDE_OVERLAY_TITLE: string = '底部工具条提示';
 
 /**
- * The one-time lesson about the swipe-down toolbar gesture. It is anchored in the
+ * The one-time lesson about the floating toolbar gestures. It is anchored in the
  * middle of the viewport like the welcome-gift announcement.
  */
 @Component
