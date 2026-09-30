@@ -1,4 +1,3 @@
-import { localizeSettingsCatalogCopy } from '../../core/settings/SettingsCatalogCopy';
 /**
  * The settings directory is searchable, so its titles, breadcrumb paths, and aliases stay
  * plain strings: the catalog normalizes and tokenizes them, and a `Resource` cannot be
