@@ -44,8 +44,8 @@ export interface AiraActivityHeatmapCellState {
 }
 
 export interface AiraActivityHeatmapViewState {
-  title: string;
-  summary: string;
+  title: ResourceStr;
+  summary: ResourceStr;
   cells: AiraActivityHeatmapCellState[];
   weekCount: number;
   legendLevels: number[];

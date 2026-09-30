@@ -1,3 +1,5 @@
+import { localizeSettingsCopy } from './SettingsCopy';
+import { hasAppResourceText } from '../resources/AppResourceText';
 import {
   DynamicAppIconAvailability,
   DynamicAppIconOption,
@@ -8,7 +10,7 @@ export type AppIconSettingsAvailability = DynamicAppIconAvailability | 'loading'
 
 export interface AppIconSettingsOptionState {
   id: string;
-  title: string;
+  title: ResourceStr;
   iconUrl: string;
   isDefault: boolean;
   isSelected: boolean;
@@ -16,38 +18,38 @@ export interface AppIconSettingsOptionState {
 }
 
 export interface AppIconSettingsState {
-  title: string;
+  title: ResourceStr;
   availability: AppIconSettingsAvailability;
   options: AppIconSettingsOptionState[];
-  statusText: string;
-  footerText: string;
+  statusText: ResourceStr;
+  footerText: ResourceStr;
 }
 
 interface KnownDynamicAppIconMetadata {
   id: string;
-  title: string;
+  title: ResourceStr;
   sortIndex: number;
 }
 
 const KNOWN_DYNAMIC_APP_ICONS: KnownDynamicAppIconMetadata[] = [
-  { id: 'Aira_dark', title: '夜色', sortIndex: 10 },
-  { id: 'Aira_dark_pad', title: '夜色', sortIndex: 11 },
-  { id: 'Aira_blue', title: '海蓝', sortIndex: 20 },
-  { id: 'Aira_blue_pad', title: '海蓝', sortIndex: 21 },
-  { id: 'Aira_color', title: '缤纷', sortIndex: 30 },
-  { id: 'Aira_color_pad', title: '缤纷', sortIndex: 31 },
-  { id: 'Aira_texture', title: '磨砂', sortIndex: 40 },
-  { id: 'Aira_texture_pad', title: '磨砂', sortIndex: 41 }
+  { id: 'Aira_dark', title: localizeSettingsCopy('夜色'), sortIndex: 10 },
+  { id: 'Aira_dark_pad', title: localizeSettingsCopy('夜色'), sortIndex: 11 },
+  { id: 'Aira_blue', title: localizeSettingsCopy('海蓝'), sortIndex: 20 },
+  { id: 'Aira_blue_pad', title: localizeSettingsCopy('海蓝'), sortIndex: 21 },
+  { id: 'Aira_color', title: localizeSettingsCopy('缤纷'), sortIndex: 30 },
+  { id: 'Aira_color_pad', title: localizeSettingsCopy('缤纷'), sortIndex: 31 },
+  { id: 'Aira_texture', title: localizeSettingsCopy('磨砂'), sortIndex: 40 },
+  { id: 'Aira_texture_pad', title: localizeSettingsCopy('磨砂'), sortIndex: 41 }
 ];
 
 export class AppIconSettingsViewModel {
   buildLoadingState(): AppIconSettingsState {
     return {
-      title: '应用图标',
+      title: localizeSettingsCopy('应用图标'),
       availability: 'loading',
       options: [],
-      statusText: '正在读取应用图标...',
-      footerText: '应用图标由华为应用市场图标管理服务提供，审核通过后会在这里显示。'
+      statusText: localizeSettingsCopy('正在读取应用图标...'),
+      footerText: localizeSettingsCopy('应用图标由华为应用市场图标管理服务提供，审核通过后会在这里显示。')
     };
   }
 
@@ -69,7 +71,7 @@ export class AppIconSettingsViewModel {
       });
     const hasSelectedDynamicIcon = dynamicOptions.some((option: AppIconSettingsOptionState) => option.isSelected);
     return {
-      title: '应用图标',
+      title: localizeSettingsCopy('应用图标'),
       availability: result.availability,
       options: this.buildDefaultOption(!hasSelectedDynamicIcon).concat(dynamicOptions),
       statusText: this.resolveStatusText(result),
@@ -81,7 +83,7 @@ export class AppIconSettingsViewModel {
     return [
       {
         id: 'default',
-        title: '经典',
+        title: localizeSettingsCopy('经典'),
         iconUrl: '',
         isDefault: true,
         isSelected: isSelected,
@@ -90,36 +92,36 @@ export class AppIconSettingsViewModel {
     ];
   }
 
-  private resolveStatusText(result: DynamicAppIconQueryResult): string {
+  private resolveStatusText(result: DynamicAppIconQueryResult): ResourceStr {
     if (result.availability === 'available') {
       return '';
     }
-    if (result.message.length > 0) {
+    if (hasAppResourceText(result.message)) {
       return result.message;
     }
-    return '暂无可用的应用图标。';
+    return localizeSettingsCopy('暂无可用的应用图标。');
   }
 
-  private resolveFooterText(availability: DynamicAppIconAvailability, code: number): string {
+  private resolveFooterText(availability: DynamicAppIconAvailability, code: number): ResourceStr {
     if (availability === 'available') {
-      return '切换后桌面图标会由系统更新；如果系统正在使用自定义主题图标，切换可能会失败。';
+      return localizeSettingsCopy('切换后桌面图标会由系统更新；如果系统正在使用自定义主题图标，切换可能会失败。');
     }
     if (availability === 'empty') {
-      return '需要先在 AppGallery Connect 图标管理中创建图标并通过审核，审核通过后会自动出现在这里。';
+      return localizeSettingsCopy('需要先在 AppGallery Connect 图标管理中创建图标并通过审核，审核通过后会自动出现在这里。');
     }
     if (code > 0) {
       return `图标管理服务暂不可用，错误码 ${code}。`;
     }
-    return '图标管理服务暂不可用。';
+    return localizeSettingsCopy('图标管理服务暂不可用。');
   }
 
-  private formatIconTitle(iconId: string): string {
+  private formatIconTitle(iconId: string): ResourceStr {
     const normalizedIconId = iconId.trim();
     const knownIcon = this.resolveKnownIconMetadata(normalizedIconId);
     if (knownIcon !== undefined) {
       return knownIcon.title;
     }
-    return normalizedIconId.length > 0 ? normalizedIconId : '应用图标';
+    return normalizedIconId.length > 0 ? normalizedIconId : localizeSettingsCopy('应用图标');
   }
 
   private shouldShowDynamicIcon(iconId: string): boolean {

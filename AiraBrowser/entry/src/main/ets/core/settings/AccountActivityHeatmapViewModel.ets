@@ -4,6 +4,7 @@ import {
   AiraActivityHeatmapViewState
 } from '../../common/models/ActivityModels';
 import { ActivityScoreService } from '../../services/activity/ActivityScoreService';
+import { localizeSettingsCopy } from '../../core/settings/SettingsCopy';
 
 const DEFAULT_WEEK_COUNT: number = 12;
 const DAYS_PER_WEEK: number = 7;
@@ -46,8 +47,10 @@ export class AccountActivityHeatmapViewModel {
       });
     }
     return {
-      title: 'Aira 活跃',
-      summary: activeDays > 0 ? `过去 ${resolvedWeekCount} 周活跃 ${activeDays} 天` : '开始使用 Aira 后，这里会点亮你的活跃日历',
+      title: localizeSettingsCopy('Aira 活跃'),
+      summary: activeDays > 0
+        ? $r('app.string.settings_activity_03', resolvedWeekCount, activeDays)
+        : localizeSettingsCopy('开始使用 Aira 后，这里会点亮你的活跃日历'),
       cells,
       weekCount: resolvedWeekCount,
       legendLevels: [0, 1, 2, 3, 4],

@@ -111,6 +111,8 @@ import { ClearBrowsingDataContent, ClearBrowsingDataDialog } from './ClearBrowsi
 import { SettingsDetailContent } from './SettingsDetailContent';
 import { SupportQqGroupDialog } from './SupportQqGroupDialog';
 import { applyDesktopDialogSheetChrome } from '../common/DesktopDialogSheetChrome';
+import { localizeSettingsCopy } from '../../../core/settings/SettingsCopy';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 const AIRA_SUPPORT_QQ_GROUP_NUMBER: string = '1049806927';
 
@@ -572,9 +574,9 @@ export struct SettingsInlineDetailPanel {
       await sharedSearchEngineSettingsCoordinator.setDefaultEngine(searchEngineId, this.buildSearchBoundary());
       this.refreshState();
       this.onSettingsChanged?.();
-      this.showToast('搜索引擎已更新。');
+      this.showToast(localizeSettingsCopy('搜索引擎已更新。'));
     } catch (_error) {
-      this.showToast('搜索引擎更新失败。');
+      this.showToast(localizeSettingsCopy('搜索引擎更新失败。'));
     }
   }
 
@@ -913,7 +915,7 @@ export struct SettingsInlineDetailPanel {
       })
       .catch((_error: Error) => {
         this.refreshState();
-        this.showToast('站点默认权限更新失败。');
+        this.showToast(localizeSettingsCopy('站点默认权限更新失败。'));
       });
   }
 
@@ -1069,17 +1071,17 @@ export struct SettingsInlineDetailPanel {
 
   private showRiskPrompt(prompt: SettingsRiskPromptState, onConfirm: () => void): void {
     showCenteredAlertDialog({
-      title: localizeExperimentsRiskPromptCopy(prompt.title),
-      message: localizeExperimentsRiskPromptCopy(prompt.message),
+      title: resolveAppResourceText(localizeExperimentsRiskPromptCopy(prompt.title)),
+      message: resolveAppResourceText(localizeExperimentsRiskPromptCopy(prompt.message)),
       autoCancel: true,
       primaryButton: {
-        value: localizeExperimentsRiskPromptCopy(prompt.cancelLabel),
+        value: resolveAppResourceText(localizeExperimentsRiskPromptCopy(prompt.cancelLabel)),
         action: () => {
           this.refreshState();
         }
       },
       secondaryButton: {
-        value: localizeExperimentsRiskPromptCopy(prompt.confirmLabel),
+        value: resolveAppResourceText(localizeExperimentsRiskPromptCopy(prompt.confirmLabel)),
         fontColor: prompt.confirmIsDestructive ? $r('app.color.permission_blocked') : this.accentColor,
         action: () => {
           onConfirm();

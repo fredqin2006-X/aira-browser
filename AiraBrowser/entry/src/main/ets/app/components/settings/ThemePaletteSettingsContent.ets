@@ -18,6 +18,7 @@ import {
 } from './SettingsLayout';
 import { BROWSER_THEME_STORAGE_RESOLVED_MODE_KEY } from '../../../core/theme/BrowserThemeStorageKeys';
 import { SettingsDetailInteractionCoordinator } from '../../../core/settings/SettingsDetailInteractionCoordinator';
+import { localizeSettingsCopy } from '../../../core/settings/SettingsCopy';
 
 const THEME_PALETTE_CARD_CORNER_RADIUS: number = 22;
 const THEME_PALETTE_GRID_GAP: number = 12;
@@ -217,11 +218,11 @@ export struct ThemePaletteSettingsContent {
       .catch((_error: Error) => {
         this.isSelectingOption = false;
         this.refreshState();
-        this.showToast('主题色更新失败。');
+        this.showToast(localizeSettingsCopy('主题色更新失败。'));
       });
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

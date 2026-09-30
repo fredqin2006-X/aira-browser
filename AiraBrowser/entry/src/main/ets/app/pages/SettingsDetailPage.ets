@@ -107,6 +107,8 @@ import {
   SettingsDetailNavigationActionHandlers
 } from '../router/SettingsDetailNavigationActionCoordinator';
 import { applyDesktopDialogSheetChrome } from '../components/common/DesktopDialogSheetChrome';
+import { localizeSettingsCopy } from '../../core/settings/SettingsCopy';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 interface SettingsDetailPageParams {
   sectionId?: string;
@@ -210,9 +212,9 @@ struct SettingsDetailPage {
   @State private alwaysPrivateConfirmationAccepted: boolean = false;
   @State private aboutOverviewState: SettingsAboutOverviewState = {
     appTitle: 'Aira',
-    versionTitle: '当前版本',
+    versionTitle: localizeSettingsCopy('当前版本'),
     versionText: '',
-    moreButtonTitle: '查看更多'
+    moreButtonTitle: localizeSettingsCopy('查看更多')
   };
   @StorageProp(BROWSER_THEME_STORAGE_DIVIDER_KEY) private storedDividerColor: string = '#E3E8EF';
   @StorageProp(BROWSER_THEME_STORAGE_PRESSED_BACKGROUND_KEY) private storedPressedBackgroundColor: string = '#DDE4EC';
@@ -644,9 +646,9 @@ struct SettingsDetailPage {
     try {
       await sharedSearchEngineSettingsCoordinator.setDefaultEngine(searchEngineId, this.buildSearchBoundary());
       this.refreshState();
-      this.showToast('搜索引擎已更新。');
+      this.showToast(localizeSettingsCopy('搜索引擎已更新。'));
     } catch (_error) {
-      this.showToast('搜索引擎更新失败。');
+      this.showToast(localizeSettingsCopy('搜索引擎更新失败。'));
     }
   }
 
@@ -960,17 +962,17 @@ struct SettingsDetailPage {
 
   private showRiskPrompt(prompt: SettingsRiskPromptState, onConfirm: () => void): void {
     showCenteredAlertDialog({
-      title: localizeExperimentsRiskPromptCopy(prompt.title),
-      message: localizeExperimentsRiskPromptCopy(prompt.message),
+      title: resolveAppResourceText(localizeExperimentsRiskPromptCopy(prompt.title)),
+      message: resolveAppResourceText(localizeExperimentsRiskPromptCopy(prompt.message)),
       autoCancel: true,
       primaryButton: {
-        value: localizeExperimentsRiskPromptCopy(prompt.cancelLabel),
+        value: resolveAppResourceText(localizeExperimentsRiskPromptCopy(prompt.cancelLabel)),
         action: () => {
           this.refreshState();
         }
       },
       secondaryButton: {
-        value: localizeExperimentsRiskPromptCopy(prompt.confirmLabel),
+        value: resolveAppResourceText(localizeExperimentsRiskPromptCopy(prompt.confirmLabel)),
         fontColor: prompt.confirmIsDestructive ? $r('app.color.permission_blocked') : this.themedAccentColor,
         action: () => {
           onConfirm();

@@ -63,6 +63,7 @@ import {
 } from './SettingsTargetReveal';
 import { applyDesktopDialogSheetChrome } from '../common/DesktopDialogSheetChrome';
 import { localizeSettingsCatalogCopy } from '../../../core/settings/SettingsCatalogCopy';
+import { localizeSettingsCopy } from '../../../core/settings/SettingsCopy';
 
 /**
  * Two preview rows plus the switch, with the stacked 应用/取消 footer left clear below them.
@@ -807,7 +808,10 @@ export struct SettingsDetailContent {
     if (this.state.id === 'experiments') {
       return localizeExperimentsSettingsCopy(value);
     }
-    return value;
+    // The destination-specific tables cover the copy that belongs to one page. Everything
+    // else a detail row can carry — a search-engine summary, a day count, a placeholder —
+    // is shared copy, and this is the last stop before it renders.
+    return localizeSettingsCopy(value);
   }
 
   private localizeGeneralOptions(options: SettingsDetailOption[]): SettingsDetailOption[] {

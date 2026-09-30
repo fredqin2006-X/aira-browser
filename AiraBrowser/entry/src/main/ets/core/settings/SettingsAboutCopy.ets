@@ -1,4 +1,7 @@
-export function localizeAboutSettingsCopy(value: string): ResourceStr {
+export function localizeAboutSettingsCopy(value: ResourceStr): ResourceStr {
+  if (typeof value !== 'string') {
+    return value;
+  }
   switch (value) {
     case '应用名称':
       return $r('app.string.settings_about_app_name');

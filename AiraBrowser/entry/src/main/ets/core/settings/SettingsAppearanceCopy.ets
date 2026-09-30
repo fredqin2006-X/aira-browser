@@ -1,4 +1,7 @@
-export function localizeAppearanceSettingsCopy(value: string): ResourceStr {
+export function localizeAppearanceSettingsCopy(value: ResourceStr): ResourceStr {
+  if (typeof value !== 'string') {
+    return value;
+  }
   switch (value) {
     case '浅色':
       return $r('app.string.settings_appearance_light');

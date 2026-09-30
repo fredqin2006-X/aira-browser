@@ -90,6 +90,7 @@ import {
 } from '../../../core/customhome/CustomHomepageSettingsPageBinding';
 import { BrowserSearchInvocationRuntime } from '../../runtime/BrowserSearchInvocationRuntime';
 import { applyDesktopDialogSheetChrome } from '../common/DesktopDialogSheetChrome';
+import { localizeSettingsCopy } from '../../../core/settings/SettingsCopy';
 
 type SettingsCenterSheetType = 'none' | 'huaweiLogin' | 'desktopLoginConfirm' | 'appProxyQuick';
 
@@ -540,7 +541,7 @@ export struct SettingsCenterScreen {
 
   private handleAccountCardAction(): void {
     if (sharedPreferencesRepository.getPreferences().appServiceMode === 'basic') {
-      this.showToast('账号与会员需切换到全量模式后使用。');
+      this.showToast(localizeSettingsCopy('账号与会员需切换到全量模式后使用。'));
       return;
     }
     if (this.isHuaweiAccountSignedIn()) {
@@ -557,13 +558,13 @@ export struct SettingsCenterScreen {
       return;
     }
     this.navigationCoordinator.openAppProxySettings(this.buildBoundaryRouteState(), () => {
-      this.showToast('代理设置暂时无法打开，请稍后重试。');
+      this.showToast(localizeSettingsCopy('代理设置暂时无法打开，请稍后重试。'));
     });
   }
 
   private openSecureDnsProfileEdit(profileId: string): void {
     this.navigationCoordinator.openSecureDnsProfileEdit(this.buildBoundaryRouteState(), profileId, () => {
-      this.showToast('自定义 DNS 编辑页暂时无法打开，请稍后重试。');
+      this.showToast(localizeSettingsCopy('自定义 DNS 编辑页暂时无法打开，请稍后重试。'));
     });
   }
 
@@ -630,12 +631,12 @@ export struct SettingsCenterScreen {
   ): void {
     if (error !== undefined) {
       if (error.code !== 1001502012) {
-        this.showToast(error.message.length > 0 ? error.message : '华为账号登录失败');
+        this.showToast(error.message.length > 0 ? error.message : localizeSettingsCopy('华为账号登录失败'));
       }
       return;
     }
     if (response.authorizationCode.trim().length <= 0 && response.openID.trim().length <= 0) {
-      this.showToast('华为账号登录未完成');
+      this.showToast(localizeSettingsCopy('华为账号登录未完成'));
       return;
     }
     this.closeSettingsSheet();
@@ -668,13 +669,13 @@ export struct SettingsCenterScreen {
         this.showToast(result.title);
       })
       .catch((_error: Error) => {
-        this.showToast('华为账号登录失败');
+        this.showToast(localizeSettingsCopy('华为账号登录失败'));
       });
   }
 
   private openHuaweiAccountLogin(): void {
     if (!sharedHuaweiAccountMutationCoordinator.canSignIn(this.buildDataBoundaryInput())) {
-      this.showToast('请回到普通会话后登录华为账号。');
+      this.showToast(localizeSettingsCopy('请回到普通会话后登录华为账号。'));
       return;
     }
     this.openSettingsSheet('huaweiLogin');
@@ -829,7 +830,7 @@ export struct SettingsCenterScreen {
       })
       .catch((_error: Error) => {
         if (reportFailure) {
-          this.showToast('设置页面导航失败，请重试');
+          this.showToast(localizeSettingsCopy('设置页面导航失败，请重试'));
         }
       });
   }

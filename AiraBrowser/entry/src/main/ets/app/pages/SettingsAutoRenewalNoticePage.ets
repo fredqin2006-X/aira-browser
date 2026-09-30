@@ -14,6 +14,7 @@ import {
   BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY
 } from '../../core/theme/BrowserThemeStorageKeys';
 import { SettingsNavigationCoordinator } from '../router/SettingsNavigationCoordinator';
+import { localizeSettingsCopy } from '../../core/settings/SettingsCopy';
 import { SettingsHdsScaffold } from '../components/settings/SettingsHdsScaffold';
 import { SettingsScrollBody } from '../components/settings/SettingsLayout';
 
@@ -38,7 +39,7 @@ struct SettingsAutoRenewalNoticePage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: this.state.title,
+        title: localizeSettingsCopy(this.state.title),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -69,13 +70,13 @@ struct SettingsAutoRenewalNoticePage {
   @Builder
   private buildLeadCard() {
     Column({ space: 8 }) {
-      Text(this.state.updatedAt)
+      Text(localizeSettingsCopy(this.state.updatedAt))
         .width('100%')
         .fontSize(12)
         .lineHeight(17)
         .fontColor(this.storedSecondaryTextColor)
 
-      Text(this.state.lead)
+      Text(localizeSettingsCopy(this.state.lead))
         .width('100%')
         .fontSize(14)
         .lineHeight(22)
@@ -90,7 +91,7 @@ struct SettingsAutoRenewalNoticePage {
   @Builder
   private buildSectionCard(section: SettingsLegalDocumentSectionState) {
     Column({ space: 12 }) {
-      Text(section.title)
+      Text(localizeSettingsCopy(section.title))
         .width('100%')
         .fontSize(17)
         .fontWeight(FontWeight.Bold)
@@ -98,7 +99,7 @@ struct SettingsAutoRenewalNoticePage {
 
       Column({ space: 8 }) {
         ForEach(section.paragraphs, (paragraph: string) => {
-          Text(paragraph)
+          Text(localizeSettingsCopy(paragraph))
             .width('100%')
             .fontSize(14)
             .lineHeight(22)

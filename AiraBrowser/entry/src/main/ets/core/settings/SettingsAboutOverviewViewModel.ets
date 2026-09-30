@@ -1,19 +1,20 @@
 import { SettingsAboutAppIdentity } from './SettingsAboutCoordinator';
+import { localizeSettingsCopy } from '../../core/settings/SettingsCopy';
 
 export interface SettingsAboutOverviewState {
   appTitle: string;
-  versionTitle: string;
+  versionTitle: ResourceStr;
   versionText: string;
-  moreButtonTitle: string;
+  moreButtonTitle: ResourceStr;
 }
 
 export class SettingsAboutOverviewViewModel {
   buildState(identity: SettingsAboutAppIdentity): SettingsAboutOverviewState {
     return {
       appTitle: 'Aira',
-      versionTitle: '当前版本',
+      versionTitle: localizeSettingsCopy('当前版本'),
       versionText: `${identity.versionName} (${identity.versionCode})`,
-      moreButtonTitle: '查看更多'
+      moreButtonTitle: localizeSettingsCopy('查看更多')
     };
   }
 }

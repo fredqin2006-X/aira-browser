@@ -22,6 +22,7 @@ import {
 } from '../../core/theme/BrowserThemeStorageKeys';
 import { sharedPreferencesRepository } from '../bootstrap/BrowserAppRuntime';
 import { AppServiceModeGateService } from '../../services/settings/AppServiceModeGateService';
+import { localizeSettingsCopy } from '../../core/settings/SettingsCopy';
 
 @Entry
 @Component
@@ -49,7 +50,7 @@ struct SyncWebdavProviderPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: 'WebDAV 服务商',
+        title: localizeSettingsCopy('WebDAV 服务商'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,

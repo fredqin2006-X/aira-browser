@@ -22,6 +22,7 @@ import {
   BrowserSettingsIconBackgroundTokenSet,
   DEFAULT_BROWSER_SETTINGS_ICON_BACKGROUND_TOKENS
 } from '../../../features/theme/BrowserThemePaletteModels';
+import { localizeSettingsCopy } from '../../../core/settings/SettingsCopy';
 
 export interface SettingsCenterPresentationTheme {
   pageBackground: ResourceColor;
@@ -78,8 +79,8 @@ export function createDefaultSettingsCenterPresentationSnapshot(): SettingsCente
       settingsIconBackgrounds: DEFAULT_BROWSER_SETTINGS_ICON_BACKGROUND_TOKENS
     },
     accountCard: {
-      title: '未登录',
-      subtitle: '本地浏览功能已全部开启，登录后可使用账号与云服务',
+      title: localizeSettingsCopy('未登录'),
+      subtitle: localizeSettingsCopy('本地浏览功能已全部开启，登录后可使用账号与云服务'),
       isLoggedIn: false,
       avatarUri: '',
       membershipBadge: 'none',

@@ -8,6 +8,7 @@ import { SettingsAboutOverviewState } from '../../../core/settings/SettingsAbout
 import { BROWSER_THEME_STORAGE_ACCENT_KEY, BROWSER_THEME_STORAGE_RESOLVED_MODE_KEY } from '../../../core/theme/BrowserThemeStorageKeys';
 import { APP_STANDARD_HORIZONTAL_PADDING } from '../common/AppLayoutTokens';
 import { SettingsActionButton } from './SettingsRows';
+import { localizeSettingsCopy } from '../../../core/settings/SettingsCopy';
 
 const ABOUT_OVERVIEW_VERSION_OPACITY: number = 0.7;
 const ABOUT_OVERVIEW_HERO_IMAGE_ENTER_MS: number = 5000;
@@ -19,9 +20,9 @@ export struct SettingsAboutOverviewContent {
   @StorageProp(BROWSER_THEME_STORAGE_RESOLVED_MODE_KEY) private storedResolvedThemeMode: string = 'light';
   @Prop state: SettingsAboutOverviewState = {
     appTitle: 'Aira',
-    versionTitle: '当前版本',
+    versionTitle: localizeSettingsCopy('当前版本'),
     versionText: '',
-    moreButtonTitle: '查看更多'
+    moreButtonTitle: localizeSettingsCopy('查看更多')
   };
   @Prop surfaceBackground: ResourceColor = '';
   @Prop accentColor: ResourceColor = '';

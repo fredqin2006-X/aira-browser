@@ -20,6 +20,8 @@ import {
   SettingsSection
 } from './SettingsLayout';
 import { SettingsRowPosition } from './SettingsRows';
+import { hasAppResourceText } from '../../../core/resources/AppResourceText';
+import { localizeSettingsCopy } from '../../../core/settings/SettingsCopy';
 
 const APP_ICON_OPTION_SIZE: number = 44;
 const APP_ICON_OPTION_RADIO_GROUP: string = 'app-icon-options-embedded';
@@ -60,7 +62,7 @@ export struct AppIconSettingsContent {
   @Builder
   private buildContent() {
     SettingsSection({
-      title: '图标',
+      title: localizeSettingsCopy('图标'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({
@@ -75,7 +77,7 @@ export struct AppIconSettingsContent {
         }, (option: AppIconSettingsOptionState) => option.id)
       }
 
-      if (this.state.statusText.length > 0) {
+      if (hasAppResourceText(this.state.statusText)) {
         this.buildStatusText()
       }
 
@@ -191,7 +193,7 @@ export struct AppIconSettingsContent {
           availability: 'service_unavailable',
           icons: [],
           code: 0,
-          message: '图标管理服务暂不可用。'
+          message: localizeSettingsCopy('图标管理服务暂不可用。')
         });
       });
   }
@@ -211,7 +213,7 @@ export struct AppIconSettingsContent {
     }).catch((_error: Error) => {
       this.isApplying = false;
       this.applyingOptionId = '';
-      this.showToast('应用图标更新失败。');
+      this.showToast(localizeSettingsCopy('应用图标更新失败。'));
       this.refreshIcons();
     });
   }
@@ -266,8 +268,8 @@ export struct AppIconSettingsContent {
     return { topLeft: 0, topRight: 0, bottomLeft: 0, bottomRight: 0 };
   }
 
-  private showToast(message: string): void {
-    if (message.length <= 0) {
+  private showToast(message: ResourceStr): void {
+    if (!hasAppResourceText(message)) {
       return;
     }
     try {

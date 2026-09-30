@@ -6,6 +6,7 @@ import {
 import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundaryService';
 import { AiraRenderableIconId } from '../resources/GeneratedAiraIconCatalog';
 import { resolveAppResourceText } from '../resources/AppResourceText';
+import { localizeSettingsCatalogCopy } from './SettingsCatalogCopy';
 import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../common/config/AiraDistributionCapabilityOwner';
 
 export type SettingsCenterDestination =
@@ -35,8 +36,8 @@ export type SettingsCenterDestination =
 
 export interface SettingsCenterRowState {
   id: SettingsCenterDestination;
-  title: string;
-  value: string;
+  title: ResourceStr;
+  value: ResourceStr;
   isEnabled: boolean;
   icon?: Resource;
   imageIcon?: Resource;
@@ -45,7 +46,7 @@ export interface SettingsCenterRowState {
 
 export interface SettingsCenterGroupState {
   id: string;
-  title: string;
+  title: ResourceStr;
   rows: SettingsCenterRowState[];
 }
 
@@ -100,12 +101,14 @@ export class SettingsCenterViewModel {
       groups: [
         {
           id: 'account',
-          title: AIRA_DISTRIBUTION_CAPABILITY_OWNER.isCommunity() ? '同步与备份' : '账号与同步',
+          title: localizeSettingsCatalogCopy(
+            AIRA_DISTRIBUTION_CAPABILITY_OWNER.isCommunity() ? '同步与备份' : '账号与同步'
+          ),
           rows: accountRows
         },
         {
           id: 'basic',
-          title: '通用',
+          title: localizeSettingsCatalogCopy('通用'),
           rows: [
             this.buildRow('general', '通用'),
             this.buildRow('search', '搜索设置', '', canReadDevicePreferences),
@@ -121,7 +124,7 @@ export class SettingsCenterViewModel {
         },
         {
           id: 'privacy',
-          title: '隐私与安全',
+          title: localizeSettingsCatalogCopy('隐私与安全'),
           rows: [
             this.buildRow('privacy_security', '隐私防护'),
             this.buildRow('private_mode', '隐私模式')
@@ -129,9 +132,9 @@ export class SettingsCenterViewModel {
         },
         {
           id: 'experience',
-          title: resolveAppResourceText($r('app.string.settings_web_features')),
+          title: localizeSettingsCatalogCopy('网页功能'),
           rows: [
-            this.buildRow('web_features', resolveAppResourceText($r('app.string.settings_web_features'))),
+            this.buildRow('web_features', '网页功能'),
             this.buildRow(
               'user_scripts',
               '用户脚本',
@@ -143,12 +146,12 @@ export class SettingsCenterViewModel {
         },
         {
           id: 'advanced',
-          title: '高级',
+          title: localizeSettingsCatalogCopy('高级'),
           rows: [
-            this.buildRow('user_agent', resolveAppResourceText($r('app.string.site_version_preset_title'))),
+            this.buildRow('user_agent', '网页标识'),
             this.buildRow(
               'experiments',
-              resolveAppResourceText($r('app.string.settings_experiments_title')),
+              '实验室',
               isFullServiceMode ? '' : this.getFullModeRequiredValue(isFullServiceMode),
               canReadDevicePreferences && isFullServiceMode
             ),
@@ -169,8 +172,8 @@ export class SettingsCenterViewModel {
 
   private buildRow(
     id: SettingsCenterDestination,
-    title: string,
-    value: string = '',
+    title: ResourceStr,
+    value: ResourceStr = '',
     isEnabled: boolean = true
   ): SettingsCenterRowState {
     return {
@@ -281,8 +284,8 @@ export class SettingsCenterViewModel {
     }
   }
 
-  private getFullModeRequiredValue(isFullServiceMode: boolean): string {
-    return isFullServiceMode ? '' : '需全量模式';
+  private getFullModeRequiredValue(isFullServiceMode: boolean): ResourceStr {
+    return isFullServiceMode ? '' : localizeSettingsCatalogCopy('需全量模式');
   }
 
   private isDevicePreferenceEffectAllowed(

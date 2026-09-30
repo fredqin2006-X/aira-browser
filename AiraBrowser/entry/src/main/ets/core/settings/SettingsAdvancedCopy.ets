@@ -3,7 +3,10 @@
  * copy to localized resources. Applied at the settings presentation boundary so the
  * detail view model can stay string-based.
  */
-export function localizeAdvancedSettingsCopy(value: string): ResourceStr {
+export function localizeAdvancedSettingsCopy(value: ResourceStr): ResourceStr {
+  if (typeof value !== 'string') {
+    return value;
+  }
   switch (value) {
     // Advanced settings
     case '高级设置':

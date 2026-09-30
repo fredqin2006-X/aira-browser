@@ -9,6 +9,7 @@ import {
 import { SettingsActionButton } from './SettingsRows';
 import { AiraIcon } from '../common/AiraIcon';
 import { BrowserDesktopLoginConfirmAction } from '../../../core/browser/BrowserQrScanCoordinator';
+import { localizeSettingsCopy } from '../../../core/settings/SettingsCopy';
 
 const DESKTOP_LOGIN_AVATAR_SIZE: number = 64;
 
@@ -89,7 +90,7 @@ export struct DesktopLoginConfirmSheetContent {
 
       Column({ space: 12 }) {
         SettingsActionButton({
-          title: this.confirming ? '正在确认登录' : '确认登录',
+          title: this.confirming ? localizeSettingsCopy('正在确认登录') : localizeSettingsCopy('确认登录'),
           variant: 'filled',
           isEnabled: !this.confirming,
           accentColor: this.storedAccentColor,

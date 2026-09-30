@@ -5,6 +5,7 @@ import {
 } from '../../../core/theme/BrowserThemeStorageKeys';
 import { BrowserSheetActionButton } from '../browser/BrowserModalBottomSheet';
 import { CENTERED_DIALOG_SYSTEM_SURFACE_MODIFIER } from '../common/CenteredDialogSurface';
+import { localizeSettingsCopy } from '../../../core/settings/SettingsCopy';
 
 @CustomDialog
 export struct DesktopInterfaceModeConfirmationDialog {
@@ -41,7 +42,7 @@ export struct DesktopInterfaceModeConfirmationDialog {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '继续切换',
+          label: localizeSettingsCopy('继续切换'),
           emphasis: 'primary',
           stacked: true,
           actionEnabled: this.accepted,
@@ -55,7 +56,7 @@ export struct DesktopInterfaceModeConfirmationDialog {
         })
 
         BrowserSheetActionButton({
-          label: '取消',
+          label: localizeSettingsCopy('取消'),
           emphasis: 'ghost',
           stacked: true,
           buttonHeight: 44,

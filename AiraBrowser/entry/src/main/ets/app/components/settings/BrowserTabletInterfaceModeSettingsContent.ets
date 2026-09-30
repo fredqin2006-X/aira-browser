@@ -16,6 +16,7 @@ import {
 import { SettingsOptionRow, SettingsRowPosition } from './SettingsRows';
 import { DesktopInterfaceModeConfirmationDialog } from './DesktopInterfaceModeConfirmationDialog';
 import { resolveCenteredDialogControllerWidth,  resolveCenteredDialogSurfaceColor, CENTERED_DIALOG_CORNER_RADIUS_VP } from '../common/CenteredDialogSurface';
+import { localizeSettingsCopy } from '../../../core/settings/SettingsCopy';
 
 const TABLET_INTERFACE_MODE_RADIO_GROUP: string = 'tablet-interface-mode';
 
@@ -61,7 +62,7 @@ export struct BrowserTabletInterfaceModeSettingsContent {
 
   build() {
     SettingsSection({
-      title: '界面模式',
+      title: localizeSettingsCopy('界面模式'),
       secondaryTextColor: this.secondaryTextColor
     }) {
       SettingsGroupCard({

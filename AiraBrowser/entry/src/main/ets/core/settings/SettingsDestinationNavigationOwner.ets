@@ -788,9 +788,12 @@ export class SettingsDestinationNavigationOwner {
     return undefined;
   }
 
-  private resolveUnavailableReason(row: SettingsCenterRowState): string {
+  private resolveUnavailableReason(row: SettingsCenterRowState): ResourceStr {
+    if (typeof row.value !== 'string') {
+      return row.value;
+    }
     const value = row.value.trim();
-    return value.length > 0 ? value : '当前不可用';
+    return value.length > 0 ? row.value : localizeSettingsCatalogCopy('当前不可用');
   }
 
   private isWebAppDetailActive(): boolean {

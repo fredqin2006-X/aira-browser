@@ -3,7 +3,10 @@
  * resources. Applied at the settings presentation boundary so the detail view model
  * can keep producing plain strings.
  */
-export function localizeExperimentsSettingsCopy(value: string): ResourceStr {
+export function localizeExperimentsSettingsCopy(value: ResourceStr): ResourceStr {
+  if (typeof value !== 'string') {
+    return value;
+  }
   switch (value) {
     case '实验室':
       return $r('app.string.settings_experiments_title');
@@ -150,7 +153,10 @@ export function localizeSettingsSearchTargetCopy(value: string): ResourceStr {
 }
 
 /** Maps the "实验室" risk-confirmation prompt text to localized resources. */
-export function localizeExperimentsRiskPromptCopy(value: string): ResourceStr {
+export function localizeExperimentsRiskPromptCopy(value: ResourceStr): ResourceStr {
+  if (typeof value !== 'string') {
+    return value;
+  }
   switch (value) {
     case '开启媒体扰动抑制？':
       return $r('app.string.settings_experiments_risk_title');

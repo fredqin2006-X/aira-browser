@@ -17,7 +17,7 @@ export interface DynamicAppIconQueryResult {
   availability: DynamicAppIconAvailability;
   icons: DynamicAppIconOption[];
   code: number;
-  message: string;
+  message: ResourceStr;
 }
 
 export type DynamicAppIconMutationKind = 'select' | 'restore_default';

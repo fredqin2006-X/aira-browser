@@ -9,6 +9,7 @@ import {
 import { PreferencesRepository } from '../../data/preferences/PreferencesRepository';
 import { BrowserPrivacyEffectPolicyService } from '../../services/privacy/BrowserPrivacyEffectPolicyService';
 import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundaryService';
+import { localizeSettingsCopy } from '../../core/settings/SettingsCopy';
 
 export interface SettingsExternalNavigationBoundary {
   privacyMode?: BrowserSessionPrivacyMode | string;
@@ -17,7 +18,7 @@ export interface SettingsExternalNavigationBoundary {
 
 export interface SettingsExternalNavigationResult {
   settings: ExternalNavigationSettings;
-  message: string;
+  message: ResourceStr;
 }
 
 export class SettingsExternalNavigationCoordinator {
@@ -49,7 +50,7 @@ export class SettingsExternalNavigationCoordinator {
     if (decision.outcome !== 'allow') {
       return {
         settings: this.preferencesRepository.getPreferences().externalNavigation,
-        message: '当前会话不可更改全局外部应用策略。'
+        message: localizeSettingsCopy('当前会话不可更改全局外部应用策略。')
       };
     }
     const currentSettings = this.preferencesRepository.getPreferences().externalNavigation;

@@ -2,7 +2,10 @@
  * Maps the privacy-protection page's hardcoded Chinese copy to localized resources.
  * Applied at the settings presentation boundary so the detail view model can stay string-based.
  */
-export function localizePrivacyProtectionCopy(value: string): ResourceStr {
+export function localizePrivacyProtectionCopy(value: ResourceStr): ResourceStr {
+  if (typeof value !== 'string') {
+    return value;
+  }
   switch (value) {
     case '网页内容过滤':
       return $r('app.string.settings_site_info_content_filter');

@@ -1,3 +1,5 @@
+import { localizeSettingsCopy } from '../settings/SettingsCopy';
+
 export type SyncWebdavProviderRole = 'active' | 'additional_backup' | 'inactive';
 
 export type SyncWebdavConfigLifecycleStage =
@@ -23,11 +25,11 @@ export interface SyncWebdavConfigViewState {
   isConfigured: boolean;
   isEnabled: boolean;
   isBusy: boolean;
-  primaryActionTitle: string;
+  primaryActionTitle: ResourceStr;
   primaryActionEnabled: boolean;
   showDisableAction: boolean;
   disableActionEnabled: boolean;
-  statusText: string;
+  statusText: ResourceStr;
   renderKey: string;
 }
 
@@ -48,12 +50,12 @@ export class SyncWebdavConfigViewModel {
 
   resolveDisplayedPrimaryActionTitle(
     role: 'active' | 'additional_backup',
-    defaultTitle: string,
+    defaultTitle: ResourceStr,
     isBusy: boolean
-  ): string {
+  ): ResourceStr {
     if (role === 'additional_backup') {
       if (isBusy) {
-        return '正在保存 WebDAV 额外备份';
+        return localizeSettingsCopy('正在保存 WebDAV 额外备份');
       }
       return defaultTitle;
     }
@@ -105,52 +107,52 @@ export class SyncWebdavConfigViewModel {
     stage: SyncWebdavConfigLifecycleStage,
     targetRole: 'active' | 'additional_backup',
     providerRole: SyncWebdavProviderRole
-  ): string {
+  ): ResourceStr {
     if (stage === 'enabled') {
-      return targetRole === 'additional_backup' ? '保存并更新额外备份' : '立即同步';
+      return targetRole === 'additional_backup' ? localizeSettingsCopy('保存并更新额外备份') : localizeSettingsCopy('立即同步');
     }
     if (stage === 'enabling') {
-      return targetRole === 'additional_backup' ? '正在开启 WebDAV 额外备份' : '正在启用 WebDAV 同步';
+      return targetRole === 'additional_backup' ? localizeSettingsCopy('正在开启 WebDAV 额外备份') : localizeSettingsCopy('正在启用 WebDAV 同步');
     }
     if (stage === 'syncing') {
-      return targetRole === 'additional_backup' ? '正在更新 WebDAV 备份' : '正在同步 WebDAV';
+      return targetRole === 'additional_backup' ? localizeSettingsCopy('正在更新 WebDAV 备份') : localizeSettingsCopy('正在同步 WebDAV');
     }
     if (stage === 'disabling') {
-      return targetRole === 'additional_backup' ? '正在关闭 WebDAV 额外备份' : '正在关闭 WebDAV 同步';
+      return targetRole === 'additional_backup' ? localizeSettingsCopy('正在关闭 WebDAV 额外备份') : localizeSettingsCopy('正在关闭 WebDAV 同步');
     }
     if (targetRole === 'additional_backup') {
-      return '保存并开启为额外备份';
+      return localizeSettingsCopy('保存并开启为额外备份');
     }
-    return providerRole === 'additional_backup' ? '设为当前同步方式并开启' : '启用 WebDAV 书签同步';
+    return providerRole === 'additional_backup' ? localizeSettingsCopy('设为当前同步方式并开启') : localizeSettingsCopy('启用 WebDAV 书签同步');
   }
 
   private resolveStatusText(
     stage: SyncWebdavConfigLifecycleStage,
     providerRole: SyncWebdavProviderRole,
     bookmarkDomainEnabled: boolean
-  ): string {
+  ): ResourceStr {
     if (stage === 'enabled') {
-      return providerRole === 'additional_backup' ? '额外备份已开启' : '书签同步已开启';
+      return providerRole === 'additional_backup' ? localizeSettingsCopy('额外备份已开启') : localizeSettingsCopy('书签同步已开启');
     }
     if (stage === 'enabling') {
-      return '正在开启';
+      return localizeSettingsCopy('正在开启');
     }
     if (stage === 'syncing') {
-      return '正在同步';
+      return localizeSettingsCopy('正在同步');
     }
     if (stage === 'disabling') {
-      return '正在关闭';
+      return localizeSettingsCopy('正在关闭');
     }
     if (stage === 'configured_off') {
       if (providerRole === 'additional_backup') {
-        return '当前为额外备份位置';
+        return localizeSettingsCopy('当前为额外备份位置');
       }
       if (providerRole === 'active' && !bookmarkDomainEnabled) {
-        return '当前同步方式，书签同步未开启';
+        return localizeSettingsCopy('当前同步方式，书签同步未开启');
       }
-      return '已保存，未开启';
+      return localizeSettingsCopy('已保存，未开启');
     }
-    return '未配置';
+    return localizeSettingsCopy('未配置');
   }
 
   private isBusyStage(stage: SyncWebdavConfigLifecycleStage): boolean {

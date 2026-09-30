@@ -110,6 +110,7 @@ import {
   CustomHomepageSettingsPageBinding
 } from '../../../core/customhome/CustomHomepageSettingsPageBinding';
 import { applyDesktopDialogSheetChrome } from '../common/DesktopDialogSheetChrome';
+import { localizeSettingsCopy } from '../../../core/settings/SettingsCopy';
 
 interface EmbeddedSettingsRouteParams extends BrowserBoundaryRouteState {
   providerId?: string;
@@ -617,7 +618,7 @@ export struct SettingsEmbeddedDetailPanel {
    */
   private requestCustomDownloadLocation(): void {
     if (!new DownloadLocationDirectoryService().isFolderSelectionSupported()) {
-      this.showToast('当前设备不支持选择文件夹。');
+      this.showToast(localizeSettingsCopy('当前设备不支持选择文件夹。'));
       return;
     }
     void this.chooseCustomDownloadLocation();
@@ -628,7 +629,7 @@ export struct SettingsEmbeddedDetailPanel {
     try {
       const result = await directoryService.selectDirectory(this.getPickerContext());
       if (result.status === 'unusable_folder') {
-        this.showToast('这个文件夹不可用，请换一个再试。');
+        this.showToast(localizeSettingsCopy('这个文件夹不可用，请换一个再试。'));
         return;
       }
       if (result.status !== 'selected' || result.selection === undefined) {
@@ -647,12 +648,12 @@ export struct SettingsEmbeddedDetailPanel {
         void directoryService.releaseDirectory(previousUri);
       }
       if (!isWritable) {
-        this.showToast('已选择该文件夹。若下载时无法写入，将回退到系统下载目录。');
+        this.showToast(localizeSettingsCopy('已选择该文件夹。若下载时无法写入，将回退到系统下载目录。'));
       } else if (!result.isPersisted) {
-        this.showToast('已选择该文件夹。重启应用后需要重新授权。');
+        this.showToast(localizeSettingsCopy('已选择该文件夹。重启应用后需要重新授权。'));
       }
     } catch (_error) {
-      this.showToast('选择下载位置失败');
+      this.showToast(localizeSettingsCopy('选择下载位置失败'));
     }
   }
 
@@ -1015,7 +1016,7 @@ export struct SettingsEmbeddedDetailPanel {
       message: '清空后不会影响网页内容过滤规则和站点例外。',
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: localizeSettingsCopy('取消'),
         action: () => {
         }
       },
@@ -1178,23 +1179,23 @@ export struct SettingsEmbeddedDetailPanel {
           this.showToast(result.message);
         })
         .catch((_error: Error) => {
-          this.showToast('导出脚本失败，请稍后重试。');
+          this.showToast(localizeSettingsCopy('导出脚本失败，请稍后重试。'));
         });
     }
   }
 
   private confirmDeleteScript(scriptId: string, scriptName: string): void {
     showCenteredAlertDialog({
-      title: '删除用户脚本',
+      title: localizeSettingsCopy('删除用户脚本'),
       message: `确定删除“${scriptName}”吗？`,
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: localizeSettingsCopy('取消'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '删除',
+        value: localizeSettingsCopy('删除'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.userScriptManagementSession.action(UserScriptManagementAction.deleteScript(scriptId));
@@ -1238,7 +1239,7 @@ export struct SettingsEmbeddedDetailPanel {
     );
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

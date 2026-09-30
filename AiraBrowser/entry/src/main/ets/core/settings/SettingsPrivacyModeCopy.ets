@@ -1,4 +1,7 @@
-export function localizePrivacyModeSettingsCopy(value: string): ResourceStr {
+export function localizePrivacyModeSettingsCopy(value: ResourceStr): ResourceStr {
+  if (typeof value !== 'string') {
+    return value;
+  }
   switch (value) {
     case '进入隐私模式时验证身份':
       return $r('app.string.settings_privacy_authenticate');

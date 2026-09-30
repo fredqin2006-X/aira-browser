@@ -23,11 +23,13 @@ import { AiraRenderableIconId } from '../../../core/resources/GeneratedAiraIconC
 import { AiraIcon } from '../common/AiraIcon';
 import { HdsImmersiveMaterialSurface } from '../common/HdsImmersiveMaterialSurface';
 import { isHdsMaterialAvailable } from '../common/HdsImmersiveMaterialTokens';
+import { localizeSettingsCopy } from '../../../core/settings/SettingsCopy';
+import { hasAppResourceText, resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 export type SettingsHdsBackIconKind = 'close' | 'back';
 
 export interface SettingsHdsMenuAction {
-  label: string;
+  label: ResourceStr;
   icon?: Resource;
   airaIconId?: AiraRenderableIconId;
   enabled?: boolean;
@@ -314,8 +316,8 @@ export struct SettingsHdsScaffold {
       } else if (this.menuActions.length > 0) {
         ForEach(this.menuActions, (menuAction: SettingsHdsMenuAction) => {
           this.buildGlassMenuAction(menuAction)
-        }, (menuAction: SettingsHdsMenuAction) => menuAction.label)
-      } else if (this.menuActionLabel.length > 0) {
+        }, (menuAction: SettingsHdsMenuAction) => resolveAppResourceText(menuAction.label))
+      } else if (hasAppResourceText(this.menuActionLabel)) {
         if (this.menuActionBadgeVisible) {
           Badge({
             value: '',
@@ -394,7 +396,7 @@ export struct SettingsHdsScaffold {
       .stateEffect(true)
       .backgroundColor(this.resolveTitleActionBackground())
       .borderRadius(SETTINGS_TITLE_BAR_CUSTOM_MENU_BUTTON_SIZE / 2)
-      .accessibilityText('更多操作')
+      .accessibilityText(resolveAppResourceText(localizeSettingsCopy('更多操作')))
       .bindMenu(this.buildCollapsedMenu())
     }
     .width(SETTINGS_TITLE_BAR_CUSTOM_MENU_BUTTON_SIZE)
@@ -413,7 +415,7 @@ export struct SettingsHdsScaffold {
               menuAction.action();
             }
           })
-      }, (menuAction: SettingsHdsMenuAction) => menuAction.label)
+      }, (menuAction: SettingsHdsMenuAction) => resolveAppResourceText(menuAction.label))
     }
   }
 
@@ -444,7 +446,7 @@ export struct SettingsHdsScaffold {
       .backgroundColor(this.resolveTitleActionBackground())
       .borderRadius(SETTINGS_TITLE_BAR_CUSTOM_MENU_BUTTON_SIZE / 2)
       .enabled(menuAction.enabled !== false)
-      .accessibilityText(menuAction.label)
+      .accessibilityText(resolveAppResourceText(menuAction.label))
       .onClick(() => {
         if (menuAction.enabled !== false) {
           menuAction.action();
@@ -531,7 +533,7 @@ export struct SettingsHdsScaffold {
       .backgroundColor(this.resolveTitleActionBackground())
       .borderRadius(SETTINGS_TITLE_BAR_CUSTOM_MENU_BUTTON_SIZE / 2)
       .hitTestBehavior(HitTestMode.None)
-      .accessibilityText('私密模式')
+      .accessibilityText(resolveAppResourceText(localizeSettingsCopy('私密模式')))
     }
     .width(SETTINGS_TITLE_BAR_CUSTOM_MENU_BUTTON_SIZE)
     .height(SETTINGS_TITLE_BAR_CUSTOM_MENU_BUTTON_SIZE)

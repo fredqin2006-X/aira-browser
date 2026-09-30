@@ -93,7 +93,10 @@ export class SettingsGeneralCoordinator {
   }
 }
 
-export function localizeGeneralSettingsCopy(value: string): ResourceStr {
+export function localizeGeneralSettingsCopy(value: ResourceStr): ResourceStr {
+  if (typeof value !== 'string') {
+    return value;
+  }
   switch (value) {
     case '默认浏览器':
       return $r('app.string.settings_general_default_browser');

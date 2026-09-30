@@ -78,6 +78,8 @@ import { SyncResultDialog } from '../components/sync/SyncResultDialog';
 import { SyncFormField } from '../components/sync/SyncFormFields';
 import { AppServiceModeGateService } from '../../services/settings/AppServiceModeGateService';
 import { applyDesktopDialogSheetChrome } from '../components/common/DesktopDialogSheetChrome';
+import { localizeSettingsCopy } from '../../core/settings/SettingsCopy';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 @Entry
 @Component
@@ -129,7 +131,7 @@ struct SyncWebdavConfigPage {
     primaryActionEnabled: true,
     showDisableAction: false,
     disableActionEnabled: true,
-    statusText: '未配置',
+    statusText: localizeSettingsCopy('未配置'),
     renderKey: 'empty|off|empty'
   };
   @State private syncFloatingTitle: ResourceStr = '';
@@ -309,7 +311,7 @@ struct SyncWebdavConfigPage {
     Column() {
       Column({ space: 0 }) {
         Row({ space: 12 }) {
-          Text('WebDAV 服务商')
+          Text(localizeSettingsCopy('WebDAV 服务商'))
             .layoutWeight(1)
             .fontSize(16)
             .fontColor(this.storedPrimaryTextColor)
@@ -350,8 +352,8 @@ struct SyncWebdavConfigPage {
   private buildAccountCredentialSection() {
     Column({ space: 16 }) {
       SyncFormField({
-        label: '用户名',
-        placeholder: 'WebDAV 用户名',
+        label: localizeSettingsCopy('用户名'),
+        placeholder: localizeSettingsCopy('WebDAV 用户名'),
         text: $username,
         onChange: (_value: string) => {
           this.syncWebdavAccountStorage();
@@ -359,8 +361,8 @@ struct SyncWebdavConfigPage {
         }
       })
       SyncFormField({
-        label: '密码',
-        placeholder: 'WebDAV 密码',
+        label: localizeSettingsCopy('密码'),
+        placeholder: localizeSettingsCopy('WebDAV 密码'),
         text: $password,
         secure: true,
         onChange: (_value: string) => {
@@ -374,11 +376,11 @@ struct SyncWebdavConfigPage {
 
   @Builder
   private buildActionSection() {
-    Button(this.syncWebdavConfigViewModel.resolveDisplayedPrimaryActionTitle(
+    Button(resolveAppResourceText(this.syncWebdavConfigViewModel.resolveDisplayedPrimaryActionTitle(
       this.syncTargetRole,
       this.webdavViewState.primaryActionTitle,
       this.webdavViewState.isBusy
-    ))
+    )))
       .width('100%')
       .height(48)
       .type(ButtonType.Normal)
@@ -400,7 +402,7 @@ struct SyncWebdavConfigPage {
   private buildDisableSection() {
     if (this.webdavViewState.showDisableAction) {
       SettingsActionButton({
-        title: this.syncTargetRole === 'additional_backup' ? '关闭 WebDAV 额外备份' : '关闭 WebDAV 同步',
+        title: this.syncTargetRole === 'additional_backup' ? localizeSettingsCopy('关闭 WebDAV 额外备份') : localizeSettingsCopy('关闭 WebDAV 同步'),
         emphasis: 'danger',
         isEnabled: this.webdavViewState.disableActionEnabled,
         pressedBackgroundColor: this.storedPressedBackgroundColor,
@@ -416,7 +418,7 @@ struct SyncWebdavConfigPage {
   private buildEndpointInput() {
     Column() {
       SyncFormField({
-        label: 'WebDAV 地址',
+        label: localizeSettingsCopy('WebDAV 地址'),
         placeholder: 'https://example.com/dav/',
         text: $endpoint,
         inputType: InputType.URL,
@@ -543,14 +545,14 @@ struct SyncWebdavConfigPage {
       password: this.password
     };
     if (this.activateExperienceAfterSave && this.syncTargetRole === 'active') {
-      this.updateSyncFloatingStep('正在开启同步', '正在保存配置并开启书签和全部常用设置', 72);
+      this.updateSyncFloatingStep(localizeSettingsCopy('正在开启同步'), localizeSettingsCopy('正在保存配置并开启书签和全部常用设置'), 72);
       sharedSyncExperienceCoordinator.configureWebdavAndActivate(configuration)
         .then((outcome: SyncExperienceActionOutcome) => {
           this.renderExperienceActivationOutcome(outcome);
         })
         .catch((error: Error) => {
           this.completeSyncProgressDialog();
-          this.showSyncFailureDialog('开启同步', 'WebDAV', error);
+          this.showSyncFailureDialog(localizeSettingsCopy('开启同步'), 'WebDAV', error);
         })
         .finally(() => {
           this.webdavOperation = '';
@@ -594,17 +596,17 @@ struct SyncWebdavConfigPage {
       return;
     }
     showCenteredAlertDialog({
-      title: this.syncTargetRole === 'additional_backup' ? '关闭 WebDAV 额外备份吗' : '关闭 WebDAV 同步吗',
+      title: this.syncTargetRole === 'additional_backup' ? localizeSettingsCopy('关闭 WebDAV 额外备份吗') : localizeSettingsCopy('关闭 WebDAV 同步吗'),
       message: this.syncTargetRole === 'additional_backup'
         ? '关闭后会停止向 WebDAV 覆盖写入额外副本，当前同步方式和已填写的 WebDAV 配置都不会删除。'
         : '关闭后会停止通过 WebDAV 同步书签，本机书签和已填写的 WebDAV 配置不会删除。',
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: localizeSettingsCopy('取消'),
         action: () => {}
       },
       secondaryButton: {
-        value: '关闭',
+        value: localizeSettingsCopy('关闭'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.deactivateWebdavSync();
@@ -654,7 +656,7 @@ struct SyncWebdavConfigPage {
       message: decision.message,
       autoCancel: true,
       primaryButton: {
-        value: '稍后',
+        value: localizeSettingsCopy('稍后'),
         action: () => {}
       },
       secondaryButton: {
@@ -676,12 +678,12 @@ struct SyncWebdavConfigPage {
   ): void {
     if (error !== undefined) {
       if (error.code !== 1001502012) {
-        this.showToast(error.message.length > 0 ? error.message : '华为账号登录失败');
+        this.showToast(error.message.length > 0 ? error.message : localizeSettingsCopy('华为账号登录失败'));
       }
       return;
     }
     if (response.authorizationCode.trim().length <= 0 && response.openID.trim().length <= 0) {
-      this.showToast('华为账号登录未完成');
+      this.showToast(localizeSettingsCopy('华为账号登录未完成'));
       return;
     }
     this.showHuaweiLoginPanel = false;
@@ -707,7 +709,7 @@ struct SyncWebdavConfigPage {
         this.showToast(outcome.title);
       })
       .catch((_error: Error) => {
-        this.showToast('华为账号登录失败');
+        this.showToast(localizeSettingsCopy('华为账号登录失败'));
       })
       .finally(() => {
         this.webdavOperation = '';
@@ -771,13 +773,13 @@ struct SyncWebdavConfigPage {
         message: outcome.message,
         autoCancel: true,
         primaryButton: {
-          value: '以云端为准',
+          value: localizeSettingsCopy('以云端为准'),
           action: () => {
             this.resolveExperienceBookmarkConflicts(conflictRemoteKind, 'prefer-remote');
           }
         },
         secondaryButton: {
-          value: '以本机为准',
+          value: localizeSettingsCopy('以本机为准'),
           action: () => {
             this.resolveExperienceBookmarkConflicts(conflictRemoteKind, 'prefer-local');
           }
@@ -793,7 +795,7 @@ struct SyncWebdavConfigPage {
   }
 
   private showExperienceFailureDialog(outcome: SyncExperienceActionOutcome): void {
-    const operationName = typeof outcome.title === 'string' ? outcome.title : '同步';
+    const operationName = typeof outcome.title === 'string' ? outcome.title : localizeSettingsCopy('同步');
     const message = typeof outcome.message === 'string' ? outcome.message : '';
     this.showSyncFailureDialog(operationName, 'WebDAV', new Error(message));
   }
@@ -802,18 +804,18 @@ struct SyncWebdavConfigPage {
     remoteKind: AiraSyncProviderKind,
     resolution: AiraBookmarkConflictResolution
   ): void {
-    this.beginSyncFloatingOperation('正在处理书签冲突', '正在按你的选择合并并保存书签');
+    this.beginSyncFloatingOperation(localizeSettingsCopy('正在处理书签冲突'), localizeSettingsCopy('正在按你的选择合并并保存书签'));
     sharedSyncExperienceCoordinator.resolveBookmarkConflicts(remoteKind, resolution)
       .then((outcome: SyncExperienceActionOutcome): void => {
         this.renderExperienceActivationOutcome(outcome);
       })
       .catch((error: Error): void => {
         this.completeSyncProgressDialog();
-        this.showSyncFailureDialog('书签冲突处理失败', 'WebDAV', error);
+        this.showSyncFailureDialog(localizeSettingsCopy('书签冲突处理失败'), 'WebDAV', error);
       });
   }
 
-  private beginSyncFloatingOperation(title: string, subtitle: string): void {
+  private beginSyncFloatingOperation(title: ResourceStr, subtitle: ResourceStr): void {
     this.stopSyncProgressTimers();
     this.syncFloatingTitle = title;
     this.syncFloatingSubtitle = subtitle;
@@ -827,7 +829,7 @@ struct SyncWebdavConfigPage {
     this.openSyncProgressDialog();
   }
 
-  private updateSyncFloatingStep(title: string, subtitle: string, progress: number): void {
+  private updateSyncFloatingStep(title: ResourceStr, subtitle: ResourceStr, progress: number): void {
     if (!this.syncProgressDialogOpen) {
       return;
     }
@@ -859,7 +861,7 @@ struct SyncWebdavConfigPage {
     this.closeSyncProgressDialog();
   }
 
-  private beginSyncProgressTips(title: string, firstTip: string): void {
+  private beginSyncProgressTips(title: ResourceStr, firstTip: ResourceStr): void {
     this.syncProgressTipsState = this.syncOperationProgressViewModel.buildInitialTips(title, firstTip);
     this.showSyncProgressTip(this.syncProgressTipsState.activeTip);
     this.syncProgressTipTimer = setInterval(() => {
@@ -867,7 +869,7 @@ struct SyncWebdavConfigPage {
     }, SYNC_OPERATION_PROGRESS_TIMING.tipIntervalMs);
   }
 
-  private appendSyncProgressTip(tip: string): void {
+  private appendSyncProgressTip(tip: ResourceStr): void {
     this.syncProgressTipsState = this.syncOperationProgressViewModel.appendTip(this.syncProgressTipsState, tip);
   }
 
@@ -989,10 +991,12 @@ struct SyncWebdavConfigPage {
     this.syncResultDialogController.open();
   }
 
-  private showSyncFailureDialog(operationName: string, serviceName: string, error: Error): void {
+  private showSyncFailureDialog(operationName: ResourceStr, serviceName: ResourceStr, error: Error): void {
     const presentation = this.syncFailurePresentationService.build({
-      serviceName: serviceName,
-      operationName: operationName,
+      // The failure presenter compares and concatenates both names, so it takes the
+      // resolved text rather than the resource.
+      serviceName: resolveAppResourceText(serviceName),
+      operationName: resolveAppResourceText(operationName),
       errorMessage: this.stringifyError(error)
     });
     this.syncFailureDialogTitle = presentation.title;
@@ -1004,24 +1008,24 @@ struct SyncWebdavConfigPage {
 
   private copyCurrentSyncFailureDiagnostics(): void {
     if (this.syncFailureDiagnosticsText.length === 0) {
-      this.showToast('当前没有可复制的错误详情。');
+      this.showToast(localizeSettingsCopy('当前没有可复制的错误详情。'));
       return;
     }
     try {
       const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.syncFailureDiagnosticsText);
       pasteboard.getSystemPasteboard().setData(data)
         .then(() => {
-          this.showToast('错误详情已复制。');
+          this.showToast(localizeSettingsCopy('错误详情已复制。'));
         })
         .catch((_error: Error) => {
-          this.showToast('复制失败，请稍后重试。');
+          this.showToast(localizeSettingsCopy('复制失败，请稍后重试。'));
         });
     } catch (_error) {
-      this.showToast('复制失败，请稍后重试。');
+      this.showToast(localizeSettingsCopy('复制失败，请稍后重试。'));
     }
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

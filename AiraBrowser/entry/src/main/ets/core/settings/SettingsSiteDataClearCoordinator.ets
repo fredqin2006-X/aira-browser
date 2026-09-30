@@ -25,6 +25,7 @@ import {
   sharedBrowserHttpsFirstNavigationService
 } from '../../services/web/BrowserHttpsFirstNavigationService';
 import { resolveAppResourceText } from '../resources/AppResourceText';
+import { localizeSettingsCopy } from '../../core/settings/SettingsCopy';
 
 export interface SettingsSiteDataClearBoundary {
   profileId?: BrowserProfileId | string;
@@ -36,9 +37,9 @@ export interface SettingsSiteDataClearState {
   profileId: BrowserProfileId;
   privacyMode: BrowserSessionPrivacyMode;
   dataScope: BrowserDataScope;
-  title: string;
-  message: string;
-  confirmLabel: string;
+  title: ResourceStr;
+  message: ResourceStr;
+  confirmLabel: ResourceStr;
 }
 
 export type SettingsBrowsingDataClearItemId =
@@ -57,21 +58,21 @@ export type SettingsBrowsingDataClearTimeRangeId =
 
 export interface SettingsBrowsingDataClearItemState {
   id: SettingsBrowsingDataClearItemId;
-  title: string;
-  summary: string;
+  title: ResourceStr;
+  summary: ResourceStr;
   isEnabled: boolean;
   defaultSelected: boolean;
 }
 
 export interface SettingsBrowsingDataClearTimeRangeState {
   id: SettingsBrowsingDataClearTimeRangeId;
-  title: string;
+  title: ResourceStr;
 }
 
 export interface SettingsBrowsingDataClearDialogState {
-  title: string;
-  message: string;
-  confirmLabel: string;
+  title: ResourceStr;
+  message: ResourceStr;
+  confirmLabel: ResourceStr;
   timeRangeTitle: string;
   dataTypesTitle: string;
   showTimeRange: boolean;
@@ -134,7 +135,7 @@ export class SettingsSiteDataClearCoordinator {
     const state = this.buildState(boundary);
     const isSessionEphemeral = state.dataScope === 'session_ephemeral';
     return {
-      title: '清除浏览数据',
+      title: localizeSettingsCopy('清除浏览数据'),
       message: isSessionEphemeral
         ? '仅清除本次私密会话数据，不影响常规浏览资料。'
         : '时间范围适用于历史记录和最近关闭；Cookie、缓存、站点存储按系统 Web 能力清除全部。',
@@ -308,7 +309,7 @@ export class SettingsSiteDataClearCoordinator {
       },
       {
         id: 'site_permissions',
-        title: '站点权限',
+        title: localizeSettingsCopy('站点权限'),
         summary: '已保存的相机、麦克风、位置等权限',
         isEnabled: true,
         defaultSelected: true

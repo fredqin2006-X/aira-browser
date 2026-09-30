@@ -23,6 +23,7 @@ import {
 import { SettingsNavigationCoordinator } from '../router/SettingsNavigationCoordinator';
 import { SettingsDetailInteractionCoordinator } from '../../core/settings/SettingsDetailInteractionCoordinator';
 import { BROWSER_THEME_STORAGE_RESOLVED_MODE_KEY } from '../../core/theme/BrowserThemeStorageKeys';
+import { localizeSettingsCopy } from '../../core/settings/SettingsCopy';
 
 const THEME_PALETTE_CARD_CORNER_RADIUS: number = 22;
 const THEME_PALETTE_GRID_GAP: number = 12;
@@ -257,7 +258,7 @@ struct ThemePaletteSettingsPage {
       .catch((_error: Error) => {
         this.isSelectingOption = false;
         this.refreshState();
-        this.showToast('主题色更新失败。');
+        this.showToast(localizeSettingsCopy('主题色更新失败。'));
       });
   }
 
@@ -270,7 +271,7 @@ struct ThemePaletteSettingsPage {
     return true;
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

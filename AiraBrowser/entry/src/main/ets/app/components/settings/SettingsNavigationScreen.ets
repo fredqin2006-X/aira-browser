@@ -123,7 +123,7 @@ export struct SettingsNavigationScreen {
 
   build() {
     SettingsHdsScaffold({
-      title: '设置',
+      title: $r('app.string.settings_destination_title'),
       backIconKind: 'back',
       pageBackground: this.resolvePageBackground(),
       headerButtonBackground: this.resolveHeaderButtonBackground(),
