@@ -956,6 +956,8 @@ export struct BrowserBottomAddressPanel {
       }
       if (this.toolbarSystemSheetEditing) {
         this.buildToolbarSystemSheetEditingTitle()
+      } else if (this.isWebContentMode()) {
+        this.buildToolbarSystemSheetWebAddressCapsule()
       } else if (this.shouldShowReadingContinuation()) {
         this.buildToolbarSystemSheetReadingCapsule()
       } else {
@@ -1032,6 +1034,89 @@ export struct BrowserBottomAddressPanel {
     .onClick((): void => {
       this.onContinueReading();
     })
+  }
+
+  @Builder
+  private buildToolbarSystemSheetWebAddressCapsule() {
+    Row() {
+      Button({ type: ButtonType.Normal }) {
+        AiraIcon({
+          airaIconId: 'browser.toolbar.userScripts',
+          iconSize: WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_ICON_SIZE,
+          iconColor: this.resolveItemTextColor(true)
+        })
+      }
+      .width(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT)
+      .height(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT)
+      .padding(0)
+      .backgroundColor(Color.Transparent)
+      .borderRadius(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT / 2)
+      .stateEffect(false)
+      .onClick((): void => {
+        this.dispatchToolbarSystemSheetHeaderAction('scripts');
+      })
+      Button({ type: ButtonType.Normal }) {
+        Text(this.getAddressText())
+          .width('100%')
+          .fontSize(15)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(this.resolveItemTextColor(true))
+          .textAlign(TextAlign.Center)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      }
+      .layoutWeight(1)
+      .height(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT)
+      .padding(0)
+      .backgroundColor(Color.Transparent)
+      .stateEffect(false)
+      .onClick((): void => {
+        this.openToolbarSystemSheetSiteInfo();
+      })
+      Button({ type: ButtonType.Normal }) {
+        AiraIcon({
+          airaIconId: 'browser.toolbar.actionTranslate',
+          iconSize: WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_ICON_SIZE,
+          iconColor: this.resolveItemTextColor(true)
+        })
+      }
+      .width(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT)
+      .height(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT)
+      .padding(0)
+      .backgroundColor(Color.Transparent)
+      .borderRadius(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT / 2)
+      .stateEffect(false)
+      .onClick((): void => {
+        this.dispatchToolbarSystemSheetHeaderAction('translate');
+      })
+    }
+    .layoutWeight(1)
+    .height(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT)
+    .margin({
+      left: WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_GAP,
+      right: WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_GAP
+    })
+    .padding({ left: 4, right: 4 })
+    .alignItems(VerticalAlign.Center)
+    .backgroundColor(resolveBrowserBottomToolbarSheetActionColor(this.resolveNeutralThemeMode()))
+    .borderRadius(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT / 2)
+  }
+
+  private dispatchToolbarSystemSheetHeaderAction(actionId: BrowserBottomAddressPanelActionId): void {
+    this.pendingToolbarSystemSheetAction = undefined;
+    this.toolbarSystemSheetVisible = false;
+    this.onAction(actionId);
+  }
+
+  private openToolbarSystemSheetSiteInfo(): void {
+    const action = this.viewModel.buildQuickActionsByLayout(this.buildActionInput(), {
+      primaryActionIds: ['siteInfo'],
+      secondaryActionIds: []
+    }).find((item: BrowserBottomAddressPanelAction): boolean => item.id === 'siteInfo');
+    if (action === undefined) {
+      return;
+    }
+    this.requestToolbarSystemSheetAction(action);
   }
 
   @Builder
