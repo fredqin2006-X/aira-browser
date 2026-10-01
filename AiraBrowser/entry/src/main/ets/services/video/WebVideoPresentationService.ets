@@ -1,4 +1,5 @@
 import { webview } from '@kit.ArkWeb';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   WEB_VIDEO_ACTION_TOOLBAR_PROTOCOL,
   WEB_VIDEO_CONTROLS_HIDDEN_MARKER_ATTRIBUTE,
@@ -109,7 +110,10 @@ export class WebVideoPresentationService {
     command: WebVideoLiveCommand
   ): Promise<WebVideoLiveCommandResult> {
     if (controller === undefined) {
-      return this.buildFailedLiveCommandResult('no_controller', '当前网页不可用，无法控制视频。');
+      return this.buildFailedLiveCommandResult(
+        'no_controller',
+        resolveAppResourceText($r('app.string.video_player_page_unavailable'))
+      );
     }
     const initialResult = (target.transport ?? 'document_direct') === 'frame_proxy' ?
       await this.runFrameProxyLiveCommand(controller, target, command) :
@@ -142,7 +146,10 @@ export class WebVideoPresentationService {
       }
       const hostResult = await this.runFrameHostCommand(controller, target, 'probe_frame_host');
       if (!hostResult.ok) {
-        return this.buildFailedLiveCommandResult(hostResult.reason, '当前网页视频会话已经变化。');
+        return this.buildFailedLiveCommandResult(
+          hostResult.reason,
+          resolveAppResourceText($r('app.string.video_player_session_changed'))
+        );
       }
       return targetResult;
     }
@@ -153,7 +160,10 @@ export class WebVideoPresentationService {
         'enter_frame_host_presentation'
       );
       if (!hostResult.ok) {
-        return this.buildFailedLiveCommandResult(hostResult.reason, '网页视频画面接管失败，原网页将继续播放。');
+        return this.buildFailedLiveCommandResult(
+          hostResult.reason,
+          resolveAppResourceText($r('app.string.video_player_takeover_failed'))
+        );
       }
       // The host must snapshot the iframe before the child video changes it. Otherwise
       // restore would write the takeover's pointer-events/z-index styles back into the
@@ -178,7 +188,10 @@ export class WebVideoPresentationService {
         'restore_frame_host_presentation'
       );
       if (!hostResult.ok) {
-        return this.buildFailedLiveCommandResult(hostResult.reason, '网页视频画面恢复失败。');
+        return this.buildFailedLiveCommandResult(
+          hostResult.reason,
+          resolveAppResourceText($r('app.string.video_player_restore_failed'))
+        );
       }
       return targetResult;
     }
@@ -219,7 +232,7 @@ export class WebVideoPresentationService {
         if (this.frameCommandTransport === undefined || tabId.length <= 0 || frameRuntimeId.length <= 0) {
           return this.buildFailedLiveCommandResult(
             'frame_transport_unavailable',
-            '当前网页视频会话已经变化。'
+            resolveAppResourceText($r('app.string.video_player_session_changed'))
           );
         }
         raw = await this.frameCommandTransport.executeFrameCommand({
@@ -235,7 +248,10 @@ export class WebVideoPresentationService {
       return result;
     } catch (error) {
       const message = (error as Error)?.message ?? 'run_javascript_failed';
-      return this.buildFailedLiveCommandResult(message, '网页视频控制失败。');
+      return this.buildFailedLiveCommandResult(
+        message,
+        resolveAppResourceText($r('app.string.video_player_control_failed'))
+      );
     }
   }
 
@@ -254,13 +270,16 @@ export class WebVideoPresentationService {
     }
     return this.buildFailedLiveCommandResult(
       'picture_in_picture_confirmation_timeout',
-      '当前视频暂不支持小窗播放。'
+      resolveAppResourceText($r('app.string.video_player_pip_unsupported'))
     );
   }
 
   private parseLiveCommandResult(raw: string, command: WebVideoLiveCommand): WebVideoLiveCommandResult {
     if (raw.length <= 0 || raw.length > MAX_WEB_VIDEO_COMMAND_RESULT_LENGTH) {
-      return this.buildFailedLiveCommandResult('invalid_result_length', '网页视频控制失败。');
+      return this.buildFailedLiveCommandResult(
+        'invalid_result_length',
+        resolveAppResourceText($r('app.string.video_player_control_failed'))
+      );
     }
     try {
       const value = JSON.parse(raw) as WebVideoLiveCommandResult;
@@ -304,7 +323,10 @@ export class WebVideoPresentationService {
       }
     } catch (_error) {
     }
-    return this.buildFailedLiveCommandResult('invalid_result', '网页视频控制失败。');
+    return this.buildFailedLiveCommandResult(
+      'invalid_result',
+      resolveAppResourceText($r('app.string.video_player_control_failed'))
+    );
   }
 
   private parseFrameHostCommandResult(
@@ -452,6 +474,33 @@ export class WebVideoPresentationService {
 })();`;
   }
 
+  private buildInjectedVideoCopy(): string {
+    return JSON.stringify({
+      sessionChanged: resolveAppResourceText($r('app.string.video_player_session_changed')),
+      takeoverFailed: resolveAppResourceText($r('app.string.video_player_takeover_failed')),
+      controlFailed: resolveAppResourceText($r('app.string.video_player_control_failed')),
+      pipUnsupported: resolveAppResourceText($r('app.string.video_player_pip_unsupported')),
+      toolbarAria: resolveAppResourceText($r('app.string.video_player_toolbar_aria')),
+      cast: resolveAppResourceText($r('app.string.video_player_cast')),
+      pip: resolveAppResourceText($r('app.string.video_player_pip')),
+      fullscreen: resolveAppResourceText($r('app.string.video_player_fullscreen')),
+      castUnsupported: resolveAppResourceText($r('app.string.video_player_cast_unsupported')),
+      castChooseDevice: resolveAppResourceText($r('app.string.video_player_cast_choose_device')),
+      pipPageUnsupported: resolveAppResourceText($r('app.string.video_player_pip_page_unsupported')),
+      pipOpening: resolveAppResourceText($r('app.string.video_player_pip_opening')),
+      fullscreenEntering: resolveAppResourceText($r('app.string.video_player_fullscreen_entering')),
+      fullscreenBlocked: resolveAppResourceText($r('app.string.video_player_fullscreen_blocked')),
+      sessionSwitching: resolveAppResourceText($r('app.string.video_player_session_switching')),
+      controlsHideRejected: resolveAppResourceText($r('app.string.video_player_controls_hide_rejected')),
+      toolbarUnavailable: resolveAppResourceText($r('app.string.video_player_toolbar_unavailable')),
+      playRejected: resolveAppResourceText($r('app.string.video_player_play_rejected')),
+      rateRejected: resolveAppResourceText($r('app.string.video_player_rate_rejected')),
+      scaleRejected: resolveAppResourceText($r('app.string.video_player_scale_rejected')),
+      pipRejected: resolveAppResourceText($r('app.string.video_player_pip_rejected')),
+      unsupportedAction: resolveAppResourceText($r('app.string.video_player_unsupported_action'))
+    });
+  }
+
   private buildExecuteLiveCommandScript(
     target: WebVideoLiveSessionTarget,
     command: WebVideoLiveCommand
@@ -477,6 +526,7 @@ export class WebVideoPresentationService {
     const themeMode = JSON.stringify(target.themeMode === 'dark' ? 'dark' : 'light');
     const action = JSON.stringify(command.action);
     const value = Number.isFinite(command.value ?? 0) ? command.value ?? 0 : 0;
+    const videoCopy = this.buildInjectedVideoCopy();
   return `
 (function () {
   function describeVideoDiagnostics(targetVideo) {
@@ -584,6 +634,7 @@ export class WebVideoPresentationService {
   var runtimeIdProperty = ${runtimeIdProperty};
   var commandAction = ${action};
   var commandValue = ${value};
+  var airaVideoCopy = ${videoCopy};
   var requestedPresentationMode = ${presentationMode};
   var expectedThemeMode = ${themeMode};
   var liveWatchdogIntervalMs = 180;
@@ -607,12 +658,12 @@ export class WebVideoPresentationService {
   });
   if (matches.length > 1) {
     return result(false, 'runtime_identity_ambiguous',
-      '当前网页视频会话已经变化。', null);
+      airaVideoCopy.sessionChanged, null);
   }
   if (commandAction === 'read_state') {
     var readableVideo = matches.length === 1 ? matches[0] : null;
     if (!readableVideo) {
-      return result(false, 'runtime_identity_missing', '当前网页视频会话已经变化。', null);
+      return result(false, 'runtime_identity_missing', airaVideoCopy.sessionChanged, null);
     }
     return result(true, 'live_target_reachable', '', readableVideo);
   }
@@ -626,7 +677,7 @@ export class WebVideoPresentationService {
     (registeredPresentationState && registeredPresentationState.targetVideo ?
       registeredPresentationState.targetVideo : null);
   if (!video) {
-    return result(false, 'runtime_identity_missing', '当前网页视频会话已经变化。', null);
+    return result(false, 'runtime_identity_missing', airaVideoCopy.sessionChanged, null);
   }
   var originalObjectFitProperty = ${originalObjectFitProperty};
   var originalObjectFitPriorityProperty = ${originalObjectFitPriorityProperty};
@@ -2033,7 +2084,7 @@ export class WebVideoPresentationService {
     toolbar.setAttribute('data-aira-video-runtime-id', expectedRuntimeId);
     toolbar.setAttribute('data-aira-theme', expectedThemeMode === 'dark' ? 'dark' : 'light');
     toolbar.setAttribute('role', 'toolbar');
-    toolbar.setAttribute('aria-label', 'Aira 视频操作');
+    toolbar.setAttribute('aria-label', airaVideoCopy.toolbarAria);
     toolbar.style.cssText = [
       'position:fixed', 'left:8px', 'top:8px', 'z-index:2147483647',
       'display:flex', 'align-items:center', 'gap:8px', 'box-sizing:border-box',
@@ -2124,13 +2175,13 @@ export class WebVideoPresentationService {
       // The busy chip is a filled blue, so its glyph stays white in both modes for contrast.
       button.style.color = busy ? '#FFFFFF' : appliedActionToolbarTheme.iconColor;
     };
-    var castButton = createButton(castIconPaths, '投屏');
-    var pipButton = createButton(pictureInPictureIconPaths, '小窗播放');
-    var fullscreenButton = createButton(fullscreenIconPaths, '使用 Aira 全屏播放');
+    var castButton = createButton(castIconPaths, airaVideoCopy.cast);
+    var pipButton = createButton(pictureInPictureIconPaths, airaVideoCopy.pip);
+    var fullscreenButton = createButton(fullscreenIconPaths, airaVideoCopy.fullscreen);
     var resetToolbarInteractionState = function () {
-      setButtonState(castButton, 'idle', '投屏');
-      setButtonState(pipButton, 'idle', '小窗播放');
-      setButtonState(fullscreenButton, 'idle', '使用 Aira 全屏播放');
+      setButtonState(castButton, 'idle', airaVideoCopy.cast);
+      setButtonState(pipButton, 'idle', airaVideoCopy.pip);
+      setButtonState(fullscreenButton, 'idle', airaVideoCopy.fullscreen);
     };
     castButton.addEventListener('click', function (event) {
       event.preventDefault();
@@ -2139,19 +2190,19 @@ export class WebVideoPresentationService {
         var remoteController = video.remote;
         if (remoteController && typeof remoteController.prompt === 'function') {
           if (String(remoteController.state || '').toLowerCase() === 'unavailable') {
-            setButtonState(castButton, 'unavailable', '当前网页不支持投屏');
+            setButtonState(castButton, 'unavailable', airaVideoCopy.castUnsupported);
             return;
           }
-          setButtonState(castButton, 'busy', '请在系统窗口选择设备');
+          setButtonState(castButton, 'busy', airaVideoCopy.castChooseDevice);
           var remotePrompt = remoteController.prompt();
           if (remotePrompt && typeof remotePrompt.then === 'function') {
             remotePrompt.then(function () {
-              setButtonState(castButton, 'idle', '投屏');
+              setButtonState(castButton, 'idle', airaVideoCopy.cast);
             }).catch(function () {
-              setButtonState(castButton, 'idle', '投屏');
+              setButtonState(castButton, 'idle', airaVideoCopy.cast);
             });
           } else {
-            setButtonState(castButton, 'idle', '投屏');
+            setButtonState(castButton, 'idle', airaVideoCopy.cast);
           }
           return;
         }
@@ -2159,9 +2210,9 @@ export class WebVideoPresentationService {
           video.webkitShowPlaybackTargetPicker();
           return;
         }
-        setButtonState(castButton, 'unavailable', '当前网页不支持投屏');
+        setButtonState(castButton, 'unavailable', airaVideoCopy.castUnsupported);
       } catch (_castToolbarError) {
-        setButtonState(castButton, 'unavailable', '当前网页不支持投屏');
+        setButtonState(castButton, 'unavailable', airaVideoCopy.castUnsupported);
       }
     });
     pipButton.addEventListener('click', function (event) {
@@ -2169,20 +2220,20 @@ export class WebVideoPresentationService {
       event.stopPropagation();
       try {
         if (video.disablePictureInPicture === true || video.hasAttribute('disablepictureinpicture')) {
-          setButtonState(pipButton, 'unavailable', '当前网页不支持小窗播放');
+          setButtonState(pipButton, 'unavailable', airaVideoCopy.pipPageUnsupported);
           return;
         }
         if (typeof video.requestPictureInPicture === 'function') {
-          setButtonState(pipButton, 'busy', '正在打开小窗');
+          setButtonState(pipButton, 'busy', airaVideoCopy.pipOpening);
           var pipRequest = video.requestPictureInPicture();
           if (pipRequest && typeof pipRequest.then === 'function') {
             pipRequest.then(function () {
-              setButtonState(pipButton, 'idle', '小窗播放');
+              setButtonState(pipButton, 'idle', airaVideoCopy.pip);
             }).catch(function () {
-              setButtonState(pipButton, 'unavailable', '当前网页不支持小窗播放');
+              setButtonState(pipButton, 'unavailable', airaVideoCopy.pipPageUnsupported);
             });
           } else {
-            setButtonState(pipButton, 'idle', '小窗播放');
+            setButtonState(pipButton, 'idle', airaVideoCopy.pip);
           }
           return;
         }
@@ -2190,9 +2241,9 @@ export class WebVideoPresentationService {
           video.webkitSetPresentationMode('picture-in-picture');
           return;
         }
-        setButtonState(pipButton, 'unavailable', '当前网页不支持小窗播放');
+        setButtonState(pipButton, 'unavailable', airaVideoCopy.pipPageUnsupported);
       } catch (_pipToolbarError) {
-        setButtonState(pipButton, 'unavailable', '当前网页不支持小窗播放');
+        setButtonState(pipButton, 'unavailable', airaVideoCopy.pipPageUnsupported);
       }
     });
     var emitFullscreenRequestResult = function (attemptId, status, reason) {
@@ -2405,7 +2456,7 @@ export class WebVideoPresentationService {
       try {
         toolbar.__airaFullscreenRequestPending = true;
         toolbar.style.visibility = 'hidden';
-        setButtonState(fullscreenButton, 'busy', '正在进入 Aira 全屏');
+        setButtonState(fullscreenButton, 'busy', airaVideoCopy.fullscreenEntering);
         var fullscreenAttemptId = Date.now();
         var fullscreenPayload = JSON.stringify({
           protocol: actionToolbarProtocol,
@@ -2426,7 +2477,7 @@ export class WebVideoPresentationService {
         }
         if (!requested) {
           toolbar.__airaFullscreenRequestPending = false;
-          setButtonState(fullscreenButton, 'unavailable', '当前页面不能进入 Aira 全屏');
+          setButtonState(fullscreenButton, 'unavailable', airaVideoCopy.fullscreenBlocked);
           scheduleToolbarRefresh();
           return;
         }
@@ -2437,14 +2488,14 @@ export class WebVideoPresentationService {
             if (toolbar.__airaFullscreenRequestPending === true &&
                 (!presentationState || presentationState.active !== true)) {
               toolbar.__airaFullscreenRequestPending = false;
-              setButtonState(fullscreenButton, 'idle', '使用 Aira 全屏播放');
+              setButtonState(fullscreenButton, 'idle', airaVideoCopy.fullscreen);
               scheduleToolbarRefresh();
             }
           }, 5000);
         }
       } catch (_fullscreenToolbarError) {
         toolbar.__airaFullscreenRequestPending = false;
-        setButtonState(fullscreenButton, 'unavailable', '当前页面不能进入 Aira 全屏');
+        setButtonState(fullscreenButton, 'unavailable', airaVideoCopy.fullscreenBlocked);
         scheduleToolbarRefresh();
       }
     });
@@ -2709,7 +2760,7 @@ export class WebVideoPresentationService {
       if (!ensureLivePresentationStable(registeredPresentationState)) {
         scheduleLivePresentationWatchdog(registeredPresentationState, true);
         return result(false, 'live_presentation_target_unavailable',
-          commandAction === 'enter_live_presentation' ? '' : '网页视频会话正在切换，请稍后重试。',
+          commandAction === 'enter_live_presentation' ? '' : airaVideoCopy.sessionSwitching,
           registeredPresentationState.targetVideo || video);
       }
       video = registeredPresentationState.targetVideo || video;
@@ -2720,15 +2771,15 @@ export class WebVideoPresentationService {
       var entered = enterLivePresentation();
       return result(entered, entered ? 'live_presentation_entered' :
         'live_presentation_failed_' + (lastPresentationFailureReason || 'unknown'),
-        entered ? '' : '网页视频画面接管失败，原网页将继续播放。', video);
+        entered ? '' : airaVideoCopy.takeoverFailed, video);
     }
     if (commandAction === 'suppress_native_controls') {
       return result(suppressNativeControls(), 'native_controls_suppressed',
-        '网页播放器拒绝隐藏原生控制栏。', video);
+        airaVideoCopy.controlsHideRejected, video);
     }
     if (commandAction === 'install_action_toolbar') {
       return result(installActionToolbar(), 'action_toolbar_installed',
-        '当前网页无法显示视频操作按钮。', video);
+        airaVideoCopy.toolbarUnavailable, video);
     }
     if (commandAction === 'toggle') {
       suppressNativeControls();
@@ -2768,7 +2819,7 @@ export class WebVideoPresentationService {
         if (registeredPresentationState) {
           registeredPresentationState.playAttemptInFlight = false;
         }
-        return result(false, 'play_request_failed', '网页播放器拒绝继续播放。', video);
+        return result(false, 'play_request_failed', airaVideoCopy.playRejected, video);
       }
       return result(true, 'play_requested', '', video);
     }
@@ -2791,7 +2842,7 @@ export class WebVideoPresentationService {
         registeredPresentationState.playbackRate = rate;
       }
       return result(Math.abs(Number(video.playbackRate || 1) - rate) < 0.01,
-        'rate_applied', '网页播放器拒绝调整倍速。', video);
+        'rate_applied', airaVideoCopy.rateRejected, video);
     }
     if (commandAction === 'scale') {
       var scaleModes = ['contain', 'cover', 'fill'];
@@ -2806,7 +2857,7 @@ export class WebVideoPresentationService {
         refreshLivePresentationGeometry(video, registeredPresentationState);
       }
       return result(video.style.getPropertyValue('object-fit') === objectFit,
-        'scale_applied', '网页播放器拒绝切换画面比例。', video);
+        'scale_applied', airaVideoCopy.scaleRejected, video);
     }
     if (commandAction === 'picture_in_picture') {
       var ownerDocument = video.ownerDocument || document;
@@ -2826,7 +2877,7 @@ export class WebVideoPresentationService {
           }
         }
         if (video.disablePictureInPicture === true || video.hasAttribute('disablepictureinpicture')) {
-          return result(false, 'picture_in_picture_disabled', '当前视频暂不支持小窗播放。', video);
+          return result(false, 'picture_in_picture_disabled', airaVideoCopy.pipUnsupported, video);
         }
       }
       pictureInPictureState.wasPlaying = video.paused === false && video.ended !== true;
@@ -2855,7 +2906,7 @@ export class WebVideoPresentationService {
           pictureInPictureState.status = 'failed';
           pictureInPictureState.reason = requestError;
           resumePictureInPicturePlayback(pictureInPictureState);
-          return result(false, requestError, '当前视频暂不支持小窗播放。', video);
+          return result(false, requestError, airaVideoCopy.pipUnsupported, video);
         }
       }
       if (typeof video.webkitSetPresentationMode === 'function') {
@@ -2874,10 +2925,10 @@ export class WebVideoPresentationService {
         }
         resumePictureInPicturePlayback(pictureInPictureState);
         return result(false, pictureInPictureState.reason || 'webkit_picture_in_picture_rejected',
-          '网页播放器拒绝启动小窗。', video);
+          airaVideoCopy.pipRejected, video);
       }
       return result(false, 'picture_in_picture_unavailable',
-        '当前视频暂不支持小窗播放。', video);
+        airaVideoCopy.pipUnsupported, video);
     }
     if (commandAction === 'picture_in_picture_status') {
       var pipOwnerDocument = video.ownerDocument || document;
@@ -2893,12 +2944,12 @@ export class WebVideoPresentationService {
       }
       if (pipRequestState && pipRequestState.status === 'failed') {
         return result(false, String(pipRequestState.reason || 'picture_in_picture_rejected'),
-          '当前视频暂不支持小窗播放。', video);
+          airaVideoCopy.pipUnsupported, video);
       }
       if (pipRequestState && pipRequestState.status === 'pending') {
         return result(true, 'picture_in_picture_pending', '', video);
       }
-      return result(false, 'picture_in_picture_not_requested', '当前视频暂不支持小窗播放。', video);
+      return result(false, 'picture_in_picture_not_requested', airaVideoCopy.pipUnsupported, video);
     }
     if (commandAction === 'restore_presentation') {
       restoreObjectFit();
@@ -2907,9 +2958,9 @@ export class WebVideoPresentationService {
       return result(true, 'presentation_restored', '', video);
     }
   } catch (error) {
-    return result(false, String(error && error.message || error || 'command_failed'), '网页视频控制失败。', video);
+    return result(false, String(error && error.message || error || 'command_failed'), airaVideoCopy.controlFailed, video);
   }
-  return result(false, 'unsupported_command', '当前网页视频暂不支持这个操作。', video);
+  return result(false, 'unsupported_command', airaVideoCopy.unsupportedAction, video);
 })();`;
   }
 

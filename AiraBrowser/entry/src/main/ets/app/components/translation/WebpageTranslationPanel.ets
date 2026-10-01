@@ -1,6 +1,7 @@
 import { LengthMetrics } from '@kit.ArkUI';
 import { TranslationProviderLogoViewModel } from '../../../core/translation/TranslationProviderLogoViewModel';
 import { WebpageTranslationPanelState } from '../../../core/translation/WebpageTranslationCoordinator';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BROWSER_THEME_STORAGE_ACCENT_KEY,
   BROWSER_THEME_STORAGE_OUTLINE_KEY,
@@ -87,13 +88,13 @@ export struct WebpageTranslationPanel {
   private buildTrailingAction() {
     if (this.state.canCancel) {
       FloatingPromptActionButton({
-        text: '取消',
+        text: resolveAppResourceText($r('app.string.settings_web_translation_cancel')),
         actionEnabled: true,
         onAction: this.onCancel
       })
     } else {
       FloatingPromptMenuButton({
-        text: '操作',
+        text: resolveAppResourceText($r('app.string.webpage_translation_actions')),
         menuContent: () => {
           this.buildMoreMenu()
         }
@@ -142,7 +143,10 @@ export struct WebpageTranslationPanel {
   @Builder
   private buildDisplayModeMenuItems() {
     MenuItem(() => {
-      this.buildDisplayModeMenuItemContent('显示原文', 'original')
+      this.buildDisplayModeMenuItemContent(
+        resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_009')),
+        'original'
+      )
     })
       .onClick(() => {
         if (this.state.displayMode === 'original') {
@@ -152,7 +156,10 @@ export struct WebpageTranslationPanel {
       })
 
     MenuItem(() => {
-      this.buildDisplayModeMenuItemContent('双语对照', 'bilingual')
+      this.buildDisplayModeMenuItemContent(
+        resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_003')),
+        'bilingual'
+      )
     })
       .onClick(() => {
         if (this.state.displayMode === 'bilingual') {
@@ -162,7 +169,10 @@ export struct WebpageTranslationPanel {
       })
 
     MenuItem(() => {
-      this.buildDisplayModeMenuItemContent('仅显示译文', 'translation_only')
+      this.buildDisplayModeMenuItemContent(
+        resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_001')),
+        'translation_only'
+      )
     })
       .onClick(() => {
         if (this.state.displayMode === 'translation_only') {
@@ -188,7 +198,7 @@ export struct WebpageTranslationPanel {
     if (this.state.canCancel) {
       MenuItem({
         startIcon: $r('sys.symbol.xmark'),
-        content: '取消翻译'
+        content: resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_004'))
       })
         .onClick(() => {
           this.onCancel();
@@ -200,7 +210,7 @@ export struct WebpageTranslationPanel {
   private buildTranslationSettingsMenuItems() {
     MenuItem({
       startIcon: $r('sys.symbol.translate_square_fill'),
-      content: `目标语言：${this.resolveTargetLanguageLabel()}`
+      content: resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_018', this.resolveTargetLanguageLabel()))
     })
       .onClick(() => {
         this.onOpenTargetLanguage();
@@ -211,7 +221,7 @@ export struct WebpageTranslationPanel {
   private buildCloseMenuItem() {
     MenuItem({
       startIcon: $r('sys.symbol.xmark'),
-      content: '关闭'
+      content: resolveAppResourceText($r('app.string.ui_close'))
     })
       .onClick(() => {
         this.onClose();
@@ -264,12 +274,12 @@ export struct WebpageTranslationPanel {
 
   private buildPrimaryActionText(): string {
     if (this.state.status === 'translated' || this.state.status === 'restored') {
-      return '重新翻译';
+      return resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_013'));
     }
     if (this.state.status === 'partially_translated') {
-      return '重新翻译';
+      return resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_013'));
     }
-    return '翻译';
+    return resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_011'));
   }
 
   private buildTitleText(): string {
@@ -277,30 +287,31 @@ export struct WebpageTranslationPanel {
       return this.buildTranslatingTitleText();
     }
     if (this.state.status === 'translated') {
-      return '已翻译当前网页';
+      return resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_006'));
     }
     if (this.state.status === 'partially_translated') {
-      return '已翻译部分内容';
+      return resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_007'));
     }
     if (this.state.status === 'restored') {
-      return '已显示原文';
+      return resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_005'));
     }
     if (this.state.status === 'error') {
       const stateTitle = this.state.title.trim();
-      if (stateTitle.length > 0 && stateTitle !== '网页翻译') {
+      const genericTitle = resolveAppResourceText($r('app.string.settings_web_translation'));
+      if (stateTitle.length > 0 && stateTitle !== genericTitle && stateTitle !== '网页翻译') {
         return stateTitle;
       }
-      return '翻译失败';
+      return resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_012'));
     }
-    return '是否翻译此页面';
+    return resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_008'));
   }
 
   private buildSubtitleText(): string {
     if (this.state.status === 'idle') {
-      return `翻译为${this.resolveTargetLanguageLabel()}`;
+      return resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_017', this.resolveTargetLanguageLabel()));
     }
     if (this.state.status === 'translated') {
-      return `目标语言：${this.resolveTargetLanguageLabel()}`;
+      return resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_018', this.resolveTargetLanguageLabel()));
     }
     if (this.state.status === 'partially_translated') {
       return this.state.message;
@@ -309,15 +320,18 @@ export struct WebpageTranslationPanel {
   }
 
   private buildTranslatingTitleText(): string {
-    const message = this.state.message.trim();
-    const segmentProgress = message.match(/(\d+)\/(\d+)\s*段/);
-    const hasSegmentProgress = segmentProgress !== null && segmentProgress.length >= 3;
+    const segmentTotal = this.state.segmentTotal !== undefined ? this.state.segmentTotal : 0;
+    const hasSegmentProgress = segmentTotal > 0;
     const tipIndex = this.translatingTipIndex % (hasSegmentProgress ? 3 : 2);
     if (hasSegmentProgress && tipIndex === 1) {
-      return `正在翻译，已完成 ${segmentProgress[1]}/${segmentProgress[2]} 段`;
+      return resolveAppResourceText($r(
+        'app.string.translation_ui_webpage_translation_panel_015',
+        `${this.state.translatedCount}`,
+        `${segmentTotal}`
+      ));
     }
     if (tipIndex === 2 || (!hasSegmentProgress && tipIndex === 1)) {
-      return '内容较多时会慢一点';
+      return resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_002'));
     }
     return this.buildProviderTranslatingTitleText();
   }
@@ -325,25 +339,27 @@ export struct WebpageTranslationPanel {
   private buildProviderTranslatingTitleText(): string {
     const providerName = this.state.providerDisplayName.trim();
     if (providerName.length === 0) {
-      return '正在使用所选翻译服务翻译此页面';
+      return resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_010'));
     }
-    return `正在使用 ${providerName} 翻译此页面`;
+    return resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_016', providerName));
   }
 
   private resolveTargetLanguageLabel(): string {
     switch (this.state.targetLanguage.trim()) {
       case 'zh-CN':
-        return '简体中文';
+        return resolveAppResourceText($r('app.string.settings_lang_zh_cn'));
       case 'zh-TW':
-        return '繁体中文';
+        return resolveAppResourceText($r('app.string.settings_lang_zh_tw'));
       case 'en':
-        return 'English';
+        return resolveAppResourceText($r('app.string.settings_lang_en'));
       case 'ja':
-        return '日本語';
+        return resolveAppResourceText($r('app.string.settings_lang_ja'));
       case 'ko':
-        return '한국어';
+        return resolveAppResourceText($r('app.string.settings_lang_ko'));
       default:
-        return this.state.targetLanguage.trim().length > 0 ? this.state.targetLanguage.trim() : '简体中文';
+        return this.state.targetLanguage.trim().length > 0
+          ? this.state.targetLanguage.trim()
+          : resolveAppResourceText($r('app.string.settings_lang_zh_cn'));
     }
   }
 
@@ -369,7 +385,7 @@ export struct WebpageTranslationPanel {
 
   private resolveProgressPercent(): number {
     const message = this.state.message;
-    const match = message.match(/约\s*(\d+)\/(\d+)/);
+    const match = message.match(/(\d+)\/(\d+)/);
     if (match === null || match.length < 3) {
       return 12;
     }

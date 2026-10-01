@@ -19,6 +19,7 @@ import {
   ElementInspectionSourceEntry,
   ElementInspectionStorageEntry
 } from '../../../services/web/ElementInspectionRuntimeScriptService';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { AiraIcon } from '../common/AiraIcon';
 import { common } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
@@ -153,7 +154,7 @@ export struct ElementInspectionDock {
           } else if (this.tab === 'security') {
             this.buildSecurityPane()
           } else {
-            Text('这个页签没有内容。')
+            Text(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_073')))
               .width('100%')
               .layoutWeight(1)
               .fontSize(13)
@@ -224,7 +225,7 @@ export struct ElementInspectionDock {
     .backgroundColor(this.splitterActive ? '#1a73e822' : '#01000000')
     .hitTestBehavior(HitTestMode.Default)
     .responseRegion({ x: -8, y: 0, width: 28, height: '100%' })
-    .accessibilityText('拖动调整网页和审查元素窗口的宽度')
+    .accessibilityText(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_033')))
     .onHover((isHover: boolean) => {
       this.splitterHovered = isHover;
       if (this.splitterDragging) {
@@ -271,19 +272,19 @@ export struct ElementInspectionDock {
         .height(32)
         .backgroundColor(Color.Transparent)
         .margin({ left: 4, right: 2 })
-        .accessibilityText(this.presentation.pickerArmed ? '停止在页面上选择' : '在页面上选择元素')
+        .accessibilityText(this.presentation.pickerArmed ? resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_004')) : resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_013')))
         .onClick(() => {
           this.onPickerArmedChange(!this.presentation.pickerArmed);
         })
 
       Scroll() {
         Row() {
-          this.buildTabButton('元素', 'elements')
-          this.buildTabButton('控制台', 'console')
-          this.buildTabButton('源代码', 'sources')
-          this.buildTabButton('网络', 'network')
-          this.buildTabButton('应用', 'application')
-          this.buildTabButton('安全', 'security')
+          this.buildTabButton(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_005')), 'elements')
+          this.buildTabButton(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_034')), 'console')
+          this.buildTabButton(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_051')), 'sources')
+          this.buildTabButton(resolveAppResourceText($r('app.string.settings_web_download_network')), 'network')
+          this.buildTabButton(resolveAppResourceText($r('app.string.element_inspection_tab_application')), 'application')
+          this.buildTabButton(resolveAppResourceText($r('app.string.settings_web_translation_section_security')), 'security')
         }
         .height(40)
         .alignItems(VerticalAlign.Center)
@@ -306,7 +307,7 @@ export struct ElementInspectionDock {
         .width(32)
         .height(32)
         .backgroundColor(Color.Transparent)
-        .accessibilityText('关闭审查元素')
+        .accessibilityText(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_006')))
         .onClick(() => {
           this.onAction('cancel');
         })
@@ -342,7 +343,7 @@ export struct ElementInspectionDock {
       Column() {
         if (this.presentation.outline.length === 0) {
           Text(this.presentation.phase === 'starting' || this.presentation.busy ?
-            '正在准备元素审查…' : '当前页面没有可显示的元素')
+            resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_041')) : resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_030')))
             .width('100%')
             .fontSize(12)
             .fontColor(ELEMENT_INSPECTION_DOCK_DIM_COLOR)
@@ -393,7 +394,7 @@ export struct ElementInspectionDock {
       } else if (this.subtab === 'listeners') {
         this.buildListenersPane()
       } else {
-        Text('布局这次先留空。')
+        Text(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_027')))
           .width('100%')
           .layoutWeight(1)
           .fontSize(12)
@@ -485,14 +486,14 @@ export struct ElementInspectionDock {
   private buildInlineHtmlEditor() {
     Column() {
       if (this.editorBusy) {
-        Text('正在读取代码…')
+        Text(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_043')))
           .width('100%')
           .fontSize(12)
           .fontColor('#FFFFFF')
       }
       TextArea({
         text: this.editorText,
-        placeholder: '编辑这段 HTML'
+        placeholder: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_059'))
       })
         .id(ELEMENT_INSPECTION_INLINE_EDIT_ID)
         .visibility(this.editorBusy ? Visibility.None : Visibility.Visible)
@@ -530,7 +531,7 @@ export struct ElementInspectionDock {
           }
           return false;
         })
-      Text('点外面或按 Ctrl+Enter 应用，Esc 取消。只改当前页面。')
+      Text(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_053')))
         .width('100%')
         .fontSize(10)
         .fontColor('#FFFFFF')
@@ -544,7 +545,9 @@ export struct ElementInspectionDock {
   @Builder
   private buildOutlineMarkup(node: ElementInspectionOutlineNode) {
     if (this.outlineRowKind(node) === 'more') {
-      Text(node.moreDirection === 'before' ? `↑ 还有 ${node.moreCount ?? 0} 个` : `↓ 还有 ${node.moreCount ?? 0} 个`)
+      Text(node.moreDirection === 'before'
+        ? resolveAppResourceText($r('app.string.element_inspection_more_before', node.moreCount ?? 0))
+        : resolveAppResourceText($r('app.string.element_inspection_more_after', node.moreCount ?? 0)))
         .layoutWeight(1)
         .fontFamily('monospace')
         .fontSize(12)
@@ -660,7 +663,7 @@ export struct ElementInspectionDock {
         this.buildAttributeChoices()
       }
       if (this.editorKind === 'attribute' || this.editorKind === 'attribute_edit') {
-        TextInput({ text: this.editorName, placeholder: '属性名' })
+        TextInput({ text: this.editorName, placeholder: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_024')) })
           .width('100%')
           .height(36)
           .fontSize(13)
@@ -674,7 +677,7 @@ export struct ElementInspectionDock {
           })
       }
       if (this.editorBusy) {
-        Text(this.editorKind === 'attribute_edit' ? '正在读取属性…' : '正在读取 HTML…')
+        Text(this.editorKind === 'attribute_edit' ? resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_044')) : resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_042')))
           .width('100%')
           .layoutWeight(1)
           .fontSize(12)
@@ -682,7 +685,7 @@ export struct ElementInspectionDock {
       }
       TextArea({
         text: this.editorText,
-        placeholder: this.editorKind === 'html' ? '' : '属性值'
+        placeholder: this.editorKind === 'html' ? '' : resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_022'))
       })
         .visibility(this.editorBusy ? Visibility.None : Visibility.Visible)
         .width('100%')
@@ -699,7 +702,7 @@ export struct ElementInspectionDock {
           }
         })
       Row({ space: 8 }) {
-        Button('取消')
+        Button(resolveAppResourceText($r('app.string.element_hide_cancel')))
           .layoutWeight(1)
           .height(34)
           .fontSize(13)
@@ -708,7 +711,9 @@ export struct ElementInspectionDock {
           .onClick(() => {
             this.closeOutlineEditor();
           })
-        Button(this.editorKind === 'html' ? '应用' : '确定')
+        Button(this.editorKind === 'html'
+          ? resolveAppResourceText($r('app.string.settings_appearance_apply'))
+          : resolveAppResourceText($r('app.string.ui_ok')))
           .layoutWeight(1)
           .height(34)
           .fontSize(13)
@@ -734,7 +739,7 @@ export struct ElementInspectionDock {
   private buildAttributeChoices() {
     Column() {
       if (this.editorAttributes.length === 0) {
-        Text('这个元素没有可编辑的属性。')
+        Text(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_071')))
           .width('100%')
           .fontSize(12)
           .fontColor(ELEMENT_INSPECTION_DOCK_DIM_COLOR)
@@ -767,7 +772,7 @@ export struct ElementInspectionDock {
         .fontFamily('monospace')
         .fontColor(attribute.redacted ? ELEMENT_INSPECTION_DOCK_DIM_COLOR : ELEMENT_INSPECTION_DOCK_ATTR_COLOR)
         .maxLines(1)
-      Text(attribute.redacted ? '已隐藏' : attribute.value)
+      Text(attribute.redacted ? resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_025')) : attribute.value)
         .layoutWeight(1)
         .fontSize(12)
         .fontFamily('monospace')
@@ -824,10 +829,10 @@ export struct ElementInspectionDock {
   @Builder
   private buildSubtabs() {
     Row() {
-      this.buildSubtabButton('样式', 'styles')
-      this.buildSubtabButton('计算后', 'computed')
-      this.buildSubtabButton('布局', 'layout')
-      this.buildSubtabButton('事件', 'listeners')
+      this.buildSubtabButton(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_040')), 'styles')
+      this.buildSubtabButton(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_063')), 'computed')
+      this.buildSubtabButton(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_026')), 'layout')
+      this.buildSubtabButton(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_002')), 'listeners')
     }
     .width('100%')
     .height(32)
@@ -859,7 +864,7 @@ export struct ElementInspectionDock {
       this.buildBoxModel()
       Scroll() {
         Column() {
-        TextInput({ placeholder: '过滤', text: this.filterText })
+        TextInput({ placeholder: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_066')), text: this.filterText })
           .width('100%')
           .height(28)
           .margin({ left: 10, right: 10, top: 8, bottom: 6 })
@@ -871,7 +876,7 @@ export struct ElementInspectionDock {
             this.filterText = value;
           })
         if (this.presentation.node === undefined) {
-          Text('还没有选中元素。点击页面，或点击上面的树。')
+          Text(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_070')))
             .width('100%')
             .fontSize(12)
             .fontColor(ELEMENT_INSPECTION_DOCK_DIM_COLOR)
@@ -896,7 +901,7 @@ export struct ElementInspectionDock {
   private buildStylesPane() {
     Scroll() {
       Column() {
-        Text('只读。这次不能改样式。')
+        Text(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_012')))
           .width('100%')
           .fontSize(12)
           .fontColor(ELEMENT_INSPECTION_DOCK_DIM_COLOR)
@@ -1472,27 +1477,27 @@ export struct ElementInspectionDock {
     const protectedNode = this.isProtectedOutlineNode(node);
     const htmlRoot = node.tagName === 'html';
     const entries: ElementInspectionOutlineMenuEntry[] = [];
-    entries.push({ key: 'add_attribute', label: '添加属性', enabled: !busy, group: 0 });
-    entries.push({ key: 'edit_attribute', label: '编辑属性', enabled: !busy, group: 0 });
-    entries.push({ key: 'edit_html', label: '编辑为 HTML', enabled: !busy && !htmlRoot, group: 0 });
-    entries.push({ key: 'duplicate', label: '创建副本', enabled: !busy && !protectedNode, group: 0 });
-    entries.push({ key: 'delete', label: '删除元素', enabled: !busy && !protectedNode, group: 0 });
-    entries.push({ key: 'cut', label: '剪切', enabled: !busy && !protectedNode, group: 1 });
-    entries.push({ key: 'copy_selector', label: '复制选择器', enabled: !busy, group: 1 });
-    entries.push({ key: 'copy_js_path', label: '复制 JS 路径', enabled: !busy, group: 1 });
-    entries.push({ key: 'copy_xpath', label: '复制 XPath', enabled: !busy, group: 1 });
-    entries.push({ key: 'copy_html', label: '复制 outerHTML', enabled: !busy, group: 1 });
-    entries.push({ key: 'copy_styles', label: '复制样式', enabled: !busy, group: 1 });
-    entries.push({ key: 'paste', label: '粘贴', enabled: !busy && !htmlRoot, group: 1 });
+    entries.push({ key: 'add_attribute', label: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_050')), enabled: !busy, group: 0 });
+    entries.push({ key: 'edit_attribute', label: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_058')), enabled: !busy, group: 0 });
+    entries.push({ key: 'edit_html', label: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_057')), enabled: !busy && !htmlRoot, group: 0 });
+    entries.push({ key: 'duplicate', label: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_007')), enabled: !busy && !protectedNode, group: 0 });
+    entries.push({ key: 'delete', label: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_008')), enabled: !busy && !protectedNode, group: 0 });
+    entries.push({ key: 'cut', label: resolveAppResourceText($r('app.string.ui_cut')), enabled: !busy && !protectedNode, group: 1 });
+    entries.push({ key: 'copy_selector', label: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_018')), enabled: !busy, group: 1 });
+    entries.push({ key: 'copy_js_path', label: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_014')), enabled: !busy, group: 1 });
+    entries.push({ key: 'copy_xpath', label: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_015')), enabled: !busy, group: 1 });
+    entries.push({ key: 'copy_html', label: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_016')), enabled: !busy, group: 1 });
+    entries.push({ key: 'copy_styles', label: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_017')), enabled: !busy, group: 1 });
+    entries.push({ key: 'paste', label: resolveAppResourceText($r('app.string.ui_paste')), enabled: !busy && !htmlRoot, group: 1 });
     entries.push({
       key: 'hide',
-      label: node.hidden === true ? '显示元素' : '隐藏元素',
+      label: node.hidden === true ? resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_038')) : resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_077')),
       enabled: !busy && !protectedNode,
       group: 2
     });
-    entries.push({ key: 'scroll_into_view', label: '滚动到可视区域', enabled: !busy, group: 2 });
-    entries.push({ key: 'focus', label: '聚焦', enabled: !busy, group: 2 });
-    entries.push({ key: 'store_global', label: '存为全局变量', enabled: !busy, group: 2 });
+    entries.push({ key: 'scroll_into_view', label: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_052')), enabled: !busy, group: 2 });
+    entries.push({ key: 'focus', label: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_061')), enabled: !busy, group: 2 });
+    entries.push({ key: 'store_global', label: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_019')), enabled: !busy, group: 2 });
     return entries;
   }
 
@@ -1521,7 +1526,7 @@ export struct ElementInspectionDock {
   private openAttributeEditor(path: string): void {
     this.editorRequestId += 1;
     this.editorKind = 'attribute_edit';
-    this.editorTitle = '编辑属性';
+    this.editorTitle = resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_058'));
     this.editorPath = path;
     this.editorName = '';
     this.editorText = '';
@@ -1541,7 +1546,7 @@ export struct ElementInspectionDock {
 
   private openAddAttributeEditor(path: string): void {
     this.editorKind = 'attribute';
-    this.editorTitle = '添加属性';
+    this.editorTitle = resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_050'));
     this.editorPath = path;
     this.editorName = '';
     this.editorText = '';
@@ -1617,7 +1622,7 @@ export struct ElementInspectionDock {
     this.inlineEditArmed = false;
     this.editorRequestId += 1;
     this.editorKind = 'html';
-    this.editorTitle = '编辑为 HTML';
+    this.editorTitle = resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_057'));
     this.editorPath = path;
     this.editorName = '';
     this.editorText = '';
@@ -1708,12 +1713,12 @@ export struct ElementInspectionDock {
 
   private resolveEditorHint(): string {
     if (this.editorKind === 'html') {
-      return '需要保留一个根元素。';
+      return resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_078'));
     }
     if (this.editorKind === 'attribute_edit') {
-      return '点选已有属性再修改。改名会删掉旧属性，值为空时会删除该属性。';
+      return resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_054'));
     }
-    return '属性值为空时会删除该属性。';
+    return resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_023'));
   }
 
   private parseAttributeDraft(text: string): ElementInspectionRuntimeAttribute[] {
@@ -1762,12 +1767,12 @@ export struct ElementInspectionDock {
   private buildConsolePane() {
     Column() {
       Row() {
-        this.buildFilterButton('全部', 'all')
-        this.buildFilterButton('信息', 'info')
-        this.buildFilterButton('警告', 'warn')
-        this.buildFilterButton('错误', 'error')
+        this.buildFilterButton(resolveAppResourceText($r('app.string.bookshelf_all')), 'all')
+        this.buildFilterButton(resolveAppResourceText($r('app.string.offline_action_details_trailing')), 'info')
+        this.buildFilterButton(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_062')), 'warn')
+        this.buildFilterButton(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_076')), 'error')
         Blank()
-        Button('清空')
+        Button(resolveAppResourceText($r('app.string.settings_privacy_protection_adblock_clear_confirm')))
           .type(ButtonType.Normal)
           .height(24)
           .fontSize(11)
@@ -1784,7 +1789,7 @@ export struct ElementInspectionDock {
       Scroll() {
         Column() {
           if (this.filteredLogs().length === 0) {
-            Text('还没有日志。页面里的 console 输出和未捕获错误会出现在这里。')
+            Text(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_068')))
               .width('100%')
               .fontSize(12)
               .fontColor(ELEMENT_INSPECTION_DOCK_DIM_COLOR)
@@ -1806,7 +1811,7 @@ export struct ElementInspectionDock {
       .scrollBar(BarState.Auto)
 
       Row() {
-        TextInput({ text: this.consoleInput, placeholder: '执行 JavaScript' })
+        TextInput({ text: this.consoleInput, placeholder: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_032')) })
           .layoutWeight(1)
           .height(36)
           .padding({ left: 10, right: 10, top: 0, bottom: 0 })
@@ -1818,7 +1823,7 @@ export struct ElementInspectionDock {
           .onChange((value: string) => {
             this.consoleInput = value;
           })
-        Button('执行')
+        Button(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_031')))
           .type(ButtonType.Normal)
           .width(52)
           .height(36)
@@ -1858,15 +1863,15 @@ export struct ElementInspectionDock {
   private buildNetworkPane() {
     Scroll() {
       Column() {
-        Text('时间来自页面资源计时。蓝色是等待，绿色是下载。状态只在脚本请求里能看到。请求头和响应体看不到。')
+        Text(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_037')))
           .width('100%')
           .fontSize(12)
           .fontColor(ELEMENT_INSPECTION_DOCK_DIM_COLOR)
           .padding({ left: 12, right: 12, top: 10, bottom: 8 })
         if (this.presentation.network.length === 0) {
           Text(this.presentation.phase === 'starting' ?
-            '网页正在刷新，审查还开着，资源会在页面准备好后出现。' :
-            '还没有看到资源。打开审查之后的新请求，以及页面已经加载的资源，会出现在这里。')
+            resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_060')) :
+            resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_069')))
             .width('100%')
             .fontSize(12)
             .fontColor(ELEMENT_INSPECTION_DOCK_DIM_COLOR)
@@ -1968,14 +1973,14 @@ export struct ElementInspectionDock {
   private buildApplicationPane() {
     Scroll() {
       Column() {
-        Text('只能看当前网站。HttpOnly Cookie 看不到，密码和令牌这类名称已隐藏。')
+        Text(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_011')))
           .width('100%')
           .fontSize(12)
           .fontColor(ELEMENT_INSPECTION_DOCK_DIM_COLOR)
           .padding({ left: 12, right: 12, top: 10, bottom: 8 })
-        this.buildStorageSection('本地存储', this.localStorageEntries(), '当前网站没有本地存储。')
-        this.buildStorageSection('会话存储', this.sessionStorageEntries(), '当前网站没有会话存储。')
-        this.buildStorageSection('Cookie', this.cookieEntries(), '页面读不到 Cookie。')
+        this.buildStorageSection(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_039')), this.localStorageEntries(), resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_029')))
+        this.buildStorageSection(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_003')), this.sessionStorageEntries(), resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_028')))
+        this.buildStorageSection('Cookie', this.cookieEntries(), resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_079')))
         this.buildDatabaseSection()
       }
       .width('100%')
@@ -2037,7 +2042,7 @@ export struct ElementInspectionDock {
         .fontColor(ELEMENT_INSPECTION_DOCK_BLUE_COLOR)
         .padding({ left: 12, right: 12, top: 8, bottom: 4 })
       if (this.databaseNames().length === 0) {
-        Text('没有看到数据库。只显示库名，不读取里面的数据。')
+        Text(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_047')))
           .width('100%')
           .fontSize(12)
           .fontColor(ELEMENT_INSPECTION_DOCK_DIM_COLOR)
@@ -2062,16 +2067,16 @@ export struct ElementInspectionDock {
     Scroll() {
       Column() {
         if (this.presentation.security === undefined) {
-          Text('正在读取页面安全信息。')
+          Text(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_045')))
             .width('100%')
             .fontSize(12)
             .fontColor(ELEMENT_INSPECTION_DOCK_DIM_COLOR)
             .padding(12)
         } else {
-          this.buildSecurityRow('连接', this.securityConnectionText())
-          this.buildSecurityRow('协议', this.securityProtocolText())
-          this.buildSecurityRow('来源', this.securityOriginText())
-          this.buildSecurityRow('证书', this.securityCertificateText())
+          this.buildSecurityRow(resolveAppResourceText($r('app.string.settings_site_info_connection')), this.securityConnectionText())
+          this.buildSecurityRow(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_009')), this.securityProtocolText())
+          this.buildSecurityRow(resolveAppResourceText($r('app.string.element_inspection_origin')), this.securityOriginText())
+          this.buildSecurityRow(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_064')), this.securityCertificateText())
           Text(this.securityMixedTitle())
             .width('100%')
             .fontSize(12)
@@ -2093,7 +2098,7 @@ export struct ElementInspectionDock {
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .padding({ left: 12, right: 12, top: 2, bottom: 4 })
           }, (url: string, index: number) => `${index}:${url}`)
-          Text('证书链、有效期和请求头看不到。')
+          Text(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_065')))
             .width('100%')
             .fontSize(12)
             .fontColor(ELEMENT_INSPECTION_DOCK_DIM_COLOR)
@@ -2141,7 +2146,7 @@ export struct ElementInspectionDock {
       Scroll() {
         Column() {
           if (this.presentation.sources.length === 0) {
-            Text('还没有可显示的源代码。')
+            Text(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_067')))
               .width('100%')
               .fontSize(12)
               .fontColor(ELEMENT_INSPECTION_DOCK_DIM_COLOR)
@@ -2190,14 +2195,14 @@ export struct ElementInspectionDock {
     Scroll() {
       Column() {
         if (this.presentation.listeners.length === 0) {
-          Text('没有读到内联事件。审查开始之后新绑定的监听会出现在这里。')
+          Text(resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_048')))
             .width('100%')
             .fontSize(12)
             .fontColor(ELEMENT_INSPECTION_DOCK_DIM_COLOR)
             .padding(12)
         }
         ForEach(this.presentation.listeners, (entry: ElementInspectionListenerEntry) => {
-          Text(`${entry.type}${entry.capture ? ' · capture' : ''} · ${entry.source === 'attribute' ? '属性' : '监听'}`)
+          Text(`${entry.type}${entry.capture ? ' · capture' : ''} · ${entry.source === 'attribute' ? resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_021')) : resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_055'))}`)
             .width('100%')
             .fontSize(12)
             .fontColor(ELEMENT_INSPECTION_DOCK_TEXT_COLOR)
@@ -2261,7 +2266,7 @@ export struct ElementInspectionDock {
     if (entry.type.length > 0) {
       return entry.type;
     }
-    return '资源';
+    return resolveAppResourceText($r('app.string.element_inspection_resource'));
   }
 
   private networkStatusText(entry: ElementInspectionNetworkEntry): string {
@@ -2271,7 +2276,7 @@ export struct ElementInspectionDock {
     if (entry.timed || entry.durationMs > 0) {
       return '—';
     }
-    return '失败';
+    return resolveAppResourceText($r('app.string.user_script_status_failed'));
   }
 
   private networkStatusColor(entry: ElementInspectionNetworkEntry): string {
@@ -2289,7 +2294,7 @@ export struct ElementInspectionDock {
       return `${entry.durationMs} ms`;
     }
     if (entry.timed) {
-      return '时间不可用';
+      return resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_036'));
     }
     return '—';
   }
@@ -2333,9 +2338,9 @@ export struct ElementInspectionDock {
 
   private storageValueText(entry: ElementInspectionStorageEntry): string {
     if (entry.redacted) {
-      return '已隐藏';
+      return resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_025'));
     }
-    return entry.value.length > 0 ? entry.value : '空';
+    return entry.value.length > 0 ? entry.value : resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_056'));
   }
 
   private localStorageEntries(): ElementInspectionStorageEntry[] {
@@ -2361,15 +2366,15 @@ export struct ElementInspectionDock {
   private securityConnectionText(): string {
     const summary = this.securitySummary();
     if (summary === undefined) {
-      return '未知';
+      return resolveAppResourceText($r('app.string.user_script_unknown'));
     }
-    return summary.secure ? '安全上下文' : '不是安全上下文';
+    return summary.secure ? resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_020')) : resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_001'));
   }
 
   private securityProtocolText(): string {
     const summary = this.securitySummary();
     if (summary === undefined || summary.protocol.length === 0) {
-      return '未知';
+      return resolveAppResourceText($r('app.string.user_script_unknown'));
     }
     if (summary.protocol === 'https') {
       return 'HTTPS';
@@ -2383,7 +2388,7 @@ export struct ElementInspectionDock {
   private securityOriginText(): string {
     const summary = this.securitySummary();
     if (summary === undefined || summary.origin.length === 0) {
-      return '未知';
+      return resolveAppResourceText($r('app.string.user_script_unknown'));
     }
     return summary.origin;
   }
@@ -2391,21 +2396,21 @@ export struct ElementInspectionDock {
   private securityCertificateText(): string {
     const summary = this.securitySummary();
     if (summary !== undefined && summary.certificateError) {
-      return '这个网站的主框架证书校验失败过。';
+      return resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_072'));
     }
-    return '这次没有看到证书错误。';
+    return resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_074'));
   }
 
   private securityMixedTitle(): string {
-    return '混合内容';
+    return resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_049'));
   }
 
   private securityMixedEmptyText(): string {
     const summary = this.securitySummary();
     if (summary !== undefined && summary.protocol !== 'https') {
-      return '只在 HTTPS 页面检查混合内容。';
+      return resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_010'));
     }
-    return '没有看到 HTTP 资源。';
+    return resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_046'));
   }
 
   private securityMixedUrls(): string[] {
@@ -2425,13 +2430,13 @@ export struct ElementInspectionDock {
   private sourcePreviewText(): string {
     const preview = this.presentation.sourcePreview;
     if (preview === undefined || preview.id !== this.selectedSourceId) {
-      return '选择一项查看源代码。跨域脚本和样式只能显示地址。';
+      return resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_075'));
     }
     if (preview.reason === 'external_script' || preview.reason === 'external_style') {
-      return `受跨域限制，只显示地址：\n${preview.text}`;
+      return resolveAppResourceText($r('app.string.element_inspection_cross_origin_address', preview.text));
     }
     if (preview.text.length === 0) {
-      return '无法读取这段源代码。';
+      return resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_035'));
     }
     return preview.text;
   }
@@ -2439,7 +2444,7 @@ export struct ElementInspectionDock {
   private resolveCrumbPrefix(): string {
     const breadcrumb = this.presentation.node?.breadcrumb ?? [];
     if (breadcrumb.length <= 1) {
-      return breadcrumb.length === 0 ? '未选择' : '';
+      return breadcrumb.length === 0 ? resolveAppResourceText($r('app.string.settings_search_engine_not_selected')) : '';
     }
     return breadcrumb.slice(0, breadcrumb.length - 1).join(' › ');
   }

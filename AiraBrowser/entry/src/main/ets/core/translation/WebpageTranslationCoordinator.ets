@@ -38,6 +38,7 @@ import {
   TranslationLanguageOptionView,
   WebpageTranslationSettingsViewModel
 } from './WebpageTranslationSettingsViewModel';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { BrowserTransientSurfaceCoordinator } from '../browser/BrowserTransientSurfaceCoordinator';
 import { BrowserRuntimeLifecyclePort } from '../../services/web/BrowserRuntimeLifecyclePort';
 import {
@@ -195,6 +196,7 @@ export interface WebpageTranslationPanelState {
   sourceLanguage: string;
   targetLanguage: string;
   translatedCount: number;
+  segmentTotal?: number;
   canTranslate: boolean;
   canRestore: boolean;
   canCancel: boolean;
@@ -204,10 +206,10 @@ export const DEFAULT_WEBPAGE_TRANSLATION_PANEL_STATE: WebpageTranslationPanelSta
   visible: false,
   status: 'idle',
   displayMode: 'none',
-  title: '网页翻译',
-  message: '准备翻译当前网页',
+  title: resolveAppResourceText($r('app.string.settings_web_translation')),
+  message: resolveAppResourceText($r('app.string.webpage_translation_preparing_message')),
   providerTemplateId: 'custom_http',
-  providerDisplayName: '未配置翻译服务',
+  providerDisplayName: resolveAppResourceText($r('app.string.webpage_translation_provider_unconfigured')),
   sourceLanguage: '',
   targetLanguage: 'zh-CN',
   translatedCount: 0,
@@ -418,10 +420,10 @@ export class WebpageTranslationCoordinator {
   ): void {
     const providerName = this.policyService.buildCloudDisclosureProviderName(decision.provider);
     const request: WebpageTranslationCloudDisclosureRequest = {
-      title: '确认网页翻译',
-      message: `当前页面文字将发送到 ${providerName} 处理。确认后会直接开始翻译。`,
-      cancelLabel: '取消',
-      acceptLabel: '同意并翻译',
+      title: resolveAppResourceText($r('app.string.webpage_translation_confirm_title')),
+      message: resolveAppResourceText($r('app.string.webpage_translation_confirm_message', providerName)),
+      cancelLabel: resolveAppResourceText($r('app.string.settings_web_translation_cancel')),
+      acceptLabel: resolveAppResourceText($r('app.string.webpage_translation_confirm_accept')),
       onAccept: (): void => {
         void this.acceptCloudDisclosureAndTranslate(settings, origin, surfaceVersion);
       }
@@ -456,7 +458,7 @@ export class WebpageTranslationCoordinator {
       await this.runWebpageTranslationForOrigin(nextSettings, origin, surfaceVersion);
     } catch (_error) {
       if (this.isExpectedOriginCurrent(origin, surfaceVersion)) {
-        this.applicationShell.showToast('暂时无法保存翻译确认，请稍后再试。');
+        this.applicationShell.showToast(resolveAppResourceText($r('app.string.webpage_translation_confirm_save_failed')));
       }
     }
   }
@@ -524,6 +526,7 @@ export class WebpageTranslationCoordinator {
       sourceLanguage: state.sourceLanguage,
       targetLanguage: normalizedLanguage,
       translatedCount: state.translatedCount,
+      segmentTotal: state.segmentTotal,
       canTranslate: state.canTranslate,
       canRestore: state.canRestore,
       canCancel: state.canCancel
@@ -548,9 +551,11 @@ export class WebpageTranslationCoordinator {
     try {
       const state = await this.updateTargetLanguage(panel, languageCode);
       this.publishPanelStateForOrigin(state, origin, surfaceVersion);
-      this.applicationShell.showToast(`已切换为${this.settingsViewModel.buildLanguageLabel(languageCode)}`);
+      this.applicationShell.showToast(resolveAppResourceText(
+        $r('app.string.webpage_translation_language_switched', this.settingsViewModel.buildLanguageLabel(languageCode))
+      ));
     } catch (_error) {
-      this.applicationShell.showToast('目标语言保存失败，请稍后再试。');
+      this.applicationShell.showToast(resolveAppResourceText($r('app.string.webpage_translation_language_save_failed')));
     }
   }
 
@@ -650,7 +655,7 @@ export class WebpageTranslationCoordinator {
       visible: true,
       status: 'idle',
       displayMode: 'none',
-      title: '翻译此网页',
+      title: resolveAppResourceText($r('app.string.webpage_translation_translate_page')),
       message: this.buildReadyMessage(settings),
       providerTemplateId: this.resolvePanelProviderTemplateId(settings),
       providerDisplayName: this.resolvePanelProviderDisplayName(settings),
@@ -733,8 +738,8 @@ export class WebpageTranslationCoordinator {
       visible: true,
       status: 'idle',
       displayMode: state.displayMode,
-      title: '网页翻译',
-      message: '已取消当前翻译任务',
+      title: resolveAppResourceText($r('app.string.settings_web_translation')),
+      message: resolveAppResourceText($r('app.string.webpage_translation_canceled')),
       providerTemplateId: state.providerTemplateId,
       providerDisplayName: state.providerDisplayName,
       sourceLanguage: state.sourceLanguage,
@@ -765,7 +770,7 @@ export class WebpageTranslationCoordinator {
     const taskGeneration = this.nextGeneration();
     this.sessionCoordinator.setDisplayMode('translation_only');
     if (!settings.preferences.enabled) {
-      onState(this.buildErrorState(settings, '请先在网页翻译设置中开启功能。'));
+      onState(this.buildErrorState(settings, resolveAppResourceText($r('app.string.webpage_translation_enable_first'))));
       return;
     }
     const provider = this.resolveActiveProvider(settings);
@@ -782,7 +787,7 @@ export class WebpageTranslationCoordinator {
       return;
     }
     if (controller === undefined) {
-      onState(this.buildErrorState(settings, '当前页面还没有可用的网页控制器。'));
+      onState(this.buildErrorState(settings, resolveAppResourceText($r('app.string.webpage_translation_no_controller'))));
       return;
     }
     const initialRuntimeCacheNamespace = this.cacheCoordinator.buildRuntimeCacheNamespace(provider, settings);
@@ -790,8 +795,8 @@ export class WebpageTranslationCoordinator {
       visible: true,
       status: 'extracting',
       displayMode: 'none',
-      title: '正在准备翻译',
-      message: '正在读取当前网页文字',
+      title: resolveAppResourceText($r('app.string.webpage_translation_preparing_title')),
+      message: resolveAppResourceText($r('app.string.webpage_translation_reading_text')),
       providerTemplateId: this.resolveProviderTemplateId(provider),
       providerDisplayName: this.resolveProviderDisplayName(provider),
       sourceLanguage: '',
@@ -822,7 +827,7 @@ export class WebpageTranslationCoordinator {
         return;
       }
       if (extraction.items.length === 0) {
-        onState(this.buildErrorState(settings, '当前可见区域没有可翻译文字。', extraction.lang));
+        onState(this.buildErrorState(settings, resolveAppResourceText($r('app.string.webpage_translation_no_visible_text')), extraction.lang));
         return;
       }
       const sourceLanguage = this.languageService.inferLanguage(extraction.lang, extraction.items);
@@ -835,7 +840,7 @@ export class WebpageTranslationCoordinator {
         settings.preferences.preferredTargetLanguage
       );
       if (sourceLanguage.length === 0) {
-        onState(this.buildErrorState(settings, '未能识别当前页面语言。', extraction.lang));
+        onState(this.buildErrorState(settings, resolveAppResourceText($r('app.string.webpage_translation_language_unknown')), extraction.lang));
         return;
       }
       const sourcePolicyDecision = this.policyService.resolveSourceLanguageDecision({
@@ -854,7 +859,7 @@ export class WebpageTranslationCoordinator {
         visible: true,
         status: 'translating',
         displayMode: 'none',
-        title: '正在翻译',
+        title: resolveAppResourceText($r('app.string.webpage_translation_translating')),
         message: this.buildTranslatingMessage(extraction.items.length, this.countItemChars(extraction.items), provider),
         providerTemplateId: this.resolveProviderTemplateId(provider),
         providerDisplayName: this.resolveProviderDisplayName(provider),
@@ -932,8 +937,8 @@ export class WebpageTranslationCoordinator {
         visible: true,
         status: 'error',
         displayMode: state.displayMode,
-        title: '恢复失败',
-        message: '当前页面还没有可用的网页控制器。',
+        title: resolveAppResourceText($r('app.string.webpage_translation_restore_failed')),
+        message: resolveAppResourceText($r('app.string.webpage_translation_no_controller')),
         providerTemplateId: state.providerTemplateId,
         providerDisplayName: state.providerDisplayName,
         sourceLanguage: state.sourceLanguage,
@@ -952,8 +957,10 @@ export class WebpageTranslationCoordinator {
       visible: true,
       status: 'restored',
       displayMode: restoredCount > 0 ? 'original' : state.displayMode,
-      title: '已显示原文',
-      message: restoredCount > 0 ? `已恢复 ${restoredCount} 段原文` : '没有可恢复的翻译内容',
+      title: resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_005')),
+      message: restoredCount > 0
+        ? resolveAppResourceText($r('app.string.webpage_translation_restored_count', restoredCount))
+        : resolveAppResourceText($r('app.string.webpage_translation_nothing_to_restore')),
       providerTemplateId: state.providerTemplateId,
       providerDisplayName: state.providerDisplayName,
       sourceLanguage: state.sourceLanguage,
@@ -989,8 +996,8 @@ export class WebpageTranslationCoordinator {
         visible: true,
         status: 'error',
         displayMode: state.displayMode,
-        title: '切换显示失败',
-        message: '当前页面还没有可用的网页控制器。',
+        title: resolveAppResourceText($r('app.string.webpage_translation_display_switch_failed')),
+        message: resolveAppResourceText($r('app.string.webpage_translation_no_controller')),
         providerTemplateId: state.providerTemplateId,
         providerDisplayName: state.providerDisplayName,
         sourceLanguage: state.sourceLanguage,
@@ -1009,10 +1016,12 @@ export class WebpageTranslationCoordinator {
       visible: true,
       status: shownCount > 0 ? 'translated' : state.status,
       displayMode: shownCount > 0 ? displayMode : state.displayMode,
-      title: shownCount > 0 ? this.buildDisplayModeTitle(displayMode) : '没有可切换的译文',
+      title: shownCount > 0
+        ? this.buildDisplayModeTitle(displayMode)
+        : resolveAppResourceText($r('app.string.webpage_translation_nothing_to_switch')),
       message: shownCount > 0
         ? this.buildDisplayModeMessage(displayMode, shownCount)
-        : '当前页面没有可恢复的缓存译文',
+        : resolveAppResourceText($r('app.string.webpage_translation_no_cached')),
       providerTemplateId: state.providerTemplateId,
       providerDisplayName: state.providerDisplayName,
       sourceLanguage: state.sourceLanguage,
@@ -1059,6 +1068,7 @@ export class WebpageTranslationCoordinator {
       sourceLanguage: state.sourceLanguage,
       targetLanguage: nextSettings.preferences.preferredTargetLanguage,
       translatedCount: state.translatedCount,
+      segmentTotal: state.segmentTotal,
       canTranslate: nextSettings.preferences.enabled,
       canRestore: state.canRestore,
       canCancel: state.canCancel
@@ -1396,7 +1406,7 @@ export class WebpageTranslationCoordinator {
 
   private buildTargetLanguageUpdatedMessage(state: WebpageTranslationPanelState, languageCode: string): string {
     if (state.status === 'idle' || state.status === 'restored' || state.status === 'error') {
-      return '目标语言已更新';
+      return resolveAppResourceText($r('app.string.webpage_translation_language_updated'));
     }
     return state.message;
   }
@@ -1429,13 +1439,13 @@ export class WebpageTranslationCoordinator {
 
   private buildReadyMessage(settings: TranslationSettings): string {
     if (!settings.preferences.enabled) {
-      return '网页翻译未开启，请先在设置中启用。';
+      return resolveAppResourceText($r('app.string.webpage_translation_disabled'));
     }
     const provider = this.resolveActiveProvider(settings);
     if (provider === undefined || provider.status !== 'configured') {
       return this.buildProviderUnavailableMessage(provider);
     }
-    return `页面文字将发送到 ${provider.displayName} 翻译。`;
+    return resolveAppResourceText($r('app.string.webpage_translation_will_send', provider.displayName));
   }
 
   private buildTranslatingMessage(
@@ -1444,9 +1454,9 @@ export class WebpageTranslationCoordinator {
     provider: TranslationProviderConfig | undefined
   ): string {
     if (provider === undefined || provider.status !== 'configured') {
-      return `已读取 ${itemCount} 段、约 ${charCount} 字，正在检查翻译服务`;
+      return resolveAppResourceText($r('app.string.webpage_translation_read_checking', itemCount, charCount));
     }
-    return `已读取 ${itemCount} 段、约 ${charCount} 字，正在请求 ${provider.displayName}`;
+    return resolveAppResourceText($r('app.string.webpage_translation_read_requesting', itemCount, charCount, provider.displayName));
   }
 
   private isProviderReadyForTranslation(provider: TranslationProviderConfig | undefined): boolean {
@@ -1458,17 +1468,22 @@ export class WebpageTranslationCoordinator {
     settings: TranslationSettings,
     provider: TranslationProviderConfig | undefined
   ): WebpageTranslationPanelState {
-    return this.buildErrorState(settings, this.buildProviderUnavailableMessage(provider), '', '未配置翻译 API');
+    return this.buildErrorState(
+      settings,
+      this.buildProviderUnavailableMessage(provider),
+      '',
+      resolveAppResourceText($r('app.string.webpage_translation_api_unconfigured'))
+    );
   }
 
   private buildProviderUnavailableMessage(provider: TranslationProviderConfig | undefined): string {
     if (provider === undefined) {
-      return '请先到网页翻译设置中添加并启用翻译 API。';
+      return resolveAppResourceText($r('app.string.webpage_translation_add_api'));
     }
     if (provider.status !== 'configured') {
-      return '当前翻译 API 未配置完成，请到网页翻译设置中补全配置。';
+      return resolveAppResourceText($r('app.string.webpage_translation_api_incomplete'));
     }
-    return '请先到网页翻译设置中添加并启用翻译 API。';
+    return resolveAppResourceText($r('app.string.webpage_translation_add_api'));
   }
 
   private buildTranslatedState(
@@ -1480,7 +1495,6 @@ export class WebpageTranslationCoordinator {
     hasMore: boolean = false,
     extractedCountOverride?: number
   ): WebpageTranslationPanelState {
-    const appliedCharsText = appliedChars !== undefined && appliedChars > 0 ? `、约 ${appliedChars} 个原文字符` : '';
     const extractedCount = extractedCountOverride !== undefined && extractedCountOverride > 0
       ? extractedCountOverride
       : extraction.items.length;
@@ -1488,10 +1502,12 @@ export class WebpageTranslationCoordinator {
       visible: true,
       status: hasMore ? 'partially_translated' : 'translated',
       displayMode: this.resolvePanelDisplayModeForAppliedCount(appliedCount),
-      title: hasMore ? '已翻译部分内容' : '已翻译当前网页',
+      title: hasMore
+        ? resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_007'))
+        : resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_006')),
       message: appliedCount > 0
-        ? this.buildTranslatedMessage(extractedCount, appliedCount, appliedCharsText, hasMore)
-        : '页面文字已变化，未能安全回写译文',
+        ? this.buildTranslatedMessage(extractedCount, appliedCount, appliedChars, hasMore)
+        : resolveAppResourceText($r('app.string.webpage_translation_writeback_failed')),
       providerTemplateId: this.resolvePanelProviderTemplateId(settings),
       providerDisplayName: this.resolvePanelProviderDisplayName(settings),
       sourceLanguage: sourceLanguage ?? extraction.lang,
@@ -1514,13 +1530,21 @@ export class WebpageTranslationCoordinator {
       visible: true,
       status: 'translating',
       displayMode: this.resolvePanelDisplayModeForAppliedCount(progress.appliedCount),
-      title: '正在翻译',
-      message: `已尝试约 ${progress.attemptedChars}/${totalChars} 个原文字符，已应用约 ${progress.appliedChars} 个原文字符、${progress.appliedCount}/${totalCount} 段`,
+      title: resolveAppResourceText($r('app.string.webpage_translation_translating')),
+      message: resolveAppResourceText($r(
+        'app.string.webpage_translation_progress_detail',
+        progress.attemptedChars,
+        totalChars,
+        progress.appliedChars,
+        progress.appliedCount,
+        totalCount
+      )),
       providerTemplateId: this.resolvePanelProviderTemplateId(settings),
       providerDisplayName: this.resolvePanelProviderDisplayName(settings),
       sourceLanguage: sourceLanguage,
       targetLanguage: settings.preferences.preferredTargetLanguage,
       translatedCount: progress.appliedCount,
+      segmentTotal: totalCount,
       canTranslate: false,
       canRestore: progress.appliedCount > 0,
       canCancel: true
@@ -1530,23 +1554,30 @@ export class WebpageTranslationCoordinator {
   private buildTranslatedMessage(
     extractedCount: number,
     appliedCount: number,
-    appliedCharsText: string,
+    appliedChars: number | undefined,
     hasMore: boolean
   ): string {
+    const chars = appliedChars !== undefined ? appliedChars : 0;
     if (hasMore) {
-      return `已应用 ${appliedCount}/${extractedCount} 段${appliedCharsText}译文，可继续翻译更多内容`;
+      return chars > 0
+        ? resolveAppResourceText($r('app.string.webpage_translation_applied_more_chars', appliedCount, extractedCount, chars))
+        : resolveAppResourceText($r('app.string.webpage_translation_applied_more', appliedCount, extractedCount));
     }
-    return `已处理 ${extractedCount} 段，已应用 ${appliedCount} 段${appliedCharsText}译文`;
+    return chars > 0
+      ? resolveAppResourceText($r('app.string.webpage_translation_applied_done_chars', extractedCount, appliedCount, chars))
+      : resolveAppResourceText($r('app.string.webpage_translation_applied_done', extractedCount, appliedCount));
   }
 
   private buildDisplayModeTitle(displayMode: 'bilingual' | 'translation_only'): string {
-    return displayMode === 'bilingual' ? '已显示双语对照' : '已仅显示译文';
+    return displayMode === 'bilingual'
+      ? resolveAppResourceText($r('app.string.webpage_translation_shown_bilingual'))
+      : resolveAppResourceText($r('app.string.webpage_translation_shown_translation_only'));
   }
 
   private buildDisplayModeMessage(displayMode: 'bilingual' | 'translation_only', shownCount: number): string {
     return displayMode === 'bilingual'
-      ? `已显示 ${shownCount} 段双语对照`
-      : `已仅显示 ${shownCount} 段译文`;
+      ? resolveAppResourceText($r('app.string.webpage_translation_shown_bilingual_count', shownCount))
+      : resolveAppResourceText($r('app.string.webpage_translation_shown_translation_only_count', shownCount));
   }
 
   private resolvePanelDisplayModeForAppliedCount(appliedCount: number): WebpageTranslationDisplayMode {
@@ -2395,7 +2426,7 @@ export class WebpageTranslationCoordinator {
   }
 
   private resolveProviderDisplayName(provider: TranslationProviderConfig | undefined): string {
-    return provider?.displayName ?? '未配置翻译服务';
+    return provider?.displayName ?? resolveAppResourceText($r('app.string.webpage_translation_provider_unconfigured'));
   }
 
   private buildErrorMessage(error: Error | Object): string {
@@ -2403,12 +2434,12 @@ export class WebpageTranslationCoordinator {
       return error.failure.message;
     }
     if (error instanceof Error) {
-      return `网页翻译失败：${error.message}`;
+      return resolveAppResourceText($r('app.string.webpage_translation_failed_detail', error.message));
     }
     try {
-      return `网页翻译失败：${JSON.stringify(error)}`;
+      return resolveAppResourceText($r('app.string.webpage_translation_failed_detail', JSON.stringify(error)));
     } catch (_error) {
-      return '网页翻译失败。';
+      return resolveAppResourceText($r('app.string.webpage_translation_failed'));
     }
   }
 
@@ -2430,13 +2461,16 @@ export class WebpageTranslationCoordinator {
     settings: TranslationSettings,
     message: string,
     sourceLanguage: string = '',
-    title: string = '网页翻译'
+    title: string = ''
   ): WebpageTranslationPanelState {
+    const resolvedTitle = title.length > 0
+      ? title
+      : resolveAppResourceText($r('app.string.settings_web_translation'));
     return {
       visible: true,
       status: 'error',
       displayMode: 'none',
-      title: title,
+      title: resolvedTitle,
       message: message,
       providerTemplateId: this.resolvePanelProviderTemplateId(settings),
       providerDisplayName: this.resolvePanelProviderDisplayName(settings),

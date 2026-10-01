@@ -2,6 +2,7 @@ import { AVCastPickerState, avSession } from '@kit.AVSessionKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import urlUtils from '@ohos.url';
 import { AppRuntimeContext } from '../../app/runtime/AppRuntimeContext';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { isLikelyLocalUrlHost } from '../../common/utils/UrlUtils';
 
 const VIDEO_ASSISTANT_CAST_LOG_DOMAIN: number = 0x0000;
@@ -79,13 +80,13 @@ export class VideoAssistantCastSessionService {
     handler: VideoAssistantCastLocalPlaybackHandler
   ): Promise<VideoAssistantCastRequestResult> {
     if (this.requestInFlight) {
-      return this.buildResult(false, 'request_in_flight', '投放设备列表正在打开。');
+      return this.buildResult(false, 'request_in_flight', resolveAppResourceText($r('app.string.video_cast_picker_opening')));
     }
     if (this.remoteStartInFlight) {
-      return this.buildResult(false, 'request_in_flight', '正在启动远端视频。');
+      return this.buildResult(false, 'request_in_flight', resolveAppResourceText($r('app.string.video_cast_remote_starting')));
     }
     if (!AppRuntimeContext.hasUIAbilityContext()) {
-      return this.buildResult(false, 'session_unavailable', '当前无法打开投放设备列表。');
+      return this.buildResult(false, 'session_unavailable', resolveAppResourceText($r('app.string.video_cast_picker_unavailable')));
     }
 
     const generation = ++this.requestGeneration;
@@ -98,7 +99,7 @@ export class VideoAssistantCastSessionService {
       const session = await avSession.getAVSession(context);
       const controller = await session.getController();
       if (!this.isRequestCurrent(generation, item.sessionKey)) {
-        return this.buildResult(false, 'session_unavailable', '当前视频会话已经变化。');
+        return this.buildResult(false, 'session_unavailable', resolveAppResourceText($r('app.string.video_cast_session_changed')));
       }
 
       this.bindSession(session, controller);
@@ -112,7 +113,7 @@ export class VideoAssistantCastSessionService {
         return this.buildResult(
           false,
           'media_unavailable',
-          '当前视频没有可供投放设备直接读取的地址。'
+          resolveAppResourceText($r('app.string.media_resource_cast_no_address'))
         );
       }
       await this.enableUrlCast(session, controller);
@@ -126,7 +127,7 @@ export class VideoAssistantCastSessionService {
       );
       await this.picker.select({ sessionType: 'video' });
       if (!this.isRequestCurrent(generation, item.sessionKey)) {
-        return this.buildResult(false, 'session_unavailable', '当前视频会话已经变化。');
+        return this.buildResult(false, 'session_unavailable', resolveAppResourceText($r('app.string.video_cast_session_changed')));
       }
       await this.startIfAlreadyConnected(controller);
       return this.buildResult(true, 'picker_opened', '');
@@ -136,7 +137,7 @@ export class VideoAssistantCastSessionService {
         this.detachPicker();
         this.currentQueueItem = undefined;
       }
-      return this.buildResult(false, 'picker_failed', '投放设备列表打开失败，请稍后重试。');
+      return this.buildResult(false, 'picker_failed', resolveAppResourceText($r('app.string.video_cast_picker_failed')));
     } finally {
       if (generation === this.requestGeneration) {
         this.requestInFlight = false;
@@ -310,7 +311,7 @@ export class VideoAssistantCastSessionService {
     }
     if (queueItem === undefined) {
       this.logInfo('remote_start_skipped', 'reason=no_remote_uri');
-      handler.showMessage('投放设备已连接，但当前视频没有可供设备直接读取的地址。');
+      handler.showMessage(resolveAppResourceText($r('app.string.video_cast_connected_no_address')));
       return;
     }
     const generation = this.requestGeneration;
@@ -372,7 +373,7 @@ export class VideoAssistantCastSessionService {
       )) {
         this.remoteStartedKey = '';
         this.remotePlaybackConfirmedDeviceKey = '';
-        handler.showMessage('投放设备已连接，但视频启动失败。');
+        handler.showMessage(resolveAppResourceText($r('app.string.video_cast_start_failed')));
         await this.queueLocalPlaybackReconciliation('remote_start_failed');
       }
     } finally {
@@ -405,7 +406,7 @@ export class VideoAssistantCastSessionService {
     if (state.state === avSession.PlaybackState.PLAYBACK_STATE_ERROR) {
       this.remoteStartedKey = '';
       this.remotePlaybackConfirmedDeviceKey = '';
-      handler.showMessage('投放设备无法播放当前视频。');
+      handler.showMessage(resolveAppResourceText($r('app.string.video_cast_playback_failed')));
       await this.queueLocalPlaybackReconciliation('remote_playback_error');
       return;
     }
@@ -498,7 +499,9 @@ export class VideoAssistantCastSessionService {
   private buildQueueItem(item: VideoAssistantCastMediaItem): avSession.AVQueueItem {
     const description: avSession.AVMediaDescription = {
       assetId: item.sessionKey,
-      title: item.title.trim().length > 0 ? item.title.trim() : '网页视频',
+      title: item.title.trim().length > 0
+        ? item.title.trim()
+        : resolveAppResourceText($r('app.string.media_resource_web_video_title')),
       subtitle: item.pageUrl,
       mediaType: 'video',
       mediaUri: item.mediaUri.trim(),

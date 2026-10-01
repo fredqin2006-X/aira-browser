@@ -5,6 +5,7 @@ import {
   BrowserArkWebMediaWebLiveCommand
 } from '../../../core/browser/media/BrowserArkWebMediaTakeoverCoordinator';
 import { BROWSER_WINDOW_SAFE_TOP_INSET_STORAGE_KEY } from '../../../core/browser/BrowserWindowAvoidAreaCoordinator';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { AiraRenderableIconId } from '../../../core/resources/GeneratedAiraIconCatalog';
 import { AiraIcon } from '../common/AiraIcon';
 import { BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY } from '../../../core/theme/BrowserThemeStorageKeys';
@@ -363,13 +364,16 @@ export struct BrowserVideoAssistantPlayerOverlay {
         tintColor: BROWSER_FLOATING_GLASS_MATERIAL_DARK_TINT
       }) {
         Column({ space: 2 }) {
-          Text(`${this.formatPlaybackSpeed(this.temporaryFastPlaybackRate)} 倍速播放中`)
+          Text(resolveAppResourceText($r(
+            'app.string.video_player_fast_playback',
+            this.formatPlaybackSpeed(this.temporaryFastPlaybackRate)
+          )))
             .fontSize(15)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.playerControlColor)
             .maxLines(1)
 
-          Text('左右滑动可微调速度')
+          Text($r('app.string.browser_ui_browser_video_assistant_player_overlay_006'))
             .fontSize(11)
             .fontWeight(FontWeight.Regular)
             .fontColor(this.playerControlColor)
@@ -418,7 +422,7 @@ export struct BrowserVideoAssistantPlayerOverlay {
         buttonSize: VIDEO_ASSISTANT_PLAYER_BACK_BUTTON_SIZE,
         iconColor: this.playerControlColor,
         buttonColor: this.playerTransparentColor,
-        accessibilityLabel: '返回网页',
+        accessibilityLabel: resolveAppResourceText($r('app.string.reader_back_to_page')),
         onPress: (): void => {
           this.closePlayer();
         }
@@ -459,7 +463,9 @@ export struct BrowserVideoAssistantPlayerOverlay {
         buttonSize: VIDEO_ASSISTANT_PLAYER_CENTER_PLAY_SIZE,
         iconColor: this.playerControlColor,
         buttonColor: this.playerTransparentColor,
-        accessibilityLabel: this.isPlaying() ? '暂停' : '播放',
+        accessibilityLabel: this.isPlaying()
+          ? resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_013'))
+          : resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_010')),
         onPress: (): void => {
           this.togglePlayback();
         }
@@ -483,7 +489,9 @@ export struct BrowserVideoAssistantPlayerOverlay {
       buttonSize: VIDEO_ASSISTANT_PLAYER_SEEK_BUTTON_SIZE,
       iconColor: this.playerControlColor,
       buttonColor: this.playerTransparentColor,
-      accessibilityLabel: forward ? '快进 10 秒' : '后退 10 秒',
+      accessibilityLabel: forward
+        ? resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_007'))
+        : resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_005')),
       onPress: (): void => {
         this.seekBySeconds(forward ? VIDEO_ASSISTANT_PLAYER_SEEK_STEP_SECONDS :
           -VIDEO_ASSISTANT_PLAYER_SEEK_STEP_SECONDS);
@@ -578,7 +586,7 @@ export struct BrowserVideoAssistantPlayerOverlay {
         buttonSize: VIDEO_ASSISTANT_PLAYER_FEATURE_TOUCH_SIZE,
         iconColor: this.playerControlColor,
         buttonColor: this.playerTransparentColor,
-        accessibilityLabel: '切换画面比例',
+        accessibilityLabel: resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_004')),
         onPress: (): void => {
           this.cycleVideoScaleMode();
         }
@@ -590,7 +598,7 @@ export struct BrowserVideoAssistantPlayerOverlay {
         buttonSize: VIDEO_ASSISTANT_PLAYER_FEATURE_TOUCH_SIZE,
         iconColor: this.playerControlColor,
         buttonColor: this.playerTransparentColor,
-        accessibilityLabel: '下载当前视频',
+        accessibilityLabel: resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_002')),
         onPress: (): void => {
           this.speedPanelVisible = false;
           this.onAction({ type: 'download' });
@@ -604,7 +612,7 @@ export struct BrowserVideoAssistantPlayerOverlay {
         buttonSize: VIDEO_ASSISTANT_PLAYER_FEATURE_TOUCH_SIZE,
         iconColor: this.playerControlColor,
         buttonColor: this.playerTransparentColor,
-        accessibilityLabel: '播放速度',
+        accessibilityLabel: resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_011')),
         onPress: (): void => {
           this.togglePlaybackSpeedPanel();
         }
@@ -616,7 +624,7 @@ export struct BrowserVideoAssistantPlayerOverlay {
         buttonSize: VIDEO_ASSISTANT_PLAYER_FEATURE_TOUCH_SIZE,
         iconColor: this.playerControlColor,
         buttonColor: this.playerTransparentColor,
-        accessibilityLabel: '旋转画面',
+        accessibilityLabel: resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_012')),
         onPress: (): void => {
           this.requestRotate();
         }
@@ -628,7 +636,7 @@ export struct BrowserVideoAssistantPlayerOverlay {
         buttonSize: VIDEO_ASSISTANT_PLAYER_FEATURE_TOUCH_SIZE,
         iconColor: this.playerControlColor,
         buttonColor: this.playerTransparentColor,
-        accessibilityLabel: '锁定播放器控制',
+        accessibilityLabel: resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_018')),
         onPress: (): void => {
           this.controlsLocked = true;
           this.controlsVisible = true;
@@ -672,7 +680,7 @@ export struct BrowserVideoAssistantPlayerOverlay {
       }) {
         Column() {
           Row() {
-            Text('播放速度')
+            Text($r('app.string.browser_ui_browser_video_assistant_player_overlay_011'))
               .fontSize(17)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.storedSpeedDialogTextColor)
@@ -745,7 +753,7 @@ export struct BrowserVideoAssistantPlayerOverlay {
         buttonSize: VIDEO_ASSISTANT_PLAYER_FEATURE_TOUCH_SIZE,
         iconColor: this.playerControlColor,
         buttonColor: this.playerTransparentColor,
-        accessibilityLabel: '解锁播放器控制',
+        accessibilityLabel: resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_016')),
         onPress: (): void => {
           this.controlsLocked = false;
           this.showControlsTemporarily();
@@ -789,7 +797,9 @@ export struct BrowserVideoAssistantPlayerOverlay {
           SymbolGlyph($r('sys.symbol.exclamationmark_triangle_fill'))
             .fontSize(32)
             .fontColor([this.playerControlColor])
-          Text(this.playerState.errorMessage.length > 0 ? this.playerState.errorMessage : '视频打开失败。')
+          Text(this.playerState.errorMessage.length > 0
+            ? this.playerState.errorMessage
+            : resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_015')))
             .fontSize(14)
             .fontColor(this.playerControlColor)
             .textAlign(TextAlign.Center)
@@ -802,7 +812,7 @@ export struct BrowserVideoAssistantPlayerOverlay {
               surfaceRadius: 20,
               tintColor: BROWSER_FLOATING_GLASS_MATERIAL_DARK_TINT
             }) {
-              Text('关闭')
+              Text($r('app.string.ui_close'))
                 .fontSize(14)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(this.playerControlColor)
@@ -813,7 +823,7 @@ export struct BrowserVideoAssistantPlayerOverlay {
               .width('100%')
               .height('100%')
               .backgroundColor(this.playerTransparentColor)
-              .accessibilityText('关闭视频播放器')
+              .accessibilityText(resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_003')))
               .onClick(() => {
                 this.onAction({ type: 'close' });
               })
@@ -1024,12 +1034,12 @@ export struct BrowserVideoAssistantPlayerOverlay {
   private resolveScreenSeekDeltaLabel(): string {
     const roundedDelta = Math.round(this.screenSeekDeltaSeconds);
     if (roundedDelta > 0) {
-      return `快进 +${roundedDelta} 秒`;
+      return resolveAppResourceText($r('app.string.video_player_seek_forward', roundedDelta));
     }
     if (roundedDelta < 0) {
-      return `后退 ${Math.abs(roundedDelta)} 秒`;
+      return resolveAppResourceText($r('app.string.video_player_seek_back', Math.abs(roundedDelta)));
     }
-    return '拖动进度';
+    return resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_009'));
   }
 
   private beginSystemControlGesture(): void {
@@ -1521,7 +1531,7 @@ export struct BrowserVideoAssistantPlayerOverlay {
 
   private resolvePlayerTitle(): string {
     const title = this.playerState.item.title.trim();
-    return title.length > 0 ? title : '网页视频';
+    return title.length > 0 ? title : resolveAppResourceText($r('app.string.media_resource_web_video_title'));
   }
 
   private resolveTopFeatureLayerHeight(): number {
@@ -1590,12 +1600,12 @@ export struct BrowserVideoAssistantPlayerOverlay {
 
   private resolveVideoScaleModeLabel(): string {
     if (this.videoScaleMode === 'crop') {
-      return '裁剪填满';
+      return resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_014'));
     }
     if (this.videoScaleMode === 'stretch') {
-      return '拉伸填满';
+      return resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_008'));
     }
-    return '适应屏幕';
+    return resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_017'));
   }
 
   private resolveWebLiveScaleModeValue(): number {
@@ -1614,7 +1624,7 @@ export struct BrowserVideoAssistantPlayerOverlay {
 
   private formatPlaybackSpeedChoice(rate: number): string {
     if (rate === 1.0) {
-      return '1.0x（正常）';
+      return resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_001'));
     }
     return rate.toString() + 'x';
   }

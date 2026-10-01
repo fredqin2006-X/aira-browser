@@ -20159,6 +20159,398 @@
     {
       "name": "download_custom_location",
       "value": "Custom location"
+    },
+    {
+      "name": "webpage_translation_actions",
+      "value": "Actions"
+    },
+    {
+      "name": "webpage_translation_preparing_message",
+      "value": "Getting this page ready to translate"
+    },
+    {
+      "name": "webpage_translation_provider_unconfigured",
+      "value": "Translation service not set up"
+    },
+    {
+      "name": "webpage_translation_confirm_title",
+      "value": "Confirm webpage translation"
+    },
+    {
+      "name": "webpage_translation_confirm_message",
+      "value": "Text on this page will be sent to %1$s. Translation starts after you confirm."
+    },
+    {
+      "name": "webpage_translation_confirm_accept",
+      "value": "Agree and translate"
+    },
+    {
+      "name": "webpage_translation_confirm_save_failed",
+      "value": "Could not save the translation confirmation. Try again later."
+    },
+    {
+      "name": "webpage_translation_language_switched",
+      "value": "Switched to %1$s"
+    },
+    {
+      "name": "webpage_translation_language_save_failed",
+      "value": "Could not save the target language. Try again later."
+    },
+    {
+      "name": "webpage_translation_translate_page",
+      "value": "Translate this page"
+    },
+    {
+      "name": "webpage_translation_canceled",
+      "value": "Translation canceled"
+    },
+    {
+      "name": "webpage_translation_enable_first",
+      "value": "Turn on webpage translation in settings first."
+    },
+    {
+      "name": "webpage_translation_no_controller",
+      "value": "This page does not have a web controller yet."
+    },
+    {
+      "name": "webpage_translation_preparing_title",
+      "value": "Preparing translation"
+    },
+    {
+      "name": "webpage_translation_reading_text",
+      "value": "Reading text on this page"
+    },
+    {
+      "name": "webpage_translation_no_visible_text",
+      "value": "No translatable text in the visible area."
+    },
+    {
+      "name": "webpage_translation_language_unknown",
+      "value": "Could not detect this page's language."
+    },
+    {
+      "name": "webpage_translation_translating",
+      "value": "Translating"
+    },
+    {
+      "name": "webpage_translation_restore_failed",
+      "value": "Could not restore"
+    },
+    {
+      "name": "webpage_translation_restored_count",
+      "value": "Restored %1$d original sections"
+    },
+    {
+      "name": "webpage_translation_nothing_to_restore",
+      "value": "Nothing to restore"
+    },
+    {
+      "name": "webpage_translation_display_switch_failed",
+      "value": "Could not switch the display"
+    },
+    {
+      "name": "webpage_translation_nothing_to_switch",
+      "value": "No translation to switch"
+    },
+    {
+      "name": "webpage_translation_no_cached",
+      "value": "No cached translation to restore on this page"
+    },
+    {
+      "name": "webpage_translation_language_updated",
+      "value": "Target language updated"
+    },
+    {
+      "name": "webpage_translation_disabled",
+      "value": "Webpage translation is off. Turn it on in settings."
+    },
+    {
+      "name": "webpage_translation_will_send",
+      "value": "Page text will be sent to %1$s for translation."
+    },
+    {
+      "name": "webpage_translation_read_checking",
+      "value": "Read %1$d sections, about %2$d characters. Checking the translation service"
+    },
+    {
+      "name": "webpage_translation_read_requesting",
+      "value": "Read %1$d sections, about %2$d characters. Requesting %3$s"
+    },
+    {
+      "name": "webpage_translation_api_unconfigured",
+      "value": "Translation API not set up"
+    },
+    {
+      "name": "webpage_translation_add_api",
+      "value": "Add and enable a translation API in webpage translation settings."
+    },
+    {
+      "name": "webpage_translation_api_incomplete",
+      "value": "The translation API is not fully set up. Finish it in webpage translation settings."
+    },
+    {
+      "name": "webpage_translation_writeback_failed",
+      "value": "The page text changed, so the translation could not be written back safely"
+    },
+    {
+      "name": "webpage_translation_progress_detail",
+      "value": "Tried about %1$d/%2$d source characters; applied about %3$d source characters and %4$d/%5$d sections"
+    },
+    {
+      "name": "webpage_translation_applied_more",
+      "value": "Applied %1$d/%2$d sections. You can translate more"
+    },
+    {
+      "name": "webpage_translation_applied_more_chars",
+      "value": "Applied %1$d/%2$d sections, about %3$d source characters. You can translate more"
+    },
+    {
+      "name": "webpage_translation_applied_done",
+      "value": "Processed %1$d sections and applied %2$d"
+    },
+    {
+      "name": "webpage_translation_applied_done_chars",
+      "value": "Processed %1$d sections and applied %2$d, about %3$d source characters"
+    },
+    {
+      "name": "webpage_translation_shown_bilingual",
+      "value": "Showing side by side"
+    },
+    {
+      "name": "webpage_translation_shown_translation_only",
+      "value": "Showing translation only"
+    },
+    {
+      "name": "webpage_translation_shown_bilingual_count",
+      "value": "Showing %1$d sections side by side"
+    },
+    {
+      "name": "webpage_translation_shown_translation_only_count",
+      "value": "Showing translation only for %1$d sections"
+    },
+    {
+      "name": "webpage_translation_failed_detail",
+      "value": "Webpage translation failed: %1$s"
+    },
+    {
+      "name": "webpage_translation_failed",
+      "value": "Webpage translation failed."
+    },
+    {
+      "name": "webpage_translation_full_mode_required",
+      "value": "Webpage translation requires full mode."
+    },
+    {
+      "name": "webpage_translation_private_blocked",
+      "value": "Webpage translation is not allowed in private tabs. Turn it on in settings."
+    },
+    {
+      "name": "webpage_translation_site_never",
+      "value": "This site is set to never translate."
+    },
+    {
+      "name": "webpage_translation_language_never",
+      "value": "This language is set to never translate."
+    },
+    {
+      "name": "webpage_translation_selected_service",
+      "value": "Selected translation service"
+    },
+    {
+      "name": "video_player_fast_playback",
+      "value": "Playing at %1$s"
+    },
+    {
+      "name": "video_player_seek_forward",
+      "value": "Forward +%1$d seconds"
+    },
+    {
+      "name": "video_player_seek_back",
+      "value": "Back %1$d seconds"
+    },
+    {
+      "name": "video_player_page_unavailable",
+      "value": "This page is unavailable, so the video cannot be controlled."
+    },
+    {
+      "name": "video_player_session_changed",
+      "value": "The web video session has changed."
+    },
+    {
+      "name": "video_player_takeover_failed",
+      "value": "Could not take over the video. The page will keep playing it."
+    },
+    {
+      "name": "video_player_restore_failed",
+      "value": "Could not restore the web video."
+    },
+    {
+      "name": "video_player_control_failed",
+      "value": "Could not control the web video."
+    },
+    {
+      "name": "video_player_pip_unsupported",
+      "value": "This video cannot play in a small window yet."
+    },
+    {
+      "name": "video_player_toolbar_aria",
+      "value": "Aira video actions"
+    },
+    {
+      "name": "video_player_cast",
+      "value": "Cast"
+    },
+    {
+      "name": "video_player_pip",
+      "value": "Small window"
+    },
+    {
+      "name": "video_player_fullscreen",
+      "value": "Play full screen in Aira"
+    },
+    {
+      "name": "video_player_cast_unsupported",
+      "value": "This page cannot cast"
+    },
+    {
+      "name": "video_player_cast_choose_device",
+      "value": "Choose a device in the system window"
+    },
+    {
+      "name": "video_player_pip_page_unsupported",
+      "value": "This page cannot play in a small window"
+    },
+    {
+      "name": "video_player_pip_opening",
+      "value": "Opening small window"
+    },
+    {
+      "name": "video_player_fullscreen_entering",
+      "value": "Entering Aira full screen"
+    },
+    {
+      "name": "video_player_fullscreen_blocked",
+      "value": "This page cannot enter Aira full screen"
+    },
+    {
+      "name": "video_player_session_switching",
+      "value": "The web video session is switching. Try again in a moment."
+    },
+    {
+      "name": "video_player_controls_hide_rejected",
+      "value": "The page player refused to hide its controls."
+    },
+    {
+      "name": "video_player_toolbar_unavailable",
+      "value": "This page cannot show the video action buttons."
+    },
+    {
+      "name": "video_player_play_rejected",
+      "value": "The page player refused to continue playback."
+    },
+    {
+      "name": "video_player_rate_rejected",
+      "value": "The page player refused to change the speed."
+    },
+    {
+      "name": "video_player_scale_rejected",
+      "value": "The page player refused to change the aspect ratio."
+    },
+    {
+      "name": "video_player_pip_rejected",
+      "value": "The page player refused to open a small window."
+    },
+    {
+      "name": "video_player_unsupported_action",
+      "value": "This web video does not support that action yet."
+    },
+    {
+      "name": "video_cast_picker_opening",
+      "value": "The cast device list is opening."
+    },
+    {
+      "name": "video_cast_remote_starting",
+      "value": "Starting the video on the cast device."
+    },
+    {
+      "name": "video_cast_picker_unavailable",
+      "value": "The cast device list cannot be opened right now."
+    },
+    {
+      "name": "video_cast_session_changed",
+      "value": "The video session has changed."
+    },
+    {
+      "name": "video_cast_picker_failed",
+      "value": "Could not open the cast device list. Try again later."
+    },
+    {
+      "name": "video_cast_connected_no_address",
+      "value": "The cast device is connected, but this video has no address it can read directly."
+    },
+    {
+      "name": "video_cast_start_failed",
+      "value": "The cast device is connected, but the video failed to start."
+    },
+    {
+      "name": "video_cast_playback_failed",
+      "value": "The cast device cannot play this video."
+    },
+    {
+      "name": "element_inspection_tab_application",
+      "value": "Application"
+    },
+    {
+      "name": "element_inspection_more_before",
+      "value": "↑ %1$d more"
+    },
+    {
+      "name": "element_inspection_more_after",
+      "value": "↓ %1$d more"
+    },
+    {
+      "name": "element_inspection_cross_origin_address",
+      "value": "Cross-origin limit. Only the address is shown:\n%1$s"
+    },
+    {
+      "name": "element_inspection_origin",
+      "value": "Origin"
+    },
+    {
+      "name": "element_inspection_resource",
+      "value": "Resource"
+    },
+    {
+      "name": "element_inspection_parent",
+      "value": "Parent"
+    },
+    {
+      "name": "element_inspection_child",
+      "value": "Child"
+    },
+    {
+      "name": "element_inspection_previous",
+      "value": "Previous"
+    },
+    {
+      "name": "element_inspection_styles_copied",
+      "value": "Styles copied."
+    },
+    {
+      "name": "element_inspection_styles_copied_truncated",
+      "value": "Styles copied; the overlong part was truncated."
+    },
+    {
+      "name": "element_inspection_element_hidden",
+      "value": "Element hidden."
+    },
+    {
+      "name": "element_inspection_element_shown",
+      "value": "Element shown."
+    },
+    {
+      "name": "element_inspection_stored_global_named",
+      "value": "Stored as %1$s. You can use it in the console."
     }
   ]
 }

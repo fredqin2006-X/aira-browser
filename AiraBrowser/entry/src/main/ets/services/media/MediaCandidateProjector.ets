@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   MediaActionHint,
   MediaCandidate,
@@ -934,7 +935,7 @@ export class MediaCandidateProjector {
       return displayName;
     }
     const pageTitle = candidate.pageTitle.trim();
-    return pageTitle.length > 0 ? pageTitle : '网页视频';
+    return pageTitle.length > 0 ? pageTitle : resolveAppResourceText($r('app.string.media_resource_web_video_title'));
   }
 
   private isGenericHlsDisplayName(value: string): boolean {

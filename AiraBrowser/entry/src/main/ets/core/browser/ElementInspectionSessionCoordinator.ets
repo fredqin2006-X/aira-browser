@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { BrowserClipboardCopyResult, BrowserClipboardService } from '../../services/share/BrowserClipboardService';
 import {
   ElementInspectionBoxModel,
@@ -432,7 +433,7 @@ export class ElementInspectionSessionCoordinator {
 
   private async runStartFromToolbar(): Promise<void> {
     if (!this.canStart()) {
-      this.shell.showToast('当前页面暂不可审查元素。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_032')));
       return;
     }
     this.clearCloseTimer();
@@ -450,7 +451,7 @@ export class ElementInspectionSessionCoordinator {
       active: true,
       phase: 'starting',
       busy: true,
-      helperText: '正在准备元素审查…',
+      helperText: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_041')),
       pickerArmed: true,
       outline: [],
       computed: [],
@@ -471,7 +472,7 @@ export class ElementInspectionSessionCoordinator {
       const snapshot = this.runtimeScriptService.parseSnapshot(raw);
       if (!this.applyRuntimeSnapshot(snapshot, generation)) {
         this.close('install_snapshot_invalid');
-        this.shell.showToast('当前页面无法启动元素审查。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_031')));
         return;
       }
       if (!this.shellPaused && (this.presentation.phase === 'selecting' || this.presentation.phase === 'inspected')) {
@@ -482,7 +483,7 @@ export class ElementInspectionSessionCoordinator {
         return;
       }
       this.close('install_failed');
-      this.shell.showToast('当前页面无法启动元素审查。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_031')));
     }
   }
 
@@ -492,7 +493,7 @@ export class ElementInspectionSessionCoordinator {
     const documentToken = this.documentToken;
     const facts = this.shell.resolveFacts();
     if (!this.canResumeShell(facts, tabId)) {
-      this.finishShellResume('shell_resume_unavailable', '当前页面已变化，元素审查已结束。');
+      this.finishShellResume('shell_resume_unavailable', resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_030')));
       return;
     }
     if (this.reattachRequested) {
@@ -518,7 +519,7 @@ export class ElementInspectionSessionCoordinator {
         return;
       }
       if (!this.applyRuntimeSnapshot(hydratedSnapshot, generation)) {
-        this.finishShellResume('shell_resume_snapshot_invalid', '页面已变化，元素审查已结束。');
+        this.finishShellResume('shell_resume_snapshot_invalid', resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_055')));
         return;
       }
       this.shellPaused = false;
@@ -542,7 +543,7 @@ export class ElementInspectionSessionCoordinator {
     }
     const facts = this.shell.resolveFacts();
     if (facts.activeTabId.trim().length > 0 && facts.activeTabId !== this.originTabId) {
-      this.finishShellResume('shell_resume_unavailable', '当前页面已变化，元素审查已结束。');
+      this.finishShellResume('shell_resume_unavailable', resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_030')));
       return;
     }
     if (facts.activeTabId.trim().length === 0 || facts.showHomePage || facts.showTabsSheet ||
@@ -569,7 +570,7 @@ export class ElementInspectionSessionCoordinator {
       return;
     }
     if (this.shellResumeRetryCount >= ELEMENT_INSPECTION_SHELL_RESUME_MAX_RETRIES) {
-      this.finishShellResume('shell_resume_timeout', '页面已变化，元素审查已结束。');
+      this.finishShellResume('shell_resume_timeout', resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_055')));
       return;
     }
     this.shellResumeRetryCount += 1;
@@ -607,7 +608,7 @@ export class ElementInspectionSessionCoordinator {
     if (!this.canRunNodeCommand()) {
       return;
     }
-    const operation = this.beginOperation('正在等待重新选择…');
+    const operation = this.beginOperation(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_045')));
     try {
       const raw: string = await this.runtimeLifecyclePort.runJavaScriptOnLiveRuntime(
         operation.tabId,
@@ -621,14 +622,14 @@ export class ElementInspectionSessionCoordinator {
       if (snapshot.revision <= operation.runtimeRevision ||
         !this.applyRuntimeSnapshot(snapshot, operation.generation)) {
         this.restoreInspectedAfterOperation();
-        this.shell.showToast('无法重新选择元素。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_041')));
         return;
       }
       this.startSelectionPolling();
     } catch (_error) {
       if (this.isCurrentOperation(operation)) {
         this.restoreInspectedAfterOperation();
-        this.shell.showToast('无法重新选择元素。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_041')));
       }
     }
   }
@@ -662,11 +663,11 @@ export class ElementInspectionSessionCoordinator {
         documentToken
       );
       if (hydratedSnapshot === undefined || !this.applyRuntimeSnapshot(hydratedSnapshot, generation)) {
-        this.shell.showToast('无法选择当前元素。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_040')));
       }
     } catch (_error) {
       if (this.isCurrentGeneration(generation)) {
-        this.shell.showToast('无法选择当前元素。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_040')));
       }
     } finally {
       this.selectionInFlight = false;
@@ -703,11 +704,11 @@ export class ElementInspectionSessionCoordinator {
       );
       if (hydratedSnapshot === undefined || hydratedSnapshot.revision <= previousRevision ||
         !this.applyRuntimeSnapshot(hydratedSnapshot, generation)) {
-        this.shell.showToast('无法选择当前元素。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_040')));
       }
     } catch (_error) {
       if (this.isCurrentGeneration(generation)) {
-        this.shell.showToast('无法选择当前元素。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_040')));
       }
     } finally {
       this.selectionInFlight = false;
@@ -723,7 +724,7 @@ export class ElementInspectionSessionCoordinator {
     if (!this.canRunNodeCommand()) {
       return;
     }
-    const operation = this.beginOperation('正在切换元素…');
+    const operation = this.beginOperation(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_043')));
     try {
       const raw: string = await this.runtimeLifecyclePort.runJavaScriptOnLiveRuntime(
         operation.tabId,
@@ -752,7 +753,7 @@ export class ElementInspectionSessionCoordinator {
       if (hydratedSnapshot.revision <= operation.runtimeRevision ||
         !this.applyRuntimeSnapshot(hydratedSnapshot, operation.generation)) {
         this.restoreInspectedAfterOperation();
-        this.shell.showToast('无法切换到该元素。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_035')));
         return;
       }
       if (snapshot.mode === 'selecting') {
@@ -761,7 +762,7 @@ export class ElementInspectionSessionCoordinator {
     } catch (_error) {
       if (this.isCurrentOperation(operation)) {
         this.restoreInspectedAfterOperation();
-        this.shell.showToast('无法切换到该元素。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_035')));
       }
     }
   }
@@ -771,12 +772,12 @@ export class ElementInspectionSessionCoordinator {
       return;
     }
     const selector = this.presentation.node?.selector ?? '';
-    const operation = this.beginOperation('正在复制选择器…');
+    const operation = this.beginOperation(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_044')));
     try {
       const result: BrowserClipboardCopyResult = await this.clipboardService.copyText({
         value: selector,
-        emptyMessage: '当前元素没有可复制的选择器。',
-        successMessage: '选择器已复制。'
+        emptyMessage: resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_029')),
+        successMessage: resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_054'))
       });
       if (!this.isCurrentOperation(operation)) {
         return;
@@ -786,7 +787,7 @@ export class ElementInspectionSessionCoordinator {
     } catch (_error) {
       if (this.isCurrentOperation(operation)) {
         this.restoreInspectedAfterOperation();
-        this.shell.showToast('复制选择器失败，请稍后重试。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_014')));
       }
     }
   }
@@ -796,12 +797,12 @@ export class ElementInspectionSessionCoordinator {
       return;
     }
     const html = this.presentation.node?.htmlPreview ?? '';
-    const operation = this.beginOperation('正在准备 HTML…');
+    const operation = this.beginOperation(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_042')));
     try {
       const clipboardResult: BrowserClipboardCopyResult = await this.clipboardService.copyText({
         value: html,
-        emptyMessage: '当前元素没有可复制的 HTML。',
-        successMessage: 'HTML 已复制。'
+        emptyMessage: resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_026')),
+        successMessage: resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_002'))
       });
       if (!this.isCurrentOperation(operation)) {
         return;
@@ -811,7 +812,7 @@ export class ElementInspectionSessionCoordinator {
     } catch (_error) {
       if (this.isCurrentOperation(operation)) {
         this.restoreInspectedAfterOperation();
-        this.shell.showToast('复制 HTML 失败，请稍后重试。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_013')));
       }
     }
   }
@@ -887,12 +888,12 @@ export class ElementInspectionSessionCoordinator {
       }
       if (!this.applyRuntimeSnapshot(hydratedSnapshot, generation)) {
         this.close('poll_snapshot_invalid');
-        this.shell.showToast('页面已变化，元素审查已结束。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_055')));
       }
     } catch (_error) {
       if (pollEpoch === this.pollEpoch && !this.shellPaused && this.isCurrentGeneration(generation)) {
         this.close('poll_failed');
-        this.shell.showToast('页面已变化，元素审查已结束。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_055')));
       }
     } finally {
       if (pollEpoch === this.pollEpoch && this.sessionGeneration === generation) {
@@ -961,7 +962,7 @@ export class ElementInspectionSessionCoordinator {
         active: true,
         phase: 'inspected',
         busy: false,
-        helperText: '已选中当前元素',
+        helperText: resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_024')),
         pickerArmed: this.presentation.pickerArmed,
         outline: snapshot.outline !== undefined ? snapshot.outline : this.presentation.outline,
         computed: snapshot.computed !== undefined ? snapshot.computed : this.presentation.computed,
@@ -992,7 +993,7 @@ export class ElementInspectionSessionCoordinator {
       active: true,
       phase: 'selecting',
       busy: false,
-      helperText: '点击网页上的元素查看代码',
+      helperText: resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_048')),
       pickerArmed: this.presentation.pickerArmed,
       outline: snapshot.outline !== undefined ? snapshot.outline : this.presentation.outline,
       computed: [],
@@ -1016,7 +1017,7 @@ export class ElementInspectionSessionCoordinator {
       active: true,
       phase: this.presentation.node === undefined ? 'selecting' : 'inspected',
       busy: false,
-      helperText: this.presentation.node === undefined ? '点击网页上的元素查看代码' : '已选中当前元素',
+      helperText: this.presentation.node === undefined ? resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_048')) : resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_024')),
       pickerArmed: this.presentation.pickerArmed,
       outline: this.presentation.outline,
       computed: this.presentation.computed,
@@ -1071,7 +1072,7 @@ export class ElementInspectionSessionCoordinator {
       active: true,
       phase: 'closing',
       busy: true,
-      helperText: '正在结束元素审查…',
+      helperText: resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_046')),
       pickerArmed: this.presentation.pickerArmed,
       outline: this.presentation.outline,
       computed: this.presentation.computed,
@@ -1136,7 +1137,7 @@ export class ElementInspectionSessionCoordinator {
       active: true,
       phase: 'starting',
       busy: true,
-      helperText: '网页正在刷新，审查会继续。',
+      helperText: resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_049')),
       pickerArmed: this.presentation.pickerArmed,
       outline: [],
       computed: [],
@@ -1678,7 +1679,7 @@ export class ElementInspectionSessionCoordinator {
       }
     } catch (_error) {
       if (this.isCurrentGeneration(generation)) {
-        this.shell.showToast('元素操作失败，请稍后重试。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_010')));
       }
     } finally {
       this.outlineCommandInFlight = false;
@@ -1709,9 +1710,9 @@ export class ElementInspectionSessionCoordinator {
     }
     const copied = await this.clipboardService.copyText({
       value: described.text,
-      emptyMessage: '当前元素没有可剪切的 HTML。',
-      successMessage: '已剪切。',
-      failureMessage: '剪切失败，请稍后重试。'
+      emptyMessage: resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_025')),
+      successMessage: resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_017')),
+      failureMessage: resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_011'))
     });
     if (!this.isCurrentGeneration(generation)) {
       return;
@@ -1725,12 +1726,12 @@ export class ElementInspectionSessionCoordinator {
       return;
     }
     if (!deleted.ok) {
-      this.shell.showToast('HTML 已复制，但无法删除元素。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_003')));
       return;
     }
     await this.applyContextSnapshot(deleted, generation, tabId, documentToken);
     if (this.isCurrentGeneration(generation)) {
-      this.shell.showToast(described.reason === 'html_truncated' ? '已剪切，超长部分已截断。' : '已剪切。');
+      this.shell.showToast(described.reason === 'html_truncated' ? resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_018')) : resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_017')));
     }
   }
 
@@ -1741,8 +1742,8 @@ export class ElementInspectionSessionCoordinator {
     documentToken: string
   ): Promise<void> {
     const clipboard = await this.clipboardService.readText({
-      emptyMessage: '剪贴板是空的。',
-      failureMessage: '读取剪贴板失败，请稍后重试。'
+      emptyMessage: resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_012')),
+      failureMessage: resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_050'))
     });
     if (!this.isCurrentGeneration(generation)) {
       return;
@@ -1762,7 +1763,7 @@ export class ElementInspectionSessionCoordinator {
     }
     await this.applyContextSnapshot(pasted, generation, tabId, documentToken);
     if (this.isCurrentGeneration(generation)) {
-      this.shell.showToast('已粘贴。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_022')));
     }
   }
 
@@ -1777,7 +1778,7 @@ export class ElementInspectionSessionCoordinator {
     const value = command.value.length > 500 ? command.value.substring(0, 500) : command.value;
     if (!this.isOutlineAttributeName(name) ||
       (previousName.length > 0 && previousName !== name && !this.isOutlineAttributeName(previousName))) {
-      this.shell.showToast('属性名无效。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_015')));
       return;
     }
     const payloadObject: ElementInspectionAttributePayload = { name: name, value: value };
@@ -1788,7 +1789,7 @@ export class ElementInspectionSessionCoordinator {
     const updated = await this.runPageOutlineCommand(
       'set_attribute', command.path, payload, generation, tabId, documentToken
     );
-    await this.finishOutlineMutation(updated, generation, tabId, documentToken, '属性已更新。');
+    await this.finishOutlineMutation(updated, generation, tabId, documentToken, resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_016')));
   }
 
   private async replaceOutlineHtml(
@@ -1799,13 +1800,13 @@ export class ElementInspectionSessionCoordinator {
   ): Promise<void> {
     const html = command.value.trim();
     if (html.length === 0 || html.length > 12000) {
-      this.shell.showToast(html.length === 0 ? 'HTML 不能为空。' : '这段 HTML 太长，暂时不能整段编辑。');
+      this.shell.showToast(html.length === 0 ? resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_001')) : resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_053')));
       return;
     }
     const replaced = await this.runPageOutlineCommand(
       'replace_html', command.path, html, generation, tabId, documentToken
     );
-    await this.finishOutlineMutation(replaced, generation, tabId, documentToken, 'HTML 已更新。');
+    await this.finishOutlineMutation(replaced, generation, tabId, documentToken, resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_005')));
   }
 
   private async readOutlineHtml(
@@ -1901,7 +1902,7 @@ export class ElementInspectionSessionCoordinator {
     }
     const snapshot = this.runtimeScriptService.parseSnapshot(raw);
     if (!snapshot.ok || snapshot.sessionGeneration !== generation || snapshot.documentToken !== documentToken) {
-      this.shell.showToast('找不到这个元素。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_033')));
       return;
     }
     if (snapshot.outline === undefined || snapshot.revision < this.runtimeRevision) {
@@ -2009,23 +2010,23 @@ export class ElementInspectionSessionCoordinator {
     kind: string,
     result: ElementInspectionContextActionResult
   ): Promise<void> {
-    let successMessage = 'HTML 已复制。';
+    let successMessage = resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_002'));
     if (kind === 'copy_selector') {
-      successMessage = '选择器已复制。';
+      successMessage = resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_054'));
     } else if (kind === 'copy_js_path') {
-      successMessage = 'JS 路径已复制。';
+      successMessage = resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_007'));
     } else if (kind === 'copy_xpath') {
-      successMessage = 'XPath 已复制。';
+      successMessage = resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_008'));
     } else if (kind === 'copy_styles') {
-      successMessage = result.reason === 'style_truncated' ? '样式已复制，超长部分已截断。' : '样式已复制。';
+      successMessage = result.reason === 'style_truncated' ? resolveAppResourceText($r('app.string.element_inspection_styles_copied_truncated')) : resolveAppResourceText($r('app.string.element_inspection_styles_copied'));
     } else if (result.reason === 'html_truncated') {
-      successMessage = 'HTML 已复制，超长部分已截断。';
+      successMessage = resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_004'));
     }
     const copied = await this.clipboardService.copyText({
       value: result.text,
-      emptyMessage: '没有可复制的内容。',
+      emptyMessage: resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_047')),
       successMessage: successMessage,
-      failureMessage: '复制失败，请稍后重试。'
+      failureMessage: resolveAppResourceText($r('app.string.reader_copy_link_failed'))
     });
     this.shell.showToast(copied.message);
   }
@@ -2041,61 +2042,63 @@ export class ElementInspectionSessionCoordinator {
       return '';
     }
     if (kind === 'duplicate') {
-      return '已在页面上创建副本。';
+      return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_019'));
     }
     if (kind === 'delete') {
-      return '元素已删除。';
+      return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_009'));
     }
     if (kind === 'hide') {
-      return result.text === 'hidden' ? '元素已隐藏。' : '元素已显示。';
+      return result.text === 'hidden' ? resolveAppResourceText($r('app.string.element_inspection_element_hidden')) : resolveAppResourceText($r('app.string.element_inspection_element_shown'));
     }
     if (kind === 'scroll_into_view') {
-      return '已滚动到元素。';
+      return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_021'));
     }
     if (kind === 'focus') {
-      return '已聚焦元素。';
+      return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_023'));
     }
     if (kind === 'store_global') {
-      return result.text.length > 0 ? `已存为 ${result.text}，可在控制台使用。` : '已存为全局变量。';
+      return result.text.length > 0
+        ? resolveAppResourceText($r('app.string.element_inspection_stored_global_named', result.text))
+        : resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_020'));
     }
     return '';
   }
 
   private outlineCommandFailureMessage(reason: string): string {
     if (reason === 'node_protected') {
-      return '这个元素不能这样修改。';
+      return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_052'));
     }
     if (reason === 'html_too_large') {
-      return '这段 HTML 太长，暂时不能整段编辑。';
+      return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_053'));
     }
     if (reason === 'html_unavailable') {
-      return '当前元素没有可复制的 HTML。';
+      return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_026'));
     }
     if (reason === 'html_rejected') {
-      return 'HTML 无法应用。请保留一个根元素。';
+      return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_006'));
     }
     if (reason === 'attribute_invalid') {
-      return '属性名无效。';
+      return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_015'));
     }
     if (reason === 'attribute_rejected') {
-      return '无法修改这个属性。';
+      return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_034'));
     }
     if (reason === 'selector_unavailable') {
-      return '当前元素没有可复制的路径。';
+      return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_028'));
     }
     if (reason === 'styles_unavailable') {
-      return '当前元素没有可复制的样式。';
+      return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_027'));
     }
     if (reason === 'not_focusable') {
-      return '这个元素不能聚焦。';
+      return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_051'));
     }
     if (reason === 'store_failed') {
-      return '无法存为全局变量。';
+      return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_036'));
     }
     if (reason === 'node_missing') {
-      return '找不到这个元素。';
+      return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_033'));
     }
-    return '元素操作失败，请稍后重试。';
+    return resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_010'));
   }
 
   private isOutlineAttributeName(value: string): boolean {
@@ -2141,11 +2144,11 @@ export class ElementInspectionSessionCoordinator {
       }
       const snapshot = this.runtimeScriptService.parseSnapshot(raw);
       if (!this.applyRuntimeSnapshot(snapshot, generation)) {
-        this.shell.showToast('无法执行脚本。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_037')));
       }
     } catch (_error) {
       if (this.isCurrentGeneration(generation)) {
-        this.shell.showToast('无法执行脚本。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_037')));
       }
     }
   }
@@ -2165,11 +2168,11 @@ export class ElementInspectionSessionCoordinator {
       }
       const snapshot = this.runtimeScriptService.parseSnapshot(raw);
       if (!this.applyRuntimeSnapshot(snapshot, generation)) {
-        this.shell.showToast('无法清空控制台。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_038')));
       }
     } catch (_error) {
       if (this.isCurrentGeneration(generation)) {
-        this.shell.showToast('无法清空控制台。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_038')));
       }
     }
   }
@@ -2191,7 +2194,7 @@ export class ElementInspectionSessionCoordinator {
       const result = this.runtimeScriptService.parseSourceReadResult(raw);
       if (result.sessionGeneration !== generation || result.documentToken !== documentToken ||
         result.id !== sourceId) {
-        this.shell.showToast('无法读取源代码。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_039')));
         return;
       }
       const next = this.clonePresentation(this.presentation);
@@ -2204,7 +2207,7 @@ export class ElementInspectionSessionCoordinator {
       this.publish(next);
     } catch (_error) {
       if (this.isCurrentGeneration(generation)) {
-        this.shell.showToast('无法读取源代码。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_element_inspection_session_coordinator_039')));
       }
     }
   }

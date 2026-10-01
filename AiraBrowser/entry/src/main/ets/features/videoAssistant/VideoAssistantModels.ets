@@ -38,7 +38,7 @@ export function createEmptyVideoAssistantItem(): VideoAssistantItem {
   return {
     id: '',
     tabId: '',
-    title: '网页视频',
+    title: '',
     pageUrl: '',
     url: '',
     width: 0,

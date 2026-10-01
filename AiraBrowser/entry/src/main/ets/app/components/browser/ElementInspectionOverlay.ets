@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   ElementInspectionAction,
   ElementInspectionPresentation
@@ -224,7 +225,7 @@ export struct ElementInspectionOverlay {
             iconSize: 17,
             iconColor: this.resolveSheetIconColor(),
             actionEnabled: !this.presentation.busy,
-            accessibilityLabel: '关闭元素审查',
+            accessibilityLabel: resolveAppResourceText($r('app.string.browser_ui_element_inspection_overlay_002')),
             onAction: () => {
               this.onAction('cancel');
             }
@@ -365,7 +366,7 @@ export struct ElementInspectionOverlay {
           iconSize: 17,
           iconColor: this.resolveSheetIconColor(),
           actionEnabled: !this.presentation.busy,
-          accessibilityLabel: '重新选择元素',
+          accessibilityLabel: resolveAppResourceText($r('app.string.browser_ui_element_inspection_overlay_010')),
           onAction: () => {
             this.onAction('reselect');
           }
@@ -376,7 +377,7 @@ export struct ElementInspectionOverlay {
           iconSize: 17,
           iconColor: this.resolveSheetIconColor(),
           actionEnabled: !this.presentation.busy,
-          accessibilityLabel: '关闭元素审查',
+          accessibilityLabel: resolveAppResourceText($r('app.string.browser_ui_element_inspection_overlay_002')),
           onAction: () => {
             this.onAction('cancel');
           }
@@ -417,11 +418,11 @@ export struct ElementInspectionOverlay {
   @Builder
   private buildNavigationActions() {
     Row({ space: 8 }) {
-      this.buildNavigationButton('父级', this.presentation.node?.hasParent === true, 'navigate_parent')
-      this.buildNavigationButton('子级', this.presentation.node?.hasFirstChild === true, 'navigate_first_child')
-      this.buildNavigationButton('上一个', this.presentation.node?.hasPreviousSibling === true,
+      this.buildNavigationButton(resolveAppResourceText($r('app.string.element_inspection_parent')), this.presentation.node?.hasParent === true, 'navigate_parent')
+      this.buildNavigationButton(resolveAppResourceText($r('app.string.element_inspection_child')), this.presentation.node?.hasFirstChild === true, 'navigate_first_child')
+      this.buildNavigationButton(resolveAppResourceText($r('app.string.element_inspection_previous')), this.presentation.node?.hasPreviousSibling === true,
         'navigate_previous_sibling')
-      this.buildNavigationButton('下一个', this.presentation.node?.hasNextSibling === true,
+      this.buildNavigationButton(resolveAppResourceText($r('app.string.settings_link_guide_next')), this.presentation.node?.hasNextSibling === true,
         'navigate_next_sibling')
     }
     .width('100%')
@@ -497,7 +498,7 @@ export struct ElementInspectionOverlay {
         .stateEffect(false)
         .focusable(false)
         .enabled(!this.presentation.busy)
-        .accessibilityText(this.codeFullscreen ? '收起全屏代码预览' : '全屏查看代码')
+        .accessibilityText(this.codeFullscreen ? resolveAppResourceText($r('app.string.browser_ui_element_inspection_overlay_006')) : resolveAppResourceText($r('app.string.browser_ui_element_inspection_overlay_001')))
         .onClick(() => {
           this.codeFullscreen = !this.codeFullscreen;
         })
@@ -536,7 +537,7 @@ export struct ElementInspectionOverlay {
         .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
         .stateEffect(!this.presentation.busy)
         .enabled(!this.presentation.busy)
-        .accessibilityText('更多元素操作')
+        .accessibilityText(resolveAppResourceText($r('app.string.browser_ui_element_inspection_overlay_007')))
         .bindMenu(this.buildMoreActionMenu())
     }
     .width(36)
@@ -547,12 +548,12 @@ export struct ElementInspectionOverlay {
   @Builder
   private buildMoreActionMenu() {
     Menu() {
-      MenuItem({ content: '复制选择器' })
+      MenuItem({ content: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_018')) })
         .enabled((this.presentation.node?.selector.length ?? 0) > 0 && !this.presentation.busy)
         .onClick(() => {
           this.onAction('copy_selector');
         })
-      MenuItem({ content: '复制 HTML' })
+      MenuItem({ content: resolveAppResourceText($r('app.string.browser_ui_element_inspection_overlay_003')) })
         .enabled(!this.presentation.busy)
         .onClick(() => {
           this.onAction('copy_html');
@@ -709,14 +710,14 @@ export struct ElementInspectionOverlay {
       visible: this.visible && this.presentation.active,
       key: this.resolveSelectingPromptKey(),
       topOffsetVp: this.topOffsetVp,
-      title: this.presentation.phase === 'starting' ? '正在启动元素审查' : '选择网页元素',
+      title: this.presentation.phase === 'starting' ? resolveAppResourceText($r('app.string.browser_ui_element_inspection_overlay_008')) : resolveAppResourceText($r('app.string.browser_ui_element_inspection_overlay_009')),
       subtitle: this.presentation.helperText,
-      fallbackLabel: '审',
+      fallbackLabel: resolveAppResourceText($r('app.string.browser_ui_element_inspection_overlay_004')),
       iconUri: '',
       airaIconId: 'browser.toolbar.actionElementInspection',
       iconColor: ELEMENT_INSPECTION_MONOCHROME_ICON_DARK_COLOR,
       iconBackgroundColor: ELEMENT_INSPECTION_SELECTING_PROMPT_ICON_BACKGROUND_COLOR,
-      actionText: '取消'
+      actionText: resolveAppResourceText($r('app.string.element_hide_cancel'))
     };
   }
 
@@ -775,7 +776,7 @@ export struct ElementInspectionOverlay {
 
   private resolveHtmlPreview(): string {
     const preview = this.presentation.node?.htmlPreview ?? '';
-    return preview.length > 0 ? preview : '当前元素没有可显示的 HTML。';
+    return preview.length > 0 ? preview : resolveAppResourceText($r('app.string.browser_ui_element_inspection_overlay_005'));
   }
 
   private resolveFullscreenTopPaddingVp(): number {

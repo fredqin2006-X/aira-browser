@@ -52,9 +52,9 @@ const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_WIDTH: number = 128;
 const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_HEIGHT: number = 44;
 const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_RADIUS: number =
   BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_HEIGHT / 2;
-// A pressing finger covers the segment and bulges above it. The pill has to clear that
-// pad, not sit in the 8vp gap the other chrome popups use.
-const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_TARGET_SPACE: number = 56;
+// Clear the pressing finger, but stay close enough that the pill still reads as belonging
+// to the segment. 56vp floated too high; 40vp keeps a gap without leaving the bar.
+const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_TARGET_SPACE: number = 40;
 const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_ICON_SIZE: number = 18;
 const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_TEXT_SIZE: number = 15;
 const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_CONTENT_GAP: number = 6;

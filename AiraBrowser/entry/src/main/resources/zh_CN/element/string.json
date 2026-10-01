@@ -20159,6 +20159,398 @@
     {
       "name": "download_custom_location",
       "value": "自定义位置"
+    },
+    {
+      "name": "webpage_translation_actions",
+      "value": "操作"
+    },
+    {
+      "name": "webpage_translation_preparing_message",
+      "value": "准备翻译当前网页"
+    },
+    {
+      "name": "webpage_translation_provider_unconfigured",
+      "value": "未配置翻译服务"
+    },
+    {
+      "name": "webpage_translation_confirm_title",
+      "value": "确认网页翻译"
+    },
+    {
+      "name": "webpage_translation_confirm_message",
+      "value": "当前页面文字将发送到 %1$s 处理。确认后会直接开始翻译。"
+    },
+    {
+      "name": "webpage_translation_confirm_accept",
+      "value": "同意并翻译"
+    },
+    {
+      "name": "webpage_translation_confirm_save_failed",
+      "value": "暂时无法保存翻译确认，请稍后再试。"
+    },
+    {
+      "name": "webpage_translation_language_switched",
+      "value": "已切换为%1$s"
+    },
+    {
+      "name": "webpage_translation_language_save_failed",
+      "value": "目标语言保存失败，请稍后再试。"
+    },
+    {
+      "name": "webpage_translation_translate_page",
+      "value": "翻译此网页"
+    },
+    {
+      "name": "webpage_translation_canceled",
+      "value": "已取消当前翻译任务"
+    },
+    {
+      "name": "webpage_translation_enable_first",
+      "value": "请先在网页翻译设置中开启功能。"
+    },
+    {
+      "name": "webpage_translation_no_controller",
+      "value": "当前页面还没有可用的网页控制器。"
+    },
+    {
+      "name": "webpage_translation_preparing_title",
+      "value": "正在准备翻译"
+    },
+    {
+      "name": "webpage_translation_reading_text",
+      "value": "正在读取当前网页文字"
+    },
+    {
+      "name": "webpage_translation_no_visible_text",
+      "value": "当前可见区域没有可翻译文字。"
+    },
+    {
+      "name": "webpage_translation_language_unknown",
+      "value": "未能识别当前页面语言。"
+    },
+    {
+      "name": "webpage_translation_translating",
+      "value": "正在翻译"
+    },
+    {
+      "name": "webpage_translation_restore_failed",
+      "value": "恢复失败"
+    },
+    {
+      "name": "webpage_translation_restored_count",
+      "value": "已恢复 %1$d 段原文"
+    },
+    {
+      "name": "webpage_translation_nothing_to_restore",
+      "value": "没有可恢复的翻译内容"
+    },
+    {
+      "name": "webpage_translation_display_switch_failed",
+      "value": "切换显示失败"
+    },
+    {
+      "name": "webpage_translation_nothing_to_switch",
+      "value": "没有可切换的译文"
+    },
+    {
+      "name": "webpage_translation_no_cached",
+      "value": "当前页面没有可恢复的缓存译文"
+    },
+    {
+      "name": "webpage_translation_language_updated",
+      "value": "目标语言已更新"
+    },
+    {
+      "name": "webpage_translation_disabled",
+      "value": "网页翻译未开启，请先在设置中启用。"
+    },
+    {
+      "name": "webpage_translation_will_send",
+      "value": "页面文字将发送到 %1$s 翻译。"
+    },
+    {
+      "name": "webpage_translation_read_checking",
+      "value": "已读取 %1$d 段、约 %2$d 字，正在检查翻译服务"
+    },
+    {
+      "name": "webpage_translation_read_requesting",
+      "value": "已读取 %1$d 段、约 %2$d 字，正在请求 %3$s"
+    },
+    {
+      "name": "webpage_translation_api_unconfigured",
+      "value": "未配置翻译 API"
+    },
+    {
+      "name": "webpage_translation_add_api",
+      "value": "请先到网页翻译设置中添加并启用翻译 API。"
+    },
+    {
+      "name": "webpage_translation_api_incomplete",
+      "value": "当前翻译 API 未配置完成，请到网页翻译设置中补全配置。"
+    },
+    {
+      "name": "webpage_translation_writeback_failed",
+      "value": "页面文字已变化，未能安全回写译文"
+    },
+    {
+      "name": "webpage_translation_progress_detail",
+      "value": "已尝试约 %1$d/%2$d 个原文字符，已应用约 %3$d 个原文字符、%4$d/%5$d 段"
+    },
+    {
+      "name": "webpage_translation_applied_more",
+      "value": "已应用 %1$d/%2$d 段译文，可继续翻译更多内容"
+    },
+    {
+      "name": "webpage_translation_applied_more_chars",
+      "value": "已应用 %1$d/%2$d 段、约 %3$d 个原文字符的译文，可继续翻译更多内容"
+    },
+    {
+      "name": "webpage_translation_applied_done",
+      "value": "已处理 %1$d 段，已应用 %2$d 段译文"
+    },
+    {
+      "name": "webpage_translation_applied_done_chars",
+      "value": "已处理 %1$d 段，已应用 %2$d 段、约 %3$d 个原文字符的译文"
+    },
+    {
+      "name": "webpage_translation_shown_bilingual",
+      "value": "已显示双语对照"
+    },
+    {
+      "name": "webpage_translation_shown_translation_only",
+      "value": "已仅显示译文"
+    },
+    {
+      "name": "webpage_translation_shown_bilingual_count",
+      "value": "已显示 %1$d 段双语对照"
+    },
+    {
+      "name": "webpage_translation_shown_translation_only_count",
+      "value": "已仅显示 %1$d 段译文"
+    },
+    {
+      "name": "webpage_translation_failed_detail",
+      "value": "网页翻译失败：%1$s"
+    },
+    {
+      "name": "webpage_translation_failed",
+      "value": "网页翻译失败。"
+    },
+    {
+      "name": "webpage_translation_full_mode_required",
+      "value": "网页翻译需切换到全量模式后使用。"
+    },
+    {
+      "name": "webpage_translation_private_blocked",
+      "value": "隐私标签页未允许网页翻译，请先在网页翻译设置中开启。"
+    },
+    {
+      "name": "webpage_translation_site_never",
+      "value": "当前网站已设为不翻译。"
+    },
+    {
+      "name": "webpage_translation_language_never",
+      "value": "当前语言已设为不翻译。"
+    },
+    {
+      "name": "webpage_translation_selected_service",
+      "value": "所选翻译服务"
+    },
+    {
+      "name": "video_player_fast_playback",
+      "value": "%1$s 倍速播放中"
+    },
+    {
+      "name": "video_player_seek_forward",
+      "value": "快进 +%1$d 秒"
+    },
+    {
+      "name": "video_player_seek_back",
+      "value": "后退 %1$d 秒"
+    },
+    {
+      "name": "video_player_page_unavailable",
+      "value": "当前网页不可用，无法控制视频。"
+    },
+    {
+      "name": "video_player_session_changed",
+      "value": "当前网页视频会话已经变化。"
+    },
+    {
+      "name": "video_player_takeover_failed",
+      "value": "网页视频画面接管失败，原网页将继续播放。"
+    },
+    {
+      "name": "video_player_restore_failed",
+      "value": "网页视频画面恢复失败。"
+    },
+    {
+      "name": "video_player_control_failed",
+      "value": "网页视频控制失败。"
+    },
+    {
+      "name": "video_player_pip_unsupported",
+      "value": "当前视频暂不支持小窗播放。"
+    },
+    {
+      "name": "video_player_toolbar_aria",
+      "value": "Aira 视频操作"
+    },
+    {
+      "name": "video_player_cast",
+      "value": "投屏"
+    },
+    {
+      "name": "video_player_pip",
+      "value": "小窗播放"
+    },
+    {
+      "name": "video_player_fullscreen",
+      "value": "使用 Aira 全屏播放"
+    },
+    {
+      "name": "video_player_cast_unsupported",
+      "value": "当前网页不支持投屏"
+    },
+    {
+      "name": "video_player_cast_choose_device",
+      "value": "请在系统窗口选择设备"
+    },
+    {
+      "name": "video_player_pip_page_unsupported",
+      "value": "当前网页不支持小窗播放"
+    },
+    {
+      "name": "video_player_pip_opening",
+      "value": "正在打开小窗"
+    },
+    {
+      "name": "video_player_fullscreen_entering",
+      "value": "正在进入 Aira 全屏"
+    },
+    {
+      "name": "video_player_fullscreen_blocked",
+      "value": "当前页面不能进入 Aira 全屏"
+    },
+    {
+      "name": "video_player_session_switching",
+      "value": "网页视频会话正在切换，请稍后重试。"
+    },
+    {
+      "name": "video_player_controls_hide_rejected",
+      "value": "网页播放器拒绝隐藏原生控制栏。"
+    },
+    {
+      "name": "video_player_toolbar_unavailable",
+      "value": "当前网页无法显示视频操作按钮。"
+    },
+    {
+      "name": "video_player_play_rejected",
+      "value": "网页播放器拒绝继续播放。"
+    },
+    {
+      "name": "video_player_rate_rejected",
+      "value": "网页播放器拒绝调整倍速。"
+    },
+    {
+      "name": "video_player_scale_rejected",
+      "value": "网页播放器拒绝切换画面比例。"
+    },
+    {
+      "name": "video_player_pip_rejected",
+      "value": "网页播放器拒绝启动小窗。"
+    },
+    {
+      "name": "video_player_unsupported_action",
+      "value": "当前网页视频暂不支持这个操作。"
+    },
+    {
+      "name": "video_cast_picker_opening",
+      "value": "投放设备列表正在打开。"
+    },
+    {
+      "name": "video_cast_remote_starting",
+      "value": "正在启动远端视频。"
+    },
+    {
+      "name": "video_cast_picker_unavailable",
+      "value": "当前无法打开投放设备列表。"
+    },
+    {
+      "name": "video_cast_session_changed",
+      "value": "当前视频会话已经变化。"
+    },
+    {
+      "name": "video_cast_picker_failed",
+      "value": "投放设备列表打开失败，请稍后重试。"
+    },
+    {
+      "name": "video_cast_connected_no_address",
+      "value": "投放设备已连接，但当前视频没有可供设备直接读取的地址。"
+    },
+    {
+      "name": "video_cast_start_failed",
+      "value": "投放设备已连接，但视频启动失败。"
+    },
+    {
+      "name": "video_cast_playback_failed",
+      "value": "投放设备无法播放当前视频。"
+    },
+    {
+      "name": "element_inspection_tab_application",
+      "value": "应用"
+    },
+    {
+      "name": "element_inspection_more_before",
+      "value": "↑ 还有 %1$d 个"
+    },
+    {
+      "name": "element_inspection_more_after",
+      "value": "↓ 还有 %1$d 个"
+    },
+    {
+      "name": "element_inspection_cross_origin_address",
+      "value": "受跨域限制，只显示地址：\n%1$s"
+    },
+    {
+      "name": "element_inspection_origin",
+      "value": "来源"
+    },
+    {
+      "name": "element_inspection_resource",
+      "value": "资源"
+    },
+    {
+      "name": "element_inspection_parent",
+      "value": "父级"
+    },
+    {
+      "name": "element_inspection_child",
+      "value": "子级"
+    },
+    {
+      "name": "element_inspection_previous",
+      "value": "上一个"
+    },
+    {
+      "name": "element_inspection_styles_copied",
+      "value": "样式已复制。"
+    },
+    {
+      "name": "element_inspection_styles_copied_truncated",
+      "value": "样式已复制，超长部分已截断。"
+    },
+    {
+      "name": "element_inspection_element_hidden",
+      "value": "元素已隐藏。"
+    },
+    {
+      "name": "element_inspection_element_shown",
+      "value": "元素已显示。"
+    },
+    {
+      "name": "element_inspection_stored_global_named",
+      "value": "已存为 %1$s，可在控制台使用。"
     }
   ]
 }

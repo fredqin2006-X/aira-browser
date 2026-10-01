@@ -4,6 +4,7 @@ import {
   TranslationSettings,
   TranslationSettingsPreferences
 } from '../../common/models/BrowserModels';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export type WebpageTranslationManualPolicyBlockReason =
   'none' |
@@ -56,7 +57,7 @@ export class WebpageTranslationPolicyService {
         false,
         false,
         provider,
-        '网页翻译需切换到全量模式后使用。',
+        resolveAppResourceText($r('app.string.webpage_translation_full_mode_required')),
         'app_service_mode'
       );
     }
@@ -65,7 +66,7 @@ export class WebpageTranslationPolicyService {
         false,
         false,
         provider,
-        '隐私标签页未允许网页翻译，请先在网页翻译设置中开启。',
+        resolveAppResourceText($r('app.string.webpage_translation_private_blocked')),
         'private_tab'
       );
     }
@@ -74,7 +75,7 @@ export class WebpageTranslationPolicyService {
         false,
         false,
         provider,
-        '当前网站已设为不翻译。',
+        resolveAppResourceText($r('app.string.webpage_translation_site_never')),
         'never_translate_site'
       );
     }
@@ -96,7 +97,7 @@ export class WebpageTranslationPolicyService {
         false,
         input.settings.preferences.preferredTargetLanguage,
         false,
-        '当前网站已设为不翻译。',
+        resolveAppResourceText($r('app.string.webpage_translation_site_never')),
         'never_translate_site',
         siteRule
       );
@@ -108,7 +109,7 @@ export class WebpageTranslationPolicyService {
         false,
         input.settings.preferences.preferredTargetLanguage,
         false,
-        '当前语言已设为不翻译。',
+        resolveAppResourceText($r('app.string.webpage_translation_language_never')),
         'never_translate_language',
         neverLanguageRule
       );
@@ -145,7 +146,7 @@ export class WebpageTranslationPolicyService {
   }
 
   buildCloudDisclosureProviderName(provider: TranslationProviderConfig | undefined): string {
-    return provider?.displayName ?? '所选翻译服务';
+    return provider?.displayName ?? resolveAppResourceText($r('app.string.webpage_translation_selected_service'));
   }
 
   buildCloudDisclosureAcceptedPreferences(

@@ -1,3 +1,5 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
+
 export const MEDIA_VIDEO_FRAME_PROBE_PROTOCOL: string = 'aira.media_frame_probe.v1';
 export const MEDIA_VIDEO_FRAME_PROBE_SOURCE: string = 'aira_frame_probe_v1';
 export const MEDIA_VIDEO_FRAME_PROBE_CHANNEL_KIND: string = 'aira_media_frame_probe_v1';
@@ -892,7 +894,7 @@ const MEDIA_VIDEO_FRAME_PROBE_SCRIPT: string = `
         rawResult = JSON.stringify({
           ok: false,
           reason: String(commandError && commandError.message || commandError || 'frame_command_failed'),
-          userVisibleMessage: '网页视频控制失败。',
+          userVisibleMessage: __AIRA_VIDEO_CONTROL_FAILED__,
           currentTime: 0,
           duration: 0,
           paused: true,
@@ -1114,7 +1116,10 @@ const MEDIA_VIDEO_FRAME_PROBE_SCRIPT: string = `
 export class MediaVideoFrameProbeScript {
   buildDocumentStartScriptItem(): ScriptItem {
     return {
-      script: MEDIA_VIDEO_FRAME_PROBE_SCRIPT,
+      script: MEDIA_VIDEO_FRAME_PROBE_SCRIPT.replace(
+        '__AIRA_VIDEO_CONTROL_FAILED__',
+        JSON.stringify(resolveAppResourceText($r('app.string.video_player_control_failed')))
+      ),
       scriptRules: ['*']
     };
   }
