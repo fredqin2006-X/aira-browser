@@ -392,7 +392,7 @@ export struct BrowserTabOverviewCard {
   /**
    * The strip and the deck fill the shared card (`Cover`). The card box is the page's own
    * aspect, so the screenshot reaches the edges instead of sitting inside a white border.
-   * The grid keeps the screenshot's own aspect ratio inside its cell.
+   * 卡片平铺的预览比整页矮三分之一。图片按自己的比例顶边对齐画进去，底部被卡片裁掉，不能压扁。
    */
   private resolveSnapshotImageFit(): ImageFit {
     if (this.snapshotCoverEnabled) {

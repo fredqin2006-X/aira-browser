@@ -79,6 +79,7 @@ import browserSearchEnginePopupLayoutViewModelTest from './BrowserSearchEnginePo
 import browserTabsOverviewSwipeDismissPolicyTest from './BrowserTabsOverviewSwipeDismissPolicy.test';
 import browserTabsOverviewSelectionDisplacementCoordinatorTest from './BrowserTabsOverviewSelectionDisplacementCoordinator.test';
 import browserTabsOverviewStackLayoutPolicyTest from './BrowserTabsOverviewStackLayoutPolicy.test';
+import browserTabsOverviewGridBottomCropTest from './BrowserTabsOverviewGridBottomCrop.test';
 import bottomToolbarGuideCoordinatorTest from './BottomToolbarGuideCoordinator.test';
 import tabsOverviewSegmentGuidePolicyTest from './TabsOverviewSegmentGuidePolicy.test';
 import crossDeviceLinkGuideCoordinatorTest from './CrossDeviceLinkGuideCoordinator.test';
@@ -192,6 +193,7 @@ export default function tests(): void {
   browserTabsOverviewSwipeDismissPolicyTest();
   browserTabsOverviewSelectionDisplacementCoordinatorTest();
   browserTabsOverviewStackLayoutPolicyTest();
+  browserTabsOverviewGridBottomCropTest();
   bottomToolbarGuideCoordinatorTest();
   tabsOverviewSegmentGuidePolicyTest();
   crossDeviceLinkGuideCoordinatorTest();

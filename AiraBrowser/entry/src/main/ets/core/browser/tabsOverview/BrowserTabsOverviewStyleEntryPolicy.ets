@@ -1,5 +1,6 @@
 import {
   BROWSER_TABS_OVERVIEW_CARD_CORNER_RADIUS,
+  BROWSER_TABS_OVERVIEW_GRID_BOTTOM_CROP_FRACTION,
   BROWSER_TABS_OVERVIEW_LIST_ROW_CORNER_RADIUS
 } from '../BrowserTabsOverviewVisualTokens';
 
@@ -27,6 +28,11 @@ export interface BrowserTabsOverviewStyleEntryProfile {
   morphHost: BrowserTabsOverviewMorphHost;
   snapshotMotion: BrowserTabsOverviewSnapshotMotion;
   pinImageToSource: boolean;
+  /**
+   * How much of the page picture the grid card throws away from the bottom.
+   * 0 keeps the page aspect. Only 卡片平铺 is non-zero.
+   */
+  bottomCropFraction: number;
   cornerRadius: number;
   /**
    * List only. Fading the covering picture applies opacity to the morph node. That must stay
@@ -63,6 +69,7 @@ export class BrowserTabsOverviewStyleEntryPolicy {
       morphHost: 'above_cards',
       snapshotMotion: 'scale',
       pinImageToSource: false,
+      bottomCropFraction: BROWSER_TABS_OVERVIEW_GRID_BOTTOM_CROP_FRACTION,
       cornerRadius: BROWSER_TABS_OVERVIEW_CARD_CORNER_RADIUS,
       fadesCoveringSnapshot: false,
       paintsEntrySurface: false
@@ -75,6 +82,7 @@ export class BrowserTabsOverviewStyleEntryPolicy {
       morphHost: 'above_cards',
       snapshotMotion: 'scale',
       pinImageToSource: false,
+      bottomCropFraction: 0,
       cornerRadius: BROWSER_TABS_OVERVIEW_CARD_CORNER_RADIUS,
       fadesCoveringSnapshot: false,
       paintsEntrySurface: false
@@ -87,6 +95,7 @@ export class BrowserTabsOverviewStyleEntryPolicy {
       morphHost: 'deck',
       snapshotMotion: 'scale',
       pinImageToSource: false,
+      bottomCropFraction: 0,
       cornerRadius: BROWSER_TABS_OVERVIEW_CARD_CORNER_RADIUS,
       fadesCoveringSnapshot: false,
       paintsEntrySurface: false
@@ -99,6 +108,7 @@ export class BrowserTabsOverviewStyleEntryPolicy {
       morphHost: 'above_cards',
       snapshotMotion: 'clip',
       pinImageToSource: true,
+      bottomCropFraction: 0,
       cornerRadius: BROWSER_TABS_OVERVIEW_LIST_ROW_CORNER_RADIUS,
       fadesCoveringSnapshot: true,
       paintsEntrySurface: true

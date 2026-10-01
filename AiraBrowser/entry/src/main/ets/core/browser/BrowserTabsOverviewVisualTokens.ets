@@ -1,4 +1,9 @@
 export const BROWSER_TABS_OVERVIEW_CARD_CORNER_RADIUS: number = 26;
+/**
+ * 卡片平铺只留截图上面 2/3。裁的是底部，顶边始终对齐，卡片高度就是裁完后的高度。
+ * 横向大卡片和堆叠式不走这条，它们仍按页面自己的比例。
+ */
+export const BROWSER_TABS_OVERVIEW_GRID_BOTTOM_CROP_FRACTION: number = 1 / 3;
 export const BROWSER_TABS_OVERVIEW_LIST_ROW_CORNER_RADIUS: number = 14;
 export const BROWSER_TABS_OVERVIEW_IDENTITY_HEADER_HEIGHT: number = 28;
 export const BROWSER_TABS_OVERVIEW_IDENTITY_ICON_SIZE: number = 20;

@@ -98,12 +98,29 @@ export interface BrowserTabsSharedSnapshotInput {
    * pixels it already occupies; only the frame moves, shrinks and rounds.
    */
   pinImageToSource?: boolean;
+  /**
+   * 卡片平铺专用。大于 0 时，容器在飞行前半段从底部裁掉这么多，再落入卡片。
+   * 图片保持页面比例、顶边对齐，不压扁。
+   */
+  bottomCropFraction?: number;
 }
 
 export interface BrowserTabsSharedSnapshotVisualState {
   frame: BrowserTabsOverlayRect;
   imageFrame: BrowserTabsOverlayRect;
   cornerRadius: number;
+}
+
+/**
+ * 裁切在行程走到 42% 之前完成，此时位置只走了 36%。之后裁完的容器再落入卡片。
+ * 和演示的时间结构一致，只是去掉了开头那一拍停顿。
+ */
+const GRID_BOTTOM_CROP_DONE_AT: number = 0.42;
+const GRID_BOTTOM_CROP_MOVE_AT_DONE: number = 0.36;
+
+interface BrowserTabsGridBottomCropMotion {
+  moveT: number;
+  cropT: number;
 }
 
 export class BrowserTabsOverlayViewModel {
@@ -220,6 +237,9 @@ export class BrowserTabsOverlayViewModel {
 
   buildSharedSnapshotVisualState(input: BrowserTabsSharedSnapshotInput): BrowserTabsSharedSnapshotVisualState {
     const progress = this.clampProgress(input.progress);
+    if ((input.bottomCropFraction ?? 0) > 0 && input.pinImageToSource !== true) {
+      return this.buildBottomCropVisualState(input, progress);
+    }
     const sourceFrame = this.buildPositiveRect(input.sourceRect);
     const targetFrame = this.buildPositiveRect(input.targetRect);
     const startRect = input.direction === 'exit' ? targetFrame : sourceFrame;
@@ -255,6 +275,77 @@ export class BrowserTabsOverlayViewModel {
       imageFrame: imageFrame,
       cornerRadius: cornerRadius
     };
+  }
+
+  /**
+   * 容器从整页大小飞向卡片。前半段把图片底部裁掉，顶边始终贴着容器；裁完后再落入卡片。
+   * 退出是同一条路倒放：先带着裁完的画面飞出来，接近整页时再把底部放回来。
+   */
+  private buildBottomCropVisualState(
+    input: BrowserTabsSharedSnapshotInput,
+    progress: number
+  ): BrowserTabsSharedSnapshotVisualState {
+    const sourceFrame = this.buildPositiveRect(input.sourceRect);
+    const targetFrame = this.buildPositiveRect(input.targetRect);
+    const startRect = input.direction === 'exit' ? targetFrame : sourceFrame;
+    const endRect = input.direction === 'exit' ? sourceFrame : targetFrame;
+    const travel = input.direction === 'exit' ? 1 - progress : progress;
+    const motion = this.resolveGridBottomCropMotion(travel);
+    const moveParam = input.direction === 'exit' ? 1 - motion.moveT : motion.moveT;
+    const width = this.lerp(startRect.width, endRect.width, moveParam);
+    const pageAspect = sourceFrame.height / Math.max(1, sourceFrame.width);
+    const imageAspect = Math.max(1, input.imageHeight) / Math.max(1, input.imageWidth);
+    const endUncropped = Math.max(1, targetFrame.width * pageAspect);
+    const endVisible = targetFrame.height / endUncropped;
+    const visible = this.lerp(1, endVisible, motion.cropT);
+    const frame: BrowserTabsOverlayRect = {
+      left: this.lerp(startRect.left, endRect.left, moveParam),
+      top: this.lerp(startRect.top, endRect.top, moveParam),
+      width: width,
+      height: Math.max(1, width * pageAspect * visible)
+    };
+    const sourceImageRect = input.useFullWebSnapshot
+      ? this.buildFullWebSnapshotSourceImageRect(sourceFrame.width, sourceFrame.height,
+        input.imageWidth, input.imageHeight, input.sourceImageTopInset)
+      : this.buildCoverImageRect(sourceFrame.width, sourceFrame.height);
+    // 图片宽度跟容器走，高度按截图自己的比例，顶边贴着容器。容器比图片矮的部分就是被裁掉的底部。
+    const imageFrame: BrowserTabsOverlayRect = {
+      left: 0,
+      top: this.lerp(sourceImageRect.top, 0, moveParam),
+      width: width,
+      height: width * imageAspect
+    };
+    const cornerRadius = input.cornerRadiusFollowsProgress === false ?
+      input.previewCornerRadius :
+      (input.direction === 'exit' ?
+        this.lerp(input.previewCornerRadius, 0, moveParam) :
+        this.lerp(0, input.previewCornerRadius, moveParam));
+    return {
+      frame: frame,
+      imageFrame: imageFrame,
+      cornerRadius: cornerRadius
+    };
+  }
+
+  private resolveGridBottomCropMotion(travel: number): BrowserTabsGridBottomCropMotion {
+    const t = this.clampProgress(travel);
+    if (t <= GRID_BOTTOM_CROP_DONE_AT) {
+      const u = this.smoothStep(t / GRID_BOTTOM_CROP_DONE_AT);
+      return {
+        moveT: u * GRID_BOTTOM_CROP_MOVE_AT_DONE,
+        cropT: u
+      };
+    }
+    const u = this.smoothStep((t - GRID_BOTTOM_CROP_DONE_AT) / (1 - GRID_BOTTOM_CROP_DONE_AT));
+    return {
+      moveT: GRID_BOTTOM_CROP_MOVE_AT_DONE + u * (1 - GRID_BOTTOM_CROP_MOVE_AT_DONE),
+      cropT: 1
+    };
+  }
+
+  private smoothStep(value: number): number {
+    const t = this.clampProgress(value);
+    return t * t * (3 - 2 * t);
   }
 
   buildSharedSnapshotPreviewImageRect(

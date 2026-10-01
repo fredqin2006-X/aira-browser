@@ -1631,7 +1631,8 @@ export class BrowserTabsOverviewSessionCoordinator {
         this.buildSharedSnapshotTargetInput(tabId, facts, preparedTargetRect),
         profile.cornerRadius,
         0,
-        profile.pinImageToSource
+        profile.pinImageToSource,
+        profile.bottomCropFraction
       );
     }
     if (state === undefined) {
@@ -1672,7 +1673,8 @@ export class BrowserTabsOverviewSessionCoordinator {
       this.buildSharedSnapshotTargetInput(tabId, facts),
       profile.cornerRadius,
       0,
-      profile.pinImageToSource
+      profile.pinImageToSource,
+      profile.bottomCropFraction
     );
     if (state === undefined) {
       host.executeEffect({

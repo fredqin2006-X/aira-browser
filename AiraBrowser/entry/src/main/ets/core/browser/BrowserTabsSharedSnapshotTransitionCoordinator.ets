@@ -49,6 +49,10 @@ export interface BrowserTabsSharedSnapshotTransitionState {
   cornerRadiusFollowsProgress?: boolean;
   /** List clip: the picture stays on its full-screen pixels while the frame crops to the row. */
   pinImageToSource?: boolean;
+  /**
+   * 卡片平铺：飞行中从底部裁掉这么多，再落入更矮的卡片。0 表示不裁，其它样式保持 0。
+   */
+  bottomCropFraction?: number;
 }
 
 export interface BrowserTabsSharedSnapshotTransitionInput {
@@ -66,6 +70,7 @@ export interface BrowserTabsSharedSnapshotTransitionInput {
   imageBlurRadius?: number;
   cornerRadiusFollowsProgress?: boolean;
   pinImageToSource?: boolean;
+  bottomCropFraction?: number;
 }
 
 export interface BrowserTabsSharedSnapshotWindowInput {
@@ -202,7 +207,8 @@ export class BrowserTabsSharedSnapshotTransitionCoordinator {
     targetInput: BrowserTabsSharedSnapshotTargetRectInput,
     previewCornerRadius: number,
     imageBlurRadius: number = 0,
-    pinImageToSource: boolean = false
+    pinImageToSource: boolean = false,
+    bottomCropFraction: number = 0
   ): BrowserTabsSharedSnapshotTransitionState | undefined {
     const imageInput = this.buildImageInput(previewState);
     if (imageInput === undefined) {
@@ -221,7 +227,8 @@ export class BrowserTabsSharedSnapshotTransitionCoordinator {
       sourceImageTopInset: this.resolveSourceImageTopInset(windowInput),
       previewCornerRadius: previewCornerRadius,
       imageBlurRadius: imageBlurRadius,
-      pinImageToSource: pinImageToSource
+      pinImageToSource: pinImageToSource,
+      bottomCropFraction: bottomCropFraction
     });
   }
 
@@ -232,7 +239,8 @@ export class BrowserTabsSharedSnapshotTransitionCoordinator {
     targetInput: BrowserTabsSharedSnapshotTargetRectInput,
     previewCornerRadius: number,
     imageBlurRadius: number = 0,
-    pinImageToSource: boolean = false
+    pinImageToSource: boolean = false,
+    bottomCropFraction: number = 0
   ): BrowserTabsSharedSnapshotTransitionState | undefined {
     const imageInput = this.buildImageInput(previewState);
     if (imageInput === undefined) {
@@ -251,7 +259,8 @@ export class BrowserTabsSharedSnapshotTransitionCoordinator {
       sourceImageTopInset: this.resolveSourceImageTopInset(windowInput),
       previewCornerRadius: previewCornerRadius,
       imageBlurRadius: imageBlurRadius,
-      pinImageToSource: pinImageToSource
+      pinImageToSource: pinImageToSource,
+      bottomCropFraction: bottomCropFraction
     });
   }
 
@@ -395,7 +404,8 @@ export class BrowserTabsSharedSnapshotTransitionCoordinator {
       previewCornerRadius: state.previewCornerRadius,
       imageBlurRadius: state.imageBlurRadius,
       cornerRadiusFollowsProgress: state.cornerRadiusFollowsProgress,
-      pinImageToSource: state.pinImageToSource
+      pinImageToSource: state.pinImageToSource,
+      bottomCropFraction: state.bottomCropFraction
     };
   }
 
@@ -431,7 +441,8 @@ export class BrowserTabsSharedSnapshotTransitionCoordinator {
       previewCornerRadius: state.previewCornerRadius,
       imageBlurRadius: state.imageBlurRadius,
       cornerRadiusFollowsProgress: state.cornerRadiusFollowsProgress,
-      pinImageToSource: state.pinImageToSource
+      pinImageToSource: state.pinImageToSource,
+      bottomCropFraction: state.bottomCropFraction
     };
   }
 
@@ -464,7 +475,8 @@ export class BrowserTabsSharedSnapshotTransitionCoordinator {
       previewCornerRadius: state.previewCornerRadius,
       imageBlurRadius: state.imageBlurRadius,
       cornerRadiusFollowsProgress: state.cornerRadiusFollowsProgress,
-      pinImageToSource: state.pinImageToSource
+      pinImageToSource: state.pinImageToSource,
+      bottomCropFraction: state.bottomCropFraction
     };
   }
 
@@ -506,6 +518,7 @@ export class BrowserTabsSharedSnapshotTransitionCoordinator {
       previewCornerRadius: state.previewCornerRadius,
       cornerRadiusFollowsProgress: state.cornerRadiusFollowsProgress,
       pinImageToSource: state.pinImageToSource,
+      bottomCropFraction: state.bottomCropFraction,
       useFullWebSnapshot: state.useFullWebSnapshot,
       imageWidth: state.imageWidth,
       imageHeight: state.imageHeight
@@ -577,7 +590,8 @@ export class BrowserTabsSharedSnapshotTransitionCoordinator {
       previewCornerRadius: input.previewCornerRadius,
       imageBlurRadius: Math.max(0, input.imageBlurRadius ?? 0),
       cornerRadiusFollowsProgress: input.cornerRadiusFollowsProgress,
-      pinImageToSource: input.pinImageToSource === true
+      pinImageToSource: input.pinImageToSource === true,
+      bottomCropFraction: this.normalizeBottomCropFraction(input.bottomCropFraction)
     };
   }
 
@@ -595,6 +609,13 @@ export class BrowserTabsSharedSnapshotTransitionCoordinator {
 
   private isPositiveNumber(value?: number): boolean {
     return value !== undefined && Number.isFinite(value) && value > 0;
+  }
+
+  private normalizeBottomCropFraction(value?: number): number {
+    if (value === undefined || !Number.isFinite(value) || value <= 0) {
+      return 0;
+    }
+    return Math.min(0.9, value);
   }
 
   private normalizeSourceImageTopInset(value?: number): number {
