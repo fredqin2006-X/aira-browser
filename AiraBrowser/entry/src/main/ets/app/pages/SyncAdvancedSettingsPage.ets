@@ -18,6 +18,7 @@ import {
 import {
   AiraFeatureKey
 } from '../../common/constants/MembershipFeatureKeys';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { EntitlementDecision } from '../../common/models/MembershipModels';
 import { SettingsNavigationCoordinator } from '../router/SettingsNavigationCoordinator';
 import { BrowserBoundaryRouteState } from '../../common/utils/RouteParamUtils';
@@ -113,7 +114,7 @@ struct SyncAdvancedSettingsPage {
   };
   @State private activeRemoteKind: AiraSyncRemoteKind = 'none';
   private activeSyncServiceKey: AiraFeatureKey = '' as AiraFeatureKey;
-  private activeSyncServiceName: string = '同步服务';
+  private activeSyncServiceName: string = resolveAppResourceText($r('app.string.settings_sync_advanced_service'));
   private activeSyncReady: boolean = false;
   private activeSyncMissingConfigurationMessage: ResourceStr =
     $r('app.string.settings_sync_advanced_enable_one');
@@ -438,7 +439,10 @@ struct SyncAdvancedSettingsPage {
           100,
           false
         );
-        this.showSyncFailureDialog('检查远端数据', this.resolveProviderServiceName(remoteKind), error);
+        this.showSyncFailureDialog(
+          resolveAppResourceText($r('app.string.settings_sync_advanced_check_remote')),
+          this.resolveProviderServiceName(remoteKind),
+          error);
       })
       .finally(() => {
         this.isBusy = false;
@@ -546,7 +550,10 @@ struct SyncAdvancedSettingsPage {
           100,
           false
         );
-        this.showSyncFailureDialog('覆盖书签', this.resolveProviderServiceName(remoteKind), error);
+        this.showSyncFailureDialog(
+          resolveAppResourceText($r('app.string.settings_sync_01')),
+          this.resolveProviderServiceName(remoteKind),
+          error);
       })
       .finally(() => {
         this.isBusy = false;
@@ -603,7 +610,10 @@ struct SyncAdvancedSettingsPage {
           100,
           false
         );
-        this.showSyncFailureDialog('立即合并同步', this.resolveActiveSyncServiceName(), error);
+        this.showSyncFailureDialog(
+          resolveAppResourceText($r('app.string.settings_sync_advanced_merge')),
+          this.resolveActiveSyncServiceName(),
+          error);
       })
       .finally(() => {
         this.isBusy = false;
@@ -662,7 +672,7 @@ struct SyncAdvancedSettingsPage {
         }
         const failureTitle = typeof presentation.dialogTitle === 'string'
           ? presentation.dialogTitle
-          : '更改同步方式';
+          : resolveAppResourceText($r('app.string.settings_sync_advanced_change_method'));
         const failureMessage = typeof presentation.message === 'string' ? presentation.message : '';
         this.showSyncFailureDialog(
           failureTitle,
@@ -1139,7 +1149,9 @@ struct SyncAdvancedSettingsPage {
       return error.message;
     }
     const serialized = JSON.stringify(error);
-    return serialized.length > 0 ? serialized : '未知错误';
+    return serialized.length > 0
+      ? serialized
+      : resolveAppResourceText($r('app.string.media_resource_unknown_error'));
   }
 
   private ensureOptionalServiceRoute(): boolean {

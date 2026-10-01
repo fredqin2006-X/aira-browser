@@ -1,9 +1,6 @@
-import { applyDesktopDialogSheetChrome } from '../common/DesktopDialogSheetChrome';
 import { FeatureIntroSkipControl } from './FeatureIntroSkipControl';
 import { AiraIcon } from '../common/AiraIcon';
-import { AiraLegalWebDocumentContent } from '../legal/AiraLegalWebDocumentContent';
 import { APP_ICP_FILING_NUMBER } from '../../../common/constants/AppVersionInfo';
-import { resolveAiraLegalDocumentLink } from '../../../services/legal/AiraLegalDocuments';
 import { BROWSER_THEME_STORAGE_RESOLVED_MODE_KEY } from '../../../core/theme/BrowserThemeStorageKeys';
 import {
   FEATURE_INTRO_GATE_KNOB_INSET_VP,
@@ -39,9 +36,6 @@ export struct FeatureIntroGate {
   @State private sliderOpacity: number = 0;
   @State private sliderShiftVp: number = 16;
   @State private sliderReady: boolean = false;
-  @State private legalSheetVisible: boolean = false;
-  @State private legalDocumentTitle: string = '';
-  @State private legalDocumentUrl: string = '';
   private entrancePlayed: boolean = false;
   private unlockCompleted: boolean = false;
   private readonly videoController: VideoController = new VideoController();
@@ -102,7 +96,7 @@ export struct FeatureIntroGate {
 
       Column() {
         this.buildTrack()
-        this.buildLegalConsent()
+        this.buildFilingNumber()
       }
       .width('100%')
       .height('100%')
@@ -127,16 +121,6 @@ export struct FeatureIntroGate {
         }
       })
     }
-    .bindSheet($$this.legalSheetVisible, this.buildLegalSheet(), applyDesktopDialogSheetChrome({
-      preferType: SheetType.BOTTOM,
-      height: SheetSize.LARGE,
-      dragBar: true,
-      showClose: true,
-      backgroundColor: '#FFFFFF',
-      onDisappear: (): void => {
-        this.legalSheetVisible = false;
-      }
-    }, 'l'))
     .width('100%')
     .height('100%')
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
@@ -149,76 +133,14 @@ export struct FeatureIntroGate {
   }
 
   @Builder
-  private buildLegalConsent() {
-    Column() {
-      Flex({
-        direction: FlexDirection.Row,
-        wrap: FlexWrap.Wrap,
-        justifyContent: FlexAlign.Center,
-        alignItems: ItemAlign.Center
-      }) {
-        Text('继续操作即表示您同意')
-          .fontSize(11)
-          .lineHeight(16)
-          .fontColor('#8A8F98')
-        Text('用户服务协议')
-          .fontSize(11)
-          .lineHeight(16)
-          .fontColor('#17191F')
-          .decoration({ type: TextDecorationType.Underline, color: '#17191F' })
-          .padding({ left: 2, right: 2, top: 4, bottom: 4 })
-          .onClick((): void => {
-            this.openLegalDocument('user_service_agreement');
-          })
-        Text('和')
-          .fontSize(11)
-          .lineHeight(16)
-          .fontColor('#8A8F98')
-        Text('隐私政策')
-          .fontSize(11)
-          .lineHeight(16)
-          .fontColor('#17191F')
-          .decoration({ type: TextDecorationType.Underline, color: '#17191F' })
-          .padding({ left: 2, right: 2, top: 4, bottom: 4 })
-          .onClick((): void => {
-            this.openLegalDocument('privacy_statement');
-          })
-      }
+  private buildFilingNumber() {
+    Text(APP_ICP_FILING_NUMBER)
       .width('100%')
-
-      Text(APP_ICP_FILING_NUMBER)
-        .width('100%')
-        .fontSize(11)
-        .lineHeight(16)
-        .fontColor('#8A8F98')
-        .textAlign(TextAlign.Center)
-        .margin({ top: 2 })
-    }
-    .width('100%')
-    .alignItems(HorizontalAlign.Center)
-    .margin({ top: 18 })
-  }
-
-  @Builder
-  private buildLegalSheet() {
-    Column() {
-      Text(this.legalDocumentTitle)
-        .width('100%')
-        .fontSize(16)
-        .lineHeight(22)
-        .fontWeight(FontWeight.Medium)
-        .fontColor('#17191F')
-        .textAlign(TextAlign.Center)
-        .padding({ top: 4, bottom: 12, left: 24, right: 24 })
-      AiraLegalWebDocumentContent({
-        documentUrl: this.legalDocumentUrl,
-        styleId: 'aira-feature-intro-legal'
-      })
-        .layoutWeight(1)
-    }
-    .width('100%')
-    .height('100%')
-    .backgroundColor('#FFFFFF')
+      .fontSize(11)
+      .lineHeight(16)
+      .fontColor('#8A8F98')
+      .textAlign(TextAlign.Center)
+      .margin({ top: 18 })
   }
 
   @Builder
@@ -274,13 +196,6 @@ export struct FeatureIntroGate {
     .onAreaChange((_oldArea: Area, newArea: Area): void => {
       this.trackWidthVp = this.parseAreaVp(newArea.width);
     })
-  }
-
-  private openLegalDocument(id: string): void {
-    const link = resolveAiraLegalDocumentLink(id);
-    this.legalDocumentTitle = link.title;
-    this.legalDocumentUrl = link.url;
-    this.legalSheetVisible = true;
   }
 
   private playEntrance(): void {

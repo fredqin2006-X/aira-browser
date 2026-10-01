@@ -129,7 +129,7 @@ export struct SyncSetupStepScaffold {
     BrowserImmersiveSheetLayout({
       footerVisible: this.showSubmitButton,
             closeVisible: true,
-      closeAccessibilityLabel: '关闭',
+      closeAccessibilityLabel: $r('app.string.ui_close'),
       onClose: (): void => {
         this.onClose();
       },

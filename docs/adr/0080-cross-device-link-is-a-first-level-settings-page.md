@@ -129,7 +129,13 @@ Entry is gated by the same optional-service check as 同步, so a basic service 
   page into a tutorial. The first step's button is 下一个. Only the second step's primary button opens the existing
   互联教程 page. 不再提示, back, dragging the sheet down, and leaving the page close it without opening the recipe.
   A tap on the dimmed page does not. The lesson is spent once it is shown, in its own preferences store, and is not a
-  fact of `CrossDeviceLinkViewModel`.
+  fact of `CrossDeviceLinkViewModel`. Amended 2026-09-30: the clip and the copy scroll; the two actions are a footer
+  pinned near the bottom of the sheet, so the buttons do not strand mid-screen when the sheet is taller than the
+  content. Both steps share that footer.
+- Amended 2026-09-30: the orbit is decoration, so it sits higher and the list starts over the logo center rather than
+  under its lower edge, and the device list carries no 在线设备 heading of its own. The recipe page is an ordinary
+  settings list: it owns one scroller, and its title bar binds that same scroller so the top gradient blur follows the
+  recipe's own scroll.
 - The device list stays ephemeral by construction: it shows only what the presence owner currently reports as online.
 
 ## Verification

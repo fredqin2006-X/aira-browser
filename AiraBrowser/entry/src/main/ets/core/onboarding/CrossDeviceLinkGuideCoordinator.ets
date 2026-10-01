@@ -47,8 +47,8 @@ const CROSS_DEVICE_LINK_GUIDE_STEPS: CrossDeviceLinkGuideStep[] = [
   },
   {
     clipId: 'device_tabs',
-    title: '看到电脑打开的标签页',
-    message: '电脑上正在开的网页，会列在手机的跨设备标签页里。'
+    title: '两台设备互相看标签页',
+    message: '两边打开的网页都会出现在对方的跨设备标签页里。'
   }
 ];
 

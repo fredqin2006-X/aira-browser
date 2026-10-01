@@ -44,8 +44,10 @@ export class SyncWebdavConfigViewModel {
     return storedRole === 'additional_backup' ? 'additional_backup' : 'active';
   }
 
-  resolvePageTitle(role: 'active' | 'additional_backup'): string {
-    return role === 'additional_backup' ? 'WebDAV 额外备份' : 'WebDAV 同步';
+  resolvePageTitle(role: 'active' | 'additional_backup'): ResourceStr {
+    return role === 'additional_backup'
+      ? $r('app.string.settings_sync_webdav_41')
+      : $r('app.string.membership_feature_webdav');
   }
 
   resolveDisplayedPrimaryActionTitle(

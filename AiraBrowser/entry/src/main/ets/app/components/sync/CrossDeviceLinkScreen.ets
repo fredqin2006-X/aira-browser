@@ -17,15 +17,15 @@ import {
 import { CrossDeviceBrowserIconKind } from '../../../core/sync/CrossDeviceBrowserIcon';
 import { CrossDeviceBrowserIconResources } from '../../../core/resources/CrossDeviceBrowserIconResources';
 import {
-  buildCrossDeviceLinkOrbitLayout,
-  capCrossDeviceLinkOrbitStageWidth,
-  crossDeviceLinkOrbitPageFadeColor,
-  crossDeviceLinkOrbitSpinPeriodMs,
-  resolveCrossDeviceLinkOrbitCoverHeight,
-  resolveCrossDeviceLinkOrbitScrollOpacity,
-  CrossDeviceLinkOrbitLayout,
-  CrossDeviceLinkOrbitMarkPlacement
-} from '../../../core/sync/CrossDeviceLinkOrbitLayout';
+  CROSS_DEVICE_LINK_MARQUEE_GAP,
+  CROSS_DEVICE_LINK_MARQUEE_RADIUS,
+  CROSS_DEVICE_LINK_MARQUEE_ROW_GAP,
+  CROSS_DEVICE_LINK_MARQUEE_TILE,
+  crossDeviceLinkMarqueeDistance,
+  crossDeviceLinkMarqueeDurationMs,
+  crossDeviceLinkMarqueeTiles,
+  CrossDeviceLinkMarqueeTile
+} from '../../../core/sync/CrossDeviceLinkMarqueeLayout';
 import { AiraRenderableIconId } from '../../../core/resources/GeneratedAiraIconCatalog';
 import { AiraIcon } from '../common/AiraIcon';
 import { SettingsContentKind } from '../../../core/settings/SettingsContentLayoutPolicy';
@@ -59,13 +59,6 @@ const LOCAL_DEVICE_GLYPH: AiraRenderableIconId = 'crossDeviceLink.localDevice';
 /** Same 34 slot as the phone row and the add-device row, so the brand mark is not smaller than those badges. */
 const DEVICE_BROWSER_ICON_SLOT: number = 34;
 const DEVICE_BROWSER_ICON_SIZE: number = 34;
-/** Neutral, low-contrast lines. No hue in either mode. */
-const ORBIT_RING_COLOR_LIGHT: string = '#1A000000';
-const ORBIT_RING_COLOR_DARK: string = '#1FFFFFFF';
-const ORBIT_SHADOW_COLOR_LIGHT: string = '#14303A60';
-const ORBIT_SHADOW_COLOR_DARK: string = '#99000000';
-const ORBIT_CENTER_SHADOW_COLOR_LIGHT: string = '#1C303A60';
-const ORBIT_RING_WIDTH: number = 1;
 
 @Component
 export struct CrossDeviceLinkScreen {
@@ -107,13 +100,10 @@ export struct CrossDeviceLinkScreen {
   onToggleLink: (enabled: boolean) => void = (_enabled: boolean): void => {};
   onAction: (action: CrossDeviceLinkActionId) => void = (_action: CrossDeviceLinkActionId) => {};
   private contentScroller: Scroller = new Scroller();
-  @State private orbitStageWidth: number = 0;
-  @State private orbitSpin0: number = 0;
-  @State private orbitSpin1: number = 0;
-  @State private orbitSpin2: number = 0;
-  @State private orbitScrollOffset: number = 0;
-  private orbitSpinStarted: boolean = false;
-  private orbitSpinAlive: boolean = true;
+  @State private marqueeOffset0: number = 0;
+  @State private marqueeOffset1: number = -crossDeviceLinkMarqueeDistance();
+  private marqueeStarted: boolean = false;
+  private marqueeAlive: boolean = true;
 
   build() {
     Column() {
@@ -134,48 +124,22 @@ export struct CrossDeviceLinkScreen {
           this.onBack();
         }
       }) {
-        Stack({ alignContent: Alignment.TopStart }) {
-          this.buildOrbitHeader()
-
-          Column() {
-            SettingsPresentationScrollBody({
-              desktopPresentation: this.desktopPresentation,
-              expandToParent: true,
-              contentSpace: 0,
-              topPadding: 0,
-              bottomPadding: 28,
-              scroller: this.contentScroller,
-              onScrollOffset: (offset: number): void => {
-                this.noteOrbitScrollOffset(offset);
-              }
-            }) {
-              this.buildOrbitCoverSpacer()
-              this.buildScrollingCover()
-            }
-          }
-          .width('100%')
-          .height('100%')
-          .zIndex(1)
+        SettingsPresentationScrollBody({
+          desktopPresentation: this.desktopPresentation,
+          expandToParent: true,
+          contentSpace: 0,
+          topPadding: 0,
+          bottomPadding: 28,
+          scroller: this.contentScroller
+        }) {
+          this.buildMarquee()
+          this.buildScrollingCover()
         }
-        .width('100%')
-        .height('100%')
       }
     }
     .width('100%')
     .height('100%')
     .backgroundColor(this.storedPageBackgroundColor)
-  }
-
-  /**
-   * The rings stay put as a background. The list starts over the logo's lower edge
-   * and scrolls over the rings. It has no sheet of its own. This spacer stays in
-   * the scroll hit test: None would let the drag fall through to the rings.
-   */
-  @Builder
-  private buildOrbitCoverSpacer() {
-    Column()
-      .width('100%')
-      .height(this.resolveOrbitCoverHeight())
   }
 
   @Builder
@@ -200,258 +164,121 @@ export struct CrossDeviceLinkScreen {
   }
 
   /**
-   * Three full rings share the Aira logo's center. The top dissolves into the page
-   * background — light and dark each use their own — and the lower half fades out
-   * instead of being clipped.
+   * Two rows of the other browsers, same rounded-rectangle size. The top row
+   * travels left and the bottom row travels right. Each track is painted twice
+   * so resetting at one copy width does not jump.
    */
   @Builder
-  private buildOrbitHeader() {
-    Column() {
-      if (this.orbitStageWidth > 0) {
-        this.buildOrbitStage(buildCrossDeviceLinkOrbitLayout(this.orbitStageWidth))
-      }
+  private buildMarquee() {
+    Column({ space: CROSS_DEVICE_LINK_MARQUEE_ROW_GAP }) {
+      this.buildMarqueeRow(0)
+      this.buildMarqueeRow(1)
     }
     .width('100%')
-    .alignItems(HorizontalAlign.Center)
-    .opacity(this.resolveOrbitScrollOpacity())
-    .zIndex(0)
-    // None still lets the rings take the touch. Block the whole decoration so a
-    // drag on the illustration scrolls the page instead of dying here.
-    .hitTestBehavior(HitTestMode.BLOCK_DESCENDANTS)
-    .onAreaChange((_oldArea: Area, newArea: Area) => {
-      const stageWidth = capCrossDeviceLinkOrbitStageWidth(this.parseStageWidth(newArea.width));
-      if (stageWidth > 0 && Math.abs(stageWidth - this.orbitStageWidth) > 0.5) {
-        this.orbitStageWidth = stageWidth;
-      }
-      this.startOrbitSpin();
+    .padding({ top: 20, bottom: 12 })
+    .hitTestBehavior(HitTestMode.None)
+    .onAppear((): void => {
+      this.startMarquee();
     })
   }
 
   @Builder
-  private buildOrbitStage(layout: CrossDeviceLinkOrbitLayout) {
-    Stack({ alignContent: Alignment.TopStart }) {
-      this.buildOrbitRings(layout)
-
-      ForEach(layout.marks, (mark: CrossDeviceLinkOrbitMarkPlacement) => {
-        this.buildOrbitMark(mark, layout)
-      }, (mark: CrossDeviceLinkOrbitMarkPlacement): string => `${mark.kind}:${layout.stageWidth}`)
-
-      this.buildOrbitCenter(layout)
-      this.buildOrbitTopFade(layout)
-    }
-    .width(layout.stageWidth)
-    .height(layout.stageHeight)
-    .hitTestBehavior(HitTestMode.BLOCK_DESCENDANTS)
-  }
-
-  /**
-   * Painted with the live page background, not a fixed wash, so a dark page does
-   * not keep a light seam and a light page does not keep a dark one.
-   */
-  @Builder
-  private buildOrbitTopFade(layout: CrossDeviceLinkOrbitLayout) {
-    Column()
-      .width(layout.stageWidth)
-      .height(layout.stageHeight)
-      .hitTestBehavior(HitTestMode.None)
-      .linearGradient({
-        direction: GradientDirection.Bottom,
-        colors: [
-          [crossDeviceLinkOrbitPageFadeColor(this.storedPageBackgroundColor, 'FF'), 0],
-          [crossDeviceLinkOrbitPageFadeColor(this.storedPageBackgroundColor, 'FF'), layout.topFadeHold],
-          [crossDeviceLinkOrbitPageFadeColor(this.storedPageBackgroundColor, '00'), layout.topFadeEnd],
-          [crossDeviceLinkOrbitPageFadeColor(this.storedPageBackgroundColor, '00'), 1]
-        ]
-      })
-  }
-
-  @Builder
-  private buildOrbitRings(layout: CrossDeviceLinkOrbitLayout) {
-    Stack({ alignContent: Alignment.TopStart }) {
-      ForEach(layout.orbits, (radius: number) => {
-        Circle()
-          .width(radius * 2)
-          .height(radius * 2)
-          .fill(Color.Transparent)
-          .stroke(this.resolveOrbitRingColor())
-          .strokeWidth(ORBIT_RING_WIDTH)
-          .position({ x: layout.centerX - radius, y: layout.centerY - radius })
-      }, (radius: number): string => `${radius}`)
+  private buildMarqueeRow(rowIndex: number) {
+    Stack({ alignContent: Alignment.Start }) {
+      Row() {
+        ForEach(crossDeviceLinkMarqueeTiles(rowIndex), (tile: CrossDeviceLinkMarqueeTile) => {
+          this.buildMarqueeTile(tile.kind)
+        }, (tile: CrossDeviceLinkMarqueeTile): string => tile.key)
+      }
+      .translate({ x: this.resolveMarqueeOffset(rowIndex) })
 
       Column()
         .width('100%')
         .height('100%')
         .hitTestBehavior(HitTestMode.None)
         .linearGradient({
-          direction: GradientDirection.Bottom,
+          direction: GradientDirection.Right,
           colors: [
-            [Color.Black, 0],
-            [Color.Black, layout.fadeHold],
-            [Color.Transparent, layout.fadeEnd],
+            [Color.Transparent, 0],
+            [Color.Black, 0.08],
+            [Color.Black, 0.92],
             [Color.Transparent, 1]
           ]
         })
         .blendMode(BlendMode.DST_IN, BlendApplyType.OFFSCREEN)
     }
-    .width(layout.stageWidth)
-    .height(layout.stageHeight)
+    .width('100%')
+    .height(CROSS_DEVICE_LINK_MARQUEE_TILE)
+    .clip(true)
     .blendMode(BlendMode.SRC_OVER, BlendApplyType.OFFSCREEN)
   }
 
   @Builder
-  private buildOrbitMark(mark: CrossDeviceLinkOrbitMarkPlacement, layout: CrossDeviceLinkOrbitLayout) {
-    Stack() {
-      Stack({ alignContent: Alignment.Center }) {
-        Image(CrossDeviceBrowserIconResources.icon(mark.kind))
-          .width(mark.size * 0.62)
-          .height(mark.size * 0.62)
-          .objectFit(ImageFit.Contain)
-      }
-      .width(mark.size)
-      .height(mark.size)
-      .borderRadius(mark.size / 2)
-      .backgroundColor(this.storedSurfaceBackgroundColor)
-      .borderWidth(this.isDarkOrbit() ? 1 : 0)
-      .borderColor(this.storedDividerColor)
-      .clip(true)
-      .shadow({ radius: 16, color: this.resolveOrbitShadowColor(), offsetX: 0, offsetY: 6 })
-      .position({ x: mark.x - mark.size / 2, y: mark.y - mark.size / 2 })
-      .rotate({
-        angle: -this.resolveOrbitSpinAngle(mark.orbitIndex),
-        centerX: '50%',
-        centerY: '50%'
-      })
-    }
-    .width(layout.stageWidth)
-    .height(layout.stageHeight)
-    .hitTestBehavior(HitTestMode.None)
-    .rotate({
-      angle: this.resolveOrbitSpinAngle(mark.orbitIndex),
-      centerX: layout.centerX,
-      centerY: layout.centerY
-    })
-  }
-
-  @Builder
-  private buildOrbitCenter(layout: CrossDeviceLinkOrbitLayout) {
+  private buildMarqueeTile(kind: CrossDeviceBrowserIconKind) {
     Stack({ alignContent: Alignment.Center }) {
-      if (this.isDarkOrbit()) {
-        Image($r('app.media.aira_logo_brand'))
-          .width(layout.logoSize * 0.64)
-          .height(layout.logoSize * 0.64)
-          .objectFit(ImageFit.Contain)
-          .fillColor(this.storedPrimaryTextColor)
-      } else {
-        Image($r('app.media.aira_logo_brand'))
-          .width(layout.logoSize * 0.64)
-          .height(layout.logoSize * 0.64)
-          .objectFit(ImageFit.Contain)
-      }
+      Image(CrossDeviceBrowserIconResources.icon(kind))
+        .width(CROSS_DEVICE_LINK_MARQUEE_TILE * 0.62)
+        .height(CROSS_DEVICE_LINK_MARQUEE_TILE * 0.62)
+        .objectFit(ImageFit.Contain)
     }
-    .width(layout.logoSize)
-    .height(layout.logoSize)
-    .borderRadius(layout.logoSize / 2)
+    .width(CROSS_DEVICE_LINK_MARQUEE_TILE)
+    .height(CROSS_DEVICE_LINK_MARQUEE_TILE)
+    .margin({ right: CROSS_DEVICE_LINK_MARQUEE_GAP })
+    .borderRadius(CROSS_DEVICE_LINK_MARQUEE_RADIUS)
     .backgroundColor(this.storedSurfaceBackgroundColor)
-    .borderWidth(this.isDarkOrbit() ? 1 : 0)
+    .borderWidth(this.storedResolvedThemeMode === 'dark' ? 1 : 0)
     .borderColor(this.storedDividerColor)
     .clip(true)
-    .shadow({
-      radius: 22,
-      color: this.isDarkOrbit() ? ORBIT_SHADOW_COLOR_DARK : ORBIT_CENTER_SHADOW_COLOR_LIGHT,
-      offsetX: 0,
-      offsetY: 8
-    })
-    .position({ x: layout.centerX - layout.logoSize / 2, y: layout.centerY - layout.logoSize / 2 })
-  }
-
-  private parseStageWidth(value: Length): number {
-    const parsed = Number.parseFloat(`${value}`);
-    return Number.isFinite(parsed) ? parsed : 0;
-  }
-
-  private isDarkOrbit(): boolean {
-    return this.storedResolvedThemeMode === 'dark';
-  }
-
-  private resolveOrbitRingColor(): string {
-    return this.isDarkOrbit() ? ORBIT_RING_COLOR_DARK : ORBIT_RING_COLOR_LIGHT;
-  }
-
-  private resolveOrbitShadowColor(): string {
-    return this.isDarkOrbit() ? ORBIT_SHADOW_COLOR_DARK : ORBIT_SHADOW_COLOR_LIGHT;
   }
 
   aboutToDisappear(): void {
-    this.orbitSpinAlive = false;
+    this.marqueeAlive = false;
   }
 
-  private resolveOrbitSpinAngle(orbitIndex: number): number {
-    if (orbitIndex === 0) {
-      return this.orbitSpin0;
-    }
-    if (orbitIndex === 1) {
-      return this.orbitSpin1;
-    }
-    return this.orbitSpin2;
+  private resolveMarqueeOffset(rowIndex: number): number {
+    return rowIndex === 0 ? this.marqueeOffset0 : this.marqueeOffset1;
   }
 
-  private startOrbitSpin(): void {
-    if (this.orbitSpinStarted || this.orbitStageWidth <= 0) {
+  private startMarquee(): void {
+    this.marqueeAlive = true;
+    if (this.marqueeStarted) {
       return;
     }
-    this.orbitSpinStarted = true;
-    this.advanceOrbitSpin(0);
-    this.advanceOrbitSpin(1);
-    this.advanceOrbitSpin(2);
+    this.marqueeStarted = true;
+    this.marqueeOffset1 = -crossDeviceLinkMarqueeDistance();
+    this.advanceMarquee(0);
+    this.advanceMarquee(1);
   }
 
   /**
-   * Each ring keeps turning while the page is open. A full turn lands on the same
-   * pose, so restarting at 0 does not jump.
+   * A full copy width lands on the same tiles, so restarting there does not jump.
+   * The left row runs toward negative x. The right row runs back toward zero.
    */
-  private advanceOrbitSpin(orbitIndex: number): void {
-    if (!this.orbitSpinAlive) {
+  private advanceMarquee(rowIndex: number): void {
+    if (!this.marqueeAlive) {
       return;
     }
+    const distance = crossDeviceLinkMarqueeDistance();
+    const from = rowIndex === 0 ? 0 : -distance;
+    const to = rowIndex === 0 ? -distance : 0;
+    this.setMarqueeOffset(rowIndex, from);
     animateTo({
-      duration: crossDeviceLinkOrbitSpinPeriodMs(orbitIndex),
+      duration: crossDeviceLinkMarqueeDurationMs(rowIndex),
       curve: Curve.Linear,
       onFinish: (): void => {
-        this.setOrbitSpin(orbitIndex, 0);
-        this.advanceOrbitSpin(orbitIndex);
+        this.advanceMarquee(rowIndex);
       }
     }, (): void => {
-      this.setOrbitSpin(orbitIndex, 360);
+      this.setMarqueeOffset(rowIndex, to);
     });
   }
 
-  private setOrbitSpin(orbitIndex: number, degrees: number): void {
-    if (orbitIndex === 0) {
-      this.orbitSpin0 = degrees;
-    } else if (orbitIndex === 1) {
-      this.orbitSpin1 = degrees;
+  private setMarqueeOffset(rowIndex: number, offset: number): void {
+    if (rowIndex === 0) {
+      this.marqueeOffset0 = offset;
     } else {
-      this.orbitSpin2 = degrees;
+      this.marqueeOffset1 = offset;
     }
-  }
-
-  private resolveOrbitCoverHeight(): number {
-    if (this.orbitStageWidth <= 0) {
-      return 0;
-    }
-    return resolveCrossDeviceLinkOrbitCoverHeight(buildCrossDeviceLinkOrbitLayout(this.orbitStageWidth));
-  }
-
-  private noteOrbitScrollOffset(offset: number): void {
-    const next = offset > 0 ? offset : 0;
-    if (Math.abs(next - this.orbitScrollOffset) < 0.5) {
-      return;
-    }
-    this.orbitScrollOffset = next;
-  }
-
-  private resolveOrbitScrollOpacity(): number {
-    return resolveCrossDeviceLinkOrbitScrollOpacity(this.orbitScrollOffset, this.resolveOrbitCoverHeight());
   }
 
   /**
@@ -515,8 +342,10 @@ export struct CrossDeviceLinkScreen {
 
   @Builder
   private buildDeviceSection() {
+    // No heading of its own: the rows are the devices, and a 在线设备 title only repeated
+    // what the surrounding section already said.
     SettingsSection({
-      title: $r('app.string.settings_link_online_devices'),
+      title: '',
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({

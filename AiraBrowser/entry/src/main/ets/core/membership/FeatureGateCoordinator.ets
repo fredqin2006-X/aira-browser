@@ -1,4 +1,5 @@
 import { AiraFeatureKey } from '../../common/constants/MembershipFeatureKeys';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   EntitlementDecision,
   EntitlementPrimaryAction
@@ -232,7 +233,7 @@ export class FeatureGateCoordinator {
       title: decision.title,
       message: decision.message,
       primaryActionTitle: this.resolvePrimaryActionTitle(primaryAction),
-      secondaryActionTitle: '稍后',
+      secondaryActionTitle: resolveAppResourceText($r('app.string.settings_sync_later')),
       primaryAction: primaryAction,
       secondaryAction: 'dismiss',
       renewal: renewal
@@ -272,7 +273,7 @@ export class FeatureGateCoordinator {
         ? this.membershipFeature.getLapsedProState().expiredAt
         : 0,
       agreementText: this.resolveAgreementText(selectedPlanId, plans),
-      restoreLabel: '恢复购买'
+      restoreLabel: resolveAppResourceText($r('app.string.settings_pro_restore'))
     };
   }
 
@@ -294,24 +295,30 @@ export class FeatureGateCoordinator {
     );
     const lifetime: FeatureGateRenewalPlanState = {
       id: AIRA_PRO_ONE_TIME_PLAN.planId,
-      title: AIRA_PRO_ONE_TIME_PLAN.title,
+      title: resolveAppResourceText($r('app.string.settings_pro_status_lifetime')),
       amountText: price.amountText,
-      periodText: AIRA_PRO_ONE_TIME_PLAN.periodText,
-      discountBadgeText: price.discountBadgeText,
-      originalPriceText: price.originalPriceText,
-      badgeText: AIRA_PRO_ONE_TIME_PLAN.badgeText,
+      periodText: resolveAppResourceText($r('app.string.settings_pro_period_lifetime')).trim(),
+      discountBadgeText: this.resolveDiscountBadge(price.discountBadgeText),
+      originalPriceText: this.resolveListPrice(price.originalPriceText),
+      badgeText: '',
       autoRenews: false
     };
     const subscriptions: FeatureGateRenewalPlanState[] = AIRA_PRO_SELLABLE_IAP_PLANS.map(
       (plan: HuaweiIapProductPlan): FeatureGateRenewalPlanState => {
         return {
           id: plan.period,
-          title: plan.title,
+          title: plan.period === 'yearly'
+            ? resolveAppResourceText($r('app.string.settings_pro_status_yearly'))
+            : resolveAppResourceText($r('app.string.settings_pro_status_monthly')),
           amountText: plan.amountText,
-          periodText: plan.periodText,
+          periodText: plan.period === 'yearly'
+            ? resolveAppResourceText($r('app.string.settings_pro_period_year'))
+            : resolveAppResourceText($r('app.string.settings_pro_period_month')),
           discountBadgeText: plan.discountBadgeText,
           originalPriceText: '',
-          badgeText: plan.badgeText,
+          badgeText: plan.badgeText === '推荐'
+            ? resolveAppResourceText($r('app.string.membership_plan_recommended'))
+            : plan.badgeText,
           autoRenews: true
         };
       }
@@ -319,12 +326,27 @@ export class FeatureGateCoordinator {
     return [lifetime].concat(subscriptions);
   }
 
+  private resolveDiscountBadge(text: string): string {
+    if (text === '7折') {
+      return resolveAppResourceText($r('app.string.settings_pro_discount_national'));
+    }
+    return text;
+  }
+
+  private resolveListPrice(text: string): string {
+    if (text.length === 0) {
+      return '';
+    }
+    const amount = text.indexOf('原价') === 0 ? text.substring('原价'.length) : text;
+    return resolveAppResourceText($r('app.string.settings_pro_list_price', amount));
+  }
+
   private resolveAgreementText(planId: string, plans: FeatureGateRenewalPlanState[]): string {
     const selected = plans.find((plan: FeatureGateRenewalPlanState): boolean => plan.id === planId);
     if (selected !== undefined && !selected.autoRenews) {
-      return '点击开通即代表同意《会员服务协议》';
+      return resolveAppResourceText($r('app.string.membership_gate_agree_membership'));
     }
-    return '点击开通即代表同意《会员服务协议》与《自动续费服务协议》';
+    return resolveAppResourceText($r('app.string.membership_gate_agree_renewal'));
   }
 
   /**
@@ -384,8 +406,9 @@ export class FeatureGateCoordinator {
       featureKey: 'cloud_sync',
       allowed: false,
       reason: 'pro_expired',
-      title: 'Aira Pro 已过期',
-      message: `你的 Aira Pro 已于 ${this.formatExpiryDate(lapsed.expiredAt)} 到期，续费后云同步等功能立即恢复。`,
+      title: resolveAppResourceText($r('app.string.membership_gate_expired_title')),
+      message: resolveAppResourceText($r('app.string.membership_gate_expired_message',
+        this.formatExpiryDate(lapsed.expiredAt))),
       primaryAction: 'open_pro'
     };
     const generation = this.presentationGeneration + 1;
@@ -405,22 +428,25 @@ export class FeatureGateCoordinator {
     const date = new Date(expiresAt);
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    return `${date.getFullYear()} 年 ${month} 月 ${day} 日`;
+    return resolveAppResourceText($r('app.string.membership_gate_expiry_date',
+      date.getFullYear(), month, day));
   }
 
   private resolvePrimaryActionTitle(action: FeatureGateAction): string {
     if (action === 'purchase_plan') {
-      return this.membershipFeature.getLapsedProState().expiredAt > 0 ? '立即续费' : '立即开通';
+      return this.membershipFeature.getLapsedProState().expiredAt > 0
+        ? resolveAppResourceText($r('app.string.membership_gate_renew'))
+        : resolveAppResourceText($r('app.string.membership_gate_subscribe'));
     }
     if (action === 'open_pro') {
-      return '升级 Aira Pro';
+      return resolveAppResourceText($r('app.string.membership_gate_upgrade'));
     }
     if (action === 'restore_purchase') {
-      return '恢复购买';
+      return resolveAppResourceText($r('app.string.settings_pro_restore'));
     }
     if (action === 'login') {
-      return '登录';
+      return resolveAppResourceText($r('app.string.browser_ui_browser_shell_dialogs_002'));
     }
-    return '知道了';
+    return resolveAppResourceText($r('app.string.settings_pro_got_it'));
   }
 }

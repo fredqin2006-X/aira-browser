@@ -1,4 +1,5 @@
 import urlUtils from '@ohos.url';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export interface DownloadFileNameResolutionInput {
   suggestedFileName?: string;
@@ -132,7 +133,8 @@ export class DownloadFileNameService {
       normalized === 'file.bin' ||
       normalized === 'index' ||
       normalized === 'index.html' ||
-      normalized === '未命名下载';
+      normalized === '未命名下载' ||
+      normalized === resolveAppResourceText($r('app.string.download_status_unnamed')).trim().toLowerCase();
   }
 
   private resolveExtension(mimeType?: string, url?: string, fileName?: string): string {

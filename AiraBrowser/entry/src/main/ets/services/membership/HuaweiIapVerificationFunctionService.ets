@@ -1,4 +1,5 @@
 import { http } from '@kit.NetworkKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { HuaweiAccountSyncAuthService } from '../sync/HuaweiAccountSyncAuthService';
 import {
   AIRA_DISTRIBUTION_CAPABILITY_OWNER,
@@ -70,7 +71,7 @@ class NetworkHuaweiIapVerificationHttpAdapter implements HuaweiIapVerificationHt
     return {
       ok: false,
       code: 'http_error',
-      message: `Aira IAP 验签服务请求失败（${responseCode}）。`
+      message: resolveAppResourceText($r('app.string.membership_iap_verify_http_failed', responseCode))
     };
   }
 }
@@ -102,14 +103,14 @@ export class HuaweiIapVerificationFunctionService {
       return {
         ok: false,
         code: 'missing_uid',
-        message: '请先登录华为账号后再恢复 Aira Pro 权益。'
+        message: resolveAppResourceText($r('app.string.membership_iap_verify_login_required'))
       };
     }
     if (normalizedPurchaseData.length <= 0) {
       return {
         ok: false,
         code: 'missing_purchase_data',
-        message: '华为 IAP 未返回可提交的购买凭证。'
+        message: resolveAppResourceText($r('app.string.settings_pro_iap_missing_purchase'))
       };
     }
     const body: HuaweiIapVerificationRequestBody = {
@@ -134,7 +135,7 @@ export class HuaweiIapVerificationFunctionService {
       return {
         ok: false,
         code: 'empty_response',
-        message: 'Aira IAP 验签云函数没有返回结果。'
+        message: resolveAppResourceText($r('app.string.membership_iap_verify_empty'))
       };
     }
     if (typeof value === 'string') {
@@ -144,7 +145,7 @@ export class HuaweiIapVerificationFunctionService {
         return {
           ok: false,
           code: 'invalid_response',
-          message: 'Aira IAP 验签云函数返回的 JSON 无法解析。'
+          message: resolveAppResourceText($r('app.string.membership_iap_verify_invalid_json'))
         };
       }
     }
@@ -161,7 +162,7 @@ export class HuaweiIapVerificationFunctionService {
         return {
           ok: false,
           code: 'invalid_response_body',
-          message: 'Aira IAP 验签云函数返回的 body 无法解析。'
+          message: resolveAppResourceText($r('app.string.membership_iap_verify_invalid_body'))
         };
       }
     }

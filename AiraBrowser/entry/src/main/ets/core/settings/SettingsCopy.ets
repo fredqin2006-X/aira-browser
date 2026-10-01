@@ -402,6 +402,8 @@ export function localizeSettingsCopy(value: ResourceStr): ResourceStr {
       return $r('app.string.settings_site_capability_rule_allow');
     case '简体中文':
       return $r('app.string.settings_general_language_chinese');
+    case '默认跟随系统语言':
+      return $r('app.string.settings_general_language_detail');
     case '网址主页':
       return $r('app.string.settings_custom_home_type_url');
     case '自定义主页':

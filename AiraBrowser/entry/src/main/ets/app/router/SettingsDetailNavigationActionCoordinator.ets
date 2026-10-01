@@ -212,31 +212,37 @@ export class SettingsDetailNavigationActionCoordinator {
     }
     if (action === 'open_theme_palette_settings') {
       this.navigationCoordinator.openThemePaletteSettings(boundary, () => {
-        handlers.showToast('主题色设置暂时无法打开，请稍后重试。');
+        handlers.showToast($r('app.string.settings_theme_palette_open_failed'));
       });
       return true;
     }
     if (action === 'open_tablet_interface_mode_settings') {
       this.navigationCoordinator.openBrowserTabletInterfaceModeSettings(boundary, () => {
-        handlers.showToast('界面模式设置暂时无法打开，请稍后重试。');
+        handlers.showToast($r('app.string.settings_interface_mode_open_failed'));
       });
       return true;
     }
     if (action === 'open_tracking_protection_settings') {
       this.navigationCoordinator.openBrowserTrackingProtectionSettings(boundary, () => {
-        handlers.showToast('防跟踪设置暂时无法打开，请稍后重试。');
+        handlers.showToast($r('app.string.settings_tracking_protection_open_failed'));
       });
       return true;
     }
     if (action === 'open_app_icon_settings') {
       this.navigationCoordinator.openAppIconSettings(boundary, () => {
-        handlers.showToast('应用图标设置暂时无法打开，请稍后重试。');
+        handlers.showToast($r('app.string.settings_app_icon_open_failed'));
       });
       return true;
     }
     if (action === 'open_browser_toolbar_customization') {
       this.navigationCoordinator.openBrowserToolbarCustomization(boundary, () => {
-        handlers.showToast('工具栏设置暂时无法打开，请稍后重试。');
+        handlers.showToast($r('app.string.settings_toolbar_open_failed'));
+      });
+      return true;
+    }
+    if (action === 'open_general_language_settings') {
+      this.navigationCoordinator.openGeneralLanguageSettings(boundary, () => {
+        handlers.showToast($r('app.string.settings_general_open_failed'));
       });
       return true;
     }
@@ -280,13 +286,13 @@ export class SettingsDetailNavigationActionCoordinator {
     }
     if (action === 'open_app_proxy_settings') {
       this.navigationCoordinator.openAppProxySettings(boundary, () => {
-        handlers.showToast('代理设置暂时无法打开，请稍后重试。');
+        handlers.showToast($r('app.string.settings_center_02'));
       });
       return true;
     }
     if (action === 'open_secure_dns_settings') {
       this.navigationCoordinator.openSecureDnsSettings(boundary, () => {
-        handlers.showToast('安全 DNS 设置暂时无法打开，请稍后重试。');
+        handlers.showToast($r('app.string.settings_secure_dns_open_failed'));
       });
       return true;
     }

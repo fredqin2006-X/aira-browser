@@ -332,10 +332,10 @@ export function localizeCrossDeviceLinkCopy(value: ResourceStr): ResourceStr {
   if (value === '打开工具栏点推送，电脑会新开这个页面，手机上的标签还在。') {
     return $r('app.string.settings_link_guide_push_message');
   }
-  if (value === '看到电脑打开的标签页') {
+  if (value === '两台设备互相看标签页') {
     return $r('app.string.settings_link_guide_tabs_title');
   }
-  if (value === '电脑上正在开的网页，会列在手机的跨设备标签页里。') {
+  if (value === '两边打开的网页都会出现在对方的跨设备标签页里。') {
     return $r('app.string.settings_link_guide_tabs_message');
   }
   if (value === '下一个') {

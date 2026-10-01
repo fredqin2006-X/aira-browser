@@ -17,6 +17,7 @@ const CROSS_DEVICE_LINK_GUIDE_PROGRESS_FONT_SIZE: number = 13;
 const CROSS_DEVICE_LINK_GUIDE_TITLE_FONT_SIZE: number = 22;
 const CROSS_DEVICE_LINK_GUIDE_MESSAGE_FONT_SIZE: number = 15;
 const CROSS_DEVICE_LINK_GUIDE_COPY_TOP: number = 20;
+const CROSS_DEVICE_LINK_GUIDE_FOOTER_TOP_GAP: number = 20;
 const CROSS_DEVICE_LINK_GUIDE_BOTTOM_PADDING: number = 28;
 const CROSS_DEVICE_LINK_GUIDE_DRAG_WIDTH: number = 36;
 const CROSS_DEVICE_LINK_GUIDE_DRAG_HEIGHT: number = 4;
@@ -116,105 +117,113 @@ export struct CrossDeviceLinkGuideSheet {
   }
 
   build() {
-    Scroll() {
-      Column({ space: 0 }) {
-        Stack({ alignContent: Alignment.Top }) {
-          Stack() {
-            this.guidePoster($rawfile('page_push_guide_poster.jpg'), 'page_push')
-            this.guidePoster($rawfile('device_tabs_guide_poster.jpg'), 'device_tabs')
-            if (this.state.clipId === 'device_tabs') {
-              this.guideClip($rawfile('device_tabs_guide.mp4'), $rawfile('device_tabs_guide_poster.jpg'), 'device_tabs')
-            } else {
-              this.guideClip($rawfile('page_push_guide.mp4'), $rawfile('page_push_guide_poster.jpg'), 'page_push')
+    // The clip and the copy scroll together; the two actions sit in their own footer at the
+    // bottom of the sheet. A sheet taller than its content must not strand the buttons
+    // mid-screen with empty surface below them.
+    Column({ space: 0 }) {
+      Scroll() {
+        Column({ space: 0 }) {
+          Stack({ alignContent: Alignment.Top }) {
+            Stack() {
+              this.guidePoster($rawfile('page_push_guide_poster.jpg'), 'page_push')
+              this.guidePoster($rawfile('device_tabs_guide_poster.jpg'), 'device_tabs')
+              if (this.state.clipId === 'device_tabs') {
+                this.guideClip($rawfile('device_tabs_guide.mp4'), $rawfile('device_tabs_guide_poster.jpg'), 'device_tabs')
+              } else {
+                this.guideClip($rawfile('page_push_guide.mp4'), $rawfile('page_push_guide_poster.jpg'), 'page_push')
+              }
             }
+            .backgroundColor(CROSS_DEVICE_LINK_GUIDE_ART_FALLBACK_COLOR)
+            .width('100%')
+            .height('100%')
+            .clip(true)
+
+            Column()
+              .width(CROSS_DEVICE_LINK_GUIDE_DRAG_WIDTH)
+              .height(CROSS_DEVICE_LINK_GUIDE_DRAG_HEIGHT)
+              .margin({ top: CROSS_DEVICE_LINK_GUIDE_DRAG_TOP })
+              .borderRadius(CROSS_DEVICE_LINK_GUIDE_DRAG_HEIGHT)
+              .backgroundColor('#F4F6F8')
+              .hitTestBehavior(HitTestMode.None)
           }
-          .backgroundColor(CROSS_DEVICE_LINK_GUIDE_ART_FALLBACK_COLOR)
           .width('100%')
-          .height('100%')
+          .aspectRatio(1)
           .clip(true)
 
-          Column()
-            .width(CROSS_DEVICE_LINK_GUIDE_DRAG_WIDTH)
-            .height(CROSS_DEVICE_LINK_GUIDE_DRAG_HEIGHT)
-            .margin({ top: CROSS_DEVICE_LINK_GUIDE_DRAG_TOP })
-            .borderRadius(CROSS_DEVICE_LINK_GUIDE_DRAG_HEIGHT)
-            .backgroundColor('#F4F6F8')
-            .hitTestBehavior(HitTestMode.None)
-        }
-        .width('100%')
-        .aspectRatio(1)
-        .clip(true)
+          Column({ space: 8 }) {
+            if (this.state.progressLabel.length > 0) {
+              Text(this.state.progressLabel)
+                .width('100%')
+                .fontSize(CROSS_DEVICE_LINK_GUIDE_PROGRESS_FONT_SIZE)
+                .fontColor(this.storedSecondaryTextColor)
+                .textAlign(TextAlign.Center)
+            }
 
-        Column({ space: 8 }) {
-          if (this.state.progressLabel.length > 0) {
-            Text(this.state.progressLabel)
+            Text(localizeCrossDeviceLinkCopy(this.state.title))
               .width('100%')
-              .fontSize(CROSS_DEVICE_LINK_GUIDE_PROGRESS_FONT_SIZE)
+              .fontSize(CROSS_DEVICE_LINK_GUIDE_TITLE_FONT_SIZE)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(this.storedPrimaryTextColor)
+              .textAlign(TextAlign.Center)
+              .maxLines(2)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+            Text(localizeCrossDeviceLinkCopy(this.state.message))
+              .width('100%')
+              .fontSize(CROSS_DEVICE_LINK_GUIDE_MESSAGE_FONT_SIZE)
+              .lineHeight(22)
               .fontColor(this.storedSecondaryTextColor)
               .textAlign(TextAlign.Center)
+              .maxLines(3)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
           }
-
-          Text(localizeCrossDeviceLinkCopy(this.state.title))
-            .width('100%')
-            .fontSize(CROSS_DEVICE_LINK_GUIDE_TITLE_FONT_SIZE)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(this.storedPrimaryTextColor)
-            .textAlign(TextAlign.Center)
-            .maxLines(2)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-
-          Text(localizeCrossDeviceLinkCopy(this.state.message))
-            .width('100%')
-            .fontSize(CROSS_DEVICE_LINK_GUIDE_MESSAGE_FONT_SIZE)
-            .lineHeight(22)
-            .fontColor(this.storedSecondaryTextColor)
-            .textAlign(TextAlign.Center)
-            .maxLines(3)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .width('100%')
+          .alignItems(HorizontalAlign.Center)
+          .padding({
+            left: APP_STANDARD_HORIZONTAL_PADDING,
+            right: APP_STANDARD_HORIZONTAL_PADDING,
+            top: CROSS_DEVICE_LINK_GUIDE_COPY_TOP
+          })
         }
         .width('100%')
         .alignItems(HorizontalAlign.Center)
-        .padding({
-          left: APP_STANDARD_HORIZONTAL_PADDING,
-          right: APP_STANDARD_HORIZONTAL_PADDING,
-          top: CROSS_DEVICE_LINK_GUIDE_COPY_TOP
+      }
+      .width('100%')
+      .layoutWeight(1)
+      .scrollBar(BarState.Off)
+      .align(Alignment.Top)
+      .edgeEffect(EdgeEffect.Spring)
+
+      Column({ space: 8 }) {
+        BrowserSheetActionButton({
+          label: localizeCrossDeviceLinkCopy(this.state.primaryActionTitle),
+          emphasis: 'primary',
+          stacked: true,
+          accentColor: this.storedAccentColor,
+          onAction: () => {
+            this.onAction(this.state.primaryAction);
+          }
         })
 
-        Column({ space: 8 }) {
-          BrowserSheetActionButton({
-            label: localizeCrossDeviceLinkCopy(this.state.primaryActionTitle),
-            emphasis: 'primary',
-            stacked: true,
-            accentColor: this.storedAccentColor,
-            onAction: () => {
-              this.onAction(this.state.primaryAction);
-            }
-          })
-
-          BrowserSheetActionButton({
-            label: localizeCrossDeviceLinkCopy(this.state.secondaryActionTitle),
-            emphasis: 'ghost',
-            stacked: true,
-            onAction: () => {
-              this.onAction('never_show_again');
-            }
-          })
-        }
-        .width('100%')
-        .padding({
-          left: APP_STANDARD_HORIZONTAL_PADDING,
-          right: APP_STANDARD_HORIZONTAL_PADDING,
-          top: 20,
-          bottom: CROSS_DEVICE_LINK_GUIDE_BOTTOM_PADDING
+        BrowserSheetActionButton({
+          label: localizeCrossDeviceLinkCopy(this.state.secondaryActionTitle),
+          emphasis: 'ghost',
+          stacked: true,
+          onAction: () => {
+            this.onAction('never_show_again');
+          }
         })
       }
       .width('100%')
-      .alignItems(HorizontalAlign.Center)
+      .padding({
+        left: APP_STANDARD_HORIZONTAL_PADDING,
+        right: APP_STANDARD_HORIZONTAL_PADDING,
+        top: CROSS_DEVICE_LINK_GUIDE_FOOTER_TOP_GAP,
+        bottom: CROSS_DEVICE_LINK_GUIDE_BOTTOM_PADDING
+      })
     }
     .width('100%')
     .height('100%')
-    .scrollBar(BarState.Off)
-    .align(Alignment.Top)
-    .edgeEffect(EdgeEffect.Spring)
+    .alignItems(HorizontalAlign.Center)
   }
 }

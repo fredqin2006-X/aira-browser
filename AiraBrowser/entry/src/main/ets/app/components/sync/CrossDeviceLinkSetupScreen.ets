@@ -61,6 +61,13 @@ const STEP_ROW_VERTICAL_PADDING: number = 14;
  */
 @Component
 export struct CrossDeviceLinkSetupScreen {
+  /**
+   * The recipe is an ordinary settings list, so its title bar blurs as that list scrolls.
+   * One scroller shared by the title bar and the body is what makes the top gradient follow
+   * this page's own scroll, exactly like every other secondary settings page.
+   */
+  private readonly settingsScroller: Scroller = new Scroller();
+
   /** Bumped by the owning page's onPageShow, which only an @Entry component receives. */
   @Prop @Watch('handlePageShowRefresh') refreshToken: number = 0;
   /** Embedded in the large-screen settings pane instead of its own routed page. */
@@ -110,6 +117,7 @@ export struct CrossDeviceLinkSetupScreen {
     Column() {
       SettingsHdsScaffold({
         title: $r('app.string.settings_link_tutorial'),
+        scrollers: [this.settingsScroller],
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
@@ -124,6 +132,7 @@ export struct CrossDeviceLinkSetupScreen {
         }
       }) {
         SettingsPresentationScrollBody({
+          scroller: this.settingsScroller,
           desktopPresentation: this.desktopPresentation,
           contentSpace: 16,
           topPadding: 8,

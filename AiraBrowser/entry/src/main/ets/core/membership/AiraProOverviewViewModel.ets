@@ -18,6 +18,7 @@ import {
   BrowserPrivacyEffectPolicyService
 } from '../../services/privacy/BrowserPrivacyEffectPolicyService';
 import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../common/config/AiraDistributionCapabilityOwner';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   AIRA_PRO_BENEFITS,
   AIRA_PRO_REACHABLE_DEVICES,
@@ -64,7 +65,11 @@ export interface AiraProOverviewViewState {
   showMembershipStatus: boolean;
   membershipStatusTitle: ResourceStr;
   membershipStatusDetail: ResourceStr;
-  /** Only a live Huawei subscription has an auto-renewal page to open. */
+  /**
+   * Only a live Huawei subscription has an auto-renewal page to open. The card that
+   * carries this action is the one place a subscriber can stop the renewal, so it
+   * must stay reachable for every state the subscription can be in.
+   */
   showManageSubscription: boolean;
   /** Hidden once there is nothing left to buy, including permanent membership. */
   showPurchaseButton: boolean;
@@ -324,10 +329,10 @@ export class AiraProOverviewViewModel {
     const timed = state.plan === 'pro' && !permanent && !subscription;
     const hasPurchasablePlan = plans.some((plan: AiraProOverviewPlanState) => plan.action === 'purchase');
     return {
-      showMembershipStatus: permanent || timed,
+      showMembershipStatus: permanent || subscription || timed,
       membershipStatusTitle: this.resolveMembershipStatusTitle(state, permanent, subscription),
       membershipStatusDetail: this.resolveMembershipStatusDetail(state, permanent, subscription, timed),
-      showManageSubscription: false,
+      showManageSubscription: subscription,
       showPurchaseButton: hasPurchasablePlan || (!purchaseAllowed && plans.length > 0)
     };
   }
@@ -414,7 +419,7 @@ export class AiraProOverviewViewModel {
       id: AIRA_PRO_ONE_TIME_PLAN.planId,
       purchaseKind: 'one_time',
       title: $r('app.string.settings_pro_status_lifetime'),
-      priceText: price.displayPrice,
+      priceText: resolveAppResourceText($r('app.string.membership_plan_lifetime_price', price.amountText)),
       amountText: price.amountText,
       periodText: $r('app.string.settings_pro_period_lifetime'),
       discountBadgeText: this.resolveDiscountBadge(price.discountBadgeText),
@@ -422,7 +427,7 @@ export class AiraProOverviewViewModel {
       description: price.descriptionText.length > 0
         ? this.localizePriceDescription(price.descriptionText)
         : this.buildOneTimePlanDescription(state),
-      badgeText: AIRA_PRO_ONE_TIME_PLAN.badgeText,
+      badgeText: '',
       actionText: action === 'manage_subscription'
         ? $r('app.string.settings_pro_manage_renewal')
         : $r('app.string.settings_pro_buy_now', price.amountText),
@@ -470,7 +475,9 @@ export class AiraProOverviewViewModel {
       title: plan.period === 'yearly'
         ? $r('app.string.settings_pro_status_yearly')
         : $r('app.string.settings_pro_status_monthly'),
-      priceText: plan.displayPrice,
+      priceText: resolveAppResourceText(plan.period === 'yearly'
+        ? $r('app.string.membership_plan_yearly_price', plan.amountText)
+        : $r('app.string.membership_plan_monthly_price', plan.amountText)),
       amountText: plan.amountText,
       periodText: plan.period === 'yearly'
         ? $r('app.string.settings_pro_period_year')
@@ -480,7 +487,9 @@ export class AiraProOverviewViewModel {
       description: plan.period === 'yearly'
         ? $r('app.string.settings_pro_plan_yearly_desc')
         : $r('app.string.settings_pro_plan_monthly_desc'),
-      badgeText: plan.badgeText,
+      badgeText: plan.badgeText === '推荐'
+        ? resolveAppResourceText($r('app.string.membership_plan_recommended'))
+        : plan.badgeText,
       actionText: $r('app.string.settings_pro_subscribe'),
       consentActionText: $r('app.string.settings_pro_subscribe_consent'),
       footerText: $r('app.string.settings_pro_subscribe_footer'),

@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { resolveDownloadFileType } from '../../../core/download/DownloadFileTypeResolver';
 import { PendingDownloadPromptState } from '../../../services/download/DownloadRuntimeService';
 import { resolveDownloadFileTypeImage } from './DownloadFileTypeIcon';
@@ -62,9 +63,9 @@ struct BrowserDownloadConfirmDialog {
     Column() {
       this.buildFileNameRow()
       if (prompt.totalBytes > 0) {
-        this.buildValueRow('大小', this.formatBytes(prompt.totalBytes), EllipsisMode.END)
+        this.buildValueRow(resolveAppResourceText($r('app.string.offline_details_label_size')), this.formatBytes(prompt.totalBytes), EllipsisMode.END)
       }
-      this.buildValueRow('来源', this.resolveSourceText(prompt), EllipsisMode.CENTER)
+      this.buildValueRow(resolveAppResourceText($r('app.string.user_script_meta_source')), this.resolveSourceText(prompt), EllipsisMode.CENTER)
       this.buildLocationRow(prompt)
     }
     .width('100%')
@@ -117,10 +118,10 @@ struct BrowserDownloadConfirmDialog {
   @Builder
   private buildFileNameRow() {
     Row({ space: 12 }) {
-      this.buildRowLabel('文件名')
+      this.buildRowLabel(resolveAppResourceText($r('app.string.browser_ui_browser_download_confirm_sheet_001')))
 
       if (this.editingFileName) {
-        TextInput({ text: this.fileNameDraft, placeholder: '文件名' })
+        TextInput({ text: this.fileNameDraft, placeholder: resolveAppResourceText($r('app.string.browser_ui_browser_download_confirm_sheet_001')) })
           .layoutWeight(1)
           .height(32)
           .fontSize(14)
@@ -202,7 +203,7 @@ struct BrowserDownloadConfirmDialog {
   @Builder
   private buildLocationRow(prompt: PendingDownloadPromptState) {
     Row({ space: 12 }) {
-      this.buildRowLabel('保存到')
+      this.buildRowLabel(resolveAppResourceText($r('app.string.bookmark_popover_save_to')))
 
       Text(prompt.locationPath)
         .layoutWeight(1)
@@ -252,7 +253,7 @@ struct BrowserDownloadConfirmDialog {
 
   private resolveFileNameDisplay(): string {
     const draft = this.fileNameDraft.trim();
-    return draft.length > 0 ? this.fileNameDraft : '文件名';
+    return draft.length > 0 ? this.fileNameDraft : resolveAppResourceText($r('app.string.browser_ui_browser_download_confirm_sheet_001'));
   }
 
   private resolveFileNameColor(): ResourceColor {
@@ -272,7 +273,7 @@ struct BrowserDownloadConfirmDialog {
       return sourceHost;
     }
     const sourceUrl = prompt.url.trim();
-    return sourceUrl.length > 0 ? sourceUrl : '未知来源';
+    return sourceUrl.length > 0 ? sourceUrl : resolveAppResourceText($r('app.string.offline_unknown_source'));
   }
 
   private formatBytes(bytes: number): string {

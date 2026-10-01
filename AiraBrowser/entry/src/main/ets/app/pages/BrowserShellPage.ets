@@ -818,6 +818,7 @@ import {
   AppShortcutNavigationCoordinator,
   AiraAppShortcutNavigationResult
 } from '../router/AppShortcutNavigationCoordinator';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   BrowserAppShortcutActionCoordinator
 } from '../../core/browser/BrowserAppShortcutActionCoordinator';
@@ -1529,7 +1530,9 @@ struct BrowserShellPage {
         this.privateModeLockSessionSnapshot = snapshot;
       },
       returnToRegularMode: (): void => {
-        this.browserTabHomeCoordinator.showHomeSurface('已回到主页', REGULAR_CREATE_TAB_OPTIONS);
+        this.browserTabHomeCoordinator.showHomeSurface(
+          resolveAppResourceText($r('app.string.browser_shell_008')),
+          REGULAR_CREATE_TAB_OPTIONS);
         this.tabsOverviewSessionCoordinator.setActiveSection('tabs');
       }
     }, sharedPreferencesRepository);
@@ -2068,7 +2071,7 @@ struct BrowserShellPage {
       });
     },
     showQueuedToast: (): void => {
-      this.showNativeToast('已加入等待打开队列');
+      this.showNativeToast($r('app.string.browser_shell_007'));
     }
   };
   private browserBackgroundOpenPromptCoordinator: BrowserBackgroundOpenPromptCoordinator =
@@ -2553,7 +2556,7 @@ struct BrowserShellPage {
           this.browserNativeAlertDialogPresenter.confirm({
             title: effect.plan.title,
             message: effect.plan.message,
-            cancelLabel: '取消',
+            cancelLabel: $r('app.string.settings_account_cancel'),
             confirmLabel: effect.plan.confirmLabel,
             confirmTone: 'alert',
             onConfirm: () => {
@@ -3373,7 +3376,7 @@ struct BrowserShellPage {
     },
     promptExit: (now: number): void => {
       this.lastSystemBackExitPromptAt = now;
-      this.showNativeToast('再按一次返回关闭应用');
+      this.showNativeToast($r('app.string.browser_shell_005'));
     }
   };
   private browserWebLoadRuntimeDependencies: BrowserWebLoadRuntimeDependencies = {
@@ -4416,7 +4419,7 @@ struct BrowserShellPage {
       this.browserNativeAlertDialogPresenter.inform({
         title: title,
         message: message,
-        confirmLabel: '知道了'
+        confirmLabel: $r('app.string.settings_advanced_backup_confirm')
       });
     },
     confirmDelete: (confirmation: BrowserConfirmationRequest): void => {
@@ -4998,7 +5001,8 @@ struct BrowserShellPage {
           this.appShortcutNavigationCoordinator.openShortcut(payload.appShortcut, boundary)
             .then((result: AiraAppShortcutNavigationResult): void => {
               if (!result.handled) {
-                this.errorMessage = `打开快捷入口失败：${result.errorMessage}`;
+                this.errorMessage = resolveAppResourceText(
+                  $r('app.string.browser_shortcut_open_failed', result.errorMessage));
               }
             });
         },
@@ -5106,7 +5110,7 @@ struct BrowserShellPage {
         runtimeLifecyclePort: this.browserRuntimeLifecyclePort,
         resolveAbilityContext: (): common.UIAbilityContext => this.getAbilityContext(),
         homeUrl: HOME_TAB_URL,
-        newTabTitle: '新标签页'
+        newTabTitle: resolveAppResourceText($r('app.string.browser_shell_015'))
       },
       {
         readFacts: (): BrowserKeyboardShortcutFacts => {
@@ -5282,7 +5286,7 @@ struct BrowserShellPage {
       openPrivateWindow: (url: string): Promise<boolean> =>
         this.browserPrivateTabCoordinator.openPrivateWindow(url),
       homeUrl: HOME_TAB_URL,
-      newTabTitle: '新标签页',
+      newTabTitle: resolveAppResourceText($r('app.string.browser_shell_015')),
       openOverflow: (): void => {
         void this.openTabsOverview();
       },
@@ -5378,7 +5382,7 @@ struct BrowserShellPage {
         return;
       }
       this.browserTabHomeCoordinator.showHomeSurface(
-        '已回到主页',
+        resolveAppResourceText($r('app.string.browser_shell_008')),
         this.browserWindowContextCoordinator.resolveCurrentTabSessionBoundary()
       );
     },
@@ -5608,7 +5612,7 @@ struct BrowserShellPage {
         openReleasePage: (url: string): void => {
           this.browserAppUrlOpenCoordinator.open({
             url: url,
-            title: 'Aira Community 版本下载',
+            title: resolveAppResourceText($r('app.string.browser_shell_001')),
             intent: 'new_tab',
             source: 'app_ui'
           });
@@ -5970,7 +5974,8 @@ struct BrowserShellPage {
   @State canGoForward: boolean = false;
   @State isLoading: boolean = false;
   @State controllerAttached: boolean = false;
-  @State helperMessage: string = '在这里输入网址或关键词，直接开始浏览。';
+  @State helperMessage: string =
+    resolveAppResourceText($r('app.string.browser_shell_006'));
   @State rootBottomPanelPresentationSnapshot: BrowserRootBottomPanelPresentationSnapshot =
     this.browserRootBottomPanelSessionCoordinator.getPresentationSnapshot();
   @State errorMessage: string = '';
@@ -6279,7 +6284,7 @@ struct BrowserShellPage {
     sizeLabel: '',
     modifiedAtSeconds: 0,
     modifiedAtLabel: '',
-    readOnlyLabel: '只读查看',
+    readOnlyLabel: resolveAppResourceText($r('app.string.bottom_panel_action_viewer_info_subtitle')),
     rows: []
   };
   @StorageLink(BROWSER_PRIVATE_FOREGROUND_REVISION_KEY) @Watch('handlePrivateForegroundRevisionChange')
@@ -6483,7 +6488,7 @@ struct BrowserShellPage {
       webpageTranslationCoordinator: this.webpageTranslationCoordinator,
       windowContextCoordinator: this.browserWindowContextCoordinator,
       homeUrl: HOME_TAB_URL,
-      newTabTitle: '新标签页'
+      newTabTitle: resolveAppResourceText($r('app.string.browser_shell_015'))
     }, this.browserRootBottomPanelFixedActionShell);
   private browserMainBackCoordinator: BrowserMainBackCoordinator = new BrowserMainBackCoordinator({
     manualElementHideRuntimeCoordinator: this.manualElementHideRuntimeCoordinator,
@@ -6806,9 +6811,9 @@ struct BrowserShellPage {
     sharedClientUpdatePolicyService.deferCurrentRequirement();
     if (action === 'continue_local') {
       this.browserNativeAlertDialogPresenter.inform({
-        title: '云同步已暂停',
-        message: '当前版本仍可正常浏览和使用本机书签。升级 Aira 后，Aira 云书签同步才会恢复。',
-        confirmLabel: '知道了'
+        title: $r('app.string.browser_shell_003'),
+        message: $r('app.string.browser_shell_012'),
+        confirmLabel: $r('app.string.settings_advanced_backup_confirm')
       });
       return;
     }
@@ -6818,9 +6823,9 @@ struct BrowserShellPage {
     updateTask.then((result): void => {
       if (!result.success) {
         this.browserNativeAlertDialogPresenter.inform({
-          title: '暂时无法打开升级页面',
-          message: `${result.message} 请稍后在应用市场搜索 Aira。`,
-          confirmLabel: '知道了'
+          title: $r('app.string.browser_shell_017'),
+          message: $r('app.string.settings_sync_update_failed_detail', result.message),
+          confirmLabel: $r('app.string.settings_advanced_backup_confirm')
         });
       }
     });
@@ -7923,7 +7928,7 @@ struct BrowserShellPage {
         this.rootBottomPanelToolbarSystemSheetRequested = false;
         this.rootBottomPanelToolbarSystemSheetRequestVersion += 1;
         this.browserRootBottomPanelSessionCoordinator.releaseProgrammaticHomeToolbarHostSession('unavailable');
-        this.showNativeToast('当前页面无法展开工具栏。');
+        this.showNativeToast($r('app.string.bottom_panel_toolbar_unavailable'));
       },
       onToolbarSystemSheetOpened: (instanceToken: number) => {
         this.browserRootBottomPanelSessionCoordinator.noteToolbarSystemSheetOpened(instanceToken);
@@ -8648,9 +8653,9 @@ struct BrowserShellPage {
         targetUrl,
         this.browserWindowContextCoordinator.resolveCurrentTabSessionProfileId()
       );
-      this.showNativeToast('已在新窗口中打开书签。');
+      this.showNativeToast($r('app.string.browser_shell_009'));
     } catch (_error) {
-      this.showNativeToast('新窗口打开失败，请重试。');
+      this.showNativeToast($r('app.string.browser_shell_016'));
     }
   }
 
@@ -9777,7 +9782,9 @@ struct BrowserShellPage {
       onClearSearchSuggestions: (): void => {
         void this.browserSearchSuggestionCoordinator.clearHistorySuggestions()
           .then((cleared: boolean): void => {
-            this.showNativeToast(cleared ? '已清空搜索历史。' : '当前没有搜索历史。');
+            this.showNativeToast(cleared
+              ? $r('app.string.browser_shell_010')
+              : $r('app.string.settings_search_engine_history_empty'));
           });
       },
       onExternalSearch: (targetId: ExternalAppSearchTargetId, query: string): void => {
@@ -11084,13 +11091,15 @@ struct BrowserShellPage {
       return true;
     }
     if (action === 'open_setup') {
-      this.browserShellRouteCoordinator.openSimpleRoute(CROSS_DEVICE_LINK_SETUP_ROUTE, '打开互联教程失败');
+      this.browserShellRouteCoordinator.openSimpleRoute(
+        CROSS_DEVICE_LINK_SETUP_ROUTE,
+        resolveAppResourceText($r('app.string.browser_shell_013')));
       return true;
     }
     if (action === 'open_guide') {
       this.browserShellRouteCoordinator.openSimpleRoute(
         SYNC_DESKTOP_BOOKMARK_GUIDE_ROUTE,
-        '打开跨设备使用指南失败'
+        resolveAppResourceText($r('app.string.browser_shell_014'))
       );
       return true;
     }
@@ -11103,7 +11112,7 @@ struct BrowserShellPage {
     }
     const candidate = this.browserTabPreviewCoordinator.getDebugSnapshotExportCandidate(tabId);
     if (candidate === undefined) {
-      this.showNativeToast('标签页动画快照还没有生成。');
+      this.showNativeToast($r('app.string.browser_shell_019'));
       return;
     }
     void this.browserTabPreviewDebugExportService.exportSnapshot(this.getAbilityContext(), candidate)
@@ -11111,7 +11120,7 @@ struct BrowserShellPage {
         this.showNativeToast(result.userMessage);
       })
       .catch((_error: Error) => {
-        this.showNativeToast('标签页动画快照导出失败，请稍后重试。');
+        this.showNativeToast($r('app.string.browser_shell_018'));
       });
   }
 
@@ -11267,11 +11276,11 @@ struct BrowserShellPage {
 
   private confirmBookmarkRemoval(confirmation: BrowserBookmarkRemoveConfirmation): void {
     this.browserNativeAlertDialogPresenter.confirm({
-      title: '取消书签',
+      title: $r('app.string.history_remove_bookmark'),
       message: confirmation.source === 'reader_article' ?
-        '这篇文章已经在书签里，要取消收藏吗？' : '这个网页已经在书签里，要取消收藏吗？',
-      cancelLabel: '保留',
-      confirmLabel: '取消书签',
+        $r('app.string.browser_shell_021') : $r('app.string.browser_shell_020'),
+      cancelLabel: $r('app.string.browser_shell_004'),
+      confirmLabel: $r('app.string.history_remove_bookmark'),
       confirmTone: 'warning',
       onConfirm: () => {
         void this.browserBookmarkActionCoordinator.removeConfirmed(confirmation);
@@ -11355,7 +11364,7 @@ struct BrowserShellPage {
       }
     );
     this.offlinePageSaveCoordinator.markPendingLinkSave(targetTabId, url);
-    this.showNativeToast('页面加载完成后将保存离线。');
+    this.showNativeToast($r('app.string.browser_shell_022'));
   }
 
   @Builder
@@ -11535,21 +11544,21 @@ struct BrowserShellPage {
   private async openCurrentDocumentViewerInfoDialog(): Promise<void> {
     const viewerUrl = this.buildCurrentDocumentViewerChromeContext().url;
     if (viewerUrl.length <= 0) {
-      this.showNativeToast('当前没有可查看的文件信息。');
+      this.showNativeToast($r('app.string.browser_shell_011'));
       return;
     }
     try {
       const info = await this.documentViewerService.resolveFileInfo(viewerUrl);
       if (info === undefined) {
-        this.showNativeToast('当前没有可查看的文件信息。');
+        this.showNativeToast($r('app.string.browser_shell_011'));
         return;
       }
       this.showDocumentViewerFileInfoDialog(info);
     } catch (error) {
       this.browserNativeAlertDialogPresenter.inform({
-        title: '文件信息',
-        message: `读取文件信息失败：${this.stringifyError(error)}`,
-        confirmLabel: '知道了'
+        title: $r('app.string.bottom_panel_action_viewer_info'),
+        message: $r('app.string.browser_shell_file_info_failed', this.stringifyError(error)),
+        confirmLabel: $r('app.string.settings_advanced_backup_confirm')
       });
     }
   }
@@ -11596,14 +11605,14 @@ struct BrowserShellPage {
   private async changeDownloadLocationFromPrompt(): Promise<boolean> {
     const directoryService = new DownloadLocationDirectoryService();
     if (!directoryService.isFolderSelectionSupported()) {
-      this.showNativeToast('当前设备不支持选择文件夹。');
+      this.showNativeToast($r('app.string.settings_web_download_folder_unsupported'));
       return false;
     }
     const boundary = this.getCurrentDownloadBoundary();
     try {
       const result = await directoryService.selectDirectory(this.getAbilityContext());
       if (result.status === 'unusable_folder') {
-        this.showNativeToast('这个文件夹不可用，请换一个再试。');
+        this.showNativeToast($r('app.string.settings_web_download_folder_unavailable'));
         return false;
       }
       if (result.status !== 'selected' || result.selection === undefined) {
@@ -11629,7 +11638,7 @@ struct BrowserShellPage {
         'change download location from prompt failed: %{public}s',
         JSON.stringify(error)
       );
-      this.showNativeToast('选择下载位置失败');
+      this.showNativeToast($r('app.string.settings_web_download_folder_failed'));
       return false;
     }
   }
@@ -11763,7 +11772,7 @@ struct BrowserShellPage {
   }
 
   private confirmSiteReport(): void {
-    this.showNativeToast('举报已发送');
+    this.showNativeToast($r('app.string.browser_shell_002'));
   }
 
   private getAbilityContext(): common.UIAbilityContext {
@@ -11906,8 +11915,8 @@ struct BrowserShellPage {
   }
 
   private handleCopyError(error: Object): void {
-    this.errorMessage = `复制失败：${JSON.stringify(error)}`;
-    this.showNativeToast('复制失败，请稍后重试。');
+    this.errorMessage = resolveAppResourceText($r('app.string.reader_copy_failed_detail', JSON.stringify(error)));
+    this.showNativeToast($r('app.string.settings_sync_self_host_guide_copy_failed'));
   }
 
   private async scanQrCodeFromBottomPanel(): Promise<void> {
@@ -12600,9 +12609,11 @@ struct BrowserShellPage {
     }
     try {
       const serialized = JSON.stringify(error);
-      return serialized.length > 0 ? serialized : '未知错误';
+      return serialized.length > 0
+        ? serialized
+        : resolveAppResourceText($r('app.string.media_resource_unknown_error'));
     } catch (_stringifyError) {
-      return '未知错误';
+      return resolveAppResourceText($r('app.string.media_resource_unknown_error'));
     }
   }
 

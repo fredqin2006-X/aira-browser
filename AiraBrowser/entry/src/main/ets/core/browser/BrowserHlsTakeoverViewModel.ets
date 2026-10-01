@@ -3,6 +3,7 @@ import {
   MediaManifestSummary,
   MediaManifestVariant
 } from '../../features/mediaDiscovery/MediaManifestModels';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface BrowserHlsTakeoverRequestContextLine {
   label: string;
@@ -15,8 +16,8 @@ export class BrowserHlsTakeoverViewModel {
     if (target === undefined) {
       return lines;
     }
-    this.appendLine(lines, '页面', target.pageUrl);
-    this.appendLine(lines, '来源', target.frameUrl);
+    this.appendLine(lines, resolveAppResourceText($r('app.string.browser_browser_hls_takeover_view_model_007')), target.pageUrl);
+    this.appendLine(lines, resolveAppResourceText($r('app.string.user_script_meta_source')), target.frameUrl);
     this.appendLine(lines, 'Referer', target.referer);
     this.appendLine(lines, 'Origin', target.originUrl);
     this.appendLine(lines, 'User-Agent', target.userAgent);
@@ -57,15 +58,17 @@ export class BrowserHlsTakeoverViewModel {
 
   buildSummaryTitle(summary: MediaManifestSummary | undefined): string {
     if (summary === undefined) {
-      return '等待解析';
+      return resolveAppResourceText($r('app.string.browser_ui_browser_hls_takeover_sheet_019'));
     }
     if (summary.kind === 'hls') {
-      return summary.role === 'master' ? 'HLS Master 清单' : 'HLS Media 清单';
+      return summary.role === 'master'
+        ? resolveAppResourceText($r('app.string.media_resource_manifest_hls_master'))
+        : resolveAppResourceText($r('app.string.media_resource_manifest_hls_media'));
     }
     if (summary.kind === 'dash') {
-      return 'DASH MPD 清单';
+      return resolveAppResourceText($r('app.string.media_resource_manifest_dash'));
     }
-    return '流媒体清单';
+    return resolveAppResourceText($r('app.string.media_resource_manifest_stream'));
   }
 
   buildSummaryMetrics(summary: MediaManifestSummary | undefined): string {
@@ -77,22 +80,23 @@ export class BrowserHlsTakeoverViewModel {
       parts.push(summary.sourceHost);
     }
     if (summary.variantCount > 0) {
-      parts.push(summary.variantCount.toString() + ' 个清晰度');
+      parts.push(resolveAppResourceText($r('app.string.media_resource_manifest_quality_count', summary.variantCount)));
     }
     if (summary.segmentCount > 0) {
-      parts.push(summary.segmentCount.toString() + ' 个分片');
+      parts.push(resolveAppResourceText($r('app.string.media_resource_manifest_segment_count', summary.segmentCount)));
     }
     if (summary.durationSeconds > 0) {
       parts.push(this.formatDurationSeconds(summary.durationSeconds));
     }
     if (summary.targetDuration > 0) {
-      parts.push('分片约 ' + summary.targetDuration.toString() + 's');
+      parts.push(resolveAppResourceText($r('app.string.browser_hls_takeover_segment_duration',
+        summary.targetDuration.toString() + 's')));
     }
     if (summary.keyCount > 0) {
-      parts.push(summary.keyCount.toString() + ' 个 Key');
+      parts.push(resolveAppResourceText($r('app.string.media_resource_manifest_key_count', summary.keyCount)));
     }
     if (summary.encrypted) {
-      parts.push('加密');
+      parts.push(resolveAppResourceText($r('app.string.media_resource_manifest_encrypted')));
     }
     return parts.join(' · ');
   }
@@ -107,7 +111,7 @@ export class BrowserHlsTakeoverViewModel {
     if (variant.bandwidth > 0) {
       return Math.round(variant.bandwidth / 1000).toString() + ' kbps';
     }
-    return '清晰度 ' + (variant.index + 1).toString();
+    return resolveAppResourceText($r('app.string.media_resource_variant_quality', variant.index + 1));
   }
 
   buildVariantMeta(variant: MediaManifestVariant): string {
@@ -116,13 +120,13 @@ export class BrowserHlsTakeoverViewModel {
       parts.push(Math.round(variant.bandwidth / 1000).toString() + ' kbps');
     }
     if (variant.segmentCount > 0) {
-      parts.push(variant.segmentCount.toString() + ' 分片');
+      parts.push(resolveAppResourceText($r('app.string.media_resource_variant_segments', variant.segmentCount)));
     }
     if (variant.targetDuration > 0) {
       parts.push(variant.targetDuration.toString() + 's');
     }
     if (variant.encrypted) {
-      parts.push('加密');
+      parts.push(resolveAppResourceText($r('app.string.media_resource_manifest_encrypted')));
     }
     return parts.join(' · ');
   }

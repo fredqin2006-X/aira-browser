@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { DownloadV2TaskEntity } from '../../../domain/downloadv2/DownloadV2TaskEntity';
 import { DownloadTaskBoundary } from '../../../domain/download/DownloadTypes';
 import {
@@ -208,18 +209,18 @@ struct BrowserLargeScreenDownloadPopupRow {
 
   private resolveHoverLabel(action: string): string {
     if (action === 'pause') {
-      return '暂停';
+      return resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_013'));
     }
     if (action === 'resume') {
-      return '继续';
+      return resolveAppResourceText($r('app.string.settings_pro_continue'));
     }
     if (action === 'open_location') {
-      return '在文件夹中显示';
+      return resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_download_popover_001'));
     }
     if (action === 'open_file') {
-      return '打开';
+      return resolveAppResourceText($r('app.string.ui_open'));
     }
-    return '取消';
+    return resolveAppResourceText($r('app.string.settings_account_cancel'));
   }
 }
 
@@ -266,7 +267,7 @@ struct BrowserLargeScreenDownloadPopupPanel {
       Scroll() {
         Column() {
           if (this.rows.length === 0) {
-            Text('当前没有可显示的下载')
+            Text(resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_download_popover_003')))
               .width('100%')
               .height(DOWNLOAD_RECENT_IDLE_ROW_HEIGHT_VP)
               .fontSize(13)
@@ -301,7 +302,7 @@ struct BrowserLargeScreenDownloadPopupPanel {
   @Builder
   private buildHeader() {
     Row() {
-      Text('近期的下载记录')
+      Text(resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_download_popover_005')))
         .layoutWeight(1)
         .fontSize(16)
         .fontWeight(FontWeight.Medium)
@@ -319,7 +320,7 @@ struct BrowserLargeScreenDownloadPopupPanel {
       .width(28)
       .height(28)
       .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
-      .accessibilityText('关闭')
+      .accessibilityText(resolveAppResourceText($r('app.string.ui_close')))
       .onClick((): void => {
         this.onRequestClose();
       })
@@ -333,7 +334,7 @@ struct BrowserLargeScreenDownloadPopupPanel {
   @Builder
   private buildFooter() {
     Row() {
-      Text('完整的下载记录')
+      Text(resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_download_popover_002')))
         .layoutWeight(1)
         .fontSize(14)
         .fontColor(this.storedPrimaryTextColor)
@@ -450,7 +451,7 @@ struct BrowserLargeScreenDownloadPopupPanel {
     if (action === 'pause') {
       this.finishControl(
         sharedDownloadRuntimeService.pauseTaskForBoundary(row.guid, boundary),
-        '当前下载暂时不能暂停。',
+        resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_027')),
         false
       );
       return;
@@ -458,7 +459,7 @@ struct BrowserLargeScreenDownloadPopupPanel {
     if (action === 'resume') {
       this.finishControl(
         sharedDownloadRuntimeService.resumeTaskForBoundary(row.guid, boundary),
-        '当前下载暂时不能继续。',
+        resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_028')),
         false
       );
       return;
@@ -466,7 +467,7 @@ struct BrowserLargeScreenDownloadPopupPanel {
     if (action === 'cancel') {
       this.finishControl(
         sharedDownloadRuntimeService.cancelTaskForBoundary(row.guid, boundary),
-        '当前下载暂时不能取消。',
+        resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_024')),
         false
       );
       return;
@@ -474,7 +475,7 @@ struct BrowserLargeScreenDownloadPopupPanel {
     if (action === 'open_location') {
       this.finishControl(
         sharedDownloadRuntimeService.openLocationForBoundary(row.guid, boundary),
-        '暂时不能在文件夹中显示。',
+        resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_download_popover_004')),
         true
       );
       return;
@@ -482,7 +483,7 @@ struct BrowserLargeScreenDownloadPopupPanel {
     if (action === 'open_file') {
       this.finishControl(
         sharedDownloadRuntimeService.openFileForBoundary(row.guid, boundary),
-        '当前下载暂时不能打开。',
+        resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_026')),
         true
       );
     }
@@ -602,7 +603,7 @@ export struct BrowserLargeScreenDownloadPopover {
     .height(DOWNLOAD_BUTTON_SIZE_VP)
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
     .stateEffect(true)
-    .accessibilityText(this.indicator.visible ? this.indicator.accessibilityText() : '下载')
+    .accessibilityText(this.indicator.visible ? this.indicator.accessibilityText() : resolveAppResourceText($r('app.string.settings_web_downloads')))
     .onClick((): void => {
       if (!this.popupVisible) {
         this.rebuildLayout();

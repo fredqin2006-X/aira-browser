@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   DownloadRuntimeService,
   ManualDownloadRequestInput,
@@ -276,7 +277,7 @@ export class BrowserDownloadConfirmOverlayCoordinator {
     }
     const confirmed = await this.downloadService.confirmPendingDownload(effectiveGuid, fileName);
     if (!confirmed) {
-      host.showToast('当前下载暂时不能开始。');
+      host.showToast(resolveAppResourceText($r('app.string.browser_browser_download_confirm_overlay_coordinator_001')));
     }
   }
 
@@ -293,7 +294,7 @@ export class BrowserDownloadConfirmOverlayCoordinator {
     }
     const canceled = this.downloadService.cancelPendingDownload(effectiveGuid);
     if (!canceled) {
-      host.showToast('当前下载暂时不能取消。');
+      host.showToast(resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_024')));
     }
   }
 

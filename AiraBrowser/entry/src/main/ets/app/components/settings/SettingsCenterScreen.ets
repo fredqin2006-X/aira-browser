@@ -824,8 +824,11 @@ export struct SettingsCenterScreen {
     this.settingsNavigationOwner.dispatch(intent)
       .then((result: SettingsNavigationDispatchResult) => {
         if (reportFailure && result.failureReason.length > 0) {
-          const target = result.targetTitle.length > 0 ? `“${result.targetTitle}”` : '设置页面';
-          this.showToast(`无法打开${target}，请重试`);
+          if (result.targetTitle.length > 0) {
+            this.showToast($r('app.string.settings_center_open_target_failed', result.targetTitle));
+          } else {
+            this.showToast($r('app.string.settings_center_05'));
+          }
         }
       })
       .catch((_error: Error) => {

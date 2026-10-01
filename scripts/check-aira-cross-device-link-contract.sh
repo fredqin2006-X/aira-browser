@@ -28,6 +28,19 @@ reject_pattern() {
   fi
 }
 
+# User-visible copy lives in the string catalogs: the screen holds the $r key and the
+# catalog holds the sentence. A contract that pins a sentence asserts the catalog entry,
+# so it keeps working when the literal is routed through resources.
+require_string_resource() {
+  local name="$1"
+  local value="$2"
+  local message="$3"
+  if ! grep -A1 "\"name\": \"${name}\"" "${REPO_ROOT}/${ENTRY_STRING_RESOURCE_REL}" \
+    | grep -Fq "\"value\": \"${value}\""; then
+    fail "${message}"
+  fi
+}
+
 ETS_DIR="AiraBrowser/entry/src/main/ets"
 VIEW_MODEL_REL="${ETS_DIR}/core/sync/CrossDeviceLinkViewModel.ets"
 SCREEN_REL="${ETS_DIR}/app/components/sync/CrossDeviceLinkScreen.ets"
@@ -46,6 +59,7 @@ LARGE_SCREEN_INTENT_REL="${ETS_DIR}/core/browser/BrowserLargeScreenShellIntentAp
 LARGE_SCREEN_TOOLBAR_REL="${ETS_DIR}/app/components/browser/BrowserLargeScreenNavigationToolbarSurface.ets"
 ROUTES_REL="${ETS_DIR}/app/router/AppRoutes.ets"
 MAIN_PAGES_REL="AiraBrowser/entry/src/main/resources/base/profile/main_pages.json"
+ENTRY_STRING_RESOURCE_REL="AiraBrowser/entry/src/main/resources/base/element/string.json"
 BROWSER_TABS_SHEET_REL="${ETS_DIR}/app/components/browser/BrowserCrossDeviceTabsOverlay.ets"
 TEST_REL="AiraBrowser/entry/src/test/CrossDeviceLinkViewModel.test.ets"
 CATALOG_REL="resources/icon-sources/aira/icon-catalog.json"
@@ -93,6 +107,10 @@ reject_pattern "${VIEW_MODEL_REL}" "UNAVAILABLE_LABEL|buildCapabilityRow" \
   "the per-capability rows must not come back beside the one switch."
 reject_pattern "${SCREEN_REL}" "SettingsSection\(\{ title: '可以做什么'" \
   "the old capability section title must not come back."
+reject_pattern "${SCREEN_REL}" "title: \$r\('app\.string\.settings_link_online_devices'" \
+  "the device list must not carry a 在线设备 heading again."
+require_pattern "${SCREEN_REL}" "private buildDeviceSection\(\) \{" \
+  "the device list must stay one section builder."
 # The device list always ends with the way to grow it.
 require_pattern "${SCREEN_REL}" "this.onAction\\('add_device'\\)" \
   "the last device row must always start the pairing handshake."
@@ -158,6 +176,14 @@ require_pattern "${SETUP_SCREEN_REL}" "buildCrossDeviceLinkSteps\\(" \
   "the sub-page must derive its steps from that function."
 require_pattern "${SETUP_SCREEN_REL}" "router.getParams" \
   "the sub-page must read the mode from its route instead of loading sync state."
+# The recipe is a settings list, so its title bar blurs as that list scrolls, exactly
+# like the other secondary settings pages. That needs one scroller shared by both.
+require_pattern "${SETUP_SCREEN_REL}" "private readonly settingsScroller: Scroller = new Scroller\(\);" \
+  "the recipe must own the scroller its title bar binds to."
+require_pattern "${SETUP_SCREEN_REL}" "scrollers: \[this\.settingsScroller\]" \
+  "the recipe's title bar must bind that scroller."
+require_pattern "${SETUP_SCREEN_REL}" "scroller: this\.settingsScroller" \
+  "the recipe's list must scroll that same scroller."
 reject_pattern "${SETUP_SCREEN_REL}" "sharedSyncExperienceCoordinator" \
   "the sub-page must not load sync state of its own."
 require_pattern "${SETUP_PAGE_REL}" "@Entry" \
@@ -240,8 +266,10 @@ reject_pattern "${SETUP_SCREEN_REL}" "menuActionLabel|menuActionIcon|onMenuActio
   "the setup sub-page must not keep a title-bar help action."
 # Removing the header icon must not remove the guide: the private-deployment config page
 # is where a self-hosting user lands, so it carries the remaining entry point.
-require_pattern "${PERSONAL_SERVER_PAGE_REL}" "查看私有化部署教程" \
+require_pattern "${PERSONAL_SERVER_PAGE_REL}" "settings_sync_self_host_view_guide" \
   "the private-deployment page must offer the deployment guide."
+require_string_resource "settings_sync_self_host_view_guide" "查看私有化部署教程" \
+  "the deployment guide entry must keep its label."
 require_pattern "${PERSONAL_SERVER_PAGE_REL}" "openSyncDesktopBookmarkGuide" \
   "the private-deployment guide entry must open the shared guide route."
 
@@ -251,8 +279,10 @@ require_pattern "${CATALOG_SERVICE_REL}" "password: string" \
   "the install catalog must carry the page password."
 require_pattern "${SETUP_SCREEN_REL}" "openLockedPage\\(entry\\)" \
   "a locked install page must go through the password handoff."
-require_pattern "${SETUP_SCREEN_REL}" "访问密码已复制，粘贴即可" \
+require_pattern "${SETUP_SCREEN_REL}" "settings_link_password_copied" \
   "opening a locked page must tell the user the password is on the clipboard."
+require_string_resource "settings_link_password_copied" "访问密码已复制，粘贴即可" \
+  "the password handoff must keep telling the user it is on the clipboard."
 require_pattern "${HOST_REL}" "openBrowserUrlFromGuide" \
   "a tapped link must return to the browser shell and open in front of the user."
 require_pattern "${SETUP_SCREEN_REL}" "openBrowserUrlFromGuide\\(url, this.boundary\\)" \
@@ -348,52 +378,35 @@ require_pattern "${TEST_REL}" "desktopLinkAvailable = false" \
 require_pattern "${TEST_REL}" "describes online computers by their browser alone" \
   "the test must pin that a device row carries no status readout."
 
-# The page opens on the orbit graphic, not the old phone-account-computer header.
-# Account identity stays on the view model; the header itself is Aira at the center of
-# three full rings, with the other browser marks sitting on those rings.
-ORBIT_LAYOUT_REL="${ETS_DIR}/core/sync/CrossDeviceLinkOrbitLayout.ets"
-require_pattern "${ORBIT_LAYOUT_REL}" "CROSS_DEVICE_LINK_ORBIT_RADII: number\[\] = DESIGN_ORBIT_RADII" \
-  "the header must keep the three reviewed rings."
-require_pattern "${ORBIT_LAYOUT_REL}" "kind: 'brave', angleDegrees: 0, orbitIndex: 2" \
-  "the outer ring must carry a mark on the vertical axis above the logo."
-require_pattern "${SCREEN_REL}" "buildCrossDeviceLinkOrbitLayout" \
-  "the page header must be the orbit layout, not a hand-placed row."
-require_pattern "${SCREEN_REL}" "app.media.aira_logo_brand" \
-  "the ring center must be the Aira logo."
+# The page opens on two scrolling rows of the other browsers, not the orbit
+# and not the old phone-account-computer header. There is no Aira logo in the middle.
+MARQUEE_LAYOUT_REL="${ETS_DIR}/core/sync/CrossDeviceLinkMarqueeLayout.ets"
+require_pattern "${MARQUEE_LAYOUT_REL}" "export function crossDeviceLinkMarqueeTiles" \
+  "the header tiles must stay a pure list, painted twice for a seamless loop."
+require_pattern "${MARQUEE_LAYOUT_REL}" "CROSS_DEVICE_LINK_MARQUEE_TILE: number = 64" \
+  "every browser tile must stay the same reviewed size."
+require_pattern "${MARQUEE_LAYOUT_REL}" "crossDeviceLinkMarqueeDirection\\(rowIndex: number\\): number" \
+  "the two rows must travel in opposite directions."
+require_pattern "${SCREEN_REL}" "buildMarquee" \
+  "the page header must be the scrolling rows, not the orbit."
+require_pattern "${SCREEN_REL}" "borderRadius\\(CROSS_DEVICE_LINK_MARQUEE_RADIUS\\)" \
+  "the tiles must be rounded rectangles, not circles."
+require_pattern "${SCREEN_REL}" "startMarquee" \
+  "the page must keep the rows scrolling while it is open."
 require_pattern "${SCREEN_REL}" "BlendMode.DST_IN" \
-  "the lower half of the rings must fade out instead of being clipped."
-require_pattern "${SCREEN_REL}" "crossDeviceLinkOrbitPageFadeColor\\(this.storedPageBackgroundColor" \
-  "the top fade must use the live page background, so light and dark do not share one wash."
-require_pattern "${ORBIT_LAYOUT_REL}" "export function crossDeviceLinkOrbitPageFadeColor" \
-  "the page-background fade color must stay a pure function."
-require_pattern "${TEST_REL}" "crossDeviceLinkOrbitPageFadeColor\\('#F2F3F5'" \
-  "light mode must fade into its own page background."
-require_pattern "${TEST_REL}" "crossDeviceLinkOrbitPageFadeColor\\('#101010'" \
-  "dark mode must fade into its own page background, not the light one."
-require_pattern "${SCREEN_REL}" "ORBIT_RING_COLOR_DARK" \
-  "dark mode must not keep the light-mode ring color."
-require_pattern "${SCREEN_REL}" "resolveOrbitCoverHeight" \
-  "the orbit must stay a background so scrolling content can cover it."
-require_pattern "${ORBIT_LAYOUT_REL}" "export function resolveCrossDeviceLinkOrbitCoverHeight" \
-  "the list must rest under the logo, not at the bottom of the faded rings."
-require_pattern "${ORBIT_LAYOUT_REL}" "export function resolveCrossDeviceLinkOrbitScrollOpacity" \
-  "scrolling up must fade the illustration, not leave it at full strength."
-require_pattern "${SCREEN_REL}" "noteOrbitScrollOffset" \
-  "the illustration opacity must follow the page scroll."
-require_pattern "${SCREEN_REL}" "HitTestMode.BLOCK_DESCENDANTS" \
-  "the orbit decoration must not take the touch, or the page cannot scroll."
-require_pattern "${ORBIT_LAYOUT_REL}" "export function crossDeviceLinkOrbitSpinAngle" \
-  "marks must keep revolving on their rings, with no entrance sweep."
-require_pattern "${SCREEN_REL}" "startOrbitSpin" \
-  "the page must keep the marks revolving while it is open."
+  "the row edges must fade out instead of ending in a hard cut."
+reject_pattern "${SCREEN_REL}" "app.media.aira_logo_brand" \
+  "the marquee must not put the Aira logo back in the middle."
+reject_pattern "${SCREEN_REL}" "buildOrbitHeader|startOrbitSpin" \
+  "the orbit graphic must not come back."
 reject_pattern "${SCREEN_REL}" "startOrbitIntro" \
   "the entrance sweep must not come back."
-require_pattern "${SCREEN_REL}" "centerX: layout.centerX" \
-  "icons must rotate around the logo center so they stay on their ring."
 reject_pattern "${SCREEN_REL}" "#C9CEEA|#7C86A8" \
-  "the rings must stay neutral, without the old tinted line color."
+  "the header must stay neutral, without the old tinted line color."
 reject_pattern "${SCREEN_REL}" "buildAccountHeader|buildConnector|PEER_COMPUTER_GLYPH" \
   "the phone-account-computer header must not come back."
+require_pattern "${TEST_REL}" "paints two identical copies so the scroll can loop without a seam" \
+  "the seamless loop must be pinned by a test."
 require_pattern "${VIEW_MODEL_REL}" "account: CrossDeviceLinkAccountFact" \
   "account identity must still come from the host's account fact."
 require_pattern "${VIEW_MODEL_REL}" "SIGNED_OUT_TITLE: string = '未登录'" \
@@ -503,12 +516,28 @@ require_pattern "${GUIDE_OVERLAY_REL}" "height: SheetSize.LARGE" \
   "the lesson is the tallest bottom sheet, not a floating card."
 require_pattern "${GUIDE_OVERLAY_REL}" "preferType: SheetType.BOTTOM" \
   "the lesson sheet starts as a bottom sheet."
+# The two actions are a footer, not the tail of the scroller. A sheet taller than its
+# content must not leave 下一个 and 不再提示 stranded mid-screen with empty surface below.
+require_pattern "${GUIDE_SHEET_REL}" "CROSS_DEVICE_LINK_GUIDE_FOOTER_TOP_GAP" \
+  "the lesson's actions must keep a footer gap of their own."
+require_pattern "${GUIDE_SHEET_REL}" "^      Scroll\\(\\) \\{" \
+  "the lesson's clip and copy must share one scroller."
+require_pattern "${GUIDE_SHEET_REL}" "^      \\.layoutWeight\\(1\\)" \
+  "the scroller must yield the footer its space instead of pushing the actions down."
+guide_scroller_line="$(grep -n '^      Scroll() {$' "${REPO_ROOT}/${GUIDE_SHEET_REL}" | head -1 | cut -d: -f1)"
+guide_footer_line="$(grep -n '^      \.layoutWeight(1)$' "${REPO_ROOT}/${GUIDE_SHEET_REL}" | head -1 | cut -d: -f1)"
+guide_action_line="$(grep -n 'BrowserSheetActionButton({' "${REPO_ROOT}/${GUIDE_SHEET_REL}" | head -1 | cut -d: -f1)"
+if [ -z "${guide_scroller_line}" ] || [ -z "${guide_footer_line}" ] || [ -z "${guide_action_line}" ]; then
+  fail "the lesson must scroll its content and keep its actions in a footer."
+elif [ "${guide_scroller_line}" -ge "${guide_footer_line}" ] || [ "${guide_footer_line}" -ge "${guide_action_line}" ]; then
+  fail "the lesson's actions must sit in the sheet footer, not inside the scroller."
+fi
 for guide_asset in page_push_guide.mp4 device_tabs_guide.mp4 page_push_guide_poster.jpg device_tabs_guide_poster.jpg; do
   if [ ! -f "${REPO_ROOT}/AiraBrowser/entry/src/main/resources/rawfile/${guide_asset}" ]; then
     fail "missing cross-device lesson asset ${guide_asset}"
   fi
 done
-reject_pattern "${VIEW_MODEL_REL}" "open_guide|查看互联教程" \
+reject_pattern "${VIEW_MODEL_REL}" "open_guide" \
   "the lesson must not become a fact of the link page view model."
 
 if [ "${failures}" -gt 0 ]; then

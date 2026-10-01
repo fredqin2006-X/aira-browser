@@ -1,6 +1,7 @@
 import { fileIo } from '@kit.CoreFileKit';
 import buffer from '@ohos.buffer';
 import { BrowserWebLoadDataPayload } from '../../core/browser/BrowserWebLoadCoordinator';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export const MARKDOWN_VIEWER_URL_PREFIX: string = 'aira://markdown-viewer';
 export const MARKDOWN_CODE_BLOCK_URL: string = 'aira://markdown-code-block';
@@ -111,7 +112,9 @@ export class MarkdownDocumentViewerService {
     const htmlInput: MarkdownViewerHtmlInput = {
       title: info.displayName,
       sourceUri: info.fileUri,
-      bodyHtml: '<p class="empty">正在读取 Markdown 文件...</p>'
+      bodyHtml: '<p class="empty">' +
+        this.escapeHtml(resolveAppResourceText($r('app.string.viewer_markdown_loading'))) +
+        '</p>'
     };
     return {
       data: this.buildHtml(htmlInput),
@@ -189,13 +192,13 @@ export class MarkdownDocumentViewerService {
   private async readMarkdownFile(uri: string): Promise<string> {
     const stat = await fileIo.stat(uri);
     if (stat.isDirectory()) {
-      throw new Error('请选择 Markdown 文件。');
+      throw new Error(resolveAppResourceText($r('app.string.viewer_markdown_choose')));
     }
     if (stat.size <= 0) {
       return '';
     }
     if (stat.size > MARKDOWN_VIEWER_MAX_BYTES) {
-      throw new Error('Markdown 文件超过 5 MB，暂不支持查看。');
+      throw new Error(resolveAppResourceText($r('app.string.viewer_markdown_too_large')));
     }
     const file = await fileIo.open(uri, fileIo.OpenMode.READ_ONLY);
     try {
@@ -208,7 +211,9 @@ export class MarkdownDocumentViewerService {
   }
 
   private buildHtml(input: MarkdownViewerHtmlInput): string {
-    const title = input.title.trim().length > 0 ? input.title.trim() : 'Markdown 文件';
+    const title = input.title.trim().length > 0
+      ? input.title.trim()
+      : resolveAppResourceText($r('app.string.viewer_markdown_file'));
     const bodyClass = input.layout === 'code_block' ? 'code-preview' : '';
     const htmlClass = input.layout === 'code_block' ? 'code-preview' : '';
     const initialScrollY = this.resolveInitialScrollY(input);
@@ -623,7 +628,9 @@ img {
   }
 
   private buildErrorHtml(message: string): string {
-    const normalizedMessage = message.trim().length > 0 ? message.trim() : 'Markdown 文件读取失败。';
+    const normalizedMessage = message.trim().length > 0
+      ? message.trim()
+      : resolveAppResourceText($r('app.string.viewer_markdown_read_failed'));
     return `<p class="error">${this.escapeHtml(normalizedMessage)}</p>`;
   }
 
@@ -631,7 +638,9 @@ img {
     const normalized = this.stripQueryAndFragment(uri);
     const slashIndex = normalized.lastIndexOf('/');
     const fileName = slashIndex >= 0 ? normalized.substring(slashIndex + 1) : normalized;
-    return this.safeDecode(fileName).trim().length > 0 ? this.safeDecode(fileName).trim() : 'Markdown 文件';
+    return this.safeDecode(fileName).trim().length > 0
+      ? this.safeDecode(fileName).trim()
+      : resolveAppResourceText($r('app.string.viewer_markdown_file'));
   }
 
   private readQueryParam(url: string, key: string): string {

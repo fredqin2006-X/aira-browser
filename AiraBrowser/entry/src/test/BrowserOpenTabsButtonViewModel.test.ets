@@ -1,8 +1,10 @@
 import { describe, expect, it } from '@ohos/hypium';
 import { BrowserTabState } from '../main/ets/core/tabs/TabManager';
 import { BrowserOpenTabsButtonViewModel } from '../main/ets/core/browser/BrowserOpenTabsButtonViewModel';
-import { BrowserTabsOverviewBottomChromeViewModel } from
-  '../main/ets/core/browser/tabsOverview/BrowserTabsOverviewBottomChromeViewModel';
+import {
+  BrowserTabsOverviewBottomChromeViewModel,
+  resolveTabsOverviewCloseAllMenuSection
+} from '../main/ets/core/browser/tabsOverview/BrowserTabsOverviewBottomChromeViewModel';
 
 function buildTab(id: string, isHome: boolean, privacyMode: 'regular' | 'private'): BrowserTabState {
   const url = isHome ? 'https://home.invalid/' : `https://example.invalid/${id}`;
@@ -81,6 +83,18 @@ export default function browserOpenTabsButtonViewModelTest(): void {
       }).regularTabCount;
 
       expect(overviewCount).assertEqual(1);
+    });
+  });
+
+  describe('tabs overview close-all menu', () => {
+    it('opens only for the local section the user is already viewing', 0, () => {
+      expect(resolveTabsOverviewCloseAllMenuSection('privacy', 'privacy')).assertEqual('privacy');
+      expect(resolveTabsOverviewCloseAllMenuSection('tabs', 'tabs')).assertEqual('tabs');
+      expect(resolveTabsOverviewCloseAllMenuSection('privacy', 'tabs')).assertEqual('');
+      expect(resolveTabsOverviewCloseAllMenuSection('tabs', 'privacy')).assertEqual('');
+      expect(resolveTabsOverviewCloseAllMenuSection('privacy', 'device')).assertEqual('');
+      expect(resolveTabsOverviewCloseAllMenuSection('devices', 'privacy')).assertEqual('');
+      expect(resolveTabsOverviewCloseAllMenuSection('devices', 'devices')).assertEqual('');
     });
   });
 }

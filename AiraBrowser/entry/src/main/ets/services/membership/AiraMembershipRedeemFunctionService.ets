@@ -1,4 +1,5 @@
 import { http } from '@kit.NetworkKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { HuaweiAccountSyncAuthService } from '../sync/HuaweiAccountSyncAuthService';
 import {
   AIRA_DISTRIBUTION_CAPABILITY_OWNER,
@@ -58,7 +59,8 @@ class NetworkAiraMembershipRedeemHttpAdapter implements AiraMembershipRedeemHttp
         const errorResponse: AiraMembershipRedeemResponseBody = {
           ok: false,
           code: 'http_error',
-          message: `Aira 兑换服务请求失败（${response.responseCode}）。`
+          message: resolveAppResourceText($r('app.string.membership_service_http_failed',
+            resolveAppResourceText($r('app.string.membership_service_redeem')), response.responseCode))
         };
         return errorResponse;
       }
@@ -96,7 +98,7 @@ export class AiraMembershipRedeemFunctionService {
       return {
         ok: false,
         code: 'missing_uid',
-        message: '请先使用华为账号登录。'
+        message: resolveAppResourceText($r('app.string.membership_login_required'))
       };
     }
     const body: AiraMembershipRedeemRequestBody = {
@@ -125,7 +127,8 @@ export class AiraMembershipRedeemFunctionService {
       return {
         ok: false,
         code: 'empty_response',
-        message: 'Aira 兑换服务没有返回结果。'
+        message: resolveAppResourceText($r('app.string.membership_service_empty',
+          resolveAppResourceText($r('app.string.membership_service_redeem'))))
       };
     }
     if (typeof value === 'string') {
@@ -135,7 +138,8 @@ export class AiraMembershipRedeemFunctionService {
         return {
           ok: false,
           code: 'invalid_response',
-          message: 'Aira 兑换服务返回的 JSON 无法解析。'
+          message: resolveAppResourceText($r('app.string.membership_service_invalid_json',
+            resolveAppResourceText($r('app.string.membership_service_redeem'))))
         };
       }
     }
@@ -152,7 +156,8 @@ export class AiraMembershipRedeemFunctionService {
         return {
           ok: false,
           code: 'invalid_response_body',
-          message: 'Aira 兑换服务返回的 body 无法解析。'
+          message: resolveAppResourceText($r('app.string.membership_service_invalid_body',
+            resolveAppResourceText($r('app.string.membership_service_redeem'))))
         };
       }
     }

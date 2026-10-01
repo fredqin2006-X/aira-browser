@@ -1,7 +1,11 @@
 import { BrowserTabState } from '../../tabs/TabManager';
-import { BrowserTabsOverviewSectionPolicy } from './BrowserTabsOverviewSectionPolicy';
+import {
+  BrowserTabsOverviewSection,
+  BrowserTabsOverviewSectionPolicy
+} from './BrowserTabsOverviewSectionPolicy';
 
 export type BrowserTabsOverviewBottomChromeReturnKind = 'tab' | 'home';
+export type BrowserTabsOverviewCloseAllMenuSection = 'tabs' | 'privacy';
 
 export interface BrowserTabsOverviewBottomChromeInput {
   tabs: BrowserTabState[];
@@ -74,4 +78,22 @@ export class BrowserTabsOverviewBottomChromeViewModel {
     }
     return removedTabIds;
   }
+}
+
+/**
+ * A long press offers to close the section the user is already looking at.
+ * Pressing another segment must not close tabs that are not on screen, and the
+ * cross-device segment never closes local tabs.
+ */
+export function resolveTabsOverviewCloseAllMenuSection(
+  selectedSection: BrowserTabsOverviewSection,
+  pressedSegment: string
+): BrowserTabsOverviewCloseAllMenuSection | '' {
+  if (selectedSection !== 'tabs' && selectedSection !== 'privacy') {
+    return '';
+  }
+  if (pressedSegment !== selectedSection) {
+    return '';
+  }
+  return selectedSection;
 }

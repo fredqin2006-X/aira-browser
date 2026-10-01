@@ -2,6 +2,7 @@ import { fileIo } from '@kit.CoreFileKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { documentViewerHtmlFileTransport } from './DocumentViewerHtmlFileTransport';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 const DOCUMENT_VIEWER_HTML_FILE_LOG_DOMAIN: number = 0x0000;
 const DOCUMENT_VIEWER_HTML_FILE_LOG_TAG: string = 'DocumentViewer';
@@ -16,7 +17,7 @@ export function buildDocumentViewerHtmlFileResponse(
   const fileUri = documentViewerHtmlFileTransport.resolveFileUri(requestUrl);
   if (fileUri.length === 0) {
     return buildReadyHtmlResponse(
-      buildMessageHtml('这个文件页面已经失效，请重新打开。'),
+      buildMessageHtml(resolveAppResourceText($r('app.string.viewer_page_expired'))),
       404,
       'Not Found'
     );
@@ -33,12 +34,12 @@ async function fulfillHtmlFileResponse(response: WebResourceResponse, fileUri: s
   try {
     const stat = await fileIo.stat(fileUri);
     if (stat.isDirectory()) {
-      applyHtmlMessage(response, buildMessageHtml('请选择文件。'), 400, 'Bad Request');
+      applyHtmlMessage(response, buildMessageHtml(resolveAppResourceText($r('app.string.viewer_choose_file'))), 400, 'Bad Request');
       return;
     }
     const sizeBytes = Math.max(0, Math.floor(stat.size));
     if (sizeBytes <= 0) {
-      applyHtmlMessage(response, buildMessageHtml('这个 HTML 文件没有内容。'), 200, 'OK');
+      applyHtmlMessage(response, buildMessageHtml(resolveAppResourceText($r('app.string.viewer_html_empty'))), 200, 'OK');
       return;
     }
     opened = await fileIo.open(fileUri, fileIo.OpenMode.READ_ONLY);
@@ -65,7 +66,7 @@ async function fulfillHtmlFileResponse(response: WebResourceResponse, fileUri: s
       'html file response failed code=%{public}s',
       readErrorCode(error)
     );
-    applyHtmlMessage(response, buildMessageHtml('无法读取这个 HTML 文件。'), 500, 'Error');
+    applyHtmlMessage(response, buildMessageHtml(resolveAppResourceText($r('app.string.viewer_html_unreadable'))), 500, 'Error');
   } finally {
     if (opened !== undefined && !handedToWeb) {
       await closeQuietly(opened);
@@ -118,10 +119,14 @@ function stripQueryAndFragment(url: string): string {
   return url.substring(0, endIndex);
 }
 
+function escapeHtml(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 function buildMessageHtml(message: string): string {
   return `<!doctype html><html><head><meta charset="utf-8">` +
     `<meta name="viewport" content="width=device-width,initial-scale=1"></head>` +
-    `<body><p>${message}</p></body></html>`;
+    `<body><p>${escapeHtml(message)}</p></body></html>`;
 }
 
 function readErrorCode(error: Object): string {

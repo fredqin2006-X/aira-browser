@@ -1,4 +1,5 @@
 import { DownloadV2TaskEntity } from '../../domain/downloadv2/DownloadV2TaskEntity';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export class DownloadToolbarIndicatorState {
   visible: boolean;
@@ -23,11 +24,13 @@ export class DownloadToolbarIndicatorState {
       return '';
     }
     if (!this.progressKnown) {
-      return this.activeTaskCount > 1 ? `正在下载 ${this.activeTaskCount} 个任务，进度未知` : '正在下载，进度未知';
+      return this.activeTaskCount > 1
+        ? resolveAppResourceText($r('app.string.download_indicator_many_unknown', this.activeTaskCount))
+        : resolveAppResourceText($r('app.string.download_indicator_unknown'));
     }
-    return this.activeTaskCount > 1 ?
-      `正在下载 ${this.activeTaskCount} 个任务，${this.progressValue}%` :
-      `正在下载，${this.progressValue}%`;
+    return this.activeTaskCount > 1
+      ? resolveAppResourceText($r('app.string.download_indicator_many_percent', this.activeTaskCount, this.progressValue))
+      : resolveAppResourceText($r('app.string.download_indicator_percent', this.progressValue));
   }
 }
 

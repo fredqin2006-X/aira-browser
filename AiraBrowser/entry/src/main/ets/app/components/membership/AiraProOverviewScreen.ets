@@ -49,6 +49,7 @@ const AIRA_PRO_PLAN_ORIGINAL_PRICE_RIGHT_PADDING: number = 96;
 const AIRA_PRO_PLAN_ORIGINAL_PRICE_CAPSULE_INSET: number = 10;
 
 const AIRA_PRO_SUBSCRIBE_BUTTON_HEIGHT: number = 52;
+const AIRA_PRO_MANAGE_BUTTON_HEIGHT: number = 48;
 const AIRA_PRO_TRANSPARENT_COLOR: string = '#00000000';
 
 @Component
@@ -545,6 +546,11 @@ export struct AiraProOverviewScreen {
   /**
    * A member who already holds Pro still sees the current entitlement here.
    * Purchasable plans, including a lifetime upgrade, stay on the purchase button.
+   *
+   * A live Huawei subscription also gets the one action that stops it: the page
+   * opens Huawei's own subscription management, where the user can cancel. That
+   * entry has to stay on this card — it is the only route to cancelling from
+   * inside Aira, and hiding it strands a subscriber who wants to stop renewing.
    */
   @Builder
   private buildMembershipStatusCard() {
@@ -570,6 +576,35 @@ export struct AiraProOverviewScreen {
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start)
+
+      if (this.state.showManageSubscription) {
+        Button() {
+          Text($r('app.string.settings_pro_manage_subscription'))
+            .fontSize(15)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.primaryTextColor)
+            .maxLines(1)
+        }
+        .width('100%')
+        .height(AIRA_PRO_MANAGE_BUTTON_HEIGHT)
+        .type(ButtonType.Normal)
+        .buttonStyle(ButtonStyleMode.NORMAL)
+        // A filled pill, not an outlined one. The stroke is deliberately absent: an
+        // explicit border() draws its own rectangle and does not follow borderRadius,
+        // so the outline rendered square while the fill stayed round. The fill alone
+        // carries the shape now, and a grey secondary surface reads as the lesser
+        // action next to the accent-coloured primary button.
+        .backgroundColor(this.controlBackground)
+        .borderRadius(AIRA_PRO_MANAGE_BUTTON_HEIGHT / 2)
+        .enabled(this.state.proActionsEnabled)
+        .opacity(this.state.proActionsEnabled ? 1 : 0.52)
+        .stateEffect(this.state.proActionsEnabled)
+        .onClick(() => {
+          if (this.state.proActionsEnabled) {
+            this.onManageSubscription?.();
+          }
+        })
+      }
     }
     .width('100%')
     .padding({ left: 18, right: 18, top: 18, bottom: 18 })

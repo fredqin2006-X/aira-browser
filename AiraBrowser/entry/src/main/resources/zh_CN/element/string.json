@@ -1661,6 +1661,10 @@
       "value": "华为订阅管理暂时无法打开"
     },
     {
+      "name": "settings_pro_manage_subscription",
+      "value": "管理我的订阅"
+    },
+    {
       "name": "settings_pro_subscription_check_failed",
       "value": "订阅状态检查失败，请稍后重试"
     },
@@ -7106,11 +7110,11 @@
     },
     {
       "name": "settings_link_guide_tabs_title",
-      "value": "看到电脑打开的标签页"
+      "value": "两台设备互相看标签页"
     },
     {
       "name": "settings_link_guide_tabs_message",
-      "value": "电脑上正在开的网页，会列在手机的跨设备标签页里。"
+      "value": "两边打开的网页都会出现在对方的跨设备标签页里。"
     },
     {
       "name": "settings_link_guide_next",
@@ -19275,6 +19279,886 @@
     {
       "name": "settings_link_online_devices",
       "value": "在线设备"
+    },
+    {
+      "name": "media_manifest_url_scheme",
+      "value": "清单链接必须是 http 或 https。"
+    },
+    {
+      "name": "media_manifest_empty",
+      "value": "清单内容为空。"
+    },
+    {
+      "name": "media_manifest_dash_deferred",
+      "value": "DASH/MPD 已识别，解析明细将在后续版本接入。"
+    },
+    {
+      "name": "media_manifest_unrecognized",
+      "value": "没有识别到 HLS 或 DASH 清单。"
+    },
+    {
+      "name": "media_manifest_request_failed",
+      "value": "清单请求失败。"
+    },
+    {
+      "name": "media_manifest_too_large",
+      "value": "清单内容过大，暂不解析。"
+    },
+    {
+      "name": "media_manifest_variant_probe_failed",
+      "value": "无法探测清晰度 %1$d 的分片信息。"
+    },
+    {
+      "name": "media_manifest_probe_limit",
+      "value": "仅探测前 %1$d 个清晰度，避免页面资源解析过重。"
+    },
+    {
+      "name": "browser_hls_takeover_segment_duration",
+      "value": "分片约 %1$s"
+    },
+    {
+      "name": "browser_hls_takeover_key_summary",
+      "value": "%1$d 个 · %2$s"
+    },
+    {
+      "name": "settings_theme_palette_open_failed",
+      "value": "主题色设置暂时无法打开，请稍后重试。"
+    },
+    {
+      "name": "settings_interface_mode_open_failed",
+      "value": "界面模式设置暂时无法打开，请稍后重试。"
+    },
+    {
+      "name": "settings_tracking_protection_open_failed",
+      "value": "防跟踪设置暂时无法打开，请稍后重试。"
+    },
+    {
+      "name": "settings_app_icon_open_failed",
+      "value": "应用图标设置暂时无法打开，请稍后重试。"
+    },
+    {
+      "name": "settings_toolbar_open_failed",
+      "value": "工具栏设置暂时无法打开，请稍后重试。"
+    },
+    {
+      "name": "settings_secure_dns_open_failed",
+      "value": "安全 DNS 设置暂时无法打开，请稍后重试。"
+    },
+    {
+      "name": "browser_shortcut_unknown",
+      "value": "未知快捷入口"
+    },
+    {
+      "name": "browser_shortcut_open_failed",
+      "value": "打开快捷入口失败：%1$s"
+    },
+    {
+      "name": "browser_window_private_tab_title",
+      "value": "隐私标签页"
+    },
+    {
+      "name": "browser_window_move_request_expired",
+      "value": "标签页移动请求已失效。"
+    },
+    {
+      "name": "browser_window_move_not_received",
+      "value": "新窗口未能及时接收标签页。"
+    },
+    {
+      "name": "browser_window_move_no_context",
+      "value": "当前窗口还没有可用的启动上下文。"
+    },
+    {
+      "name": "browser_window_move_open_failed",
+      "value": "无法打开新的浏览器窗口。"
+    },
+    {
+      "name": "membership_login_required",
+      "value": "请先使用华为账号登录。"
+    },
+    {
+      "name": "membership_relogin_required",
+      "value": "请重新登录华为账号后再继续。"
+    },
+    {
+      "name": "membership_account_changed",
+      "value": "账号已切换，请稍后重试。"
+    },
+    {
+      "name": "membership_gift_private_session",
+      "value": "请回到普通会话后再同步新用户会员。"
+    },
+    {
+      "name": "membership_gift_sync_failed",
+      "value": "新用户会员暂时未能同步，请稍后再试。"
+    },
+    {
+      "name": "membership_gift_not_applied",
+      "value": "新用户会员未能生效，请稍后在会员页恢复。"
+    },
+    {
+      "name": "membership_gift_granted",
+      "value": "已获得新用户会员"
+    },
+    {
+      "name": "membership_gift_landed_title",
+      "value": "Aira Pro 已到账"
+    },
+    {
+      "name": "membership_gift_landed_message",
+      "value": "已为你开通 %1$d 天 Aira Pro，权益立即生效。"
+    },
+    {
+      "name": "membership_gift_accept",
+      "value": "开心收下"
+    },
+    {
+      "name": "membership_claim_private_session",
+      "value": "请回到普通会话后再领取会员。"
+    },
+    {
+      "name": "membership_claim_not_applied",
+      "value": "会员领取未能生效，请稍后重试。"
+    },
+    {
+      "name": "membership_claim_granted",
+      "value": "已领取 15 天会员"
+    },
+    {
+      "name": "membership_redeem_private_session",
+      "value": "请回到普通会话后再兑换会员。"
+    },
+    {
+      "name": "membership_redeem_not_applied",
+      "value": "兑换未能生效，请稍后重试。"
+    },
+    {
+      "name": "membership_redeem_granted",
+      "value": "已兑换会员"
+    },
+    {
+      "name": "membership_account_profile_invalid",
+      "value": "账号资料响应缺少有效账号。"
+    },
+    {
+      "name": "membership_grant_invalid",
+      "value": "会员状态响应缺少有效账号权益。"
+    },
+    {
+      "name": "membership_state_refresh_failed",
+      "value": "会员状态暂时无法刷新，请稍后再试。"
+    },
+    {
+      "name": "membership_entitlement_private_title",
+      "value": "当前会话无法读取会员权益"
+    },
+    {
+      "name": "membership_entitlement_private_message",
+      "value": "会员权益读取未通过隐私策略检查。"
+    },
+    {
+      "name": "membership_gate_expired_title",
+      "value": "Aira Pro 已过期"
+    },
+    {
+      "name": "membership_gate_expired_message",
+      "value": "你的 Aira Pro 已于 %1$s 到期，续费后云同步等功能立即恢复。"
+    },
+    {
+      "name": "membership_gate_expiry_date",
+      "value": "%1$d 年 %2$d 月 %3$d 日"
+    },
+    {
+      "name": "membership_gate_renew",
+      "value": "立即续费"
+    },
+    {
+      "name": "membership_gate_subscribe",
+      "value": "立即开通"
+    },
+    {
+      "name": "membership_gate_upgrade",
+      "value": "升级 Aira Pro"
+    },
+    {
+      "name": "membership_gate_upgrade_continue",
+      "value": "升级 Aira Pro 后可继续"
+    },
+    {
+      "name": "membership_gate_unavailable_title",
+      "value": "当前版本暂不可用"
+    },
+    {
+      "name": "membership_gate_login_title",
+      "value": "需要登录后使用"
+    },
+    {
+      "name": "membership_gate_agree_membership",
+      "value": "点击开通即代表同意《会员服务协议》"
+    },
+    {
+      "name": "membership_gate_agree_renewal",
+      "value": "点击开通即代表同意《会员服务协议》与《自动续费服务协议》"
+    },
+    {
+      "name": "membership_gate_paused",
+      "value": "%1$s 已暂停，续费后立即恢复。"
+    },
+    {
+      "name": "membership_gate_pro_feature",
+      "value": "%1$s 是 Aira Pro 能力。"
+    },
+    {
+      "name": "membership_gate_unavailable_now",
+      "value": "%1$s 当前无法使用。"
+    },
+    {
+      "name": "membership_gate_login_required",
+      "value": "%1$s 需要绑定华为账号后使用。"
+    },
+    {
+      "name": "membership_gate_needs_pro",
+      "value": "%1$s 当前需要 Aira Pro。"
+    },
+    {
+      "name": "membership_gate_quota_limited",
+      "value": "当前 %1$s 的%2$s能力受限。"
+    },
+    {
+      "name": "membership_gate_unavailable_feature",
+      "value": "%1$s 当前不可用。"
+    },
+    {
+      "name": "membership_feature_offline_pages",
+      "value": "离线页面"
+    },
+    {
+      "name": "membership_feature_user_scripts",
+      "value": "用户脚本"
+    },
+    {
+      "name": "membership_feature_hide_rules",
+      "value": "手动隐藏规则"
+    },
+    {
+      "name": "membership_feature_translation",
+      "value": "Aira 系统翻译"
+    },
+    {
+      "name": "membership_feature_bookmark_sync",
+      "value": "跨设备同步书签"
+    },
+    {
+      "name": "membership_feature_webdav",
+      "value": "WebDAV 同步"
+    },
+    {
+      "name": "membership_feature_bookmark_auto_sync",
+      "value": "书签自动同步"
+    },
+    {
+      "name": "membership_feature_page_push",
+      "value": "Aira 云网页推送"
+    },
+    {
+      "name": "membership_feature_device_tabs",
+      "value": "Aira 云跨设备标签页"
+    },
+    {
+      "name": "membership_feature_labs",
+      "value": "实验室功能"
+    },
+    {
+      "name": "membership_service_gift",
+      "value": "Aira 新用户礼包服务"
+    },
+    {
+      "name": "membership_service_claim",
+      "value": "Aira 会员领取服务"
+    },
+    {
+      "name": "membership_service_redeem",
+      "value": "Aira 兑换服务"
+    },
+    {
+      "name": "membership_service_state",
+      "value": "Aira 会员状态服务"
+    },
+    {
+      "name": "membership_service_http_failed",
+      "value": "%1$s请求失败（%2$d）。"
+    },
+    {
+      "name": "membership_service_empty",
+      "value": "%1$s没有返回结果。"
+    },
+    {
+      "name": "membership_service_invalid_json",
+      "value": "%1$s返回的 JSON 无法解析。"
+    },
+    {
+      "name": "membership_service_invalid_body",
+      "value": "%1$s返回的 body 无法解析。"
+    },
+    {
+      "name": "membership_purchase_subscription_opened",
+      "value": "订阅已开通"
+    },
+    {
+      "name": "membership_purchase_diagnostic_opened",
+      "value": "%1$s 已开通，会员权益已写入云端。"
+    },
+    {
+      "name": "membership_purchase_diagnostic_product",
+      "value": "%1$s 已开通，商品 %2$s，会员权益已写入云端。"
+    },
+    {
+      "name": "membership_purchase_diagnostic_until",
+      "value": "%1$s 已开通，有效期至 %2$s，会员权益已写入云端。"
+    },
+    {
+      "name": "membership_purchase_diagnostic_product_until",
+      "value": "%1$s 已开通，商品 %2$s，有效期至 %3$s，会员权益已写入云端。"
+    },
+    {
+      "name": "membership_iap_lifetime_unavailable",
+      "value": "一次购暂不可用"
+    },
+    {
+      "name": "membership_iap_subscription_unavailable",
+      "value": "订阅暂不可用"
+    },
+    {
+      "name": "membership_iap_lifetime_paid",
+      "value": "一次购支付完成"
+    },
+    {
+      "name": "membership_iap_subscription_paid",
+      "value": "订阅购买完成"
+    },
+    {
+      "name": "membership_iap_lifetime_failed_title",
+      "value": "一次购支付失败"
+    },
+    {
+      "name": "membership_iap_subscription_failed_title",
+      "value": "订阅购买失败"
+    },
+    {
+      "name": "membership_iap_restore_unavailable",
+      "value": "恢复购买暂不可用"
+    },
+    {
+      "name": "membership_iap_restore_failed_title",
+      "value": "恢复购买失败"
+    },
+    {
+      "name": "membership_iap_restore_found_title",
+      "value": "已找到购买记录"
+    },
+    {
+      "name": "membership_iap_restore_empty_title",
+      "value": "没有找到购买记录"
+    },
+    {
+      "name": "membership_iap_manage_unavailable",
+      "value": "订阅管理暂不可用"
+    },
+    {
+      "name": "membership_iap_manage_opened_title",
+      "value": "已打开订阅管理"
+    },
+    {
+      "name": "membership_iap_manage_failed_title",
+      "value": "订阅管理打开失败"
+    },
+    {
+      "name": "membership_iap_cancelled",
+      "value": "已取消操作"
+    },
+    {
+      "name": "membership_iap_error_code",
+      "value": "错误码 %1$d"
+    },
+    {
+      "name": "membership_iap_error_detail",
+      "value": "%1$s：%2$s"
+    },
+    {
+      "name": "membership_iap_missing_order",
+      "value": "华为 IAP 购买数据缺少完成发货所需的 purchaseToken 或 purchaseOrderId。"
+    },
+    {
+      "name": "membership_iap_invalid_purchase_json",
+      "value": "华为 IAP 购买数据不是有效 JSON，无法确认发货。"
+    },
+    {
+      "name": "membership_iap_verify_http_failed",
+      "value": "Aira IAP 验签服务请求失败（%1$d）。"
+    },
+    {
+      "name": "membership_iap_verify_login_required",
+      "value": "请先登录华为账号后再恢复 Aira Pro 权益。"
+    },
+    {
+      "name": "membership_iap_verify_empty",
+      "value": "Aira IAP 验签云函数没有返回结果。"
+    },
+    {
+      "name": "membership_iap_verify_invalid_json",
+      "value": "Aira IAP 验签云函数返回的 JSON 无法解析。"
+    },
+    {
+      "name": "membership_iap_verify_invalid_body",
+      "value": "Aira IAP 验签云函数返回的 body 无法解析。"
+    },
+    {
+      "name": "membership_plan_recommended",
+      "value": "推荐"
+    },
+    {
+      "name": "membership_plan_monthly_price",
+      "value": "%1$s / 月自动续费"
+    },
+    {
+      "name": "membership_plan_yearly_price",
+      "value": "%1$s / 年自动续费"
+    },
+    {
+      "name": "membership_plan_lifetime_price",
+      "value": "%1$s 长期"
+    },
+    {
+      "name": "membership_pro_active",
+      "value": "Aira Pro 权益有效"
+    },
+    {
+      "name": "settings_center_open_target_failed",
+      "value": "无法打开“%1$s”，请重试"
+    },
+    {
+      "name": "sync_bookmark_v4_backup_update",
+      "value": "备份并更新"
+    },
+    {
+      "name": "custom_home_guide_share_failed",
+      "value": "分享开发文档失败：%1$s"
+    },
+    {
+      "name": "browser_shell_file_info_failed",
+      "value": "读取文件信息失败：%1$s"
+    },
+    {
+      "name": "browser_shell_route_failed_detail",
+      "value": "%1$s：%2$s"
+    },
+    {
+      "name": "viewer_file",
+      "value": "文件"
+    },
+    {
+      "name": "viewer_choose_file",
+      "value": "请选择文件。"
+    },
+    {
+      "name": "viewer_html_empty",
+      "value": "这个 HTML 文件没有内容。"
+    },
+    {
+      "name": "viewer_html_unreadable",
+      "value": "无法读取这个 HTML 文件。"
+    },
+    {
+      "name": "viewer_page_expired",
+      "value": "这个文件页面已经失效，请重新打开。"
+    },
+    {
+      "name": "viewer_html_too_large",
+      "value": "这个 HTML 文件太大，无法整份读入。"
+    },
+    {
+      "name": "viewer_loading",
+      "value": "正在读取文件..."
+    },
+    {
+      "name": "viewer_json_empty",
+      "value": "这个 JSON 文件没有内容。"
+    },
+    {
+      "name": "viewer_text_empty",
+      "value": "这个文本文件没有内容。"
+    },
+    {
+      "name": "viewer_kind_markdown",
+      "value": "Markdown 文档"
+    },
+    {
+      "name": "viewer_kind_json",
+      "value": "JSON 文档"
+    },
+    {
+      "name": "viewer_kind_text",
+      "value": "文本文件"
+    },
+    {
+      "name": "viewer_kind_html",
+      "value": "HTML 文档"
+    },
+    {
+      "name": "viewer_label_name",
+      "value": "文件名"
+    },
+    {
+      "name": "viewer_label_type",
+      "value": "类型"
+    },
+    {
+      "name": "viewer_label_modified",
+      "value": "修改时间"
+    },
+    {
+      "name": "viewer_label_open_mode",
+      "value": "打开方式"
+    },
+    {
+      "name": "viewer_label_location",
+      "value": "位置"
+    },
+    {
+      "name": "viewer_unknown",
+      "value": "未知"
+    },
+    {
+      "name": "viewer_markdown_loading",
+      "value": "正在读取 Markdown 文件..."
+    },
+    {
+      "name": "viewer_markdown_choose",
+      "value": "请选择 Markdown 文件。"
+    },
+    {
+      "name": "viewer_markdown_too_large",
+      "value": "Markdown 文件超过 5 MB，暂不支持查看。"
+    },
+    {
+      "name": "viewer_markdown_file",
+      "value": "Markdown 文件"
+    },
+    {
+      "name": "viewer_markdown_read_failed",
+      "value": "Markdown 文件读取失败。"
+    },
+    {
+      "name": "download_status_paused",
+      "value": "下载已暂停"
+    },
+    {
+      "name": "download_status_downloading",
+      "value": "下载中"
+    },
+    {
+      "name": "download_status_completed",
+      "value": "已完成"
+    },
+    {
+      "name": "download_status_unnamed",
+      "value": "未命名下载"
+    },
+    {
+      "name": "download_status_failed",
+      "value": "下载失败"
+    },
+    {
+      "name": "download_status_complete",
+      "value": "下载完成"
+    },
+    {
+      "name": "download_status_waiting",
+      "value": "等待下载"
+    },
+    {
+      "name": "download_status_canceled",
+      "value": "下载已取消"
+    },
+    {
+      "name": "download_status_waiting_short",
+      "value": "等待中"
+    },
+    {
+      "name": "download_status_canceled_short",
+      "value": "已取消"
+    },
+    {
+      "name": "download_status_no_source",
+      "value": "当前没有可显示的来源信息"
+    },
+    {
+      "name": "download_status_time_unknown",
+      "value": "完成时间未知"
+    },
+    {
+      "name": "download_action_save_system",
+      "value": "保存到系统下载"
+    },
+    {
+      "name": "download_action_delete_task",
+      "value": "删除任务"
+    },
+    {
+      "name": "download_action_copy_link",
+      "value": "复制下载链接"
+    },
+    {
+      "name": "download_status_failed_code",
+      "value": "下载失败，错误码 %1$d"
+    },
+    {
+      "name": "download_status_running_speed",
+      "value": "正在下载%1$s"
+    },
+    {
+      "name": "download_status_raw",
+      "value": "状态：%1$s"
+    },
+    {
+      "name": "download_progress_unknown_size",
+      "value": "%1$s / 未知大小"
+    },
+    {
+      "name": "download_cancel_message",
+      "value": "这会删除当前下载任务和已下载的临时文件。\n\n%1$s"
+    },
+    {
+      "name": "download_delete_file_message",
+      "value": "下载任务会从 Aira 中删除，对应文件将移入系统回收站。\n\n%1$s"
+    },
+    {
+      "name": "download_delete_task_message",
+      "value": "只删除 Aira 中的下载任务，对应文件会保留。\n\n%1$s"
+    },
+    {
+      "name": "download_settings_open_failed",
+      "value": "打开下载设置失败：%1$s"
+    },
+    {
+      "name": "download_delete_selected_message",
+      "value": "确定删除选中的 %1$d 项下载吗？\n\n“仅删除任务”会让文件保留在设备上；“删除任务和文件”会把文件移入系统回收站。"
+    },
+    {
+      "name": "download_deleted_records",
+      "value": "已删除 %1$d 项下载记录。"
+    },
+    {
+      "name": "download_deleted_items",
+      "value": "已删除 %1$d 项下载。"
+    },
+    {
+      "name": "download_saved_to_location",
+      "value": "已保存到%1$s：%2$s。"
+    },
+    {
+      "name": "download_completed_saved_to",
+      "value": "下载完成，已保存到%1$s：%2$s。"
+    },
+    {
+      "name": "download_system_downloads",
+      "value": "系统下载目录"
+    },
+    {
+      "name": "download_canceled_message",
+      "value": "下载已取消。"
+    },
+    {
+      "name": "download_start_no_directory",
+      "value": "下载启动失败：无法创建本地保存目录。"
+    },
+    {
+      "name": "download_started",
+      "value": "开始下载 %1$s。"
+    },
+    {
+      "name": "download_start_failed",
+      "value": "下载启动失败：%1$s。"
+    },
+    {
+      "name": "download_queued",
+      "value": "已加入下载队列：%1$s。"
+    },
+    {
+      "name": "download_queued_wifi",
+      "value": "已加入下载队列，连接 WLAN 后开始下载：%1$s。"
+    },
+    {
+      "name": "download_queued_offline",
+      "value": "网络不可用，已加入下载队列：%1$s。"
+    },
+    {
+      "name": "download_queued_unknown_network",
+      "value": "无法确认网络类型，已暂缓下载：%1$s。"
+    },
+    {
+      "name": "download_failed_file",
+      "value": "下载失败：%1$s。"
+    },
+    {
+      "name": "download_completed_system",
+      "value": "下载完成，已保存到系统下载目录：%1$s。"
+    },
+    {
+      "name": "download_completed_file",
+      "value": "下载完成：%1$s。"
+    },
+    {
+      "name": "download_export_failed",
+      "value": "下载完成，但自动导出到系统下载目录失败。文件仍保存在 Aira 临时下载目录：%1$s。"
+    },
+    {
+      "name": "download_export_skipped",
+      "value": "下载完成，未导出到系统下载目录。文件仍保存在 Aira 临时下载目录：%1$s。"
+    },
+    {
+      "name": "download_cleanup_failed",
+      "value": "下载临时文件清理失败：%1$s。"
+    },
+    {
+      "name": "download_paused_progress_kept",
+      "value": "下载已暂停，已有进度已保留。"
+    },
+    {
+      "name": "download_connection_lost",
+      "value": "下载连接已中断，请重试。"
+    },
+    {
+      "name": "download_network_offline",
+      "value": "网络不可用，下载已等待网络恢复。"
+    },
+    {
+      "name": "download_network_cellular",
+      "value": "当前为蜂窝网络，下载已等待 WLAN。"
+    },
+    {
+      "name": "download_network_unknown",
+      "value": "无法确认当前网络类型，下载已暂缓。"
+    },
+    {
+      "name": "download_network_unsupported",
+      "value": "当前网络类型暂不支持自动下载，下载已暂缓。"
+    },
+    {
+      "name": "download_open_missing",
+      "value": "无法打开下载文件：文件不存在或尚未落地。"
+    },
+    {
+      "name": "download_open_failed",
+      "value": "无法打开下载文件：%1$s。"
+    },
+    {
+      "name": "download_location_missing",
+      "value": "无法打开下载位置：文件不存在或尚未落地。"
+    },
+    {
+      "name": "download_location_opened",
+      "value": "已提供下载文件位置入口：%1$s。"
+    },
+    {
+      "name": "download_location_failed",
+      "value": "无法打开下载位置：%1$s。"
+    },
+    {
+      "name": "download_notification_tasks",
+      "value": "%1$d 个下载任务"
+    },
+    {
+      "name": "download_notification_downloading",
+      "value": "正在下载"
+    },
+    {
+      "name": "download_notification_files",
+      "value": "正在下载 %1$d 个文件"
+    },
+    {
+      "name": "download_notification_tap",
+      "value": "点击查看下载"
+    },
+    {
+      "name": "download_notification_preparing",
+      "value": "准备中"
+    },
+    {
+      "name": "download_indicator_many_unknown",
+      "value": "正在下载 %1$d 个任务，进度未知"
+    },
+    {
+      "name": "download_indicator_unknown",
+      "value": "正在下载，进度未知"
+    },
+    {
+      "name": "download_indicator_many_percent",
+      "value": "正在下载 %1$d 个任务，%2$d%%"
+    },
+    {
+      "name": "download_indicator_percent",
+      "value": "正在下载，%1$d%%"
+    },
+    {
+      "name": "download_prompt_title",
+      "value": "是否下载文件？"
+    },
+    {
+      "name": "download_prompt_message",
+      "value": "下载确认只对本次点击生效。取消后不会再次自动触发。"
+    },
+    {
+      "name": "download_selection_empty",
+      "value": "请先选择下载任务。"
+    },
+    {
+      "name": "download_selection_title",
+      "value": "已选 %1$d 项"
+    },
+    {
+      "name": "download_private_completed",
+      "value": "私密下载完成，文件仅保存在本次会话临时目录：%1$s。"
+    },
+    {
+      "name": "download_temp_completed",
+      "value": "下载完成，文件仍保存在 Aira 临时下载目录：%1$s。"
+    },
+    {
+      "name": "download_choose_location_later",
+      "value": "完成后选择系统下载位置"
+    },
+    {
+      "name": "download_private_temp_dir",
+      "value": "Aira 私密临时下载目录"
+    },
+    {
+      "name": "download_temp_dir",
+      "value": "Aira 临时下载目录"
+    },
+    {
+      "name": "download_init_failed",
+      "value": "下载组件初始化失败，请稍后重试。"
+    },
+    {
+      "name": "download_canceled_named",
+      "value": "已取消下载：%1$s。"
+    },
+    {
+      "name": "download_choose_each_time",
+      "value": "下载时选择保存位置"
+    },
+    {
+      "name": "download_process_failed",
+      "value": "下载处理失败：%1$s。"
+    },
+    {
+      "name": "download_private_cleanup_failed",
+      "value": "私密下载临时文件清理失败：%1$s。"
+    },
+    {
+      "name": "download_custom_location",
+      "value": "自定义位置"
     }
   ]
 }

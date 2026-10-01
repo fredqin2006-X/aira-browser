@@ -117,9 +117,9 @@ export struct AiraCloudBookmarkV4BootstrapOverlay {
   @Builder
   private buildPreparationDetails() {
     Column({ space: 12 }) {
-      this.buildDetailRow('1', '导出本机书签备份到你选择的位置')
-      this.buildDetailRow('2', '清空本机书签')
-      this.buildDetailRow('3', '从云端同步一份完整书签')
+      this.buildDetailRow('1', $r('app.string.sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_003'))
+      this.buildDetailRow('2', $r('app.string.sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_008'))
+      this.buildDetailRow('3', $r('app.string.sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_002'))
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
@@ -127,7 +127,7 @@ export struct AiraCloudBookmarkV4BootstrapOverlay {
   }
 
   @Builder
-  private buildDetailRow(index: string, label: string) {
+  private buildDetailRow(index: string, label: ResourceStr) {
     Row({ space: 12 }) {
       Text(index)
         .width(28)
@@ -152,7 +152,9 @@ export struct AiraCloudBookmarkV4BootstrapOverlay {
   @Builder
   private buildActions() {
     Column({ space: 10 }) {
-      Button(this.state.primaryAction === 'retry' ? '重试' : '备份并更新')
+      Button(this.state.primaryAction === 'retry'
+        ? $r('app.string.novel_action_retry')
+        : $r('app.string.sync_bookmark_v4_backup_update'))
         .width('100%')
         .height(50)
         .fontSize(16)
@@ -177,23 +179,23 @@ export struct AiraCloudBookmarkV4BootstrapOverlay {
     }
   }
 
-  private resolveTitle(): string {
+  private resolveTitle(): ResourceStr {
     if (this.state.status === 'running') {
-      return '正在备份并更新书签';
+      return $r('app.string.sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_006');
     }
     if (this.state.status === 'failed') {
-      return '书签更新未完成';
+      return $r('app.string.sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_001');
     }
-    return '更新 Aira 云书签';
+    return $r('app.string.sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_004');
   }
 
-  private resolveMessage(): string {
+  private resolveMessage(): ResourceStr {
     if (this.state.status === 'running') {
-      return '请保持 Aira 在前台。完成前不会启动自动书签同步。';
+      return $r('app.string.sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_009');
     }
     if (this.state.status === 'failed') {
-      return '本机书签备份已经保存。请重试，用云端书签覆盖本机。';
+      return $r('app.string.sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_005');
     }
-    return '此版本使用全新的 Aira 云书签基线。请先把本机书签导出为本地备份；备份成功后会清空本机书签，再从云端同步一份。';
+    return $r('app.string.sync_ui_aira_cloud_bookmark_v4_bootstrap_overlay_007');
   }
 }

@@ -4,6 +4,7 @@ import { fileManagerService } from '@kit.FileManagerServiceKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { AppRuntimeContext } from '../../app/runtime/AppRuntimeContext';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { DownloadFileNameService } from './DownloadFileNameService';
 import {
   DownloadFilenameConflictPlan,
@@ -287,7 +288,7 @@ export class DownloadFileResolutionService implements DownloadFileResolutionAdap
   }
 
   buildTemporaryDisplayPath(fileName: string): string {
-    return `Aira 临时下载目录/${this.sanitizeFileName(fileName)}`;
+    return resolveAppResourceText($r('app.string.download_temp_dir')) + '/' + this.sanitizeFileName(fileName);
   }
 
   private getDownloadsTempDir(): string {

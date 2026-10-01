@@ -12,6 +12,7 @@ import {
 } from './HuaweiIapProductCatalog';
 import { HuaweiIapAccountBindingService } from './HuaweiIapAccountBindingService';
 import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../common/config/AiraDistributionCapabilityOwner';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 const IAP_SYSTEM_CAPABILITY: string = 'SystemCapability.Payment.IAP';
 const IAP_SUBSCRIPTION_PRODUCT_IDS: string[] = AIRA_PRO_IAP_PLANS.map((plan: HuaweiIapProductPlan) => plan.productId);
@@ -122,7 +123,9 @@ export class HuaweiIapPurchaseService {
     const productId = resolveAiraProProductId(normalizedPlanId);
     const action: HuaweiIapAction = oneTimeSelected ? 'purchase_pro_one_time' : 'purchase_pro_monthly';
     if (!this.isIapAvailable()) {
-      return this.buildIapUnavailableResult(action, oneTimeSelected ? '一次购暂不可用' : '订阅暂不可用');
+      return this.buildIapUnavailableResult(action, oneTimeSelected
+        ? $r('app.string.membership_iap_lifetime_unavailable')
+        : $r('app.string.membership_iap_subscription_unavailable'));
     }
     const purchaseParameter: iap.PurchaseParameter = {
       productType: oneTimeSelected ? iap.ProductType.NONCONSUMABLE : iap.ProductType.AUTORENEWABLE,
@@ -134,7 +137,9 @@ export class HuaweiIapPurchaseService {
       const result = await iap.createPurchase(context, purchaseParameter);
       return {
         ok: true,
-        title: oneTimeSelected ? '一次购支付完成' : '订阅购买完成',
+        title: oneTimeSelected
+          ? $r('app.string.membership_iap_lifetime_paid')
+          : $r('app.string.membership_iap_subscription_paid'),
         message: oneTimeSelected
           ? $r('app.string.settings_pro_iap_received_lifetime')
           : $r('app.string.settings_pro_iap_received_subscription'),
@@ -145,13 +150,15 @@ export class HuaweiIapPurchaseService {
           : [result.purchaseData]
       };
     } catch (error) {
-      return this.buildFailureResult(action, oneTimeSelected ? '一次购支付失败' : '订阅购买失败', error);
+      return this.buildFailureResult(action, oneTimeSelected
+        ? $r('app.string.membership_iap_lifetime_failed_title')
+        : $r('app.string.membership_iap_subscription_failed_title'), error);
     }
   }
 
   async restorePurchases(context: common.UIAbilityContext): Promise<HuaweiIapOperationResult> {
     if (!this.isIapAvailable()) {
-      return this.buildIapUnavailableResult('restore_purchase', '恢复购买暂不可用');
+      return this.buildIapUnavailableResult('restore_purchase', $r('app.string.membership_iap_restore_unavailable'));
     }
     let subscriptionDataList: string[] = [];
     let oneTimeDataList: string[] = [];
@@ -189,12 +196,15 @@ export class HuaweiIapPurchaseService {
       oneTimeError = undefined;
     }
     if (subscriptionError !== undefined && oneTimeError !== undefined) {
-      return this.buildFailureResult('restore_purchase', '恢复购买失败', subscriptionError);
+      return this.buildFailureResult('restore_purchase', $r('app.string.membership_iap_restore_failed_title'),
+        subscriptionError);
     }
     const purchaseDataList = oneTimeDataList.concat(subscriptionDataList);
     return {
       ok: true,
-      title: purchaseDataList.length > 0 ? '已找到购买记录' : '没有找到购买记录',
+      title: purchaseDataList.length > 0
+        ? $r('app.string.membership_iap_restore_found_title')
+        : $r('app.string.membership_iap_restore_empty_title'),
       message: purchaseDataList.length > 0
         ? $r('app.string.settings_pro_iap_restore_found')
         : $r('app.string.settings_pro_iap_restore_empty'),
@@ -207,7 +217,7 @@ export class HuaweiIapPurchaseService {
 
   async openSubscriptionManagement(context: common.UIAbilityContext): Promise<HuaweiIapOperationResult> {
     if (!this.isIapAvailable()) {
-      return this.buildIapUnavailableResult('manage_subscription', '订阅管理暂不可用');
+      return this.buildIapUnavailableResult('manage_subscription', $r('app.string.membership_iap_manage_unavailable'));
     }
     try {
       await iap.showManagedSubscriptions(context, {
@@ -215,12 +225,12 @@ export class HuaweiIapPurchaseService {
       });
       return {
         ok: true,
-        title: '已打开订阅管理',
+        title: $r('app.string.membership_iap_manage_opened_title'),
         message: $r('app.string.settings_pro_iap_manage_opened'),
         action: 'manage_subscription'
       };
     } catch (error) {
-      return this.buildFailureResult('manage_subscription', '订阅管理打开失败', error);
+      return this.buildFailureResult('manage_subscription', $r('app.string.membership_iap_manage_failed_title'), error);
     }
   }
 
@@ -282,7 +292,7 @@ export class HuaweiIapPurchaseService {
     if (!AIRA_DISTRIBUTION_CAPABILITY_OWNER.isAvailable('huawei_iap')) {
       return AIRA_DISTRIBUTION_CAPABILITY_OWNER.resolveUnavailableReason('huawei_iap');
     }
-    return '当前设备暂不支持华为应用内支付，已有会员权益不受影响。';
+    return resolveAppResourceText($r('app.string.settings_pro_iap_unsupported'));
   }
 
   private buildIapUnavailableResult(action: HuaweiIapAction, title: ResourceStr): HuaweiIapOperationResult {
@@ -307,7 +317,7 @@ export class HuaweiIapPurchaseService {
     const purchaseToken = this.normalizeString(order.purchaseToken ?? decodedStatus?.purchaseToken ?? purchase.purchaseToken);
     const purchaseOrderId = this.normalizeString(order.purchaseOrderId ?? purchase.purchaseOrderId);
     if (purchaseToken.length <= 0 || purchaseOrderId.length <= 0) {
-      throw new Error('华为 IAP 购买数据缺少完成发货所需的 purchaseToken 或 purchaseOrderId。');
+      throw new Error(resolveAppResourceText($r('app.string.membership_iap_missing_order')));
     }
     return {
       productType: order.productType ?? purchase.productType,
@@ -320,7 +330,7 @@ export class HuaweiIapPurchaseService {
     try {
       return JSON.parse(purchaseData) as HuaweiIapRawPurchaseData;
     } catch (_error) {
-      throw new Error('华为 IAP 购买数据不是有效 JSON，无法确认发货。');
+      throw new Error(resolveAppResourceText($r('app.string.membership_iap_invalid_purchase_json')));
     }
   }
 
@@ -352,7 +362,7 @@ export class HuaweiIapPurchaseService {
     if (this.isUserCancelledError(businessError)) {
       return {
         ok: false,
-        title: '已取消操作',
+        title: $r('app.string.membership_iap_cancelled'),
         message: '',
         action: action,
         silent: true,
@@ -420,10 +430,12 @@ export class HuaweiIapPurchaseService {
   }
 
   private formatErrorDetails(error: BusinessError): string {
-    const codeText = error.code === undefined ? '' : `错误码 ${error.code}`;
+    const codeText = error.code === undefined
+      ? ''
+      : resolveAppResourceText($r('app.string.membership_iap_error_code', error.code));
     const messageText = error.message === undefined || error.message.length === 0 ? '' : error.message;
     if (codeText.length > 0 && messageText.length > 0) {
-      return `${codeText}：${messageText}`;
+      return resolveAppResourceText($r('app.string.membership_iap_error_detail', codeText, messageText));
     }
     if (codeText.length > 0) {
       return codeText;

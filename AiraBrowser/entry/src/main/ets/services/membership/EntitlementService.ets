@@ -14,6 +14,7 @@ import {
   MembershipPlanPolicyService
 } from './MembershipPlanPolicyService';
 import { MembershipQuotaService } from './MembershipQuotaService';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export interface EntitlementContext {
   dataScope: string;
@@ -64,8 +65,8 @@ export class EntitlementService {
           featureKey,
           policy,
           'pro_expired',
-          'Aira Pro 已过期',
-          `${policy.title} 已暂停，续费后立即恢复。`,
+          resolveAppResourceText($r('app.string.membership_gate_expired_title')),
+          resolveAppResourceText($r('app.string.membership_gate_paused', this.featureTitle(policy))),
           'open_pro'
         );
       }
@@ -73,8 +74,8 @@ export class EntitlementService {
         featureKey,
         policy,
         'pro_required',
-        '升级 Aira Pro 后可继续',
-        `${policy.title} 是 Aira Pro 能力。`,
+        resolveAppResourceText($r('app.string.membership_gate_upgrade_continue')),
+        resolveAppResourceText($r('app.string.membership_gate_pro_feature', this.featureTitle(policy))),
         'open_pro'
       );
     }
@@ -84,8 +85,8 @@ export class EntitlementService {
         featureKey,
         policy,
         'club_required',
-        '当前版本暂不可用',
-        `${policy.title} 当前无法使用。`,
+        resolveAppResourceText($r('app.string.membership_gate_unavailable_title')),
+        resolveAppResourceText($r('app.string.membership_gate_unavailable_now', this.featureTitle(policy))),
         'none'
       );
     }
@@ -95,8 +96,8 @@ export class EntitlementService {
         featureKey,
         policy,
         'login_required',
-        '需要登录后使用',
-        `${policy.title} 需要绑定华为账号后使用。`,
+        resolveAppResourceText($r('app.string.membership_gate_login_title')),
+        resolveAppResourceText($r('app.string.membership_gate_login_required', this.featureTitle(policy))),
         'login'
       );
     }
@@ -126,8 +127,8 @@ export class EntitlementService {
         featureKey,
         policy,
         'pro_required',
-        '升级 Aira Pro 后可继续',
-        `${policy.title} 当前需要 Aira Pro。`,
+        resolveAppResourceText($r('app.string.membership_gate_upgrade_continue')),
+        resolveAppResourceText($r('app.string.membership_gate_needs_pro', this.featureTitle(policy))),
         'open_pro',
         quota
       );
@@ -138,8 +139,9 @@ export class EntitlementService {
         featureKey,
         policy,
         'quota_exceeded',
-        '升级 Aira Pro 后可继续',
-        `当前 ${this.resolvePlanLabel(entitlementPlan)} 的${policy.title}能力受限。`,
+        resolveAppResourceText($r('app.string.membership_gate_upgrade_continue')),
+        resolveAppResourceText($r('app.string.membership_gate_quota_limited',
+          this.resolvePlanLabel(entitlementPlan), this.featureTitle(policy))),
         'open_pro',
         quota
       );
@@ -170,7 +172,8 @@ export class EntitlementService {
       allowed: false,
       reason: reason,
       title: title,
-      message: message.length > 0 ? message : `${policy.title} 当前不可用。`,
+      message: message.length > 0 ? message :
+        resolveAppResourceText($r('app.string.membership_gate_unavailable_feature', this.featureTitle(policy))),
       primaryAction: primaryAction,
       quota: quota
     };
@@ -185,5 +188,40 @@ export class EntitlementService {
 
   private resolvePlanLabel(plan: AiraPlan): string {
     return this.policyService.resolveEntitlementPlanLabel(plan);
+  }
+
+  private featureTitle(policy: FeaturePolicy): string {
+    const featureKey = policy.featureKey;
+    if (featureKey === 'offline_page_save') {
+      return resolveAppResourceText($r('app.string.membership_feature_offline_pages'));
+    }
+    if (featureKey === 'userscript_install') {
+      return resolveAppResourceText($r('app.string.membership_feature_user_scripts'));
+    }
+    if (featureKey === 'manual_element_hide') {
+      return resolveAppResourceText($r('app.string.membership_feature_hide_rules'));
+    }
+    if (featureKey === 'cloud_translation') {
+      return resolveAppResourceText($r('app.string.membership_feature_translation'));
+    }
+    if (featureKey === 'cloud_sync') {
+      return resolveAppResourceText($r('app.string.membership_feature_bookmark_sync'));
+    }
+    if (featureKey === 'webdav_sync') {
+      return resolveAppResourceText($r('app.string.membership_feature_webdav'));
+    }
+    if (featureKey === 'bookmark_auto_sync') {
+      return resolveAppResourceText($r('app.string.membership_feature_bookmark_auto_sync'));
+    }
+    if (featureKey === 'phone_page_push') {
+      return resolveAppResourceText($r('app.string.membership_feature_page_push'));
+    }
+    if (featureKey === 'cross_device_tabs') {
+      return resolveAppResourceText($r('app.string.membership_feature_device_tabs'));
+    }
+    if (featureKey === 'labs_feature') {
+      return resolveAppResourceText($r('app.string.membership_feature_labs'));
+    }
+    return policy.title;
   }
 }

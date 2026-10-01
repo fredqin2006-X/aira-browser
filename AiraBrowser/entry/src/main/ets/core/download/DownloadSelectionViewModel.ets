@@ -1,14 +1,17 @@
 import { DownloadV2Status } from '../../domain/downloadv2/DownloadV2Types';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface DownloadSelectionCandidate {
   guid: string;
   status: DownloadV2Status;
 }
 
-export const DOWNLOAD_SELECTION_EMPTY_TOAST: string = '请先选择下载任务。';
+export function downloadSelectionEmptyToast(): string {
+  return resolveAppResourceText($r('app.string.download_selection_empty'));
+}
 
 export function buildDownloadSelectionTitle(selectedCount: number): string {
-  return `已选 ${selectedCount} 项`;
+  return resolveAppResourceText($r('app.string.download_selection_title', selectedCount));
 }
 
 /**

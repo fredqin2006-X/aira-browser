@@ -10,6 +10,7 @@ import {
   DownloadV2Prompt
 } from './DownloadV2CaptureTypes';
 import { inferDownloadSourceHost } from './DownloadV2UrlUtils';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 const DOWNLOAD_V2_CAPTURE_DOMAIN = 0x0000;
 const DOWNLOAD_V2_CAPTURE_TAG = 'DownloadV2Capture';
@@ -85,7 +86,8 @@ export class DownloadV2RequestCapture {
         mimeType: context?.mimeType,
         contentDisposition: context?.contentDisposition
       }),
-      sourceHost: sourceHost?.trim() ?? inferDownloadSourceHost(trimmedUrl) ?? '未知来源',
+      sourceHost: sourceHost?.trim() ?? inferDownloadSourceHost(trimmedUrl) ??
+        resolveAppResourceText($r('app.string.offline_unknown_source')),
       totalBytes: context?.totalBytes !== undefined && context.totalBytes > 0 ? Math.floor(context.totalBytes) : 0,
       mimeType: context?.mimeType,
       method: 'GET',
@@ -259,7 +261,8 @@ export class DownloadV2RequestCapture {
         mimeType: snapshot.mimeType,
         contentDisposition: snapshot.contentDisposition
       }),
-      sourceHost: inferDownloadSourceHost(snapshot.url) ?? '未知来源',
+      sourceHost: inferDownloadSourceHost(snapshot.url) ??
+        resolveAppResourceText($r('app.string.offline_unknown_source')),
       totalBytes: snapshot.totalBytes,
       mimeType: snapshot.mimeType,
       method: snapshot.method?.trim() ?? 'GET',
@@ -283,10 +286,10 @@ export class DownloadV2RequestCapture {
       totalBytes: request.totalBytes,
       mimeType: request.mimeType,
       contentDisposition: request.contentDisposition,
-      title: '是否下载文件？',
-      message: '下载确认只对本次点击生效。取消后不会再次自动触发。',
-      confirmLabel: '下载',
-      cancelLabel: '取消'
+      title: resolveAppResourceText($r('app.string.download_prompt_title')),
+      message: resolveAppResourceText($r('app.string.download_prompt_message')),
+      confirmLabel: resolveAppResourceText($r('app.string.media_resource_action_download')),
+      cancelLabel: resolveAppResourceText($r('app.string.settings_account_cancel'))
     };
   }
 

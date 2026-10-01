@@ -3,6 +3,7 @@ import { fileIo, fileShare, fileUri, picker } from '@kit.CoreFileKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BrowserDownloadSettings } from '../../common/models/BrowserModels';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 const DOWNLOAD_DIRECTORY_DOMAIN = 0x0000;
 const DOWNLOAD_DIRECTORY_TAG = 'DownloadLocationDirectory';
@@ -56,7 +57,7 @@ export interface DownloadCustomDirectory {
   label: string;
 }
 
-const DOWNLOAD_DIRECTORY_FALLBACK_LABEL: string = '自定义位置';
+
 
 /**
  * The full picker URI is far too long for a settings row, so this keeps the
@@ -66,7 +67,7 @@ const DOWNLOAD_DIRECTORY_FALLBACK_LABEL: string = '自定义位置';
 export function buildDownloadDirectoryLocationLabel(uri: string): string {
   const segments = resolveDecodedDirectorySegments(uri);
   if (segments.length === 0) {
-    return DOWNLOAD_DIRECTORY_FALLBACK_LABEL;
+    return resolveAppResourceText($r('app.string.download_custom_location'));
   }
   return segments.slice(-DOWNLOAD_DIRECTORY_LOCATION_TAIL_SEGMENTS).join('/');
 }

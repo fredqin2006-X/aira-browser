@@ -1,6 +1,7 @@
 import { fileIo } from '@kit.CoreFileKit';
 import { util } from '@kit.ArkTS';
 import { TabRecord } from '../../common/models/BrowserModels';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { BrowserWebLoadDataPayload } from '../../core/browser/BrowserWebLoadCoordinator';
 import { MarkdownDocumentViewerService } from '../markdown/MarkdownDocumentViewerService';
 import { documentViewerHtmlFileTransport } from './DocumentViewerHtmlFileTransport';
@@ -173,14 +174,14 @@ export class DocumentViewerService {
       return {
         url: candidateUrl,
         policy: policy,
-        title: policy.title.trim().length > 0 ? policy.title.trim() : '文件'
+        title: policy.title.trim().length > 0 ? policy.title.trim() : this.fileFallbackTitle()
       };
     }
     const normalizedFallbackTitle = fallbackTitle.trim();
     return {
       url: '',
       policy: this.resolveChromePolicy(''),
-      title: normalizedFallbackTitle.length > 0 ? normalizedFallbackTitle : '文件'
+      title: normalizedFallbackTitle.length > 0 ? normalizedFallbackTitle : this.fileFallbackTitle()
     };
   }
 
@@ -236,7 +237,7 @@ export class DocumentViewerService {
       info.displayName,
       this.buildHtml({
         title: info.displayName,
-        bodyHtml: '<p class="empty">正在读取文件...</p>',
+        bodyHtml: this.emptyParagraph($r('app.string.viewer_loading')),
         documentClass: this.resolveDocumentClass(info.kind)
       })
     );
@@ -259,7 +260,7 @@ export class DocumentViewerService {
       if (info.kind === 'html') {
         const html = text.trim().length > 0 ? text : this.buildHtml({
           title: info.displayName,
-          bodyHtml: '<p class="empty">这个 HTML 文件没有内容。</p>',
+          bodyHtml: this.emptyParagraph($r('app.string.viewer_html_empty')),
           documentClass: this.resolveDocumentClass(info.kind)
         });
         return this.buildPayload(url, info.displayName, html);
@@ -298,7 +299,7 @@ export class DocumentViewerService {
     }
     const stat = await fileIo.stat(policy.sourceUri);
     if (stat.isDirectory()) {
-      throw new Error('请选择文件。');
+      throw new Error(resolveAppResourceText($r('app.string.viewer_choose_file')));
     }
     const sizeBytes = Math.max(0, Math.floor(stat.size));
     const modifiedAtSeconds = Math.max(0, Math.floor(stat.mtime));
@@ -311,7 +312,7 @@ export class DocumentViewerService {
       sizeLabel: this.formatBytes(sizeBytes),
       modifiedAtSeconds: modifiedAtSeconds,
       modifiedAtLabel: this.formatUnixSeconds(modifiedAtSeconds),
-      readOnlyLabel: '只读查看',
+      readOnlyLabel: resolveAppResourceText($r('app.string.bottom_panel_action_viewer_info_subtitle')),
       rows: []
     };
     info.rows = this.buildInfoRows(info);
@@ -323,7 +324,7 @@ export class DocumentViewerService {
     return {
       active: true,
       kind: kind,
-      title: title.trim().length > 0 ? title.trim() : '文件',
+      title: title.trim().length > 0 ? title.trim() : this.fileFallbackTitle(),
       sourceUri: sourceUri,
       expansionEnabled: webLikeDocument,
       scrollCollapseEnabled: true,
@@ -364,18 +365,18 @@ export class DocumentViewerService {
   private async rejectOversizedHtmlFile(uri: string): Promise<void> {
     const stat = await fileIo.stat(uri);
     if (stat.isDirectory()) {
-      throw new Error('请选择文件。');
+      throw new Error(resolveAppResourceText($r('app.string.viewer_choose_file')));
     }
     const totalBytes = Math.max(0, Math.floor(stat.size));
     if (totalBytes > DOCUMENT_VIEWER_HTML_INLINE_MAX_BYTES) {
-      throw new Error('这个 HTML 文件太大，无法整份读入。');
+      throw new Error(resolveAppResourceText($r('app.string.viewer_html_too_large')));
     }
   }
 
   private async readTextFile(uri: string): Promise<string> {
     const stat = await fileIo.stat(uri);
     if (stat.isDirectory()) {
-      throw new Error('请选择文件。');
+      throw new Error(resolveAppResourceText($r('app.string.viewer_choose_file')));
     }
     const totalBytes = Math.max(0, Math.floor(stat.size));
     if (totalBytes <= 0) {
@@ -412,7 +413,7 @@ export class DocumentViewerService {
   private renderJson(text: string): string {
     const normalized = text.trim();
     if (normalized.length === 0) {
-      return '<p class="empty">这个 JSON 文件没有内容。</p>';
+      return this.emptyParagraph($r('app.string.viewer_json_empty'));
     }
     try {
       const parsed = JSON.parse(normalized) as Object;
@@ -424,13 +425,13 @@ export class DocumentViewerService {
 
   private renderText(text: string): string {
     if (text.trim().length === 0) {
-      return '<p class="empty">这个文本文件没有内容。</p>';
+      return this.emptyParagraph($r('app.string.viewer_text_empty'));
     }
     return `<pre class="document-pre">${this.escapeHtml(text)}</pre>`;
   }
 
   private buildHtml(input: DocumentViewerHtmlInput): string {
-    const title = input.title.trim().length > 0 ? input.title.trim() : '文件';
+    const title = input.title.trim().length > 0 ? input.title.trim() : this.fileFallbackTitle();
     return `<!doctype html>
 <html>
 <head>
@@ -515,33 +516,33 @@ body.document-json .document-pre {
   private resolveKindLabel(kind: DocumentViewerKind): string {
     switch (kind) {
       case 'markdown':
-        return 'Markdown 文档';
+        return resolveAppResourceText($r('app.string.viewer_kind_markdown'));
       case 'json':
-        return 'JSON 文档';
+        return resolveAppResourceText($r('app.string.viewer_kind_json'));
       case 'text':
-        return '文本文件';
+        return resolveAppResourceText($r('app.string.viewer_kind_text'));
       case 'html':
-        return 'HTML 文档';
+        return resolveAppResourceText($r('app.string.viewer_kind_html'));
       default:
-        return '文件';
+        return this.fileFallbackTitle();
     }
   }
 
   private buildInfoRows(info: DocumentViewerFileInfo): DocumentViewerInfoRow[] {
     return [
-      this.buildInfoRow('文件名', info.displayName, false),
-      this.buildInfoRow('类型', info.typeLabel, false),
-      this.buildInfoRow('大小', info.sizeLabel, false),
-      this.buildInfoRow('修改时间', info.modifiedAtLabel, false),
-      this.buildInfoRow('打开方式', info.readOnlyLabel, false),
-      this.buildInfoRow('位置', info.sourceUri, true)
+      this.buildInfoRow(resolveAppResourceText($r('app.string.viewer_label_name')), info.displayName, false),
+      this.buildInfoRow(resolveAppResourceText($r('app.string.viewer_label_type')), info.typeLabel, false),
+      this.buildInfoRow(resolveAppResourceText($r('app.string.offline_details_label_size')), info.sizeLabel, false),
+      this.buildInfoRow(resolveAppResourceText($r('app.string.viewer_label_modified')), info.modifiedAtLabel, false),
+      this.buildInfoRow(resolveAppResourceText($r('app.string.viewer_label_open_mode')), info.readOnlyLabel, false),
+      this.buildInfoRow(resolveAppResourceText($r('app.string.viewer_label_location')), info.sourceUri, true)
     ];
   }
 
   private buildInfoRow(label: string, value: string, multiline: boolean): DocumentViewerInfoRow {
     return {
       label: label,
-      value: value.trim().length > 0 ? value.trim() : '未知',
+      value: value.trim().length > 0 ? value.trim() : this.unknownLabel(),
       multiline: multiline
     };
   }
@@ -573,7 +574,7 @@ body.document-json .document-pre {
 
   private formatUnixSeconds(seconds: number): string {
     if (seconds <= 0) {
-      return '未知';
+      return this.unknownLabel();
     }
     const date = new Date(seconds * 1000);
     return `${date.getFullYear()}-${this.pad2(date.getMonth() + 1)}-${this.pad2(date.getDate())} ` +
@@ -647,7 +648,7 @@ body.document-json .document-pre {
     const slashIndex = Math.max(stripped.lastIndexOf('/'), stripped.lastIndexOf('\\'));
     const rawName = slashIndex >= 0 ? stripped.substring(slashIndex + 1) : stripped;
     const decodedName = this.safeDecode(rawName);
-    return decodedName.trim().length > 0 ? decodedName.trim() : '文件';
+    return decodedName.trim().length > 0 ? decodedName.trim() : this.fileFallbackTitle();
   }
 
   private stripQueryAndFragment(url: string): string {
@@ -694,6 +695,18 @@ body.document-json .document-pre {
     const separatorIndex = mimeType.indexOf(';');
     const raw = separatorIndex >= 0 ? mimeType.substring(0, separatorIndex) : mimeType;
     return raw.trim().toLowerCase();
+  }
+
+  private fileFallbackTitle(): string {
+    return resolveAppResourceText($r('app.string.viewer_file'));
+  }
+
+  private unknownLabel(): string {
+    return resolveAppResourceText($r('app.string.viewer_unknown'));
+  }
+
+  private emptyParagraph(message: Resource): string {
+    return '<p class="empty">' + this.escapeHtml(resolveAppResourceText(message)) + '</p>';
   }
 
   private escapeHtml(value: string): string {

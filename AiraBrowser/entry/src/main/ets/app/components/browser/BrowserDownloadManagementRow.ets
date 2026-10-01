@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   DownloadManagementRowAction,
   DownloadManagementRowMenuActionView,
@@ -632,19 +633,19 @@ export struct BrowserDownloadManagementRow {
   private resolveFileTypeLabel(): string {
     switch (this.row.fileType) {
       case 'archive':
-        return '压缩';
+        return resolveAppResourceText($r('app.string.browser_ui_browser_download_management_row_001'));
       case 'video':
-        return '视频';
+        return resolveAppResourceText($r('app.string.media_resource_tab_video'));
       case 'audio':
-        return '音频';
+        return resolveAppResourceText($r('app.string.media_resource_kind_audio'));
       case 'image':
-        return '图片';
+        return resolveAppResourceText($r('app.string.media_resource_kind_image'));
       case 'spreadsheet':
-        return '表格';
+        return resolveAppResourceText($r('app.string.browser_ui_browser_download_management_row_006'));
       case 'presentation':
-        return '演示';
+        return resolveAppResourceText($r('app.string.browser_ui_browser_download_management_row_004'));
       case 'web':
-        return '网页代码';
+        return resolveAppResourceText($r('app.string.browser_ui_browser_download_management_row_005'));
       case 'json':
         return 'JSON';
       case 'apk':
@@ -654,11 +655,11 @@ export struct BrowserDownloadManagementRow {
       case 'pdf':
         return 'PDF';
       case 'text':
-        return '文本';
+        return resolveAppResourceText($r('app.string.browser_ui_browser_download_management_row_003'));
       case 'document':
-        return '文档';
+        return resolveAppResourceText($r('app.string.media_resource_kind_document'));
       default:
-        return '文件';
+        return resolveAppResourceText($r('app.string.browser_ui_browser_download_management_row_002'));
     }
   }
 }

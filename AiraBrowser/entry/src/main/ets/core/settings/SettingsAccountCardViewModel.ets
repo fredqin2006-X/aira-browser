@@ -93,7 +93,7 @@ export class SettingsAccountCardViewModel {
     if (membership.plan === 'pro') {
       return this.membershipPresentationService.resolveAccountSubtitle(membership);
     }
-    return '本地浏览功能已全部开启，登录后可使用账号与云服务';
+    return $r('app.string.settings_account_signed_out_note');
   }
 
   private isHuaweiAccountSignedIn(settings?: AiraSyncSettings): boolean {
@@ -101,21 +101,26 @@ export class SettingsAccountCardViewModel {
       resolveAiraHuaweiAccountIdentity(settings.huaweiCloud, settings.huaweiSpace).uid.length > 0;
   }
 
-  private resolveHuaweiAccountTitle(settings?: AiraSyncSettings): string {
+  private resolveHuaweiAccountTitle(settings?: AiraSyncSettings): ResourceStr {
     if (settings === undefined) {
-      return '华为账号';
+      return $r('app.string.settings_account_huawei');
     }
     const identity = resolveAiraHuaweiAccountIdentity(settings.huaweiCloud, settings.huaweiSpace);
+    const uid = identity.uid;
+    const suffix = uid.length > 6 ? uid.slice(uid.length - 6) : uid;
     const displayName = identity.displayName;
-    if (displayName.length > 0) {
+    if (displayName.length > 0 && !this.isFallbackHuaweiDisplayName(displayName, suffix)) {
       return displayName;
     }
-    const uid = identity.uid;
-    if (uid.length <= 0) {
-      return '华为账号';
+    if (suffix.length <= 0) {
+      return $r('app.string.settings_account_huawei');
     }
-    const suffix = uid.length > 6 ? uid.slice(uid.length - 6) : uid;
-    return `华为账号 ${suffix}`;
+    return $r('app.string.settings_account_huawei_suffix', suffix);
+  }
+
+  /** Stored when Huawei does not provide a nickname. The value itself stays Chinese. */
+  private isFallbackHuaweiDisplayName(displayName: string, suffix: string): boolean {
+    return displayName === '华为账号' || (suffix.length > 0 && displayName === `华为账号 ${suffix}`);
   }
 
   private resolveAvatarUri(settings?: AiraSyncSettings, localAvatarUri: string = ''): string {

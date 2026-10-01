@@ -1,5 +1,6 @@
 import { AiraFeatureKey } from '../../common/constants/MembershipFeatureKeys';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   AiraAccountRecognition,
   AiraFeatureQuota,
@@ -241,7 +242,7 @@ export class MembershipFeature {
       return {
         ok: false,
         code: 'private_session_blocked',
-        message: '请回到普通会话后再同步新用户会员。'
+        message: resolveAppResourceText($r('app.string.membership_gift_private_session'))
       };
     }
     await this.repository.initialize();
@@ -251,7 +252,7 @@ export class MembershipFeature {
       return {
         ok: false,
         code: 'login_required',
-        message: '请先使用华为账号登录。'
+        message: resolveAppResourceText($r('app.string.membership_login_required'))
       };
     }
     const accountScope = this.captureAccountScope(uid);
@@ -267,14 +268,14 @@ export class MembershipFeature {
       return {
         ok: false,
         code: response.code?.trim() ?? 'gift_ensure_failed',
-        message: response.message?.trim() ?? '新用户会员暂时未能同步，请稍后再试。'
+        message: response.message?.trim() ?? resolveAppResourceText($r('app.string.membership_gift_sync_failed'))
       };
     }
     if (!this.isCurrentAccountScope(accountScope)) {
       return {
         ok: false,
         code: 'account_changed',
-        message: '账号已切换，请稍后重试。'
+        message: resolveAppResourceText($r('app.string.membership_account_changed'))
       };
     }
     const committedSnapshot = await this.repository.updateSnapshotIf(
@@ -295,7 +296,7 @@ export class MembershipFeature {
       return {
         ok: false,
         code: 'account_changed',
-        message: '账号已切换，请稍后重试。'
+        message: resolveAppResourceText($r('app.string.membership_account_changed'))
       };
     }
     // The grant is already committed server-side, so the authoritative
@@ -312,14 +313,14 @@ export class MembershipFeature {
       return {
         ok: false,
         code: 'grant_not_applied',
-        message: '新用户会员未能生效，请稍后在会员页恢复。'
+        message: resolveAppResourceText($r('app.string.membership_gift_not_applied'))
       };
     }
     this.notifyStateChanged(committedSnapshot.state);
     return {
       ok: true,
       code: 'gift_granted',
-      message: '已获得新用户会员',
+      message: resolveAppResourceText($r('app.string.membership_gift_granted')),
       state: committedSnapshot.state
     };
   }
@@ -337,7 +338,7 @@ export class MembershipFeature {
       return {
         ok: false,
         code: 'private_session_blocked',
-        message: '请回到普通会话后再领取会员。'
+        message: resolveAppResourceText($r('app.string.membership_claim_private_session'))
       };
     }
     await this.repository.initialize();
@@ -347,7 +348,7 @@ export class MembershipFeature {
       return {
         ok: false,
         code: 'login_required',
-        message: '请先使用华为账号登录。'
+        message: resolveAppResourceText($r('app.string.membership_login_required'))
       };
     }
     const accountScope = this.captureAccountScope(uid);
@@ -356,7 +357,7 @@ export class MembershipFeature {
       return {
         ok: false,
         code: 'account_changed',
-        message: '账号已切换，请稍后重试。'
+        message: resolveAppResourceText($r('app.string.membership_account_changed'))
       };
     }
     if (response.ok !== true) {
@@ -364,7 +365,7 @@ export class MembershipFeature {
       return {
         ok: false,
         code: response.code?.trim() ?? 'complimentary_claim_failed',
-        message: response.message?.trim() ?? '会员领取失败，请稍后再试。'
+        message: response.message?.trim() ?? resolveAppResourceText($r('app.string.settings_pro_claim_failed'))
       };
     }
     const committedSnapshot = await this.commitComplimentaryClaimGrant(accountScope, response);
@@ -372,28 +373,28 @@ export class MembershipFeature {
       return {
         ok: false,
         code: 'account_changed',
-        message: '账号已切换，请稍后重试。'
+        message: resolveAppResourceText($r('app.string.membership_account_changed'))
       };
     }
     if (committedSnapshot === undefined) {
       return {
         ok: false,
         code: 'grant_not_applied',
-        message: '会员领取未能生效，请稍后重试。'
+        message: resolveAppResourceText($r('app.string.membership_claim_not_applied'))
       };
     }
     if (committedSnapshot.state.plan !== 'pro') {
       return {
         ok: false,
         code: 'grant_not_applied',
-        message: '会员领取未能生效，请稍后重试。'
+        message: resolveAppResourceText($r('app.string.membership_claim_not_applied'))
       };
     }
     this.notifyStateChanged(committedSnapshot.state);
     return {
       ok: true,
       code: 'complimentary_claim_granted',
-      message: response.message?.trim() ?? '已领取 15 天会员',
+      message: response.message?.trim() ?? resolveAppResourceText($r('app.string.membership_claim_granted')),
       state: committedSnapshot.state
     };
   }
@@ -411,7 +412,7 @@ export class MembershipFeature {
       return {
         ok: false,
         code: 'private_session_blocked',
-        message: '请回到普通会话后再兑换会员。',
+        message: resolveAppResourceText($r('app.string.membership_redeem_private_session')),
         kind: ''
       };
     }
@@ -420,7 +421,7 @@ export class MembershipFeature {
       return {
         ok: false,
         code: 'invalid_format',
-        message: '兑换码格式不正确',
+        message: resolveAppResourceText($r('app.string.settings_pro_redeem_invalid')),
         kind: ''
       };
     }
@@ -431,7 +432,7 @@ export class MembershipFeature {
       return {
         ok: false,
         code: 'login_required',
-        message: '请先使用华为账号登录。',
+        message: resolveAppResourceText($r('app.string.membership_login_required')),
         kind: ''
       };
     }
@@ -441,7 +442,7 @@ export class MembershipFeature {
       return {
         ok: false,
         code: 'account_changed',
-        message: '账号已切换，请稍后重试。',
+        message: resolveAppResourceText($r('app.string.membership_account_changed')),
         kind: ''
       };
     }
@@ -451,7 +452,7 @@ export class MembershipFeature {
       return {
         ok: false,
         code: response.code?.trim() ?? 'membership_redeem_failed',
-        message: response.message?.trim() ?? '兑换失败，请稍后再试。',
+        message: response.message?.trim() ?? resolveAppResourceText($r('app.string.settings_pro_redeem_failed')),
         kind: ''
       };
     }
@@ -460,7 +461,7 @@ export class MembershipFeature {
       return {
         ok: false,
         code: 'account_changed',
-        message: '账号已切换，请稍后重试。',
+        message: resolveAppResourceText($r('app.string.membership_account_changed')),
         kind: ''
       };
     }
@@ -468,7 +469,7 @@ export class MembershipFeature {
       return {
         ok: false,
         code: 'grant_not_applied',
-        message: '兑换未能生效，请稍后重试。',
+        message: resolveAppResourceText($r('app.string.membership_redeem_not_applied')),
         kind: ''
       };
     }
@@ -476,7 +477,7 @@ export class MembershipFeature {
     return {
       ok: true,
       code: 'membership_redeemed',
-      message: response.message?.trim() ?? '已兑换会员',
+      message: response.message?.trim() ?? resolveAppResourceText($r('app.string.membership_redeem_granted')),
       kind: kind,
       state: committedSnapshot.state
     };
@@ -633,7 +634,8 @@ export class MembershipFeature {
       }
       const accountProfile = remote.accountProfile ?? undefined;
       if (accountProfile === undefined || !this.isAuthoritativeAccountProfile(accountProfile, uid)) {
-        throw new Error('invalid_account_profile: 账号资料响应缺少有效账号。');
+        throw new Error('invalid_account_profile: ' +
+          resolveAppResourceText($r('app.string.membership_account_profile_invalid')));
       }
       if (!this.isCurrentAccountProfileRequest(accountScope, accountProfileRequestGeneration)) {
         return this.getState();
@@ -673,7 +675,8 @@ export class MembershipFeature {
         throw this.buildMembershipStateFunctionError(remoteState);
       }
       if (!this.isAuthoritativeMembershipGrant(remoteState.membershipGrant ?? undefined, uid)) {
-        throw new Error('invalid_membership_grant: 会员状态响应缺少有效账号权益。');
+        throw new Error('invalid_membership_grant: ' +
+          resolveAppResourceText($r('app.string.membership_grant_invalid')));
       }
       if (!this.isCurrentEntitlementRequest(accountScope, entitlementRequestGeneration)) {
         return this.getState();
@@ -812,8 +815,8 @@ export class MembershipFeature {
         featureKey: featureKey,
         allowed: false,
         reason: 'unsupported_context',
-        title: '当前会话无法读取会员权益',
-        message: '会员权益读取未通过隐私策略检查。',
+        title: resolveAppResourceText($r('app.string.membership_entitlement_private_title')),
+        message: resolveAppResourceText($r('app.string.membership_entitlement_private_message')),
         primaryAction: 'none'
       };
     }
@@ -941,7 +944,8 @@ export class MembershipFeature {
 
   private buildMembershipStateFunctionError(result: AiraMembershipStateResponseBody): Error {
     const code = result.code?.trim() ?? 'membership_state_failed';
-    const message = result.message?.trim() ?? '会员状态暂时无法刷新，请稍后再试。';
+    const message = result.message?.trim() ??
+      resolveAppResourceText($r('app.string.membership_state_refresh_failed'));
     return new Error(`${code}: ${message}`);
   }
 

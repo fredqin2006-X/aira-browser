@@ -535,6 +535,9 @@ export struct BrowserTabsFloatingOverlay {
             },
             onOpenDeviceTabs: () => {
               this.onOpenDeviceTabs();
+            },
+            onCloseAll: () => {
+              this.onRequestCloseAll();
             }
           })
           .zIndex(FLOATING_TABS_BOTTOM_CHROME_Z_INDEX)

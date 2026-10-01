@@ -4,6 +4,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { notificationManager } from '@kit.NotificationKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { AppRuntimeContext } from '../../app/runtime/AppRuntimeContext';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { DownloadV2TaskEntity } from '../../domain/downloadv2/DownloadV2TaskEntity';
 import { DownloadV2Status, isDownloadV2TerminalStatus } from '../../domain/downloadv2/DownloadV2Types';
 
@@ -247,7 +248,7 @@ export class DownloadV2SystemNotificationService {
     const title = this.buildProgressTitle(progress);
     const fileName = progress.taskCount === 1
       ? this.resolveFileName(progress.primaryTask)
-      : `${progress.taskCount} 个下载任务`;
+      : resolveAppResourceText($r('app.string.download_notification_tasks', progress.taskCount));
     const additionalText = this.buildProgressAdditionalText(progress);
     const request: notificationManager.NotificationRequest = {
       id: state.notificationId,
@@ -286,7 +287,7 @@ export class DownloadV2SystemNotificationService {
       request.template = {
         name: 'downloadTemplate',
         data: {
-          title: '正在下载',
+          title: resolveAppResourceText($r('app.string.download_notification_downloading')),
           fileName: fileName,
           progressValue: progress.progressPercent
         }
@@ -318,9 +319,11 @@ export class DownloadV2SystemNotificationService {
       content: {
         notificationContentType: notificationManager.ContentType.NOTIFICATION_CONTENT_BASIC_TEXT,
         normal: {
-          title: completed ? '下载完成' : '下载失败',
+          title: resolveAppResourceText(completed
+            ? $r('app.string.download_status_complete')
+            : $r('app.string.download_status_failed')),
           text: this.resolveFileName(task),
-          additionalText: '点击查看下载'
+          additionalText: resolveAppResourceText($r('app.string.download_notification_tap'))
         }
       }
     };
@@ -361,7 +364,9 @@ export class DownloadV2SystemNotificationService {
   }
 
   private buildProgressTitle(progress: DownloadV2AggregateProgress): string {
-    const subject = progress.taskCount === 1 ? '正在下载' : `正在下载 ${progress.taskCount} 个文件`;
+    const subject = progress.taskCount === 1
+      ? resolveAppResourceText($r('app.string.download_notification_downloading'))
+      : resolveAppResourceText($r('app.string.download_notification_files', progress.taskCount));
     return progress.progressDeterminate ? `${subject} ${progress.progressPercent}%` : subject;
   }
 
@@ -375,7 +380,7 @@ export class DownloadV2SystemNotificationService {
 
   private formatSpeed(task: DownloadV2TaskEntity): string {
     const speed = Math.max(0, task.progress.speedBytesPerSecond);
-    return speed > 0 ? `${this.formatSize(speed)}/s` : '准备中';
+    return speed > 0 ? `${this.formatSize(speed)}/s` : resolveAppResourceText($r('app.string.download_notification_preparing'));
   }
 
   private resolveFileName(task: DownloadV2TaskEntity): string {

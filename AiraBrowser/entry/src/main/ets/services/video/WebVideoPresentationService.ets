@@ -2215,29 +2215,137 @@ export class WebVideoPresentationService {
       } catch (_fullscreenEventError) {
       }
     };
+    // Inner shells such as plyr__video-wrapper contain the player name but are not the
+    // fullscreen root. Sites often lift a hard max-width/max-height only when the outer
+    // shell (class token "plyr", not "plyr__*") is the Fullscreen API element.
+    var isPlayerFullscreenRoot = function (className) {
+      var tokens = String(className || '').toLowerCase().split(/\\s+/);
+      for (var tokenIndex = 0; tokenIndex < tokens.length; tokenIndex += 1) {
+        var token = tokens[tokenIndex];
+        if (token === 'plyr' || token.indexOf('plyr--') === 0 ||
+            token === 'dplayer' || token === 'artplayer' || token === 'art-video-player' ||
+            token === 'video-js' || token === 'jwplayer' || token === 'xgplayer') {
+          return true;
+        }
+      }
+      return false;
+    };
+    var isPlayerFullscreenCandidate = function (className, dataPlayer) {
+      return /art-video-player|artplayer|dplayer|video-js|jwplayer|plyr|xgplayer|video-container/.test(className) ||
+        dataPlayer.length > 0;
+    };
     var resolveWebFullscreenTarget = function (videoElement) {
       var current = videoElement;
+      var fallback = null;
+      var playerRoot = null;
       for (var depth = 0; current && depth < 8; depth += 1) {
         try {
           var tagName = String(current.tagName || '').toLowerCase();
           var className = String(current.className || '').toLowerCase();
           var dataPlayer = String(current.getAttribute && current.getAttribute('data-player') || '').toLowerCase();
-          if (tagName !== 'video' &&
-              (/art-video-player|artplayer|dplayer|video-js|jwplayer|plyr|xgplayer|video-container/.test(className) ||
-               dataPlayer.length > 0)) {
-            return current;
+          if (tagName !== 'video' && isPlayerFullscreenRoot(className)) {
+            playerRoot = current;
+          } else if (!fallback && tagName !== 'video' && isPlayerFullscreenCandidate(className, dataPlayer)) {
+            fallback = current;
           }
           current = current.parentElement;
         } catch (_fullscreenTargetError) {
           break;
         }
       }
-      return videoElement;
+      return playerRoot || fallback || videoElement;
+    };
+    var fullscreenSizeCapSnapshots = [];
+    var fullscreenSizeCapProperties = ['max-width', 'max-height'];
+    var rememberAndLiftFullscreenSizeCap = function (element) {
+      if (!element || !element.style) {
+        return;
+      }
+      for (var existingIndex = 0; existingIndex < fullscreenSizeCapSnapshots.length; existingIndex += 1) {
+        if (fullscreenSizeCapSnapshots[existingIndex].element === element) {
+          return;
+        }
+      }
+      var properties = [];
+      for (var propertyIndex = 0; propertyIndex < fullscreenSizeCapProperties.length; propertyIndex += 1) {
+        var propertyName = fullscreenSizeCapProperties[propertyIndex];
+        properties.push({
+          name: propertyName,
+          value: String(element.style.getPropertyValue(propertyName) || ''),
+          priority: String(element.style.getPropertyPriority(propertyName) || '')
+        });
+      }
+      fullscreenSizeCapSnapshots.push({ element: element, properties: properties });
+      element.style.setProperty('max-width', 'none', 'important');
+      element.style.setProperty('max-height', 'none', 'important');
+    };
+    var restoreFullscreenSizeCaps = function () {
+      for (var snapshotIndex = fullscreenSizeCapSnapshots.length - 1; snapshotIndex >= 0; snapshotIndex -= 1) {
+        var snapshot = fullscreenSizeCapSnapshots[snapshotIndex];
+        if (!snapshot || !snapshot.element || !snapshot.element.style) {
+          continue;
+        }
+        for (var propertyIndex = 0; propertyIndex < snapshot.properties.length; propertyIndex += 1) {
+          var property = snapshot.properties[propertyIndex];
+          if (property.value.length > 0) {
+            snapshot.element.style.setProperty(property.name, property.value, property.priority);
+          } else {
+            snapshot.element.style.removeProperty(property.name);
+          }
+        }
+      }
+      fullscreenSizeCapSnapshots = [];
+    };
+    var fullscreenElementContainsVideo = function (videoElement) {
+      try {
+        var ownerDocument = videoElement && videoElement.ownerDocument ? videoElement.ownerDocument : document;
+        var fullscreenElement = ownerDocument.fullscreenElement || ownerDocument.webkitFullscreenElement || null;
+        if (!fullscreenElement || !videoElement) {
+          return false;
+        }
+        return fullscreenElement === videoElement ||
+          (typeof fullscreenElement.contains === 'function' && fullscreenElement.contains(videoElement));
+      } catch (_fullscreenContainsError) {
+        return false;
+      }
+    };
+    var restoreFullscreenSizeCapsIfInactive = function (videoElement) {
+      if (fullscreenElementContainsVideo(videoElement) || videoElement.webkitDisplayingFullscreen === true) {
+        return;
+      }
+      restoreFullscreenSizeCaps();
+    };
+    var liftFullscreenSizeCaps = function (videoElement, targetElement) {
+      var current = videoElement;
+      for (var depth = 0; current && depth < 8; depth += 1) {
+        rememberAndLiftFullscreenSizeCap(current);
+        if (current === targetElement) {
+          break;
+        }
+        current = current.parentElement;
+      }
+      rememberAndLiftFullscreenSizeCap(targetElement);
+      try {
+        var ownerDocument = videoElement && videoElement.ownerDocument ? videoElement.ownerDocument : document;
+        if (ownerDocument && videoElement.__airaFullscreenSizeCapListener !== true) {
+          videoElement.__airaFullscreenSizeCapListener = true;
+          var onFullscreenChange = function () {
+            restoreFullscreenSizeCapsIfInactive(videoElement);
+          };
+          ownerDocument.addEventListener('fullscreenchange', onFullscreenChange);
+          ownerDocument.addEventListener('webkitfullscreenchange', onFullscreenChange);
+        }
+      } catch (_fullscreenListenerError) {
+      }
     };
     var requestWebFullscreen = function (videoElement, attemptId) {
       var targetElement = resolveWebFullscreenTarget(videoElement);
       var requestMethod = null;
       try {
+        // Lift stylesheet max-width/max-height caps before requesting fullscreen. A site can
+        // keep the picture at a few hundred pixels unless its own :fullscreen selector matches,
+        // and that selector does not match an inner player shell.
+        liftFullscreenSizeCaps(videoElement, targetElement);
         if (targetElement && typeof targetElement.requestFullscreen === 'function') {
           requestMethod = targetElement.requestFullscreen;
         } else if (targetElement && typeof targetElement.webkitRequestFullscreen === 'function') {
@@ -2252,6 +2360,7 @@ export class WebVideoPresentationService {
             requestResult.then(function () {
               emitFullscreenRequestResult(attemptId, 'resolved', 'standard');
             }).catch(function (error) {
+              restoreFullscreenSizeCapsIfInactive(videoElement);
               emitFullscreenRequestResult(attemptId, 'rejected', String(error && (error.name || error.message) || error || 'rejected'));
             });
           }
@@ -2267,7 +2376,9 @@ export class WebVideoPresentationService {
           emitFullscreenRequestResult(attemptId, 'requested', 'webkit');
           return true;
         }
+        restoreFullscreenSizeCaps();
       } catch (error) {
+        restoreFullscreenSizeCapsIfInactive(videoElement);
         emitFullscreenRequestResult(attemptId, 'rejected', String(error && (error.name || error.message) || error || 'rejected'));
       }
       return false;

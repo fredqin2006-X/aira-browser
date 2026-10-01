@@ -1,4 +1,5 @@
 import { http } from '@kit.NetworkKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   MediaManifestMediaRendition,
   MediaManifestParseResult,
@@ -47,7 +48,7 @@ export class MediaManifestProcessingService {
   async parse(context: MediaManifestRequestContext): Promise<MediaManifestParseResult> {
     const url = context.url.trim();
     if (!this.isHttpUrl(url)) {
-      return this.fail('清单链接必须是 http 或 https。');
+      return this.fail(resolveAppResourceText($r('app.string.media_manifest_url_scheme')));
     }
     const fetchResult = await this.fetchText(url, context);
     if (!fetchResult.ok) {
@@ -63,17 +64,17 @@ export class MediaManifestProcessingService {
   ): Promise<MediaManifestParseResult> {
     const source = text.trim();
     if (source.length <= 0) {
-      return this.fail('清单内容为空。');
+      return this.fail(resolveAppResourceText($r('app.string.media_manifest_empty')));
     }
     if (this.looksLikeDash(source, url)) {
       const summary = this.createBaseSummary(url);
       summary.kind = 'dash';
       summary.role = 'dash';
-      summary.warnings.push('DASH/MPD 已识别，解析明细将在后续版本接入。');
+      summary.warnings.push(resolveAppResourceText($r('app.string.media_manifest_dash_deferred')));
       return { ok: true, summary: summary, errorMessage: '' };
     }
     if (!this.looksLikeHls(source, url)) {
-      return this.fail('没有识别到 HLS 或 DASH 清单。');
+      return this.fail(resolveAppResourceText($r('app.string.media_manifest_unrecognized')));
     }
     const lines = this.normalizeLines(source);
     const master = this.parseHlsMaster(lines, url);
@@ -119,7 +120,7 @@ export class MediaManifestProcessingService {
         requestHeaders: context.requestHeaders
       });
       if (!fetchResult.ok) {
-        summary.warnings.push('无法探测清晰度 ' + (i + 1).toString() + ' 的分片信息。');
+        summary.warnings.push(resolveAppResourceText($r('app.string.media_manifest_variant_probe_failed', i + 1)));
         continue;
       }
       const analysis = this.parseHlsMedia(this.normalizeLines(fetchResult.text), variant.url);
@@ -144,7 +145,7 @@ export class MediaManifestProcessingService {
     }
     summary.keyCount = summary.keyUrls.length;
     if (summary.variants.length > limit) {
-      summary.warnings.push('仅探测前 ' + limit.toString() + ' 个清晰度，避免页面资源解析过重。');
+      summary.warnings.push(resolveAppResourceText($r('app.string.media_manifest_probe_limit', limit)));
     }
   }
 
@@ -303,18 +304,18 @@ export class MediaManifestProcessingService {
         header: this.buildHeaders(context)
       });
       if (response.responseCode < 200 || response.responseCode >= 300 || typeof response.result !== 'string') {
-        return { ok: false, text: '', errorMessage: '清单请求失败。' };
+        return { ok: false, text: '', errorMessage: resolveAppResourceText($r('app.string.media_manifest_request_failed')) };
       }
       const text = response.result.trim();
       if (text.length <= 0) {
-        return { ok: false, text: '', errorMessage: '清单内容为空。' };
+        return { ok: false, text: '', errorMessage: resolveAppResourceText($r('app.string.media_manifest_empty')) };
       }
       if (text.length > MAX_MANIFEST_TEXT_BYTES) {
-        return { ok: false, text: '', errorMessage: '清单内容过大，暂不解析。' };
+        return { ok: false, text: '', errorMessage: resolveAppResourceText($r('app.string.media_manifest_too_large')) };
       }
       return { ok: true, text: text, errorMessage: '' };
     } catch (_error) {
-      return { ok: false, text: '', errorMessage: '清单请求失败。' };
+      return { ok: false, text: '', errorMessage: resolveAppResourceText($r('app.string.media_manifest_request_failed')) };
     } finally {
       request.destroy();
     }

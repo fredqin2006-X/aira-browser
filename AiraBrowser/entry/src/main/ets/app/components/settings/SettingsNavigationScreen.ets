@@ -94,8 +94,8 @@ export struct SettingsNavigationScreen {
   @Prop dividerColor: ResourceColor | undefined = undefined;
   @Prop settingsIconBackgrounds: BrowserSettingsIconBackgroundTokenSet = DEFAULT_BROWSER_SETTINGS_ICON_BACKGROUND_TOKENS;
   @Prop accountCard: SettingsAccountCardState = {
-    title: '未登录',
-    subtitle: '本地浏览功能已全部开启，登录后可使用账号与云服务',
+    title: $r('app.string.settings_account_signed_out'),
+    subtitle: $r('app.string.settings_account_signed_out_note'),
     isLoggedIn: false,
     avatarUri: '',
     membershipBadge: 'none',

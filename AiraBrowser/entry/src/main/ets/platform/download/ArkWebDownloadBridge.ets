@@ -10,6 +10,7 @@ import {
 } from './PlatformDownloadAdapter';
 import { LibcurlDownloadAdapter } from './LibcurlDownloadAdapter';
 import { DownloadRuntimeDiagnosticRecorder } from '../../common/models/RuntimeDiagnosticModels';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 const DOWNLOAD_BRIDGE_DOMAIN = 0x0000;
 const DOWNLOAD_BRIDGE_TAG = 'DownloadBridge';
@@ -375,9 +376,9 @@ export class ArkWebDownloadBridge implements PlatformDownloadAdapter {
   private readSuggestedFileName(item: webview.WebDownloadItem): string {
     try {
       const name = item.getSuggestedFileName();
-      return name.length > 0 ? name : '未命名下载';
+      return name.length > 0 ? name : resolveAppResourceText($r('app.string.download_status_unnamed'));
     } catch (_error) {
-      return '未命名下载';
+      return resolveAppResourceText($r('app.string.download_status_unnamed'));
     }
   }
 

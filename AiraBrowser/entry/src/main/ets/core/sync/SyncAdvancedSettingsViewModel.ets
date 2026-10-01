@@ -17,6 +17,7 @@ import {
 import {
   AIRA_CLOUD_BOOKMARK_API_LARGE_PAYLOAD_TIMEOUT_MS
 } from '../../services/sync/AiraCloudBookmarkRemoteStore';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   SYNC_OPERATION_PROGRESS_TIMING
 } from './SyncOperationProgressViewModel';
@@ -149,34 +150,34 @@ export class SyncAdvancedSettingsViewModel {
 
   resolveProviderServiceName(remoteKind: AiraSyncRemoteKind): string {
     if (remoteKind === 'aira_cloud') {
-      return 'Aira 云同步';
+      return resolveAppResourceText($r('app.string.settings_sync_goal_cloud'));
     }
     if (remoteKind === 'huawei_space') {
-      return '华为云空间同步';
+      return resolveAppResourceText($r('app.string.settings_sync_advanced_huawei_sync'));
     }
     if (remoteKind === 'webdav') {
       return 'WebDAV';
     }
     if (remoteKind === 'self_hosted') {
-      return '私有化部署';
+      return resolveAppResourceText($r('app.string.settings_sync_self_host_title'));
     }
-    return '同步服务';
+    return resolveAppResourceText($r('app.string.settings_sync_advanced_service'));
   }
 
   resolveProviderShortLabel(remoteKind: AiraSyncRemoteKind): string {
     if (remoteKind === 'aira_cloud') {
-      return 'Aira 云端';
+      return resolveAppResourceText($r('app.string.settings_sync_advanced_cloud_short'));
     }
     if (remoteKind === 'huawei_space') {
-      return '云空间';
+      return resolveAppResourceText($r('app.string.settings_sync_advanced_huawei_short'));
     }
     if (remoteKind === 'webdav') {
       return 'WebDAV';
     }
     if (remoteKind === 'self_hosted') {
-      return '私有化部署';
+      return resolveAppResourceText($r('app.string.settings_sync_self_host_title'));
     }
-    return '远端';
+    return resolveAppResourceText($r('app.string.settings_sync_advanced_remote_short'));
   }
 
   resolveProviderCheckActionLabel(remoteKind: AiraSyncRemoteKind): ResourceStr {

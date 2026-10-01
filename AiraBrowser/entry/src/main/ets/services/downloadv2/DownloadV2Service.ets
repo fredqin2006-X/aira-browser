@@ -1,4 +1,5 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   DownloadV2Engine,
   DownloadV2EngineObserver
@@ -548,7 +549,7 @@ export class DownloadV2Service {
       });
       await this.repository.flushPersistence();
     }
-    this.callbacks.onInfo?.(this.buildSavedLocationMessage('已保存到', task.suggestedFileName, persisted));
+    this.callbacks.onInfo?.(this.buildSavedLocationMessage('saved', task.suggestedFileName, persisted));
     return true;
   }
 
@@ -799,7 +800,7 @@ export class DownloadV2Service {
       failure: {
         code: 'canceled',
         sourceCode: task.failure.sourceCode,
-        message: '下载已取消。',
+        message: resolveAppResourceText($r('app.string.download_canceled_message')),
         retriable: false
       },
       runtime: {
@@ -1003,12 +1004,12 @@ export class DownloadV2Service {
       this.engine.dispatch(queuedTask.guid, 'fail', {
         failure: {
           code: 'file_system',
-          message: '下载启动失败：无法创建本地保存目录。',
+          message: resolveAppResourceText($r('app.string.download_start_no_directory')),
           retriable: true
         }
       });
       await this.repository.flushPersistence();
-      this.callbacks.onError?.('下载启动失败：无法创建本地保存目录。');
+      this.callbacks.onError?.(resolveAppResourceText($r('app.string.download_start_no_directory')));
       return this.engine.findTask(queuedTask.guid);
     }
     hilog.info(
@@ -1147,7 +1148,7 @@ export class DownloadV2Service {
       snapshot: startedSnapshot
     });
     this.markStartedSnapshotAccepted(task.guid, startedSnapshot);
-    this.callbacks.onInfo?.(`开始下载 ${request.suggestedFileName}。`);
+    this.callbacks.onInfo?.(resolveAppResourceText($r('app.string.download_started', request.suggestedFileName)));
     return true;
   }
 
@@ -1173,12 +1174,12 @@ export class DownloadV2Service {
     this.engine.dispatch(task.guid, 'fail', {
       failure: {
         code: 'unknown',
-        message: `下载启动失败：${request.suggestedFileName}。`,
+        message: resolveAppResourceText($r('app.string.download_start_failed', request.suggestedFileName)),
         retriable: true
       }
     });
     await this.repository.flushPersistence();
-    this.callbacks.onError?.(`下载启动失败：${request.suggestedFileName}。`);
+    this.callbacks.onError?.(resolveAppResourceText($r('app.string.download_start_failed', request.suggestedFileName)));
     void this.scheduleNextQueuedDownloads('start_failed');
   }
 
@@ -1289,19 +1290,19 @@ export class DownloadV2Service {
     reason: 'concurrency_limit' | 'waiting_wifi' | 'offline_network' | 'network_unknown' | 'not_startable' | 'start_now'
   ): void {
     if (reason === 'concurrency_limit') {
-      this.callbacks.onInfo?.(`已加入下载队列：${suggestedFileName}。`);
+      this.callbacks.onInfo?.(resolveAppResourceText($r('app.string.download_queued', suggestedFileName)));
       return;
     }
     if (reason === 'waiting_wifi') {
-      this.callbacks.onInfo?.(`已加入下载队列，连接 WLAN 后开始下载：${suggestedFileName}。`);
+      this.callbacks.onInfo?.(resolveAppResourceText($r('app.string.download_queued_wifi', suggestedFileName)));
       return;
     }
     if (reason === 'offline_network') {
-      this.callbacks.onInfo?.(`网络不可用，已加入下载队列：${suggestedFileName}。`);
+      this.callbacks.onInfo?.(resolveAppResourceText($r('app.string.download_queued_offline', suggestedFileName)));
       return;
     }
     if (reason === 'network_unknown') {
-      this.callbacks.onInfo?.(`无法确认网络类型，已暂缓下载：${suggestedFileName}。`);
+      this.callbacks.onInfo?.(resolveAppResourceText($r('app.string.download_queued_unknown_network', suggestedFileName)));
     }
   }
 
@@ -1621,7 +1622,9 @@ export class DownloadV2Service {
       this.completedPersistenceGuids[task.guid] = undefined;
     }
     if (!silent && task.status === 'failed') {
-      this.callbacks.onError?.(task.failure.message.length > 0 ? task.failure.message : `下载失败：${task.suggestedFileName}。`);
+      this.callbacks.onError?.(task.failure.message.length > 0
+        ? task.failure.message
+        : resolveAppResourceText($r('app.string.download_failed_file', task.suggestedFileName)));
     }
     await this.repository.flushPersistence();
     if (task.status === 'completed' || task.status === 'failed' || task.status === 'canceled') {
@@ -1642,7 +1645,7 @@ export class DownloadV2Service {
       this.completedPersistenceGuids[guid] = true;
       this.recordDownloadActivityOnce(guid);
       if (!silent) {
-        this.callbacks.onInfo?.(`下载完成，已保存到系统下载目录：${suggestedFileName}。`);
+        this.callbacks.onInfo?.(resolveAppResourceText($r('app.string.download_completed_system', suggestedFileName)));
       }
       return;
     }
@@ -1651,7 +1654,7 @@ export class DownloadV2Service {
     if (localPath.length <= 0) {
       this.recordDownloadActivityOnce(guid);
       if (!silent) {
-        this.callbacks.onInfo?.(`下载完成：${suggestedFileName}。`);
+        this.callbacks.onInfo?.(resolveAppResourceText($r('app.string.download_completed_file', suggestedFileName)));
       }
       return;
     }
@@ -1687,8 +1690,8 @@ export class DownloadV2Service {
       await this.repository.flushPersistence();
       if (!silent) {
         const message = persisted?.status === 'failed'
-          ? `下载完成，但自动导出到系统下载目录失败。文件仍保存在 Aira 临时下载目录：${suggestedFileName}。`
-          : `下载完成，未导出到系统下载目录。文件仍保存在 Aira 临时下载目录：${suggestedFileName}。`;
+          ? resolveAppResourceText($r('app.string.download_export_failed', suggestedFileName))
+          : resolveAppResourceText($r('app.string.download_export_skipped', suggestedFileName));
         this.callbacks.onInfo?.(message);
       }
       return;
@@ -1746,7 +1749,7 @@ export class DownloadV2Service {
       await this.repository.flushPersistence();
     }
     if (!silent) {
-      this.callbacks.onInfo?.(this.buildSavedLocationMessage('下载完成，已保存到', suggestedFileName, persisted));
+      this.callbacks.onInfo?.(this.buildSavedLocationMessage('completed', suggestedFileName, persisted));
     }
   }
 
@@ -1774,14 +1777,16 @@ export class DownloadV2Service {
   }
 
   private buildSavedLocationMessage(
-    prefix: string,
+    kind: 'saved' | 'completed',
     fileName: string,
     persisted: DownloadPersistResult | undefined
   ): string {
     const location = persisted?.destinationLabel !== undefined && persisted.destinationLabel.length > 0
       ? persisted.destinationLabel
-      : '系统下载目录';
-    return `${prefix}${location}：${fileName}。`;
+      : resolveAppResourceText($r('app.string.download_system_downloads'));
+    return resolveAppResourceText(kind === 'saved'
+      ? $r('app.string.download_saved_to_location', location, fileName)
+      : $r('app.string.download_completed_saved_to', location, fileName));
   }
 
   private persistCompletionLocalDisplayPath(task: DownloadV2TaskEntity, displayPath: string): void {
@@ -1911,7 +1916,7 @@ export class DownloadV2Service {
       failure: {
         code: 'canceled',
         sourceCode: task.failure.sourceCode,
-        message: '下载已取消。',
+        message: resolveAppResourceText($r('app.string.download_canceled_message')),
         retriable: false
       },
       runtime: {
@@ -1962,7 +1967,7 @@ export class DownloadV2Service {
         JSON.stringify(error)
       );
       if (reason !== 'retry' && reason !== 'completed_export' && reason !== 'manual_export') {
-        this.callbacks.onError?.(`下载临时文件清理失败：${suggestedFileName}。`);
+        this.callbacks.onError?.(resolveAppResourceText($r('app.string.download_cleanup_failed', suggestedFileName)));
       }
       return false;
     }
@@ -2018,8 +2023,8 @@ export class DownloadV2Service {
       code: 'context_lost',
       sourceCode: task.failure.sourceCode,
       message: partialBytes > 0
-        ? '下载已暂停，已有进度已保留。'
-        : '下载连接已中断，请重试。',
+        ? resolveAppResourceText($r('app.string.download_paused_progress_kept'))
+        : resolveAppResourceText($r('app.string.download_connection_lost')),
       retriable: true
     };
   }
@@ -2164,7 +2169,7 @@ export class DownloadV2Service {
       return {
         code: 'canceled',
         sourceCode: event.snapshot.lastErrorCode,
-        message: '下载已取消。',
+        message: resolveAppResourceText($r('app.string.download_canceled_message')),
         retriable: false
       };
     }
@@ -2172,7 +2177,9 @@ export class DownloadV2Service {
     return {
       code: 'unknown',
       sourceCode: event.snapshot.lastErrorCode,
-      message: nativeMessage.length > 0 ? nativeMessage : `下载失败：${event.snapshot.suggestedFileName}。`,
+      message: nativeMessage.length > 0
+        ? nativeMessage
+        : resolveAppResourceText($r('app.string.download_failed_file', event.snapshot.suggestedFileName)),
       retriable: true
     };
   }

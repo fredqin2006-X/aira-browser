@@ -22,18 +22,18 @@ export class HuaweiSpaceBookmarkUpgradePromptPresenter {
     this.presenting = true;
     try {
       showCenteredAlertDialog({
-        title: '重新开启华为云空间书签同步',
-        message: '书签同步方式已经升级。请重新开启一次，以便将本机书签真正同步到华为云空间。本机书签、主页收藏、小说书架、常用设置和其他同步方式都不会受到影响。',
+        title: $r('app.string.sync_ui_huawei_space_bookmark_upgrade_prompt_presenter_004'),
+        message: $r('app.string.sync_ui_huawei_space_bookmark_upgrade_prompt_presenter_001'),
         autoCancel: false,
         primaryButton: {
-          value: '稍后处理',
+          value: $r('app.string.sync_ui_huawei_space_bookmark_upgrade_prompt_presenter_003'),
           action: () => {
             this.presenting = false;
             void this.syncExperienceCoordinator.acknowledgeHuaweiSpaceBookmarkUpgradePrompt();
           }
         },
         secondaryButton: {
-          value: '前往重新开启',
+          value: $r('app.string.sync_ui_huawei_space_bookmark_upgrade_prompt_presenter_002'),
           action: () => {
             this.presenting = false;
             void this.syncExperienceCoordinator.acknowledgeHuaweiSpaceBookmarkUpgradePrompt()

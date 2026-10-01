@@ -5,6 +5,7 @@ import {
 } from '../../../core/theme/BrowserThemeStorageKeys';
 import { BrowserSheetActionButton } from '../browser/BrowserModalBottomSheet';
 import { CENTERED_DIALOG_SYSTEM_SURFACE_MODIFIER } from '../common/CenteredDialogSurface';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 
 type SyncResultDialogRowKind = 'status' | 'paragraph';
 
@@ -177,7 +178,9 @@ export struct SyncResultDialog {
    */
   private buildRows(message: string): SyncResultDialogRow[] {
     const rows: SyncResultDialogRow[] = [];
-    const normalized = message.trim().length > 0 ? message.replace(/\r/g, '') : '操作已完成。';
+    const normalized = message.trim().length > 0
+      ? message.replace(/\r/g, '')
+      : resolveAppResourceText($r('app.string.sync_ui_sync_result_dialog_001'));
     const lines = normalized.split('\n').map((line: string) => line.trim()).filter((line: string) => {
       return line.length > 0 && !this.shouldHideTechnicalLine(line);
     });
@@ -209,7 +212,7 @@ export struct SyncResultDialog {
         key: 'fallback',
         kind: 'paragraph',
         label: '',
-        value: '操作已完成。'
+        value: resolveAppResourceText($r('app.string.sync_ui_sync_result_dialog_001'))
       });
     }
     return rows;

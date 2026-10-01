@@ -5,6 +5,7 @@ import { filePreview } from '@kit.PreviewKit';
 import { systemShare } from '@kit.ShareKit';
 import wantConstant from '@ohos.app.ability.wantConstant';
 import { AppRuntimeContext } from '../../app/runtime/AppRuntimeContext';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   DownloadFileResolutionAdapter,
   DownloadFileResolutionService
@@ -90,7 +91,7 @@ export class DownloadFollowupService {
     if (targetUri === undefined) {
       return {
         success: false,
-        userMessage: '无法打开下载文件：文件不存在或尚未落地。'
+        userMessage: resolveAppResourceText($r('app.string.download_open_missing'))
       };
     }
 
@@ -109,7 +110,7 @@ export class DownloadFollowupService {
       }
       return {
         success: false,
-        userMessage: `无法打开下载文件：${task.suggestedFileName}。`
+        userMessage: resolveAppResourceText($r('app.string.download_open_failed', task.suggestedFileName))
       };
     }
 
@@ -134,7 +135,7 @@ export class DownloadFollowupService {
     }
     return {
       success: false,
-      userMessage: `无法打开下载文件：${task.suggestedFileName}。`
+      userMessage: resolveAppResourceText($r('app.string.download_open_failed', task.suggestedFileName))
     };
   }
 
@@ -184,7 +185,7 @@ export class DownloadFollowupService {
     if (targetUri === undefined) {
       return {
         success: false,
-        userMessage: '无法打开下载位置：文件不存在或尚未落地。'
+        userMessage: resolveAppResourceText($r('app.string.download_location_missing'))
       };
     }
 
@@ -193,12 +194,12 @@ export class DownloadFollowupService {
       return {
         success: true,
         finalFileUri: targetUri,
-        userMessage: `已提供下载文件位置入口：${task.suggestedFileName}。`
+        userMessage: resolveAppResourceText($r('app.string.download_location_opened', task.suggestedFileName))
       };
     } catch (_error) {
       return {
         success: false,
-        userMessage: `无法打开下载位置：${task.suggestedFileName}。`
+        userMessage: resolveAppResourceText($r('app.string.download_location_failed', task.suggestedFileName))
       };
     }
   }

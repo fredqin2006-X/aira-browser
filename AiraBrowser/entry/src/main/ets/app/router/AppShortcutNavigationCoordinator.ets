@@ -1,4 +1,5 @@
 import router from '@ohos.router';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   AD_BLOCK_SETTINGS_ROUTE,
   AIRA_PRO_ROUTE,
@@ -81,7 +82,7 @@ export class AppShortcutNavigationCoordinator {
       const result: AiraAppShortcutNavigationResult = {
         handled: false,
         route: '',
-        errorMessage: '未知快捷入口'
+        errorMessage: resolveAppResourceText($r('app.string.browser_shortcut_unknown'))
       };
       return Promise.resolve(result);
     }

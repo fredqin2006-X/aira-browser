@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { DownloadStatusCounts } from './DownloadQueryService';
 import { DownloadRuntimeService } from '../../services/download/DownloadRuntimeService';
 import {
@@ -41,7 +42,7 @@ export type DownloadManagementRowAction = DownloadV2ManagementAction | 'copy_lin
   'enter_selection';
 
 export const DOWNLOAD_ROW_ENTER_SELECTION_ACTION: DownloadManagementRowAction = 'enter_selection';
-export const DOWNLOAD_ROW_ENTER_SELECTION_LABEL: string = '多选';
+export const DOWNLOAD_ROW_ENTER_SELECTION_LABEL: string = resolveAppResourceText($r('app.string.ui_multi_select'));
 
 export interface DownloadManagementRowMenuActionView {
   action: DownloadManagementRowAction;
@@ -220,10 +221,10 @@ export class DownloadManagerViewModel {
   applyOptimisticStatus(row: DownloadManagementRowState, targetStatus: DownloadV2Status): boolean {
     if (targetStatus === 'paused') {
       row.status = 'paused';
-      row.statusText = '下载已暂停';
-      row.trailingText = '已暂停';
+      row.statusText = resolveAppResourceText($r('app.string.download_status_paused'));
+      row.trailingText = resolveAppResourceText($r('app.string.settings_sync_paused'));
       row.primaryAction = 'resume';
-      row.primaryActionLabel = '继续';
+      row.primaryActionLabel = resolveAppResourceText($r('app.string.settings_pro_continue'));
       row.primaryActionEmphasis = 'primary';
       row.menuActions = this.buildOptimisticMenuActions('paused');
       return true;
@@ -231,11 +232,11 @@ export class DownloadManagerViewModel {
     if (targetStatus === 'running') {
       row.status = 'running';
       row.statusText = '';
-      if (row.trailingText === '已暂停') {
+      if (row.trailingText === resolveAppResourceText($r('app.string.settings_sync_paused'))) {
         row.trailingText = '--';
       }
       row.primaryAction = 'pause';
-      row.primaryActionLabel = '暂停';
+      row.primaryActionLabel = resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_013'));
       row.primaryActionEmphasis = 'secondary';
       row.menuActions = this.buildOptimisticMenuActions('running');
       return true;
@@ -267,8 +268,8 @@ export class DownloadManagerViewModel {
     // does not make paused/recoverable tasks appear to "disappear" after restart.
     const activeCount = counts.active + counts.pending + counts.paused + counts.failed;
     const groups: DownloadManagementFilterChipView[] = [
-      { group: 'in_progress', label: '下载中', count: activeCount },
-      { group: 'completed', label: '已完成', count: counts.completed }
+      { group: 'in_progress', label: resolveAppResourceText($r('app.string.download_status_downloading')), count: activeCount },
+      { group: 'completed', label: resolveAppResourceText($r('app.string.download_status_completed')), count: counts.completed }
     ];
     return groups;
   }
@@ -315,7 +316,7 @@ export class DownloadManagerViewModel {
     task: DownloadV2TaskEntity
   ): DownloadV2TaskPresentation {
     return {
-      fileName: task.suggestedFileName.length > 0 ? task.suggestedFileName : '未命名下载',
+      fileName: task.suggestedFileName.length > 0 ? task.suggestedFileName : resolveAppResourceText($r('app.string.download_status_unnamed')),
       statusText: this.buildTaskStatusText(task),
       progressValue: this.buildTaskProgressValue(task),
       progressText: this.buildTaskProgressText(task),
@@ -326,30 +327,32 @@ export class DownloadManagerViewModel {
 
   private buildTaskStatusText(task: DownloadV2TaskEntity): string {
     if (task.status === 'failed' && canContinueDownloadV2Task(task)) {
-      return '下载已暂停';
+      return resolveAppResourceText($r('app.string.download_status_paused'));
     }
     switch (task.status) {
       case 'failed': {
         const errorCode = task.failure.sourceCode ?? 0;
-        return errorCode !== 0 ? `下载失败，错误码 ${errorCode}` : '下载失败';
+        return errorCode !== 0
+          ? resolveAppResourceText($r('app.string.download_status_failed_code', errorCode))
+          : resolveAppResourceText($r('app.string.download_status_failed'));
       }
       case 'completed':
-        return '下载完成';
+        return resolveAppResourceText($r('app.string.download_status_complete'));
       case 'running': {
         const speed = task.progress.speedBytesPerSecond;
         const speedText = speed > 0 ? `，${this.formatBytes(speed)}/s` : '';
-        return `正在下载${speedText}`;
+        return resolveAppResourceText($r('app.string.download_status_running_speed', speedText));
       }
       case 'created':
       case 'awaiting_confirmation':
       case 'queued':
-        return '等待下载';
+        return resolveAppResourceText($r('app.string.download_status_waiting'));
       case 'paused':
-        return '下载已暂停';
+        return resolveAppResourceText($r('app.string.download_status_paused'));
       case 'canceled':
-        return '下载已取消';
+        return resolveAppResourceText($r('app.string.download_status_canceled'));
       default:
-        return `状态：${task.status}`;
+        return resolveAppResourceText($r('app.string.download_status_raw', task.status));
     }
   }
 
@@ -364,7 +367,7 @@ export class DownloadManagerViewModel {
   private buildTaskProgressText(task: DownloadV2TaskEntity): string {
     const downloaded = this.formatBytes(task.progress.receivedBytes);
     if (task.progress.totalBytes <= 0) {
-      return `${downloaded} / 未知大小`;
+      return resolveAppResourceText($r('app.string.download_progress_unknown_size', downloaded));
     }
     return `${downloaded} / ${this.formatBytes(task.progress.totalBytes)}`;
   }
@@ -380,7 +383,7 @@ export class DownloadManagerViewModel {
       return '';
     }
     if (task.status === 'canceled') {
-      return '下载已取消';
+      return resolveAppResourceText($r('app.string.download_status_canceled'));
     }
     return '';
   }
@@ -401,19 +404,19 @@ export class DownloadManagerViewModel {
       return `${this.formatBytes(task.progress.speedBytesPerSecond)}/s`;
     }
     if (task.status === 'failed' && canContinueDownloadV2Task(task)) {
-      return '已暂停';
+      return resolveAppResourceText($r('app.string.settings_sync_paused'));
     }
     if (task.status === 'failed') {
-      return '下载失败';
+      return resolveAppResourceText($r('app.string.download_status_failed'));
     }
     if (task.status === 'paused') {
-      return '已暂停';
+      return resolveAppResourceText($r('app.string.settings_sync_paused'));
     }
     if (task.status === 'created' || task.status === 'awaiting_confirmation' || task.status === 'queued') {
-      return '等待中';
+      return resolveAppResourceText($r('app.string.download_status_waiting_short'));
     }
     if (task.status === 'canceled') {
-      return '已取消';
+      return resolveAppResourceText($r('app.string.download_status_canceled_short'));
     }
     return '--';
   }
@@ -426,7 +429,7 @@ export class DownloadManagerViewModel {
     if (task.request.url.length > 0) {
       return task.request.url;
     }
-    return '当前没有可显示的来源信息';
+    return resolveAppResourceText($r('app.string.download_status_no_source'));
   }
 
   private buildRecentCompletionTimeText(task: DownloadV2TaskEntity): string {
@@ -435,7 +438,7 @@ export class DownloadManagerViewModel {
     }
     const completedAt = task.timing.completedAt ?? task.timing.updatedAt;
     if (completedAt <= 0) {
-      return '完成时间未知';
+      return resolveAppResourceText($r('app.string.download_status_time_unknown'));
     }
     return this.formatDateTime(completedAt);
   }
@@ -467,23 +470,25 @@ export class DownloadManagerViewModel {
   private getQuickActionLabel(action: DownloadManagementRowAction, status: DownloadV2Status): string {
     switch (action) {
       case 'open_file':
-        return '打开';
+        return resolveAppResourceText($r('app.string.ui_open'));
       case 'open_location':
-        return '分享';
+        return resolveAppResourceText($r('app.string.ui_share'));
       case 'save_to_system':
-        return '保存到系统下载';
+        return resolveAppResourceText($r('app.string.download_action_save_system'));
       case 'copy_link':
-        return '复制下载链接';
+        return resolveAppResourceText($r('app.string.download_action_copy_link'));
       case 'pause':
-        return '暂停';
+        return resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_013'));
       case 'resume':
-        return '继续';
+        return resolveAppResourceText($r('app.string.settings_pro_continue'));
       case 'retry':
-        return '重试';
+        return resolveAppResourceText($r('app.string.novel_action_retry'));
       case 'cancel':
-        return '取消';
+        return resolveAppResourceText($r('app.string.settings_account_cancel'));
       case 'remove_record':
-        return status === 'completed' ? '仅删除任务' : '删除任务';
+        return status === 'completed'
+          ? resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_013'))
+          : resolveAppResourceText($r('app.string.download_action_delete_task'));
       case 'enter_selection':
         return DOWNLOAD_ROW_ENTER_SELECTION_LABEL;
       default:
@@ -520,7 +525,7 @@ export class DownloadManagerViewModel {
       if (action === 'remove_record' && status === 'completed') {
         views.push({
           action: 'delete_task_and_file',
-          label: '删除任务和文件'
+          label: resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_015'))
         });
       }
     });
@@ -530,8 +535,8 @@ export class DownloadManagerViewModel {
   private buildOptimisticMenuActions(status: DownloadV2Status): DownloadManagementRowMenuActionView[] {
     if (status === 'paused' || status === 'running') {
       return [
-        { action: 'copy_link', label: '复制下载链接' },
-        { action: 'cancel', label: '取消' }
+        { action: 'copy_link', label: resolveAppResourceText($r('app.string.download_action_copy_link')) },
+        { action: 'cancel', label: resolveAppResourceText($r('app.string.settings_account_cancel')) }
       ];
     }
     return [];
@@ -555,16 +560,16 @@ export class DownloadManagerViewModel {
 
   private resolvePrimaryActionLabel(action: DownloadV2ManagementAction | undefined): string {
     if (action === 'pause') {
-      return '暂停';
+      return resolveAppResourceText($r('app.string.browser_ui_browser_video_assistant_player_overlay_013'));
     }
     if (action === 'resume') {
-      return '继续';
+      return resolveAppResourceText($r('app.string.settings_pro_continue'));
     }
     if (action === 'open_file') {
-      return '打开';
+      return resolveAppResourceText($r('app.string.ui_open'));
     }
     if (action === 'retry') {
-      return '重试';
+      return resolveAppResourceText($r('app.string.novel_action_retry'));
     }
     return '';
   }

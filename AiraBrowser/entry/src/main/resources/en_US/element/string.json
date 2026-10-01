@@ -1661,6 +1661,10 @@
       "value": "Huawei subscription management can't be opened right now"
     },
     {
+      "name": "settings_pro_manage_subscription",
+      "value": "Manage my subscription"
+    },
+    {
       "name": "settings_pro_subscription_check_failed",
       "value": "Couldn't check the subscription. Try again later."
     },
@@ -7106,11 +7110,11 @@
     },
     {
       "name": "settings_link_guide_tabs_title",
-      "value": "See tabs open on the computer"
+      "value": "See tabs on both devices"
     },
     {
       "name": "settings_link_guide_tabs_message",
-      "value": "Pages open on the computer appear in cross-device tabs on this phone."
+      "value": "Pages open on either device show up in the other's cross-device tabs."
     },
     {
       "name": "settings_link_guide_next",
@@ -19275,6 +19279,886 @@
     {
       "name": "settings_link_online_devices",
       "value": "Online devices"
+    },
+    {
+      "name": "media_manifest_url_scheme",
+      "value": "The manifest link must use http or https."
+    },
+    {
+      "name": "media_manifest_empty",
+      "value": "The manifest is empty."
+    },
+    {
+      "name": "media_manifest_dash_deferred",
+      "value": "DASH/MPD was recognized. Detailed parsing will come in a later version."
+    },
+    {
+      "name": "media_manifest_unrecognized",
+      "value": "No HLS or DASH manifest was recognized."
+    },
+    {
+      "name": "media_manifest_request_failed",
+      "value": "Could not fetch the manifest."
+    },
+    {
+      "name": "media_manifest_too_large",
+      "value": "The manifest is too large to parse right now."
+    },
+    {
+      "name": "media_manifest_variant_probe_failed",
+      "value": "Could not probe segments for quality %1$d."
+    },
+    {
+      "name": "media_manifest_probe_limit",
+      "value": "Only the first %1$d qualities were probed, to keep page parsing light."
+    },
+    {
+      "name": "browser_hls_takeover_segment_duration",
+      "value": "About %1$s per segment"
+    },
+    {
+      "name": "browser_hls_takeover_key_summary",
+      "value": "%1$d · %2$s"
+    },
+    {
+      "name": "settings_theme_palette_open_failed",
+      "value": "Theme color settings can't be opened right now. Try again later."
+    },
+    {
+      "name": "settings_interface_mode_open_failed",
+      "value": "Interface mode settings can't be opened right now. Try again later."
+    },
+    {
+      "name": "settings_tracking_protection_open_failed",
+      "value": "Tracking protection settings can't be opened right now. Try again later."
+    },
+    {
+      "name": "settings_app_icon_open_failed",
+      "value": "App icon settings can't be opened right now. Try again later."
+    },
+    {
+      "name": "settings_toolbar_open_failed",
+      "value": "Toolbar settings can't be opened right now. Try again later."
+    },
+    {
+      "name": "settings_secure_dns_open_failed",
+      "value": "Secure DNS settings can't be opened right now. Try again later."
+    },
+    {
+      "name": "browser_shortcut_unknown",
+      "value": "Unknown shortcut"
+    },
+    {
+      "name": "browser_shortcut_open_failed",
+      "value": "Couldn't open the shortcut: %1$s"
+    },
+    {
+      "name": "browser_window_private_tab_title",
+      "value": "Private tab"
+    },
+    {
+      "name": "browser_window_move_request_expired",
+      "value": "The tab move request has expired."
+    },
+    {
+      "name": "browser_window_move_not_received",
+      "value": "The new window did not receive the tab in time."
+    },
+    {
+      "name": "browser_window_move_no_context",
+      "value": "This window does not have a launch context yet."
+    },
+    {
+      "name": "browser_window_move_open_failed",
+      "value": "Could not open a new browser window."
+    },
+    {
+      "name": "membership_login_required",
+      "value": "Sign in with a HUAWEI ID first."
+    },
+    {
+      "name": "membership_relogin_required",
+      "value": "Sign in to the HUAWEI ID again before continuing."
+    },
+    {
+      "name": "membership_account_changed",
+      "value": "The account changed. Try again later."
+    },
+    {
+      "name": "membership_gift_private_session",
+      "value": "Return to a regular session before syncing the new-user membership."
+    },
+    {
+      "name": "membership_gift_sync_failed",
+      "value": "Couldn't sync the new-user membership. Try again later."
+    },
+    {
+      "name": "membership_gift_not_applied",
+      "value": "The new-user membership didn't take effect. Restore it later on the membership page."
+    },
+    {
+      "name": "membership_gift_granted",
+      "value": "New-user membership is active"
+    },
+    {
+      "name": "membership_gift_landed_title",
+      "value": "Aira Pro is here"
+    },
+    {
+      "name": "membership_gift_landed_message",
+      "value": "%1$d days of Aira Pro are active now."
+    },
+    {
+      "name": "membership_gift_accept",
+      "value": "Accept"
+    },
+    {
+      "name": "membership_claim_private_session",
+      "value": "Return to a regular session before claiming membership."
+    },
+    {
+      "name": "membership_claim_not_applied",
+      "value": "The membership claim didn't take effect. Try again later."
+    },
+    {
+      "name": "membership_claim_granted",
+      "value": "15 days of membership claimed"
+    },
+    {
+      "name": "membership_redeem_private_session",
+      "value": "Return to a regular session before redeeming membership."
+    },
+    {
+      "name": "membership_redeem_not_applied",
+      "value": "The redemption didn't take effect. Try again later."
+    },
+    {
+      "name": "membership_redeem_granted",
+      "value": "Membership redeemed"
+    },
+    {
+      "name": "membership_account_profile_invalid",
+      "value": "The account profile response has no valid account."
+    },
+    {
+      "name": "membership_grant_invalid",
+      "value": "The membership response has no valid entitlement."
+    },
+    {
+      "name": "membership_state_refresh_failed",
+      "value": "Couldn't refresh membership right now. Try again later."
+    },
+    {
+      "name": "membership_entitlement_private_title",
+      "value": "Can't read membership in this session"
+    },
+    {
+      "name": "membership_entitlement_private_message",
+      "value": "Membership can't be read because of the privacy policy."
+    },
+    {
+      "name": "membership_gate_expired_title",
+      "value": "Aira Pro has expired"
+    },
+    {
+      "name": "membership_gate_expired_message",
+      "value": "Your Aira Pro expired on %1$s. Cloud sync and other features return as soon as you renew."
+    },
+    {
+      "name": "membership_gate_expiry_date",
+      "value": "%1$d-%2$d-%3$d"
+    },
+    {
+      "name": "membership_gate_renew",
+      "value": "Renew now"
+    },
+    {
+      "name": "membership_gate_subscribe",
+      "value": "Subscribe now"
+    },
+    {
+      "name": "membership_gate_upgrade",
+      "value": "Upgrade to Aira Pro"
+    },
+    {
+      "name": "membership_gate_upgrade_continue",
+      "value": "Upgrade to Aira Pro to continue"
+    },
+    {
+      "name": "membership_gate_unavailable_title",
+      "value": "Not available in this version"
+    },
+    {
+      "name": "membership_gate_login_title",
+      "value": "Sign in to use this"
+    },
+    {
+      "name": "membership_gate_agree_membership",
+      "value": "Subscribing means you agree to the Membership Service Agreement"
+    },
+    {
+      "name": "membership_gate_agree_renewal",
+      "value": "Subscribing means you agree to the Membership Service Agreement and the Auto-Renewal Service Agreement"
+    },
+    {
+      "name": "membership_gate_paused",
+      "value": "%1$s is paused. It returns as soon as you renew."
+    },
+    {
+      "name": "membership_gate_pro_feature",
+      "value": "%1$s is an Aira Pro feature."
+    },
+    {
+      "name": "membership_gate_unavailable_now",
+      "value": "%1$s can't be used right now."
+    },
+    {
+      "name": "membership_gate_login_required",
+      "value": "%1$s requires a HUAWEI ID."
+    },
+    {
+      "name": "membership_gate_needs_pro",
+      "value": "%1$s requires Aira Pro."
+    },
+    {
+      "name": "membership_gate_quota_limited",
+      "value": "%2$s is limited on the current %1$s plan."
+    },
+    {
+      "name": "membership_gate_unavailable_feature",
+      "value": "%1$s isn't available right now."
+    },
+    {
+      "name": "membership_feature_offline_pages",
+      "value": "Offline pages"
+    },
+    {
+      "name": "membership_feature_user_scripts",
+      "value": "User scripts"
+    },
+    {
+      "name": "membership_feature_hide_rules",
+      "value": "Manual hide rules"
+    },
+    {
+      "name": "membership_feature_translation",
+      "value": "Aira system translation"
+    },
+    {
+      "name": "membership_feature_bookmark_sync",
+      "value": "Bookmark sync across devices"
+    },
+    {
+      "name": "membership_feature_webdav",
+      "value": "WebDAV sync"
+    },
+    {
+      "name": "membership_feature_bookmark_auto_sync",
+      "value": "Automatic bookmark sync"
+    },
+    {
+      "name": "membership_feature_page_push",
+      "value": "Aira cloud page push"
+    },
+    {
+      "name": "membership_feature_device_tabs",
+      "value": "Aira cloud tabs across devices"
+    },
+    {
+      "name": "membership_feature_labs",
+      "value": "Labs"
+    },
+    {
+      "name": "membership_service_gift",
+      "value": "Aira new-user gift service"
+    },
+    {
+      "name": "membership_service_claim",
+      "value": "Aira membership claim service"
+    },
+    {
+      "name": "membership_service_redeem",
+      "value": "Aira redeem service"
+    },
+    {
+      "name": "membership_service_state",
+      "value": "Aira membership status service"
+    },
+    {
+      "name": "membership_service_http_failed",
+      "value": "The %1$s request failed (%2$d)."
+    },
+    {
+      "name": "membership_service_empty",
+      "value": "%1$s didn't return a result."
+    },
+    {
+      "name": "membership_service_invalid_json",
+      "value": "Couldn't parse the JSON returned by %1$s."
+    },
+    {
+      "name": "membership_service_invalid_body",
+      "value": "Couldn't parse the response body returned by %1$s."
+    },
+    {
+      "name": "membership_purchase_subscription_opened",
+      "value": "Subscription is active"
+    },
+    {
+      "name": "membership_purchase_diagnostic_opened",
+      "value": "%1$s is active. The entitlement was written to the cloud."
+    },
+    {
+      "name": "membership_purchase_diagnostic_product",
+      "value": "%1$s is active. Product %2$s. The entitlement was written to the cloud."
+    },
+    {
+      "name": "membership_purchase_diagnostic_until",
+      "value": "%1$s is active. Valid until %2$s. The entitlement was written to the cloud."
+    },
+    {
+      "name": "membership_purchase_diagnostic_product_until",
+      "value": "%1$s is active. Product %2$s. Valid until %3$s. The entitlement was written to the cloud."
+    },
+    {
+      "name": "membership_iap_lifetime_unavailable",
+      "value": "Lifetime purchase isn't available right now"
+    },
+    {
+      "name": "membership_iap_subscription_unavailable",
+      "value": "Subscription isn't available right now"
+    },
+    {
+      "name": "membership_iap_lifetime_paid",
+      "value": "Lifetime purchase completed"
+    },
+    {
+      "name": "membership_iap_subscription_paid",
+      "value": "Subscription purchase completed"
+    },
+    {
+      "name": "membership_iap_lifetime_failed_title",
+      "value": "Lifetime purchase failed"
+    },
+    {
+      "name": "membership_iap_subscription_failed_title",
+      "value": "Subscription purchase failed"
+    },
+    {
+      "name": "membership_iap_restore_unavailable",
+      "value": "Restore purchases isn't available right now"
+    },
+    {
+      "name": "membership_iap_restore_failed_title",
+      "value": "Couldn't restore purchases"
+    },
+    {
+      "name": "membership_iap_restore_found_title",
+      "value": "Purchases found"
+    },
+    {
+      "name": "membership_iap_restore_empty_title",
+      "value": "No purchases found"
+    },
+    {
+      "name": "membership_iap_manage_unavailable",
+      "value": "Subscription management isn't available right now"
+    },
+    {
+      "name": "membership_iap_manage_opened_title",
+      "value": "Subscription management opened"
+    },
+    {
+      "name": "membership_iap_manage_failed_title",
+      "value": "Couldn't open subscription management"
+    },
+    {
+      "name": "membership_iap_cancelled",
+      "value": "Cancelled"
+    },
+    {
+      "name": "membership_iap_error_code",
+      "value": "Error %1$d"
+    },
+    {
+      "name": "membership_iap_error_detail",
+      "value": "%1$s: %2$s"
+    },
+    {
+      "name": "membership_iap_missing_order",
+      "value": "The Huawei IAP purchase is missing the purchaseToken or purchaseOrderId needed to finish delivery."
+    },
+    {
+      "name": "membership_iap_invalid_purchase_json",
+      "value": "The Huawei IAP purchase data isn't valid JSON, so delivery can't be confirmed."
+    },
+    {
+      "name": "membership_iap_verify_http_failed",
+      "value": "The Aira IAP verification request failed (%1$d)."
+    },
+    {
+      "name": "membership_iap_verify_login_required",
+      "value": "Sign in to a HUAWEI ID before restoring Aira Pro."
+    },
+    {
+      "name": "membership_iap_verify_empty",
+      "value": "The Aira IAP verification function didn't return a result."
+    },
+    {
+      "name": "membership_iap_verify_invalid_json",
+      "value": "Couldn't parse the JSON returned by the Aira IAP verification function."
+    },
+    {
+      "name": "membership_iap_verify_invalid_body",
+      "value": "Couldn't parse the response body returned by the Aira IAP verification function."
+    },
+    {
+      "name": "membership_plan_recommended",
+      "value": "Recommended"
+    },
+    {
+      "name": "membership_plan_monthly_price",
+      "value": "%1$s / month, auto-renews"
+    },
+    {
+      "name": "membership_plan_yearly_price",
+      "value": "%1$s / year, auto-renews"
+    },
+    {
+      "name": "membership_plan_lifetime_price",
+      "value": "%1$s lifetime"
+    },
+    {
+      "name": "membership_pro_active",
+      "value": "Aira Pro is active"
+    },
+    {
+      "name": "settings_center_open_target_failed",
+      "value": "Couldn't open \"%1$s\". Try again."
+    },
+    {
+      "name": "sync_bookmark_v4_backup_update",
+      "value": "Back up and update"
+    },
+    {
+      "name": "custom_home_guide_share_failed",
+      "value": "Couldn't share the developer guide: %1$s"
+    },
+    {
+      "name": "browser_shell_file_info_failed",
+      "value": "Couldn't read the file information: %1$s"
+    },
+    {
+      "name": "browser_shell_route_failed_detail",
+      "value": "%1$s: %2$s"
+    },
+    {
+      "name": "viewer_file",
+      "value": "File"
+    },
+    {
+      "name": "viewer_choose_file",
+      "value": "Choose a file."
+    },
+    {
+      "name": "viewer_html_empty",
+      "value": "This HTML file is empty."
+    },
+    {
+      "name": "viewer_html_unreadable",
+      "value": "Couldn't read this HTML file."
+    },
+    {
+      "name": "viewer_page_expired",
+      "value": "This file page is no longer valid. Open it again."
+    },
+    {
+      "name": "viewer_html_too_large",
+      "value": "This HTML file is too large to read all at once."
+    },
+    {
+      "name": "viewer_loading",
+      "value": "Reading the file..."
+    },
+    {
+      "name": "viewer_json_empty",
+      "value": "This JSON file is empty."
+    },
+    {
+      "name": "viewer_text_empty",
+      "value": "This text file is empty."
+    },
+    {
+      "name": "viewer_kind_markdown",
+      "value": "Markdown document"
+    },
+    {
+      "name": "viewer_kind_json",
+      "value": "JSON document"
+    },
+    {
+      "name": "viewer_kind_text",
+      "value": "Text file"
+    },
+    {
+      "name": "viewer_kind_html",
+      "value": "HTML document"
+    },
+    {
+      "name": "viewer_label_name",
+      "value": "File name"
+    },
+    {
+      "name": "viewer_label_type",
+      "value": "Type"
+    },
+    {
+      "name": "viewer_label_modified",
+      "value": "Modified"
+    },
+    {
+      "name": "viewer_label_open_mode",
+      "value": "How it opens"
+    },
+    {
+      "name": "viewer_label_location",
+      "value": "Location"
+    },
+    {
+      "name": "viewer_unknown",
+      "value": "Unknown"
+    },
+    {
+      "name": "viewer_markdown_loading",
+      "value": "Reading the Markdown file..."
+    },
+    {
+      "name": "viewer_markdown_choose",
+      "value": "Choose a Markdown file."
+    },
+    {
+      "name": "viewer_markdown_too_large",
+      "value": "Markdown files over 5 MB can't be viewed yet."
+    },
+    {
+      "name": "viewer_markdown_file",
+      "value": "Markdown file"
+    },
+    {
+      "name": "viewer_markdown_read_failed",
+      "value": "Couldn't read the Markdown file."
+    },
+    {
+      "name": "download_status_paused",
+      "value": "Download paused"
+    },
+    {
+      "name": "download_status_downloading",
+      "value": "Downloading"
+    },
+    {
+      "name": "download_status_completed",
+      "value": "Completed"
+    },
+    {
+      "name": "download_status_unnamed",
+      "value": "Untitled download"
+    },
+    {
+      "name": "download_status_failed",
+      "value": "Download failed"
+    },
+    {
+      "name": "download_status_complete",
+      "value": "Download complete"
+    },
+    {
+      "name": "download_status_waiting",
+      "value": "Waiting to download"
+    },
+    {
+      "name": "download_status_canceled",
+      "value": "Download canceled"
+    },
+    {
+      "name": "download_status_waiting_short",
+      "value": "Waiting"
+    },
+    {
+      "name": "download_status_canceled_short",
+      "value": "Canceled"
+    },
+    {
+      "name": "download_status_no_source",
+      "value": "No source to show"
+    },
+    {
+      "name": "download_status_time_unknown",
+      "value": "Completion time unknown"
+    },
+    {
+      "name": "download_action_save_system",
+      "value": "Save to system downloads"
+    },
+    {
+      "name": "download_action_delete_task",
+      "value": "Delete task"
+    },
+    {
+      "name": "download_action_copy_link",
+      "value": "Copy download link"
+    },
+    {
+      "name": "download_status_failed_code",
+      "value": "Download failed, error %1$d"
+    },
+    {
+      "name": "download_status_running_speed",
+      "value": "Downloading%1$s"
+    },
+    {
+      "name": "download_status_raw",
+      "value": "Status: %1$s"
+    },
+    {
+      "name": "download_progress_unknown_size",
+      "value": "%1$s / Unknown size"
+    },
+    {
+      "name": "download_cancel_message",
+      "value": "This deletes the download task and its temporary file.\n\n%1$s"
+    },
+    {
+      "name": "download_delete_file_message",
+      "value": "The download task will be removed from Aira, and the file will move to the system recycle bin.\n\n%1$s"
+    },
+    {
+      "name": "download_delete_task_message",
+      "value": "Only the Aira download task is deleted. The file stays on the device.\n\n%1$s"
+    },
+    {
+      "name": "download_settings_open_failed",
+      "value": "Couldn't open download settings: %1$s"
+    },
+    {
+      "name": "download_delete_selected_message",
+      "value": "Delete %1$d selected downloads?\n\n\"Delete the task only\" keeps the file on the device. \"Delete the task and the file\" moves the file to the recycle bin."
+    },
+    {
+      "name": "download_deleted_records",
+      "value": "Deleted %1$d download records."
+    },
+    {
+      "name": "download_deleted_items",
+      "value": "Deleted %1$d downloads."
+    },
+    {
+      "name": "download_saved_to_location",
+      "value": "Saved to %1$s: %2$s."
+    },
+    {
+      "name": "download_completed_saved_to",
+      "value": "Download complete. Saved to %1$s: %2$s."
+    },
+    {
+      "name": "download_system_downloads",
+      "value": "System downloads"
+    },
+    {
+      "name": "download_canceled_message",
+      "value": "Download canceled."
+    },
+    {
+      "name": "download_start_no_directory",
+      "value": "Couldn't start the download: the save folder couldn't be created."
+    },
+    {
+      "name": "download_started",
+      "value": "Starting download of %1$s."
+    },
+    {
+      "name": "download_start_failed",
+      "value": "Couldn't start the download: %1$s."
+    },
+    {
+      "name": "download_queued",
+      "value": "Added to the download queue: %1$s."
+    },
+    {
+      "name": "download_queued_wifi",
+      "value": "Added to the queue. The download starts after connecting to WLAN: %1$s."
+    },
+    {
+      "name": "download_queued_offline",
+      "value": "No network. Added to the download queue: %1$s."
+    },
+    {
+      "name": "download_queued_unknown_network",
+      "value": "Couldn't confirm the network type. Download paused: %1$s."
+    },
+    {
+      "name": "download_failed_file",
+      "value": "Download failed: %1$s."
+    },
+    {
+      "name": "download_completed_system",
+      "value": "Download complete. Saved to the system downloads folder: %1$s."
+    },
+    {
+      "name": "download_completed_file",
+      "value": "Download complete: %1$s."
+    },
+    {
+      "name": "download_export_failed",
+      "value": "Download complete, but saving to the system downloads folder failed. The file remains in Aira's temporary download folder: %1$s."
+    },
+    {
+      "name": "download_export_skipped",
+      "value": "Download complete. It was not saved to the system downloads folder. The file remains in Aira's temporary download folder: %1$s."
+    },
+    {
+      "name": "download_cleanup_failed",
+      "value": "Couldn't clean up the temporary download file: %1$s."
+    },
+    {
+      "name": "download_paused_progress_kept",
+      "value": "Download paused. Progress so far is kept."
+    },
+    {
+      "name": "download_connection_lost",
+      "value": "The download connection was interrupted. Try again."
+    },
+    {
+      "name": "download_network_offline",
+      "value": "No network. The download is waiting for the network to return."
+    },
+    {
+      "name": "download_network_cellular",
+      "value": "On cellular. The download is waiting for WLAN."
+    },
+    {
+      "name": "download_network_unknown",
+      "value": "Couldn't confirm the network type. The download is paused."
+    },
+    {
+      "name": "download_network_unsupported",
+      "value": "This network type doesn't support automatic downloads yet. The download is paused."
+    },
+    {
+      "name": "download_open_missing",
+      "value": "Couldn't open the download: the file doesn't exist yet."
+    },
+    {
+      "name": "download_open_failed",
+      "value": "Couldn't open the download: %1$s."
+    },
+    {
+      "name": "download_location_missing",
+      "value": "Couldn't open the download location: the file doesn't exist yet."
+    },
+    {
+      "name": "download_location_opened",
+      "value": "Opened the download location: %1$s."
+    },
+    {
+      "name": "download_location_failed",
+      "value": "Couldn't open the download location: %1$s."
+    },
+    {
+      "name": "download_notification_tasks",
+      "value": "%1$d downloads"
+    },
+    {
+      "name": "download_notification_downloading",
+      "value": "Downloading"
+    },
+    {
+      "name": "download_notification_files",
+      "value": "Downloading %1$d files"
+    },
+    {
+      "name": "download_notification_tap",
+      "value": "Tap to view downloads"
+    },
+    {
+      "name": "download_notification_preparing",
+      "value": "Preparing"
+    },
+    {
+      "name": "download_indicator_many_unknown",
+      "value": "Downloading %1$d tasks, progress unknown"
+    },
+    {
+      "name": "download_indicator_unknown",
+      "value": "Downloading, progress unknown"
+    },
+    {
+      "name": "download_indicator_many_percent",
+      "value": "Downloading %1$d tasks, %2$d%%"
+    },
+    {
+      "name": "download_indicator_percent",
+      "value": "Downloading, %1$d%%"
+    },
+    {
+      "name": "download_prompt_title",
+      "value": "Download this file?"
+    },
+    {
+      "name": "download_prompt_message",
+      "value": "This confirmation applies only to this tap. Canceling won't trigger it again."
+    },
+    {
+      "name": "download_selection_empty",
+      "value": "Select a download first."
+    },
+    {
+      "name": "download_selection_title",
+      "value": "%1$d selected"
+    },
+    {
+      "name": "download_private_completed",
+      "value": "Private download complete. The file is kept only in this session's temporary folder: %1$s."
+    },
+    {
+      "name": "download_temp_completed",
+      "value": "Download complete. The file remains in Aira's temporary download folder: %1$s."
+    },
+    {
+      "name": "download_choose_location_later",
+      "value": "Choose a system download location after it finishes"
+    },
+    {
+      "name": "download_private_temp_dir",
+      "value": "Aira private temporary downloads"
+    },
+    {
+      "name": "download_temp_dir",
+      "value": "Aira temporary downloads"
+    },
+    {
+      "name": "download_init_failed",
+      "value": "Couldn't start the download component. Try again later."
+    },
+    {
+      "name": "download_canceled_named",
+      "value": "Download canceled: %1$s."
+    },
+    {
+      "name": "download_choose_each_time",
+      "value": "Choose a save location when downloading"
+    },
+    {
+      "name": "download_process_failed",
+      "value": "Couldn't handle the download: %1$s."
+    },
+    {
+      "name": "download_private_cleanup_failed",
+      "value": "Couldn't clean up the private download's temporary file: %1$s."
+    },
+    {
+      "name": "download_custom_location",
+      "value": "Custom location"
     }
   ]
 }

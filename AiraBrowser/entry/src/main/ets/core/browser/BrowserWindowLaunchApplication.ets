@@ -10,6 +10,7 @@ import {
   BrowserWindowRuntime
 } from '../../app/runtime/BrowserWindowRuntime';
 import { resolveBrowserNewWindowTestTitle } from '../../app/debug/BrowserNewWindowTestPage';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { WebAppSessionCoordinator, WebAppSessionSnapshot } from '../webapps/WebAppSessionCoordinator';
 import {
   BrowserCreateTabOptions,
@@ -141,7 +142,7 @@ export class BrowserWindowFixedLaunchApplication implements BrowserWindowLaunchA
       sharedBrowserContinuationCoordinator.bindIncomingTab(payload, targetTabId);
     } catch (_error) {
       sharedBrowserContinuationCoordinator.releaseIncomingPayload(payload.transferId);
-      this.shell.showToast('无法接续此页面');
+      this.shell.showToast(resolveAppResourceText($r('app.string.browser_browser_window_launch_application_006')));
     }
   }
 
@@ -179,7 +180,7 @@ export class BrowserWindowFixedLaunchApplication implements BrowserWindowLaunchA
         accepted: true,
         targetWindowId: targetWindowId,
         targetTabId: targetTabId,
-        message: '新窗口已接收标签页。'
+        message: resolveAppResourceText($r('app.string.browser_browser_window_launch_application_004'))
       });
     } catch (_error) {
       BrowserWindowRuntime.acknowledgeTabWindowMove({
@@ -187,7 +188,7 @@ export class BrowserWindowFixedLaunchApplication implements BrowserWindowLaunchA
         accepted: false,
         targetWindowId: targetWindowId,
         targetTabId: '',
-        message: '新窗口无法保存这个标签页。'
+        message: resolveAppResourceText($r('app.string.browser_browser_window_launch_application_005'))
       });
     }
   }
@@ -270,23 +271,25 @@ export class BrowserWindowFixedLaunchApplication implements BrowserWindowLaunchA
           skipCurrentTabPreviewForForegroundOpen: true
         }
       });
-      this.shell.publishHelper('已在新的隐私窗口中打开链接。');
+      this.shell.publishHelper(resolveAppResourceText($r('app.string.browser_browser_window_launch_application_001')));
       return;
     }
     if (facts.tabs.length === 0) {
       this.dependencies.foregroundTabCreationCoordinator.createNewTabNow({
         initialUrl: 'aira://home',
-        initialTitle: '隐私标签页',
+        initialTitle: resolveAppResourceText($r('app.string.browser_window_private_tab_title')),
         options: options,
         homePresentationMode: 'direct',
         runtimeOptions: {
           skipCurrentTabPreviewForForegroundOpen: true
         }
       });
-      this.dependencies.tabHomeCoordinator.showHomeSurface('已打开隐私窗口', options);
+      this.dependencies.tabHomeCoordinator.showHomeSurface(
+        resolveAppResourceText($r('app.string.browser_browser_window_launch_application_003')), options);
       return;
     }
-    this.dependencies.tabHomeCoordinator.showHomeSurface('已打开隐私窗口', options);
+    this.dependencies.tabHomeCoordinator.showHomeSurface(
+      resolveAppResourceText($r('app.string.browser_browser_window_launch_application_003')), options);
   }
 
   /**
@@ -311,7 +314,7 @@ export class BrowserWindowFixedLaunchApplication implements BrowserWindowLaunchA
         skipCurrentTabPreviewForForegroundOpen: true
       }
     });
-    this.shell.publishHelper('已在新窗口中打开链接。');
+    this.shell.publishHelper(resolveAppResourceText($r('app.string.browser_browser_window_launch_application_002')));
   }
 
   private openAppShortcut(payload: BrowserLaunchPayload): void {
@@ -405,7 +408,9 @@ export class BrowserWindowFixedLaunchApplication implements BrowserWindowLaunchA
         title: targetUrl,
         intent: 'current_tab',
         source: 'external_url',
-        helperMessage: payload.action.length > 0 ? '系统已交给Aira打开链接' : '正在打开外部链接',
+        helperMessage: payload.action.length > 0
+          ? resolveAppResourceText($r('app.string.browser_browser_window_launch_application_008'))
+          : resolveAppResourceText($r('app.string.browser_browser_window_launch_application_007')),
         profileId: payload.profileId,
         privacyMode: privacyMode,
         dataScope: dataScope,

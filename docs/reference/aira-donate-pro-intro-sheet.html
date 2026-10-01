@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>捐赠版 Pro · 首次进入的底部 Sheet 草稿</title>
+<style>
+  /* ------------------------------------------------------------------
+     设计规则（对齐 iOS 系统语言，不是「卡片落地页」）：
+     1. 只有一个强调色。除主按钮与列表勾选，其余全是黑 / 灰。
+     2. 容器只靠 hairline（0.5px）分隔，不用边框 + 圆角 + 阴影三层叠加。
+     3. 大字号 + 负字距建立层级，不用色块、不用字距拉开的微标题。
+     4. 组标题就是一行 17px 半粗正文，不做独立样式。
+     5. 留白用 4pt 网格，横向 24px，纵向节奏 20 / 24 / 32。
+     ------------------------------------------------------------------ */
+  :root{
+    /* iOS system colors */
+    --page:#F2F2F7;
+    --sheet:#FFFFFF;
+    --fill:rgba(120,120,128,.12);
+    --fill-2:rgba(120,120,128,.08);
+    --label:#000000;
+    --label-2:rgba(60,60,67,.60);
+    --label-3:rgba(60,60,67,.30);
+    --separator:rgba(60,60,67,.20);
+    --accent:#0A59F7;
+    --on-accent:#FFFFFF;
+    --scrim:rgba(0,0,0,.36);
+    --hairline:0.5px;
+  }
+  html[data-theme="dark"]{
+    --page:#000000;
+    --sheet:#1C1C1E;
+    --fill:rgba(120,120,128,.24);
+    --fill-2:rgba(120,120,128,.16);
+    --label:#FFFFFF;
+    --label-2:rgba(235,235,245,.60);
+    --label-3:rgba(235,235,245,.30);
+    --separator:rgba(84,84,88,.65);
+    --accent:#7EA7FF;
+    --on-accent:#0B0D12;
+    --scrim:rgba(0,0,0,.54);
+  }
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  html,body{margin:0}
+  body{
+    background:var(--page);
+    color:var(--label);
+    font:17px/1.4 -apple-system,"SF Pro Text","SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;
+    padding:28px 24px 72px;
+  }
+
+  /* ---------- 草稿页壳 ---------- */
+  .head{max-width:1180px;margin:0 auto 18px}
+  .head .eyebrow{font-size:12px;font-weight:590;color:var(--label-3);letter-spacing:.01em}
+  .head h1{font-size:30px;font-weight:700;letter-spacing:-.028em;margin:6px 0 8px}
+  .head p{margin:0;color:var(--label-2);font-size:14px;max-width:780px;line-height:1.55}
+
+  .toolbar{
+    max-width:1180px;margin:18px auto 30px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;
+  }
+  .toolbar .lbl{font-size:12px;font-weight:590;color:var(--label-3);margin:0 4px 0 10px}
+  .toolbar .lbl:first-child{margin-left:0}
+  .toolbar button{
+    font:inherit;font-size:13px;font-weight:510;padding:6px 13px;border-radius:980px;
+    border:0;background:var(--fill-2);color:var(--label);cursor:pointer;
+    transition:background .15s ease;
+  }
+  .toolbar button:hover{background:var(--fill)}
+  .toolbar button.on{background:var(--accent);color:var(--on-accent)}
+
+  .stage{max-width:1180px;margin:0 auto;display:flex;gap:56px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+  .device-wrap{display:flex;flex-direction:column;align-items:center}
+  .caption{margin-top:16px;font-size:12px;color:var(--label-3);text-align:center;max-width:392px;line-height:1.55}
+  .caption b{color:var(--label-2);font-weight:590;display:block;margin-bottom:3px}
+
+  .device{
+    width:392px;height:812px;position:relative;flex:0 0 auto;background:#000;border-radius:56px;padding:11px;
+    box-shadow:0 34px 60px -18px rgba(16,22,38,.30),0 8px 20px -8px rgba(16,22,38,.16),
+               inset 0 0 0 1.5px #3a3d42,inset 0 0 0 3px #16181c;
+  }
+  .screen{
+    position:relative;width:100%;height:100%;background:var(--page);color:var(--label);
+    border-radius:45px;overflow:hidden;display:flex;flex-direction:column;
+  }
+  .island{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:112px;height:32px;background:#000;border-radius:20px;z-index:60}
+  .statusbar{
+    height:52px;flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-between;
+    padding:0 30px 6px;font-size:15px;font-weight:600;letter-spacing:.005em;color:var(--label);
+    position:relative;z-index:50;
+  }
+  .statusbar .right{display:flex;align-items:center;gap:5px}
+
+  /* ---------- 背景：捐赠版 Pro 页面 ---------- */
+  .navbar{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:8px 16px 4px;gap:12px}
+  .icon-btn{
+    width:40px;height:40px;border-radius:50%;background:var(--fill-2);border:0;
+    display:flex;align-items:center;justify-content:center;color:var(--label);cursor:pointer
+  }
+  .pill-btn{
+    height:40px;padding:0 16px;border-radius:980px;background:var(--fill-2);border:0;
+    font:inherit;font-size:15px;font-weight:510;color:var(--label);cursor:pointer
+  }
+  .page-scroll{flex:1 1 auto;overflow:hidden;padding:8px 20px 30px;display:flex;flex-direction:column}
+  .page-hero{padding:16px 0 22px}
+  .page-hero h2{margin:0;font-size:34px;line-height:1.12;font-weight:700;letter-spacing:-.032em}
+  .page-hero p{margin:8px 0 0;font-size:17px;line-height:1.45;color:var(--label-2);letter-spacing:-.01em}
+  .group{background:var(--sheet);border-radius:12px;overflow:hidden}
+  .grow{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;padding:14px 16px;font-size:17px;letter-spacing:-.01em;position:relative}
+  .grow + .grow::before{
+    content:"";position:absolute;left:16px;right:0;top:0;height:var(--hairline);background:var(--separator);
+  }
+  .grow .val{font-size:17px;color:var(--label-2)}
+  .page-foot{padding:14px 16px 0;font-size:13px;line-height:1.5;color:var(--label-3)}
+
+  /* 遮罩 */
+  .scrim{
+    position:absolute;inset:0;background:var(--scrim);z-index:40;
+    transition:opacity .22s ease;
+  }
+  html[data-sheet="off"] .scrim{opacity:0;pointer-events:none}
+
+  /* ---------- 底部 Sheet：最高高度 ---------- */
+  .sheet{
+    position:absolute;left:0;right:0;bottom:0;z-index:55;
+    height:92%;                       /* ← 最高高度：贴近 SheetSize.LARGE */
+    background:var(--sheet);
+    border-radius:28px 28px 0 0;
+    display:flex;flex-direction:column;
+    transform:translateY(0);
+    transition:transform .3s cubic-bezier(.32,.72,0,1);
+  }
+  html[data-sheet="off"] .sheet{transform:translateY(101%)}
+  .grabber{flex:0 0 auto;padding:9px 0 0;display:flex;justify-content:center}
+  .grabber i{display:block;width:36px;height:5px;border-radius:3px;background:var(--label-3)}
+
+  .sheet-body{
+    flex:1 1 auto;overflow-y:auto;overflow-x:hidden;
+    padding:20px 24px 8px;display:flex;flex-direction:column;
+    scrollbar-width:none;
+  }
+  .sheet-body::-webkit-scrollbar{display:none}
+
+  /* 字号只有三档：32 / 17 / 13。正文一律 17，不再出现 15、16 这类中间档 */
+  .sheet-title{
+    margin:0;font-size:32px;line-height:1.14;font-weight:700;letter-spacing:-.034em;color:var(--label);
+  }
+  .sheet-lead{
+    margin:10px 0 0;font-size:17px;line-height:1.45;color:var(--label-2);letter-spacing:-.01em;
+  }
+
+  /* 列表：hairline 分隔，无勾选、无缩进、无容器 */
+  .list{margin-top:26px;border-top:var(--hairline) solid var(--separator)}
+  .row{
+    padding:15px 0;border-bottom:var(--hairline) solid var(--separator);
+    font-size:17px;line-height:1.35;letter-spacing:-.01em;color:var(--label);
+  }
+
+  /* 组标题就是一行正文，不做独立样式 */
+  .section-title{
+    margin:30px 0 0;font-size:17px;line-height:1.35;font-weight:600;letter-spacing:-.012em;color:var(--label);
+  }
+
+  .tail{
+    margin:24px 0 0;font-size:13px;line-height:1.5;color:var(--label-3);letter-spacing:-.003em;
+  }
+
+  /* 页脚：实心主按钮 + 纯文字次动作 */
+  .sheet-foot{
+    flex:0 0 auto;padding:16px 24px calc(18px + env(safe-area-inset-bottom));
+    display:flex;flex-direction:column;align-items:stretch;gap:2px;
+    border-top:var(--hairline) solid var(--separator);
+  }
+  .cta{
+    width:100%;height:50px;border:0;border-radius:980px;background:var(--accent);color:var(--on-accent);
+    font:inherit;font-size:17px;font-weight:590;letter-spacing:-.01em;cursor:pointer;
+    transition:opacity .15s ease;
+  }
+  .cta:disabled{opacity:.36;cursor:default}
+  .cta.ghost{
+    background:transparent;color:var(--label-2);border:0;font-weight:400;height:44px;font-size:17px;letter-spacing:-.01em;
+  }
+
+  /* ---------- 说明区 ---------- */
+  .notes{max-width:1180px;margin:60px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media (max-width:1080px){.notes{grid-template-columns:1fr}}
+  .panel{background:var(--sheet);border-radius:14px;padding:22px 24px}
+  .panel h3{margin:0 0 12px;font-size:15px;font-weight:600;letter-spacing:-.01em}
+  .panel ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.65;color:var(--label-2)}
+  .panel li{margin-bottom:9px}
+  .panel b{color:var(--label);font-weight:590}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <div class="eyebrow">Aira Browser · 布局草稿（H5）</div>
+  <h1>捐赠版 Pro · 首次进入的底部 Sheet</h1>
+  <p>只在第一次进入「捐赠版 Pro」页时弹出一次，关掉或点过按钮后不再出现。排版按 iOS 系统语言重做：单一强调色、hairline 分隔、大字号负字距、不做容器堆叠。</p>
+</div>
+
+<div class="toolbar">
+  <span class="lbl">状态</span>
+  <button data-state="first" class="on">第一次进入</button>
+  <button data-state="claimed">刚领到会员</button>
+  <button data-state="pro">已开通捐赠版</button>
+  <span class="lbl">外观</span>
+  <button data-theme-btn="light" class="on">浅色</button>
+  <button data-theme-btn="dark">深色</button>
+  <span class="lbl">Sheet</span>
+  <button data-sheet-btn="on" class="on">展开</button>
+  <button data-sheet-btn="off">收起</button>
+</div>
+
+<div class="stage">
+  <div class="device-wrap">
+    <div class="device">
+      <div class="island"></div>
+      <div class="screen">
+
+        <div class="statusbar">
+          <span>9:41</span>
+          <span class="right">
+            <svg width="18" height="11" viewBox="0 0 18 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="6" rx="1"/><rect x="10" y="3" width="3" height="8" rx="1"/><rect x="15" y="0.5" width="3" height="10.5" rx="1"/></svg>
+            <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><path d="M8.5 10.6 6.5 8.2a3.1 3.1 0 0 1 4 0l-2 2.4Z"/><path d="M8.5 4.2c1.5 0 2.9.52 4 1.4l1.3-1.52A8.7 8.7 0 0 0 8.5 2.1c-1.95 0-3.76.72-5.3 1.88L4.5 5.6a6.3 6.3 0 0 1 4-1.4Z"/></svg>
+            <svg width="25" height="12" viewBox="0 0 25 12"><rect x=".5" y=".5" width="21" height="11" rx="3.4" fill="none" stroke="currentColor" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="currentColor"/><path d="M23.3 4v4c.85-.33 1.3-.9 1.3-2s-.45-1.67-1.3-2Z" fill="currentColor" fill-opacity=".35"/></svg>
+          </span>
+        </div>
+
+        <!-- 背景页：捐赠版 Pro -->
+        <div class="navbar">
+          <button class="icon-btn" aria-label="关闭">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M3.4 3.4l9.2 9.2M12.6 3.4 3.4 12.6"/></svg>
+          </button>
+          <button class="pill-btn">恢复购买</button>
+        </div>
+
+        <div class="page-scroll">
+          <div class="page-hero">
+            <h2 id="page-title">捐赠版 Pro</h2>
+            <p id="page-sub">本地功能永久免费，Pro 只用于官方托管云服务。</p>
+          </div>
+
+          <div class="group">
+            <div class="grow"><span>书签同步</span><span class="val">已开启</span></div>
+            <div class="grow"><span>历史记录同步</span><span class="val">已开启</span></div>
+            <div class="grow"><span>网页接力</span><span class="val">已开启</span></div>
+            <div class="grow"><span>跨设备标签页</span><span class="val">已开启</span></div>
+          </div>
+
+          <div class="page-foot">以上能力依赖 Aira 官方托管服务，需要登录华为账号。</div>
+        </div>
+
+        <!-- 遮罩 -->
+        <div class="scrim" id="scrim"></div>
+
+        <!-- ================= 底部 Sheet ================= -->
+        <div class="sheet" id="sheet">
+          <div class="grabber"><i></i></div>
+
+          <div class="sheet-body">
+            <h2 class="sheet-title">开源免费，捐赠自愿</h2>
+            <p class="sheet-lead">捐赠用于维护 Aira 自己的服务器。</p>
+
+            <div class="list">
+              <div class="row">浏览器全部功能</div>
+              <div class="row">自己搭服务器同步</div>
+              <div class="row">华为云空间 / WebDAV 同步</div>
+            </div>
+
+            <h3 class="section-title">那捐赠版 Pro 是什么</h3>
+            <div class="list" style="margin-top:12px">
+              <div class="row">用 Aira 的服务器同步，不用自己搭</div>
+              <div class="row">跨设备互联开箱可用</div>
+              <div class="row">支持我继续做下去</div>
+            </div>
+
+            <p class="tail" id="tail">不想捐也没关系，页面下面可以一直免费领会员。</p>
+          </div>
+
+          <div class="sheet-foot">
+            <button class="cta" id="cta">支持一下，开通捐赠版 Pro</button>
+            <button class="cta ghost" id="dismiss">以后再说</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="caption"><b>落在 HarmonyOS 上的样子</b>底部 Sheet 取最高高度；正文短，一屏放得下，主按钮与「以后再说」固定在页脚。</div>
+  </div>
+</div>
+
+<div class="notes">
+  <div class="panel">
+    <h3>这版排掉了哪些「AI 味」</h3>
+    <ul>
+      <li><b>勾选图标 → 删。</b>两段清单本来就是在陈述事实，不是「功能对比表」，打勾会把它们读成待办事项。同时删掉那 22px 图标列，两段清单的文字左边界现在完全对齐。</li>
+      <li><b>字号从 5 档收到 3 档：32 / 17 / 13。</b>标题 32，正文一律 17（含组标题、导语、清单），页尾备注 13。原来 16 和 17 混用是左边界错位之外另一个「看着不齐」的原因。</li>
+      <li><b>① ② ③ 带色编号圆点 → 删。</b>换成 hairline 分隔的普通行，编号本身就是模板感最强的元素。</li>
+      <li><b>字距拉开的微标题 → 删。</b>组标题就是一行 17px 半粗正文，靠字重和间距区分，不靠全大写 + letter-spacing。</li>
+      <li><b>虚线描边卡 → 删。</b>那一段已经压成页尾一行 13px 灰字。</li>
+      <li><b>页脚渐变遮罩 → 换成 hairline 顶边。</b>渐变是网页语言，iOS 用一条 0.5px 分隔线。</li>
+      <li><b>边框 + 圆角 + 阴影三层叠加 → 只留 hairline。</b>内容靠分隔线组织，不靠容器。</li>
+      <li><b>大字号 + 负字距建立层级。</b>标题 32px / -0.034em，这是 iOS 大标题的标准做法，比加色块更「贵」。</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h3>行为与待定</h3>
+    <ul>
+      <li><b>只弹一次。</b>第一次进入「捐赠版 Pro」页时弹出；点主按钮、点「以后再说」、或下滑关掉，都记为已看过，之后不再出现。</li>
+      <li><b>名字范围待定。</b>建议只把会员页与购买流程改叫「捐赠版 Pro」；《Aira Pro 会员服务协议》《自动续费服务协议》这类法定名称保持不动。</li>
+      <li><b>「不限次数」待确认。</b>现在客户端策略是「会员期内不能再领，到期可再领」，页尾那句是准的；如果服务端以后加冷却期要跟着改。</li>
+      <li><b>免费领取的落点。</b>页尾那句指的是页面上已有的领取入口，Sheet 里不重复实现流程。</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  const state = {mode:'first', sheet:'on'};
+
+  const PAGE_TITLE = {first:'捐赠版 Pro', claimed:'捐赠版 Pro', pro:'捐赠版 Pro 已开通'};
+  const PAGE_SUB = {
+    first:   '本地功能永久免费，Pro 只用于官方托管云服务。',
+    claimed: '已通过免费领取开通，权益和捐赠版一样。',
+    pro:     '云同步、网页接力与跨设备标签页均已生效。'
+  };
+  const CTA = {
+    first:   '支持一下，开通捐赠版 Pro',
+    claimed: '支持一下，升级为捐赠版 Pro',
+    pro:     '已开通捐赠版 Pro'
+  };
+  const TAIL = {
+    first:   '不想捐也没关系，页面下面可以一直免费领会员。',
+    claimed: '已通过免费领取开通，到期后可以再领。',
+    pro:     ''
+  };
+
+  function render(){
+    document.getElementById('page-title').textContent = PAGE_TITLE[state.mode];
+    document.getElementById('page-sub').textContent = PAGE_SUB[state.mode];
+
+    const tail = document.getElementById('tail');
+    tail.textContent = TAIL[state.mode];
+    tail.style.display = TAIL[state.mode].length > 0 ? 'block' : 'none';
+
+    const cta = document.getElementById('cta');
+    cta.textContent = CTA[state.mode];
+    cta.disabled = state.mode === 'pro';
+
+    document.documentElement.dataset.sheet = state.sheet;
+  }
+
+  document.querySelectorAll('.toolbar [data-state]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.mode = btn.dataset.state;
+      document.querySelectorAll('.toolbar [data-state]').forEach(b => b.classList.toggle('on', b === btn));
+      render();
+    });
+  });
+  document.querySelectorAll('.toolbar [data-theme-btn]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.documentElement.dataset.theme = btn.dataset.themeBtn;
+      document.querySelectorAll('.toolbar [data-theme-btn]').forEach(b => b.classList.toggle('on', b === btn));
+    });
+  });
+  document.querySelectorAll('.toolbar [data-sheet-btn]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.sheet = btn.dataset.sheetBtn;
+      document.querySelectorAll('.toolbar [data-sheet-btn]').forEach(b => b.classList.toggle('on', b === btn));
+      render();
+    });
+  });
+
+  document.getElementById('scrim').addEventListener('click', () => { state.sheet = 'off'; render(); });
+  document.getElementById('dismiss').addEventListener('click', () => { state.sheet = 'off'; render(); });
+
+  render();
+</script>
+</body>
+</html>

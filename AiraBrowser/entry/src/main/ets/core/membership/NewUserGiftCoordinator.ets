@@ -6,6 +6,7 @@ import { MembershipFeature } from '../../features/membership/MembershipFeature';
 import { NewUserGiftRepository } from '../../data/membership/NewUserGiftRepository';
 import { AiraNewUserGiftView } from '../../common/models/MembershipModels';
 import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../common/config/AiraDistributionCapabilityOwner';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export type NewUserGiftAction = 'dismiss';
 
@@ -265,10 +266,10 @@ export class NewUserGiftCoordinator {
     return {
       visible: true,
       uid: gift.uid,
-      title: 'Aira Pro 已到账',
-      message: `已为你开通 ${grantDays} 天 Aira Pro，权益立即生效。`,
+      title: resolveAppResourceText($r('app.string.membership_gift_landed_title')),
+      message: resolveAppResourceText($r('app.string.membership_gift_landed_message', grantDays)),
       grantDays: grantDays,
-      actionTitle: '开心收下'
+      actionTitle: resolveAppResourceText($r('app.string.membership_gift_accept'))
     };
   }
 

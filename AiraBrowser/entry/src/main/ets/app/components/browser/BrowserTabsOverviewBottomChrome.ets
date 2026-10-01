@@ -9,6 +9,8 @@ import {
 } from '../../../core/browser/BrowserBottomAddressPanelMetrics';
 import { BrowserBottomPanelResponsiveViewModel } from '../../../core/browser/BrowserBottomPanelResponsiveViewModel';
 import { BrowserTabsOverviewSection } from '../../../core/browser/tabsOverview/BrowserTabsOverviewSectionPolicy';
+import { resolveTabsOverviewCloseAllMenuSection } from '../../../core/browser/tabsOverview/BrowserTabsOverviewBottomChromeViewModel';
+import { BrowserTabsOverviewSwipeFeedbackService } from '../../../core/browser/tabsOverview/BrowserTabsOverviewSwipeFeedbackService';
 import { AppChromeIconTone } from '../../../core/resources/AppIconResources';
 import { AiraRenderableIconId } from '../../../core/resources/GeneratedAiraIconCatalog';
 import {
@@ -45,10 +47,23 @@ const BROWSER_TABS_OVERVIEW_BOTTOM_CHROME_COUNT_OVERFLOW: number = 99;
 // as selected while the finger is down on another one.
 const BROWSER_TABS_OVERVIEW_BOTTOM_CHROME_SEGMENT_SELECTED_LIGHT: string = '#E6FFFFFF';
 const BROWSER_TABS_OVERVIEW_BOTTOM_CHROME_SEGMENT_SELECTED_DARK: string = '#47FFFFFF';
+const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_LONG_PRESS_MS: number = 450;
+const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_WIDTH: number = 128;
+const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_HEIGHT: number = 44;
+const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_RADIUS: number =
+  BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_HEIGHT / 2;
+// A pressing finger covers the segment and bulges above it. The pill has to clear that
+// pad, not sit in the 8vp gap the other chrome popups use.
+const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_TARGET_SPACE: number = 56;
+const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_ICON_SIZE: number = 18;
+const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_TEXT_SIZE: number = 15;
+const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_CONTENT_GAP: number = 6;
+const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_LIFT_GUARD_MS: number = 200;
+const BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_LABEL: string = '关闭全部';
 
 @Component
 export struct BrowserTabsOverviewBottomChrome {
-  @Prop selectedSection: BrowserTabsOverviewSection = 'tabs';
+  @Prop @Watch('handleCloseAllMenuContextChanged') selectedSection: BrowserTabsOverviewSection = 'tabs';
   @Prop regularTabCount: number = 0;
   @Prop regularTabsLabel: string = '0 个标签页';
   @Prop privacyTabsLabel: string = '隐私标签页';
@@ -57,24 +72,33 @@ export struct BrowserTabsOverviewBottomChrome {
   @Prop viewportHeight: number = 844;
   @Prop bottomChromeLiftVp: number = 0;
   @Prop surfaceOpacity: number = 1;
-  @Prop chromeInteractionEnabled: boolean = true;
+  @Prop @Watch('handleCloseAllMenuContextChanged') chromeInteractionEnabled: boolean = true;
   @Prop regularChromeIconTone: AppChromeIconTone = 'light';
   @Prop adaptiveForeground: boolean = true;
   @State private pressedOuterScaleTarget: string = '';
   @State private pressedOuterScale: number = 1;
   @State private pressedSegment: string = '';
+  @State private closeAllMenuSection: string = '';
+  @State private closeAllMenuPressed: boolean = false;
+  private suppressNextSegmentClick: boolean = false;
+  private closeAllMenuFingerDown: boolean = false;
+  private closeAllMenuIgnoreDismiss: boolean = false;
+  private closeAllMenuIgnoreDismissTimer: number = 0;
 
   onReturn: () => void = () => {};
   onCreateHome: () => void = () => {};
   onSwitchToTabs: () => void = () => {};
   onSwitchToPrivacy: () => void = () => {};
   onOpenDeviceTabs: () => void = () => {};
+  onCloseAll: () => void = () => {};
 
   private responsiveViewModel: BrowserBottomPanelResponsiveViewModel = new BrowserBottomPanelResponsiveViewModel();
 
   aboutToDisappear(): void {
     this.resetOuterPressScale();
     this.pressedSegment = '';
+    this.dismissCloseAllMenu();
+    this.clearCloseAllMenuLiftGuard();
   }
 
   build() {
@@ -213,10 +237,43 @@ export struct BrowserTabsOverviewBottomChrome {
     .borderRadius(this.resolveSegmentHeight() / 2)
     .accessibilityText(this.resolveSegmentAccessibilityText(target))
     .onTouch((event: TouchEvent) => {
-      this.updatePressedSegment(target, event.type);
+      this.handleSegmentTouch(target, event.type);
     })
     .onClick(() => {
-      this.dispatchSegmentAction(target);
+      this.handleSegmentClick(target);
+    })
+    .gesture(
+      LongPressGesture({
+        fingers: 1,
+        repeat: false,
+        duration: BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_LONG_PRESS_MS
+      })
+        .onAction(() => {
+          this.handleSegmentLongPress(target);
+        })
+    )
+    .bindPopup(this.closeAllMenuSection === target, {
+      builder: this.buildCloseAllMenu,
+      placement: Placement.Top,
+      popupColor: $r('sys.color.ohos_id_color_background_transparent'),
+      enableArrow: false,
+      autoCancel: true,
+      onStateChange: (event: PopupStateChangeParam): void => {
+        if (!event.isVisible && this.closeAllMenuSection === target) {
+          this.dismissCloseAllMenu();
+        }
+      },
+      onWillDismiss: (action: DismissPopupAction): void => {
+        this.handleCloseAllMenuWillDismiss(action);
+      },
+      showInSubWindow: false,
+      mask: false,
+      targetSpace: BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_TARGET_SPACE,
+      width: BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_WIDTH,
+      radius: BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_RADIUS,
+      shadow: this.resolveMaterialShadow(),
+      backgroundBlurStyle: BlurStyle.NONE,
+      focusable: false
     })
   }
 
@@ -253,11 +310,216 @@ export struct BrowserTabsOverviewBottomChrome {
     .borderRadius(this.resolveSegmentHeight() / 2)
     .accessibilityText(this.regularTabsLabel)
     .onTouch((event: TouchEvent) => {
-      this.updatePressedSegment('tabs', event.type);
+      this.handleSegmentTouch('tabs', event.type);
     })
     .onClick(() => {
-      this.dispatchSegmentAction('tabs');
+      this.handleSegmentClick('tabs');
     })
+    .gesture(
+      LongPressGesture({
+        fingers: 1,
+        repeat: false,
+        duration: BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_LONG_PRESS_MS
+      })
+        .onAction(() => {
+          this.handleSegmentLongPress('tabs');
+        })
+    )
+    .bindPopup(this.closeAllMenuSection === 'tabs', {
+      builder: this.buildCloseAllMenu,
+      placement: Placement.Top,
+      popupColor: $r('sys.color.ohos_id_color_background_transparent'),
+      enableArrow: false,
+      autoCancel: true,
+      onStateChange: (event: PopupStateChangeParam): void => {
+        if (!event.isVisible && this.closeAllMenuSection === 'tabs') {
+          this.dismissCloseAllMenu();
+        }
+      },
+      onWillDismiss: (action: DismissPopupAction): void => {
+        this.handleCloseAllMenuWillDismiss(action);
+      },
+      showInSubWindow: false,
+      mask: false,
+      targetSpace: BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_TARGET_SPACE,
+      width: BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_WIDTH,
+      radius: BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_RADIUS,
+      shadow: this.resolveMaterialShadow(),
+      backgroundBlurStyle: BlurStyle.NONE,
+      focusable: false
+    })
+  }
+
+  /**
+   * A glass pill in the same family as the bar. It is anchored above the segment
+   * that was held; the lift that ends that press must not dismiss it.
+   */
+  @Builder
+  private buildCloseAllMenu() {
+    Stack({ alignContent: Alignment.Center }) {
+      if (this.shouldUseHdsMaterialPlate()) {
+        HdsImmersiveMaterialSurface({
+          plateWidth: BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_WIDTH,
+          plateHeight: BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_HEIGHT,
+          plateRadius: BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_RADIUS
+        })
+      }
+      BrowserBottomChromeImmersiveMaterialSurface({
+        surfaceWidth: '100%',
+        surfaceHeight: BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_HEIGHT,
+        surfaceRadius: BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_RADIUS,
+        materialTint: this.resolveMaterialTint(),
+        fallbackColor: $r('app.color.browser_bottom_toolbar_glass_background'),
+        hostMaterialActive: this.shouldUseHdsMaterialPlate()
+      }) {
+        Button() {
+          Row({ space: BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_CONTENT_GAP }) {
+            AiraIcon({
+              airaIconId: 'browser.tabs.overviewClose',
+              iconSize: BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_ICON_SIZE,
+              iconColor: this.resolvePrimaryColor()
+            })
+              .hitTestBehavior(HitTestMode.None)
+            Text(BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_LABEL)
+              .fontSize(BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_TEXT_SIZE)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(this.resolvePrimaryColor())
+              .minFontScale(1)
+              .maxFontScale(1)
+              .maxLines(1)
+              .hitTestBehavior(HitTestMode.None)
+          }
+          .justifyContent(FlexAlign.Center)
+          .alignItems(VerticalAlign.Center)
+        }
+        .width('100%')
+        .height('100%')
+        .type(ButtonType.Normal)
+        .backgroundColor(this.closeAllMenuPressed ? this.resolveCloseAllMenuPressedColor() :
+          $r('sys.color.ohos_id_color_background_transparent'))
+        .borderRadius(BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_RADIUS)
+        .stateEffect(false)
+        .accessibilityText(this.resolveCloseAllMenuAccessibilityText())
+        .onTouch((event: TouchEvent) => {
+          this.updateCloseAllMenuPressed(event.type);
+        })
+        .onClick(() => {
+          this.confirmCloseAllFromMenu();
+        })
+      }
+    }
+    .width('100%')
+    .height(BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_HEIGHT)
+  }
+
+  private handleSegmentTouch(target: string, touchType: TouchType): void {
+    if (touchType === TouchType.Down) {
+      this.suppressNextSegmentClick = false;
+      // A press that starts while the menu is already open is an outside tap, not the
+      // long press that opened it, so it must still be allowed to dismiss the menu.
+      if (this.closeAllMenuSection === '') {
+        this.closeAllMenuFingerDown = true;
+      }
+    } else if (touchType === TouchType.Up || touchType === TouchType.Cancel) {
+      this.closeAllMenuFingerDown = false;
+      this.armCloseAllMenuLiftGuard();
+    }
+    this.updatePressedSegment(target, touchType);
+  }
+
+  private handleSegmentClick(target: string): void {
+    if (this.suppressNextSegmentClick) {
+      this.suppressNextSegmentClick = false;
+      return;
+    }
+    this.dispatchSegmentAction(target);
+  }
+
+  private handleSegmentLongPress(target: string): void {
+    if (!this.chromeInteractionEnabled) {
+      return;
+    }
+    const section = resolveTabsOverviewCloseAllMenuSection(this.selectedSection, target);
+    if (section === '') {
+      return;
+    }
+    this.suppressNextSegmentClick = true;
+    this.closeAllMenuSection = section;
+    BrowserTabsOverviewSwipeFeedbackService.performLongPressFeedback();
+  }
+
+  private handleCloseAllMenuContextChanged(): void {
+    if (!this.chromeInteractionEnabled ||
+      resolveTabsOverviewCloseAllMenuSection(this.selectedSection, this.closeAllMenuSection) === '') {
+      this.dismissCloseAllMenu();
+    }
+  }
+
+  private handleCloseAllMenuWillDismiss(action: DismissPopupAction): void {
+    if (this.closeAllMenuFingerDown || this.closeAllMenuIgnoreDismiss) {
+      return;
+    }
+    action.dismiss();
+  }
+
+  private confirmCloseAllFromMenu(): void {
+    if (!this.chromeInteractionEnabled || this.closeAllMenuSection === '') {
+      this.dismissCloseAllMenu();
+      return;
+    }
+    this.dismissCloseAllMenu();
+    this.onCloseAll();
+  }
+
+  private dismissCloseAllMenu(): void {
+    this.closeAllMenuSection = '';
+    this.closeAllMenuPressed = false;
+  }
+
+  private armCloseAllMenuLiftGuard(): void {
+    if (this.closeAllMenuSection === '') {
+      return;
+    }
+    this.closeAllMenuIgnoreDismiss = true;
+    if (this.closeAllMenuIgnoreDismissTimer !== 0) {
+      clearTimeout(this.closeAllMenuIgnoreDismissTimer);
+    }
+    this.closeAllMenuIgnoreDismissTimer = setTimeout(() => {
+      this.closeAllMenuIgnoreDismissTimer = 0;
+      this.closeAllMenuIgnoreDismiss = false;
+    }, BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_LIFT_GUARD_MS);
+  }
+
+  private clearCloseAllMenuLiftGuard(): void {
+    if (this.closeAllMenuIgnoreDismissTimer !== 0) {
+      clearTimeout(this.closeAllMenuIgnoreDismissTimer);
+      this.closeAllMenuIgnoreDismissTimer = 0;
+    }
+    this.closeAllMenuIgnoreDismiss = false;
+    this.closeAllMenuFingerDown = false;
+    this.suppressNextSegmentClick = false;
+  }
+
+  private updateCloseAllMenuPressed(touchType: TouchType): void {
+    if (!this.chromeInteractionEnabled) {
+      this.closeAllMenuPressed = false;
+      return;
+    }
+    if (touchType === TouchType.Down) {
+      this.closeAllMenuPressed = true;
+      return;
+    }
+    if (touchType === TouchType.Up || touchType === TouchType.Cancel) {
+      this.closeAllMenuPressed = false;
+    }
+  }
+
+  private resolveCloseAllMenuPressedColor(): ResourceColor {
+    return resolveBrowserBottomNeutralPressedColor(this.resolveMaterialMode());
+  }
+
+  private resolveCloseAllMenuAccessibilityText(): string {
+    return this.closeAllMenuSection === 'privacy' ? '关闭所有隐私标签页' : '关闭所有普通标签页';
   }
 
   private dispatchSegmentAction(target: string): void {

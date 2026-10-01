@@ -103,13 +103,15 @@ export class BrowserLargeScreenAccountPopoverCoordinator {
     if (credential.errorCode !== 0) {
       if (credential.errorCode !== HUAWEI_LOGIN_CANCEL_ERROR_CODE) {
         this.host.showMessage(
-          credential.errorMessage.trim().length > 0 ? credential.errorMessage : '华为账号登录失败'
+          credential.errorMessage.trim().length > 0
+            ? credential.errorMessage
+            : $r('app.string.settings_pro_sign_in_failed')
         );
       }
       return;
     }
     if (credential.authorizationCode.trim().length <= 0 && credential.openId.trim().length <= 0) {
-      this.host.showMessage('华为账号登录未完成');
+      this.host.showMessage($r('app.string.settings_pro_sign_in_incomplete'));
       return;
     }
     void this.signInHuaweiAccount(boundaryInput);
@@ -172,7 +174,7 @@ export class BrowserLargeScreenAccountPopoverCoordinator {
       }
       this.host.showMessage(result.title);
     } catch (_error) {
-      this.host.showMessage('华为账号登录失败');
+      this.host.showMessage($r('app.string.settings_pro_sign_in_failed'));
     } finally {
       this.setBusy(false);
     }

@@ -155,10 +155,12 @@ export struct BrowserLargeScreenAccountPopover {
     .height(LARGE_SCREEN_ACCOUNT_BUTTON_SIZE_VP)
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
     .stateEffect(true)
-    .accessibilityText(this.snapshot.signedIn ? '账号信息' : '登录华为账号')
+    .accessibilityText(this.snapshot.signedIn
+      ? $r('app.string.settings_account_info')
+      : $r('app.string.settings_pro_sign_in_title'))
     .onClick(() => {
       if (!this.snapshot.signedIn && !this.coordinator.canSignIn(this.buildDataBoundaryInput())) {
-        this.showToast('请回到普通会话后登录华为账号。');
+        this.showToast($r('app.string.settings_pro_sign_in_private'));
         return;
       }
       const shouldOpen = !this.popupVisible;

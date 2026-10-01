@@ -19,6 +19,7 @@ import {
   AiraProPurchasePolicyService
 } from '../../services/membership/AiraProPurchasePolicyService';
 import { MembershipFeature } from '../../features/membership/MembershipFeature';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { BrowserDataBoundaryInput } from '../../common/models/BrowserModels';
 import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundaryService';
 import {
@@ -466,12 +467,24 @@ export class AiraProPurchaseCoordinator {
   }
 
   private buildDiagnosticVerificationMessage(verification: HuaweiIapVerificationResponseBody): string {
-    const productText = verification.productId === undefined || verification.productId.length <= 0
-      ? ''
-      : `商品 ${verification.productId}，`;
-    const expiresText = this.buildExpiresText(verification.expiresAt);
-    const membershipName = this.resolveMembershipName(verification);
-    return `${membershipName}已开通，${productText}${expiresText}会员权益已写入云端。`;
+    const membershipName = this.isLongTermPurchase(verification)
+      ? resolveAppResourceText($r('app.string.settings_account_long_term_member'))
+      : 'Aira Pro';
+    const productId = verification.productId ?? '';
+    const expiresAt = verification.expiresAt ?? 0;
+    if (productId.length > 0 && expiresAt > 0) {
+      return resolveAppResourceText($r('app.string.membership_purchase_diagnostic_product_until',
+        membershipName, productId, this.formatDate(expiresAt)));
+    }
+    if (productId.length > 0) {
+      return resolveAppResourceText($r('app.string.membership_purchase_diagnostic_product',
+        membershipName, productId));
+    }
+    if (expiresAt > 0) {
+      return resolveAppResourceText($r('app.string.membership_purchase_diagnostic_until',
+        membershipName, this.formatDate(expiresAt)));
+    }
+    return resolveAppResourceText($r('app.string.membership_purchase_diagnostic_opened', membershipName));
   }
 
   private buildUserVerificationMessage(
@@ -495,19 +508,10 @@ export class AiraProPurchaseCoordinator {
       : $r('app.string.settings_pro_opened');
   }
 
-  private buildExpiresText(expiresAt?: number): string {
-    if (expiresAt === undefined || expiresAt <= 0) {
-      return '';
-    }
-    return `有效期至 ${this.formatDate(expiresAt)}，`;
-  }
-
-  private buildSuccessTitle(verification: HuaweiIapVerificationResponseBody): string {
-    return this.isLongTermPurchase(verification) ? '长期会员已开通' : '订阅已开通';
-  }
-
-  private resolveMembershipName(verification: HuaweiIapVerificationResponseBody): string {
-    return this.isLongTermPurchase(verification) ? 'Aira 长期会员' : 'Aira Pro ';
+  private buildSuccessTitle(verification: HuaweiIapVerificationResponseBody): ResourceStr {
+    return this.isLongTermPurchase(verification)
+      ? $r('app.string.settings_pro_lifetime_active_title')
+      : $r('app.string.membership_purchase_subscription_opened');
   }
 
   private isLongTermPurchase(verification: HuaweiIapVerificationResponseBody): boolean {
@@ -563,7 +567,7 @@ export class AiraProPurchaseCoordinator {
       ok: false,
       title: $r('app.string.settings_pro_purchase_unavailable'),
       message: this.showDiagnosticMessages
-        ? `华为当前没有拉起新的支付页面，只返回了已过期的旧订阅记录。请先确认华为订阅管理里没有未清理的沙盒订阅，或清除沙盒购买记录后稍等几分钟再购买。${diagnosticText}`
+        ? resolveAppResourceText($r('app.string.settings_pro_purchase_blocked')) + diagnosticText
         : $r('app.string.settings_pro_purchase_blocked'),
       action: purchaseResult.action,
       purchaseData: restoreResult.purchaseData,

@@ -7,6 +7,7 @@ import { DownloadV2TaskEntity } from '../../domain/downloadv2/DownloadV2TaskEnti
 import { DownloadV2Status } from '../../domain/downloadv2/DownloadV2Types';
 import { DownloadFileType, resolveDownloadFileType } from './DownloadFileTypeResolver';
 import { RecentlyClosedRecordTimeViewModel } from '../browser/RecentlyClosedRecordTimeViewModel';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 /** Ceiling only. A short window shows fewer rows, and the popup hugs whatever is shown. */
 export const DOWNLOAD_RECENT_POPUP_MAX_ROWS: number = 6;
@@ -204,7 +205,7 @@ export class DownloadRecentRecordsViewModel {
     now: number
   ): string {
     if (task.status === 'canceled') {
-      return '已取消';
+      return resolveAppResourceText($r('app.string.download_status_canceled_short'));
     }
     if (task.status === 'completed') {
       const sizeText = this.formatBytes(receivedBytes > 0 ? receivedBytes : totalBytes);
@@ -219,15 +220,15 @@ export class DownloadRecentRecordsViewModel {
 
   private statusText(status: DownloadV2Status): string {
     if (status === 'running') {
-      return '正在下载';
+      return resolveAppResourceText($r('app.string.download_notification_downloading'));
     }
     if (status === 'paused') {
-      return '已暂停';
+      return resolveAppResourceText($r('app.string.settings_sync_paused'));
     }
     if (status === 'failed') {
-      return '下载失败';
+      return resolveAppResourceText($r('app.string.download_status_failed'));
     }
-    return '等待下载';
+    return resolveAppResourceText($r('app.string.download_status_waiting'));
   }
 
   private resolveFileName(task: DownloadV2TaskEntity): string {
@@ -236,7 +237,7 @@ export class DownloadRecentRecordsViewModel {
       return resolved;
     }
     const suggested = task.suggestedFileName.trim();
-    return suggested.length > 0 ? suggested : '未命名下载';
+    return suggested.length > 0 ? suggested : resolveAppResourceText($r('app.string.download_status_unnamed'));
   }
 
   private formatBytePair(receivedBytes: number, totalBytes: number): string {

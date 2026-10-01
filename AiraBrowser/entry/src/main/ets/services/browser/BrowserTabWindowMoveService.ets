@@ -12,6 +12,7 @@ import {
   BrowserWindowRuntime
 } from '../../app/runtime/BrowserWindowRuntime';
 import { APP_BUNDLE_NAME } from '../../common/constants/AppVersionInfo';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { BrowserTabState } from '../../core/tabs/TabManager';
 
 const ENTRY_MODULE_NAME: string = 'entry';
@@ -26,7 +27,8 @@ export class BrowserTabWindowMoveService {
     const sourceContext = BrowserWindowRuntime.resolveWindowAbilityContext(request.sourceWindowId);
     if (sourceContext === undefined) {
       BrowserWindowRuntime.finishTabWindowMove(request.requestId);
-      return this.buildRejectedAcknowledgement(request, '当前窗口还没有可用的启动上下文。');
+      return this.buildRejectedAcknowledgement(request,
+        resolveAppResourceText($r('app.string.browser_window_move_no_context')));
     }
     try {
       await sourceContext.startAbility(this.buildWant(request));
@@ -35,7 +37,8 @@ export class BrowserTabWindowMoveService {
       return acknowledgement;
     } catch (_error) {
       BrowserWindowRuntime.finishTabWindowMove(request.requestId);
-      return this.buildRejectedAcknowledgement(request, '无法打开新的浏览器窗口。');
+      return this.buildRejectedAcknowledgement(request,
+        resolveAppResourceText($r('app.string.browser_window_move_open_failed')));
     }
   }
 

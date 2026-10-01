@@ -18,6 +18,7 @@ import {
 } from '../../core/theme/BrowserThemeStorageKeys';
 import { BrowserBoundaryRouteState, readBrowserBoundaryRouteState } from '../../common/utils/RouteParamUtils';
 import { SettingsHdsScaffold } from '../components/settings/SettingsHdsScaffold';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { SettingsNavigationCoordinator } from '../router/SettingsNavigationCoordinator';
 
 @Entry
@@ -50,14 +51,14 @@ struct CustomHomepageDeveloperGuidePage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '开发文档',
+        title: $r('app.string.settings_custom_home_docs_short'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,
         primaryTextColor: this.storedPrimaryTextColor,
         dividerColor: this.storedDividerColor,
         contentKind: 'readable',
-        menuActionLabel: '分享文档',
+        menuActionLabel: resolveAppResourceText($r('app.string.custom_home_guide_001')),
         menuActionAiraIconId: 'browser.toolbar.shareDocument',
         menuActionEnabled: !this.busy,
         onMenuAction: () => {
@@ -112,7 +113,7 @@ struct CustomHomepageDeveloperGuidePage {
         payload.historyUrl
       );
     } catch (_error) {
-      this.showToast('开发文档加载失败');
+      this.showToast($r('app.string.custom_home_guide_002'));
     }
   }
 
@@ -150,14 +151,14 @@ struct CustomHomepageDeveloperGuidePage {
         this.showToast(result.message);
       })
       .catch((error: Error) => {
-        this.showToast(`分享开发文档失败：${this.stringifyError(error)}`);
+        this.showToast($r('app.string.custom_home_guide_share_failed', this.stringifyError(error)));
       })
       .finally(() => {
         this.busy = false;
       });
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,

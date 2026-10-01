@@ -1,4 +1,5 @@
 import { DownloadTaskBoundary } from '../../domain/download/DownloadTypes';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { DownloadV2CapturedRequest } from '../../features/downloadv2/DownloadV2CaptureTypes';
 import {
   DownloadFilenameConflictAction,
@@ -90,14 +91,14 @@ export class DownloadTargetResolutionService {
       return {
         shouldPromptForExport: false,
         tempDisplayPath: tempDisplayPath,
-        completionMessage: `私密下载完成，文件仅保存在本次会话临时目录：${fileName}。`,
+        completionMessage: resolveAppResourceText($r('app.string.download_private_completed', fileName)),
         reason: reason
       };
     }
     return {
       shouldPromptForExport: true,
       tempDisplayPath: tempDisplayPath,
-      completionMessage: `下载完成，文件仍保存在 Aira 临时下载目录：${fileName}。`,
+      completionMessage: resolveAppResourceText($r('app.string.download_temp_completed', fileName)),
       reason: reason
     };
   }
@@ -142,7 +143,7 @@ export class DownloadTargetResolutionService {
         return `${customDirectory.label}/${fileName}`;
       }
     }
-    return '完成后选择系统下载位置';
+    return resolveAppResourceText($r('app.string.download_choose_location_later'));
   }
 
   private resolvePlanReason(savePolicy: DownloadSavePolicy): DownloadTargetPlanReason {
@@ -160,7 +161,9 @@ export class DownloadTargetResolutionService {
   }
 
   private buildTempDisplayPath(fileName: string, isPrivateSession: boolean): string {
-    const directoryName = isPrivateSession ? 'Aira 私密临时下载目录' : 'Aira 临时下载目录';
+    const directoryName = isPrivateSession
+      ? resolveAppResourceText($r('app.string.download_private_temp_dir'))
+      : resolveAppResourceText($r('app.string.download_temp_dir'));
     return `${directoryName}/${fileName}`;
   }
 }

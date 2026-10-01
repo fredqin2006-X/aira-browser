@@ -14,6 +14,7 @@ import {
   DESKTOP_WEB_SHORTCUT_WANT_KEYS
 } from '../../data/webapps/WebAppInstallModels';
 import { AiraAppShortcutTarget } from '../router/AppShortcutNavigationCoordinator';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { DocumentViewerService } from '../../services/viewer/DocumentViewerService';
 import {
   BrowserWindowSessionBackgroundBinding,
@@ -830,7 +831,9 @@ export class BrowserWindowRuntime {
             accepted: false,
             targetWindowId: '',
             targetTabId: '',
-            message: record === undefined ? '标签页移动请求已失效。' : '新窗口未能及时接收标签页。'
+            message: record === undefined
+              ? resolveAppResourceText($r('app.string.browser_window_move_request_expired'))
+              : resolveAppResourceText($r('app.string.browser_window_move_not_received'))
           });
         }
       }, 40);

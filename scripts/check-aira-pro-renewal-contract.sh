@@ -34,6 +34,9 @@ REPOSITORY_REL="AiraBrowser/entry/src/main/ets/data/membership/RenewalReminderRe
 SHEET_REL="AiraBrowser/entry/src/main/ets/app/components/membership/FeatureGateSheet.ets"
 BENEFITS_REL="AiraBrowser/entry/src/main/ets/core/membership/AiraProBenefitCatalog.ets"
 OVERVIEW_REL="AiraBrowser/entry/src/main/ets/core/membership/AiraProOverviewViewModel.ets"
+OVERVIEW_SCREEN_REL="AiraBrowser/entry/src/main/ets/app/components/membership/AiraProOverviewScreen.ets"
+PRO_SCREEN_REL="AiraBrowser/entry/src/main/ets/app/components/membership/AiraProScreen.ets"
+IAP_SERVICE_REL="AiraBrowser/entry/src/main/ets/services/membership/HuaweiIapPurchaseService.ets"
 FEATURE_REL="AiraBrowser/entry/src/main/ets/features/membership/MembershipFeature.ets"
 ENTITLEMENT_REL="AiraBrowser/entry/src/main/ets/services/membership/EntitlementService.ets"
 MODELS_REL="AiraBrowser/entry/src/main/ets/common/models/MembershipModels.ets"
@@ -42,7 +45,8 @@ SHELL_PAGE_REL="AiraBrowser/entry/src/main/ets/app/pages/BrowserShellPage.ets"
 TAB_HOME_REL="AiraBrowser/entry/src/main/ets/core/browser/BrowserTabHomeCoordinator.ets"
 
 for rel_path in "${COORDINATOR_REL}" "${GATE_REL}" "${REPOSITORY_REL}" "${SHEET_REL}" \
-  "${BENEFITS_REL}" "${OVERVIEW_REL}" "${FEATURE_REL}" "${ENTITLEMENT_REL}" "${MODELS_REL}" \
+  "${BENEFITS_REL}" "${OVERVIEW_REL}" "${OVERVIEW_SCREEN_REL}" "${PRO_SCREEN_REL}" \
+  "${IAP_SERVICE_REL}" "${FEATURE_REL}" "${ENTITLEMENT_REL}" "${MODELS_REL}" \
   "${STATE_REL}" "${SHELL_PAGE_REL}" "${TAB_HOME_REL}"; do
   if [ ! -f "${REPO_ROOT}/${rel_path}" ]; then
     fail "missing ${rel_path}"
@@ -123,6 +127,27 @@ require_pattern "${SHELL_PAGE_REL}" "startFeatureGatePurchase\\(\\)" \
   "the shell must own the in-sheet purchase flow."
 require_pattern "${GATE_REL}" "AIRA_PRO_SELLABLE_IAP_PLANS" \
   "plan options must come from the IAP catalog, not local literals."
+
+# A live store subscription must keep its own way out. The membership page has to
+# offer the entry that opens Huawei's subscription management, because that page is
+# the only place the user can cancel auto-renewal from inside Aira. The entry stays a
+# reported action, and its label stays a resource, so an English device reads English.
+require_pattern "${OVERVIEW_REL}" "showManageSubscription: subscription" \
+  "a live store subscription must be the state that shows the manage-subscription entry."
+require_pattern "${OVERVIEW_SCREEN_REL}" "this\.state\.showManageSubscription" \
+  "the membership card must render the manage-subscription entry."
+require_pattern "${OVERVIEW_SCREEN_REL}" "settings_pro_manage_subscription" \
+  "the entry's label must come from the string catalog."
+reject_pattern "${OVERVIEW_SCREEN_REL}" "管理自动续费|管理我的订阅" \
+  "a hard-coded entry label would stay Chinese on an English device."
+require_pattern "${OVERVIEW_SCREEN_REL}" "this\.onManageSubscription\?\.\(\)" \
+  "the entry must report the action instead of performing it."
+require_pattern "${PRO_SCREEN_REL}" "onManageSubscription" \
+  "the Pro page must wire the entry to the purchase flow."
+require_pattern "${PRO_SCREEN_REL}" "openLifetimeUpgradeSubscriptionManagement" \
+  "the entry must open the subscription-management flow."
+require_pattern "${IAP_SERVICE_REL}" "iap\.showManagedSubscriptions" \
+  "the flow must open Huawei's own subscription management page."
 
 if [ "${failures}" -gt 0 ]; then
   exit 1

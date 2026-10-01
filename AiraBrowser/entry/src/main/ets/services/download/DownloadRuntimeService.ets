@@ -1,4 +1,5 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   BrowserDataScope,
   BrowserProfileId,
@@ -569,7 +570,7 @@ export class DownloadRuntimeService {
         return confirmed;
       })
       .catch((_error: Error) => {
-        this.emitError('下载组件初始化失败，请稍后重试。');
+        this.emitError(resolveAppResourceText($r('app.string.download_init_failed')));
         return false;
       });
   }
@@ -578,7 +579,10 @@ export class DownloadRuntimeService {
     const canceledV2Request = this.downloadV2Service.cancelPendingPrompt(guid);
     if (canceledV2Request !== undefined) {
       const fileName = canceledV2Request.suggestedFileName?.trim() ?? '';
-      this.emitInfo(`已取消下载：${fileName.length > 0 ? fileName : '未命名下载'}。`);
+      const displayName = fileName.length > 0
+        ? fileName
+        : resolveAppResourceText($r('app.string.download_status_unnamed'));
+      this.emitInfo(resolveAppResourceText($r('app.string.download_canceled_named', displayName)));
       return true;
     }
     return false;
@@ -704,13 +708,13 @@ export class DownloadRuntimeService {
       savePolicy = this.downloadPolicyService.resolveSavePolicy(boundary);
     } catch (_error) {
       return {
-        path: '我的手机/Download/Aira',
+        path: resolveAppResourceText($r('app.string.settings_web_download_system_location')),
         canChange: false
       };
     }
     if (savePolicy.isPrivateSession) {
       return {
-        path: '下载时选择保存位置',
+        path: resolveAppResourceText($r('app.string.download_choose_each_time')),
         canChange: false
       };
     }
@@ -722,7 +726,7 @@ export class DownloadRuntimeService {
       };
     }
     return {
-      path: '我的手机/Download/Aira',
+      path: resolveAppResourceText($r('app.string.settings_web_download_system_location')),
       canChange: true
     };
   }
@@ -768,7 +772,7 @@ export class DownloadRuntimeService {
           sourcePageUrl: this.activeBoundary.sourcePageUrl
         }) === true;
         if (!handled) {
-          this.emitError(`下载处理失败：${event.snapshot.suggestedFileName}。`);
+          this.emitError(resolveAppResourceText($r('app.string.download_process_failed', event.snapshot.suggestedFileName)));
         }
       }
     });
@@ -938,7 +942,7 @@ export class DownloadRuntimeService {
         return;
       }
       this.fileResolutionService.deleteLocalPath(tempLocalPath).catch(() => {
-        this.emitError(`私密下载临时文件清理失败：${task.suggestedFileName}。`);
+        this.emitError(resolveAppResourceText($r('app.string.download_private_cleanup_failed', task.suggestedFileName)));
       });
     });
   }

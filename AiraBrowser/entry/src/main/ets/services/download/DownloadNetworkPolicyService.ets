@@ -1,4 +1,5 @@
 import { connection } from '@kit.NetworkKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export type DownloadNetworkKind =
   'unknown' |
@@ -190,7 +191,7 @@ export class DownloadNetworkPolicyService {
       return {
         canStartNow: false,
         reason: 'offline_network',
-        message: '网络不可用，下载已等待网络恢复。',
+        message: resolveAppResourceText($r('app.string.download_network_offline')),
         snapshot: snapshot
       };
     }
@@ -198,7 +199,7 @@ export class DownloadNetworkPolicyService {
       return {
         canStartNow: false,
         reason: 'waiting_wifi',
-        message: '当前为蜂窝网络，下载已等待 WLAN。',
+        message: resolveAppResourceText($r('app.string.download_network_cellular')),
         snapshot: snapshot
       };
     }
@@ -206,7 +207,7 @@ export class DownloadNetworkPolicyService {
       return {
         canStartNow: false,
         reason: 'network_unknown',
-        message: '无法确认当前网络类型，下载已暂缓。',
+        message: resolveAppResourceText($r('app.string.download_network_unknown')),
         snapshot: snapshot
       };
     }
@@ -214,7 +215,7 @@ export class DownloadNetworkPolicyService {
       return {
         canStartNow: false,
         reason: 'network_unknown',
-        message: '当前网络类型暂不支持自动下载，下载已暂缓。',
+        message: resolveAppResourceText($r('app.string.download_network_unsupported')),
         snapshot: snapshot
       };
     }

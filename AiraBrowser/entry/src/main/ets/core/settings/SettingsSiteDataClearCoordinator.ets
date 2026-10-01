@@ -25,7 +25,6 @@ import {
   sharedBrowserHttpsFirstNavigationService
 } from '../../services/web/BrowserHttpsFirstNavigationService';
 import { resolveAppResourceText } from '../resources/AppResourceText';
-import { localizeSettingsCopy } from '../../core/settings/SettingsCopy';
 
 export interface SettingsSiteDataClearBoundary {
   profileId?: BrowserProfileId | string;
@@ -123,11 +122,13 @@ export class SettingsSiteDataClearCoordinator {
       profileId: normalizeBrowserProfileId(boundary.profileId ?? DEFAULT_BROWSER_PROFILE_ID),
       privacyMode: privacyMode,
       dataScope: dataScope,
-      title: dataScope === 'session_ephemeral' ? '清除本次私密数据' : '清除全部浏览数据',
+      title: dataScope === 'session_ephemeral'
+        ? $r('app.string.settings_privacy_protection_clear_private')
+        : $r('app.string.settings_privacy_protection_clear_all_title'),
       message: dataScope === 'session_ephemeral'
-        ? '清除本次私密数据，不影响常规资料。'
-        : '清除数据、Cookie、缓存和站点权限。',
-      confirmLabel: '清除'
+        ? $r('app.string.settings_privacy_protection_clear_private_message')
+        : $r('app.string.settings_privacy_protection_clear_all_message'),
+      confirmLabel: $r('app.string.settings_privacy_protection_clear_confirm')
     };
   }
 
@@ -135,20 +136,20 @@ export class SettingsSiteDataClearCoordinator {
     const state = this.buildState(boundary);
     const isSessionEphemeral = state.dataScope === 'session_ephemeral';
     return {
-      title: localizeSettingsCopy('清除浏览数据'),
+      title: $r('app.string.settings_privacy_protection_clear_dialog_title'),
       message: isSessionEphemeral
-        ? '仅清除本次私密会话数据，不影响常规浏览资料。'
-        : '时间范围适用于历史记录和最近关闭；Cookie、缓存、站点存储按系统 Web 能力清除全部。',
-      confirmLabel: '清除',
+        ? $r('app.string.settings_privacy_protection_clear_dialog_private_message')
+        : $r('app.string.settings_privacy_protection_clear_dialog_message'),
+      confirmLabel: $r('app.string.settings_privacy_protection_clear_confirm'),
       timeRangeTitle: '时间范围',
       dataTypesTitle: '数据类型',
       showTimeRange: !isSessionEphemeral,
       defaultTimeRangeId: 'all',
       ranges: [
-        { id: 'last_hour', title: '最近 1 小时' },
-        { id: 'last_day', title: '最近 24 小时' },
-        { id: 'last_7_days', title: '最近 7 天' },
-        { id: 'all', title: '全部时间' }
+        { id: 'last_hour', title: $r('app.string.settings_privacy_protection_range_last_hour') },
+        { id: 'last_day', title: $r('app.string.settings_privacy_protection_range_last_day') },
+        { id: 'last_7_days', title: $r('app.string.settings_privacy_protection_range_last_7_days') },
+        { id: 'all', title: $r('app.string.settings_privacy_protection_range_all') }
       ],
       items: isSessionEphemeral ? this.buildPrivateClearItems() : this.buildPersistentClearItems()
     };
@@ -274,43 +275,43 @@ export class SettingsSiteDataClearCoordinator {
     return [
       {
         id: 'history',
-        title: '历史记录',
-        summary: '地址栏建议和历史页面中的访问记录',
+        title: $r('app.string.settings_privacy_protection_item_history'),
+        summary: $r('app.string.settings_privacy_protection_item_history_summary'),
         isEnabled: true,
         defaultSelected: true
       },
       {
         id: 'recently_closed',
-        title: '最近关闭',
-        summary: '主页和标签页恢复使用的最近关闭记录',
+        title: $r('app.string.settings_privacy_protection_item_recently_closed'),
+        summary: $r('app.string.settings_privacy_protection_item_recently_closed_summary'),
         isEnabled: true,
         defaultSelected: true
       },
       {
         id: 'cookies',
-        title: 'Cookie',
-        summary: '网站登录状态和会话 Cookie',
+        title: $r('app.string.settings_privacy_protection_item_cookies'),
+        summary: $r('app.string.settings_privacy_protection_item_cookies_summary'),
         isEnabled: true,
         defaultSelected: true
       },
       {
         id: 'cache',
-        title: '缓存',
-        summary: '网页资源缓存',
+        title: $r('app.string.settings_privacy_protection_item_cache'),
+        summary: $r('app.string.settings_privacy_protection_item_cache_summary'),
         isEnabled: true,
         defaultSelected: true
       },
       {
         id: 'site_storage',
-        title: '站点存储',
-        summary: '网站保存的本地数据',
+        title: $r('app.string.settings_privacy_protection_item_site_storage'),
+        summary: $r('app.string.settings_privacy_protection_item_site_storage_summary'),
         isEnabled: true,
         defaultSelected: true
       },
       {
         id: 'site_permissions',
-        title: localizeSettingsCopy('站点权限'),
-        summary: '已保存的相机、麦克风、位置等权限',
+        title: $r('app.string.settings_privacy_protection_item_site_permissions'),
+        summary: $r('app.string.settings_privacy_protection_item_site_permissions_summary'),
         isEnabled: true,
         defaultSelected: true
       }
@@ -321,22 +322,22 @@ export class SettingsSiteDataClearCoordinator {
     return [
       {
         id: 'cookies',
-        title: '本次私密 Cookie',
-        summary: '清除本次私密会话中的全部 Cookie',
+        title: $r('app.string.settings_privacy_protection_item_private_cookies'),
+        summary: $r('app.string.settings_privacy_protection_item_private_cookies_summary'),
         isEnabled: true,
         defaultSelected: true
       },
       {
         id: 'site_storage',
-        title: '本次私密站点存储',
-        summary: '清除本次私密会话中的站点数据',
+        title: $r('app.string.settings_privacy_protection_item_private_storage'),
+        summary: $r('app.string.settings_privacy_protection_item_private_storage_summary'),
         isEnabled: true,
         defaultSelected: true
       },
       {
         id: 'site_permissions',
-        title: '本次临时权限',
-        summary: '清除本次私密会话授权',
+        title: $r('app.string.settings_privacy_protection_item_private_permissions'),
+        summary: $r('app.string.settings_privacy_protection_item_private_permissions_summary'),
         isEnabled: true,
         defaultSelected: true
       }

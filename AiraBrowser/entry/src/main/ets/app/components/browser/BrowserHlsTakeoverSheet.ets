@@ -9,6 +9,7 @@ import {
   BrowserHlsTakeoverRequestContextLine,
   BrowserHlsTakeoverViewModel
 } from '../../../core/browser/BrowserHlsTakeoverViewModel';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { BrowserHlsTakeoverAction } from '../../../core/browser/BrowserMediaResourceSessionCoordinator';
 import {
   BROWSER_THEME_STORAGE_ACCENT_KEY,
@@ -79,7 +80,7 @@ struct BrowserHlsTakeoverSheet {
       BrowserImmersiveSheetLayout({
         footerVisible: true,
         closeVisible: true,
-        closeAccessibilityLabel: '关闭',
+        closeAccessibilityLabel: $r('app.string.ui_close'),
         onClose: (): void => {
           this.onClose();
         },
@@ -99,7 +100,7 @@ struct BrowserHlsTakeoverSheet {
   @Builder
   private buildHeader() {
     BrowserFeatureSheetHeader({
-      title: 'HLS 接管准备',
+      title: $r('app.string.browser_ui_browser_hls_takeover_sheet_005'),
       titleColor: this.storedPrimaryTextColor
     })
   }
@@ -221,11 +222,11 @@ struct BrowserHlsTakeoverSheet {
               .height(22)
               .color(this.storedAccentColor)
             Column({ space: 3 }) {
-              Text('正在解析 m3u8 清单')
+              Text($r('app.string.browser_ui_browser_hls_takeover_sheet_015'))
                 .fontSize(15)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(this.storedPrimaryTextColor)
-              Text('会探测 master/media、清晰度、分片、Key 和请求上下文。')
+              Text($r('app.string.browser_ui_browser_hls_takeover_sheet_007'))
                 .fontSize(12)
                 .fontColor(this.storedSecondaryTextColor)
                 .maxLines(2)
@@ -252,12 +253,12 @@ struct BrowserHlsTakeoverSheet {
   @Builder
   private buildParseEmpty() {
     Column({ space: 5 }) {
-      Text('等待解析')
+      Text($r('app.string.browser_ui_browser_hls_takeover_sheet_019'))
         .width('100%')
         .fontSize(15)
         .fontWeight(FontWeight.Medium)
         .fontColor(this.storedPrimaryTextColor)
-      Text('点击浮窗后会自动解析；也可以手动刷新清单。')
+      Text($r('app.string.browser_ui_browser_hls_takeover_sheet_018'))
         .width('100%')
         .fontSize(12)
         .fontColor(this.storedSecondaryTextColor)
@@ -269,12 +270,12 @@ struct BrowserHlsTakeoverSheet {
   @Builder
   private buildParseError() {
     Column({ space: 5 }) {
-      Text('清单解析失败')
+      Text($r('app.string.browser_ui_browser_hls_takeover_sheet_017'))
         .width('100%')
         .fontSize(15)
         .fontWeight(FontWeight.Medium)
         .fontColor(this.storedPrimaryTextColor)
-      Text(this.parseResult?.errorMessage ?? '清单解析失败。')
+      Text(this.parseResult?.errorMessage ?? resolveAppResourceText($r('app.string.media_resource_toast_manifest_parse_failed')))
         .width('100%')
         .fontSize(12)
         .fontColor(this.storedSecondaryTextColor)
@@ -297,7 +298,9 @@ struct BrowserHlsTakeoverSheet {
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-        Text(summary.encrypted ? '加密' : '未加密')
+        Text(summary.encrypted
+          ? $r('app.string.media_resource_manifest_encrypted')
+          : $r('app.string.media_resource_manifest_unencrypted'))
           .fontSize(11)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.storedAccentColor)
@@ -325,15 +328,17 @@ struct BrowserHlsTakeoverSheet {
       }
 
       if (summary.keyUrls.length > 0) {
-        this.buildInfoLine('Key', summary.keyUrls.length.toString() + ' 个 · ' + this.viewModel.shortenUrl(summary.keyUrls[0]))
+        this.buildInfoLine('Key', resolveAppResourceText($r('app.string.browser_hls_takeover_key_summary',
+          summary.keyUrls.length, this.viewModel.shortenUrl(summary.keyUrls[0]))))
       }
 
       if (summary.sampleSegments.length > 0) {
-        this.buildInfoLine('样例分片', this.viewModel.shortenUrl(summary.sampleSegments[0]))
+        this.buildInfoLine($r('app.string.browser_ui_browser_hls_takeover_sheet_014'),
+          this.viewModel.shortenUrl(summary.sampleSegments[0]))
       }
 
       if (summary.warnings.length > 0) {
-        this.buildInfoLine('提示', summary.warnings[0])
+        this.buildInfoLine($r('app.string.browser_ui_browser_hls_takeover_sheet_011'), summary.warnings[0])
       }
     }
     .width('100%')
@@ -365,7 +370,7 @@ struct BrowserHlsTakeoverSheet {
   }
 
   @Builder
-  private buildInfoLine(label: string, value: string) {
+  private buildInfoLine(label: ResourceStr, value: string) {
     Row({ space: 8 }) {
       Text(label)
         .fontSize(11)
@@ -387,7 +392,7 @@ struct BrowserHlsTakeoverSheet {
     SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
       Column({ space: 0 }) {
         Row() {
-          Text('请求上下文')
+          Text($r('app.string.browser_ui_browser_hls_takeover_sheet_020'))
             .fontSize(15)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.storedPrimaryTextColor)
@@ -442,7 +447,7 @@ struct BrowserHlsTakeoverSheet {
     Column({ space: 8 }) {
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '刷新解析',
+          label: $r('app.string.browser_ui_browser_hls_takeover_sheet_008'),
           emphasis: 'primary',
           stacked: true,
           actionEnabled: this.target !== undefined && !this.parsing,
@@ -453,7 +458,7 @@ struct BrowserHlsTakeoverSheet {
         })
 
         BrowserSheetActionButton({
-          label: '复制链接',
+          label: $r('app.string.ui_copy_link'),
           emphasis: 'ghost',
           stacked: true,
           actionEnabled: this.target !== undefined,
@@ -466,7 +471,7 @@ struct BrowserHlsTakeoverSheet {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '复制上下文',
+          label: $r('app.string.browser_ui_browser_hls_takeover_sheet_009'),
           emphasis: 'primary',
           stacked: true,
           actionEnabled: this.target !== undefined,
@@ -476,7 +481,7 @@ struct BrowserHlsTakeoverSheet {
         })
 
         BrowserSheetActionButton({
-          label: '资源嗅探',
+          label: $r('app.string.bottom_panel_action_video'),
           emphasis: 'ghost',
           stacked: true,
           actionEnabled: true,
@@ -492,31 +497,31 @@ struct BrowserHlsTakeoverSheet {
 
   private buildHeaderSubtitle(): string {
     if (this.target === undefined) {
-      return '没有可处理的 HLS 清单';
+      return resolveAppResourceText($r('app.string.browser_ui_browser_hls_takeover_sheet_016'));
     }
     return this.target.sourceHost.length > 0 ? this.target.sourceHost : this.viewModel.shortenUrl(this.target.url);
   }
 
-  private buildCandidateTitle(): string {
+  private buildCandidateTitle(): ResourceStr {
     if (this.target === undefined) {
-      return '未选择清单';
+      return $r('app.string.browser_ui_browser_hls_takeover_sheet_013');
     }
     if (this.target.kind === 'dash') {
-      return 'DASH 清单';
+      return $r('app.string.browser_ui_browser_hls_takeover_sheet_003');
     }
-    return 'HLS m3u8 清单';
+    return $r('app.string.browser_ui_browser_hls_takeover_sheet_004');
   }
 
   private buildCandidateMeta(): string {
     const target = this.target;
     if (target === undefined) {
-      return '暂无资源';
+      return resolveAppResourceText($r('app.string.browser_ui_browser_hls_takeover_sheet_012'));
     }
     const parts: string[] = [];
     if (target.frameType === 'main_frame') {
-      parts.push('主框架');
+      parts.push(resolveAppResourceText($r('app.string.media_resource_frame_main')));
     } else if (target.frameType === 'sub_frame' || target.frameType === 'dom_frame') {
-      parts.push('iframe/子框架');
+      parts.push(resolveAppResourceText($r('app.string.browser_ui_browser_hls_takeover_sheet_006')));
     }
     if (target.sourceHost.length > 0) {
       parts.push(target.sourceHost);
@@ -524,16 +529,20 @@ struct BrowserHlsTakeoverSheet {
     if ((target.mimeType?.length ?? 0) > 0) {
       parts.push(target.mimeType ?? '');
     }
-    return parts.length > 0 ? parts.join(' · ') : '已发现流媒体清单';
+    return parts.length > 0
+      ? parts.join(' · ')
+      : resolveAppResourceText($r('app.string.browser_ui_browser_hls_takeover_sheet_010'));
   }
 
   private resolveContextLines(): BrowserHlsTakeoverRequestContextLine[] {
     return this.viewModel.buildContextLines(this.target);
   }
 
-  private buildContextCountLabel(): string {
+  private buildContextCountLabel(): ResourceStr {
     const count = this.resolveContextLines().length;
-    return count > 0 ? count.toString() + ' 项' : '暂无';
+    return count > 0
+      ? $r('app.string.history_item_count', count)
+      : $r('app.string.offline_value_unavailable');
   }
 }
 

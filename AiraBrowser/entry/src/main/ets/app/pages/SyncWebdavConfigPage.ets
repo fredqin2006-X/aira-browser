@@ -127,7 +127,7 @@ struct SyncWebdavConfigPage {
     isConfigured: false,
     isEnabled: false,
     isBusy: false,
-    primaryActionTitle: '启用 WebDAV 同步',
+    primaryActionTitle: $r('app.string.settings_sync_webdav_01'),
     primaryActionEnabled: true,
     showDisableAction: false,
     disableActionEnabled: true,
@@ -529,12 +529,18 @@ struct SyncWebdavConfigPage {
     const shouldActivate = this.syncWebdavConfigViewModel.shouldActivateOnSave(this.syncTargetRole);
     const isBackup = this.syncTargetRole === 'additional_backup';
     this.webdavOperation = this.webdavViewState.isEnabled ? 'syncing' : 'enabling';
-    const progressTitle = isBackup
-      ? (this.webdavViewState.isEnabled ? '正在更新 WebDAV 备份' : '正在开启 WebDAV 额外备份')
-      : (this.webdavViewState.isEnabled ? '正在同步 WebDAV' : '正在启用 WebDAV 同步');
-    const progressFirstTip = isBackup
-      ? '正在保存配置，并用本机内容覆盖 WebDAV'
-      : (this.webdavViewState.isEnabled ? '正在准备本机和云端数据' : '正在保存配置并检查连接');
+    const progressTitle: ResourceStr = isBackup
+      ? (this.webdavViewState.isEnabled
+        ? $r('app.string.settings_sync_webdav_08')
+        : $r('app.string.settings_sync_webdav_09'))
+      : (this.webdavViewState.isEnabled
+        ? $r('app.string.settings_sync_webdav_10')
+        : $r('app.string.settings_sync_webdav_11'));
+    const progressFirstTip: ResourceStr = isBackup
+      ? $r('app.string.settings_sync_webdav_12')
+      : (this.webdavViewState.isEnabled
+        ? $r('app.string.settings_sync_advanced_preparing_both')
+        : $r('app.string.settings_sync_webdav_13'));
     this.rebuildWebdavViewState();
     if (shouldActivate || this.syncTargetRole === 'additional_backup') {
       this.beginSyncFloatingOperation(progressTitle, progressFirstTip);
@@ -569,7 +575,9 @@ struct SyncWebdavConfigPage {
         if (shouldActivate || this.syncTargetRole === 'additional_backup') {
           this.updateSyncFloatingStep(
             progressTitle,
-            isBackup ? '正在覆盖写入 WebDAV 额外备份' : '正在处理 WebDAV 同步状态',
+            isBackup
+              ? $r('app.string.settings_sync_webdav_16')
+              : $r('app.string.settings_sync_webdav_17'),
             72
           );
         }
@@ -579,8 +587,12 @@ struct SyncWebdavConfigPage {
         this.completeSyncProgressDialog();
         this.showSyncFailureDialog(
           isBackup
-            ? (this.webdavViewState.isEnabled ? 'WebDAV 额外备份' : '开启 WebDAV 额外备份')
-            : (this.webdavViewState.isEnabled ? 'WebDAV 同步' : '启用 WebDAV 同步'),
+            ? (this.webdavViewState.isEnabled
+              ? $r('app.string.settings_sync_webdav_41')
+              : $r('app.string.settings_sync_webdav_19'))
+            : (this.webdavViewState.isEnabled
+              ? $r('app.string.membership_feature_webdav')
+              : $r('app.string.settings_sync_webdav_01')),
           'WebDAV',
           error
         );
@@ -598,8 +610,8 @@ struct SyncWebdavConfigPage {
     showCenteredAlertDialog({
       title: this.syncTargetRole === 'additional_backup' ? localizeSettingsCopy('关闭 WebDAV 额外备份吗') : localizeSettingsCopy('关闭 WebDAV 同步吗'),
       message: this.syncTargetRole === 'additional_backup'
-        ? '关闭后会停止向 WebDAV 覆盖写入额外副本，当前同步方式和已填写的 WebDAV 配置都不会删除。'
-        : '关闭后会停止通过 WebDAV 同步书签，本机书签和已填写的 WebDAV 配置不会删除。',
+        ? $r('app.string.settings_sync_webdav_22')
+        : $r('app.string.settings_sync_webdav_23'),
       autoCancel: true,
       primaryButton: {
         value: localizeSettingsCopy('取消'),
@@ -633,10 +645,10 @@ struct SyncWebdavConfigPage {
       })
       .catch((_error: Error) => {
         this.showDialog(
-          '关闭失败',
+          $r('app.string.settings_sync_webdav_24'),
           this.syncTargetRole === 'additional_backup'
-            ? '暂时没能关闭 WebDAV 额外备份，请稍后再试。'
-            : '暂时没能关闭 WebDAV 同步，请检查网络后再试。'
+            ? $r('app.string.settings_sync_webdav_25')
+            : $r('app.string.settings_sync_webdav_26')
         );
       })
       .finally(() => {
@@ -650,7 +662,9 @@ struct SyncWebdavConfigPage {
       this.showHuaweiLoginPanel = true;
       return;
     }
-    const primaryLabel = decision.primaryAction === 'open_pro' ? '查看 Aira Pro' : '查看权益';
+    const primaryLabel: ResourceStr = decision.primaryAction === 'open_pro'
+      ? $r('app.string.settings_sync_view_pro')
+      : $r('app.string.settings_sync_view_benefits');
     showCenteredAlertDialog({
       title: decision.title.length > 0 ? decision.title : title,
       message: decision.message,
@@ -911,14 +925,14 @@ struct SyncWebdavConfigPage {
       this.completeSyncProgressDialog();
       this.webdavOperation = '';
       this.rebuildWebdavViewState();
-      this.showDialog('操作超时', message);
+      this.showDialog($r('app.string.settings_sync_advanced_timeout'), message);
     }, SYNC_OPERATION_PROGRESS_TIMING.timeoutMs);
   }
 
   private completeSyncProgressWithRamp(title: ResourceStr, subtitle: ResourceStr, afterClose?: () => void): void {
     this.stopSyncProgressActiveTimers();
-    this.syncFloatingSubtitle = '正在完成处理';
-    this.showSyncProgressTip('正在完成处理');
+    this.syncFloatingSubtitle = $r('app.string.settings_sync_advanced_finishing');
+    this.showSyncProgressTip($r('app.string.settings_sync_advanced_finishing'));
     this.syncProgressCompletionTimer = setInterval(() => {
       const nextProgress = Math.min(100, this.syncFloatingProgress + 4);
       this.syncFloatingProgress = nextProgress;

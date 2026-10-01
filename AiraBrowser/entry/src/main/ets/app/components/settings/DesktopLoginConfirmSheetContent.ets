@@ -100,7 +100,7 @@ export struct DesktopLoginConfirmSheetContent {
           }
         })
 
-        Button('取消')
+        Button($r('app.string.settings_account_cancel'))
           .width('100%')
           .height(44)
           .buttonStyle(ButtonStyleMode.TEXTUAL)
@@ -160,16 +160,16 @@ export struct DesktopLoginConfirmSheetContent {
     .clip(true)
   }
 
-  private resolveDisplayName(): string {
+  private resolveDisplayName(): ResourceStr {
     const normalized = this.displayName.trim();
-    return normalized.length > 0 ? normalized : 'Aira 账号';
+    return normalized.length > 0 ? normalized : $r('app.string.settings_desktop_login_03');
   }
 
-  private resolveUidLabel(): string {
+  private resolveUidLabel(): ResourceStr {
     const normalized = this.uid.trim();
     if (normalized.length <= 0) {
-      return '当前华为账号';
+      return $r('app.string.settings_desktop_login_04');
     }
-    return `用户ID：${normalized}`;
+    return $r('app.string.settings_desktop_login_05', normalized);
   }
 }

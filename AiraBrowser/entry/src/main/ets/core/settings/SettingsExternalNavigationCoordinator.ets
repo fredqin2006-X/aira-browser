@@ -9,7 +9,6 @@ import {
 import { PreferencesRepository } from '../../data/preferences/PreferencesRepository';
 import { BrowserPrivacyEffectPolicyService } from '../../services/privacy/BrowserPrivacyEffectPolicyService';
 import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundaryService';
-import { localizeSettingsCopy } from '../../core/settings/SettingsCopy';
 
 export interface SettingsExternalNavigationBoundary {
   privacyMode?: BrowserSessionPrivacyMode | string;
@@ -50,7 +49,7 @@ export class SettingsExternalNavigationCoordinator {
     if (decision.outcome !== 'allow') {
       return {
         settings: this.preferencesRepository.getPreferences().externalNavigation,
-        message: localizeSettingsCopy('当前会话不可更改全局外部应用策略。')
+        message: $r('app.string.settings_external_navigation_01')
       };
     }
     const currentSettings = this.preferencesRepository.getPreferences().externalNavigation;
@@ -74,13 +73,13 @@ export class SettingsExternalNavigationCoordinator {
     };
   }
 
-  private buildResultMessage(policy: ExternalNavigationAppOpenPolicy): string {
+  private buildResultMessage(policy: ExternalNavigationAppOpenPolicy): ResourceStr {
     if (policy === 'block') {
-      return '已阻止网站打开外部应用。';
+      return $r('app.string.settings_external_navigation_02');
     }
     if (policy === 'allow') {
-      return '已允许网站直接打开外部应用。';
+      return $r('app.string.settings_external_navigation_03');
     }
-    return '打开外部应用前会先询问。';
+    return $r('app.string.settings_external_navigation_04');
   }
 }

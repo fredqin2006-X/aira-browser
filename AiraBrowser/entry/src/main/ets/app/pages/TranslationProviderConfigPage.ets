@@ -49,13 +49,13 @@ struct TranslationProviderValidationDialog {
         .width(34)
         .height(34)
         .color(this.storedAccentColor)
-      Text('正在测试翻译服务')
+      Text($r('app.string.settings_web_translation_testing'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.storedPrimaryTextColor)
         .textAlign(TextAlign.Center)
-      Text('正在联网校验 API 配置，请稍候。')
+      Text($r('app.string.settings_web_translation_testing_hint'))
         .fontSize(14)
         .lineHeight(20)
         .textAlign(TextAlign.Center)
@@ -166,7 +166,7 @@ struct TranslationProviderConfigPage {
     const state = this.editViewModel.buildState(this.draft, '');
     if (!state.saveEnabled) {
       this.errorMessage = state.errorMessage;
-      this.showDialog('保存失败', state.errorMessage);
+      this.showDialog($r('app.string.settings_web_translation_save_failed'), state.errorMessage);
       return;
     }
     this.showSaveConfirmation();
@@ -175,16 +175,16 @@ struct TranslationProviderConfigPage {
   private showSaveConfirmation(): void {
     const provider = this.editViewModel.buildProvider(this.draft);
     showCenteredAlertDialog({
-      title: '启用翻译服务？',
+      title: $r('app.string.settings_web_translation_enable_title'),
       message: this.coordinator.buildSaveConfirmationMessage(provider),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_app_proxy_delete_cancel'),
         action: () => {
         }
       },
       secondaryButton: {
-        value: '保存并启用',
+        value: $r('app.string.settings_web_translation_save_enable'),
         action: () => {
           this.persistProvider();
         }
@@ -208,22 +208,22 @@ struct TranslationProviderConfigPage {
         this.isSaving = false;
         this.validationDialogController.close();
         if (result.ok) {
-          this.showToast('翻译服务验证成功。');
+          this.showToast($r('app.string.settings_web_translation_verify_ok'));
           this.navigationCoordinator.back();
           return;
         }
-        this.showToast('翻译服务验证失败。');
-        this.showDialog('连接校验失败', result.message);
+        this.showToast($r('app.string.settings_web_translation_verify_failed'));
+        this.showDialog($r('app.string.settings_web_translation_verify_failed_title'), result.message);
       })
       .catch((error: Error) => {
         this.isSaving = false;
         this.validationDialogController.close();
-        this.showToast('翻译服务验证失败。');
-        this.showDialog('连接校验失败', error.message);
+        this.showToast($r('app.string.settings_web_translation_verify_failed'));
+        this.showDialog($r('app.string.settings_web_translation_verify_failed_title'), error.message);
       });
   }
 
-  private showToast(message: string): void {
+  private showToast(message: ResourceStr): void {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,
@@ -233,13 +233,13 @@ struct TranslationProviderConfigPage {
     }
   }
 
-  private showDialog(title: string, message: string): void {
+  private showDialog(title: ResourceStr, message: ResourceStr): void {
     showCenteredAlertDialog({
       title: title,
       message: message,
       autoCancel: true,
       confirm: {
-        value: '知道了',
+        value: $r('app.string.settings_advanced_backup_confirm'),
         action: () => {
         }
       }

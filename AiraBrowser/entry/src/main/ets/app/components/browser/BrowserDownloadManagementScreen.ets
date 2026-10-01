@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
 import {
   resolveCenteredDialogControllerWidth,
@@ -31,7 +32,7 @@ import {
   canSelectDownloadTask,
   collectSelectableDownloadGuids,
   DownloadSelectionCandidate,
-  DOWNLOAD_SELECTION_EMPTY_TOAST,
+  downloadSelectionEmptyToast,
   pruneDownloadSelection
 } from '../../../core/download/DownloadSelectionViewModel';
 import {
@@ -240,7 +241,7 @@ export struct BrowserDownloadManagementScreen {
       this.requestDownloadRepositoryInitialization();
     } catch (error) {
       this.downloadListState = createEmptyDownloadManagementListState();
-      this.statusText = '下载列表加载失败';
+      this.statusText = resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_004'));
       hilog.error(
         DOWNLOAD_MANAGEMENT_DOMAIN,
         DOWNLOAD_MANAGEMENT_TAG,
@@ -290,7 +291,7 @@ export struct BrowserDownloadManagementScreen {
     ManagementLargeScreenShell({
       title: this.resolveScreenTitle(),
       badge: this.resolveDesktopBadge(),
-      searchPlaceholder: '搜索下载',
+      searchPlaceholder: resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_038')),
       searchQuery: this.desktopQuery,
       onSearchChange: (value: string): void => {
         this.desktopQuery = value;
@@ -313,7 +314,7 @@ export struct BrowserDownloadManagementScreen {
 
   @Builder
   private buildDesktopSidebar() {
-    ManagementLargeScreenNavSection({ title: '下载' })
+    ManagementLargeScreenNavSection({ title: resolveAppResourceText($r('app.string.settings_web_downloads')) })
     ForEach(this.downloadListState.groups, (group: DownloadManagementGroupState) => {
       ManagementLargeScreenNavItem({
         title: group.label,
@@ -331,20 +332,20 @@ export struct BrowserDownloadManagementScreen {
   private buildDesktopToolbarActions() {
     if (this.isSelectionMode) {
       ManagementLargeScreenTextButton({
-        label: '全选',
+        label: resolveAppResourceText($r('app.string.ui_select_all')),
         onAction: (): void => {
           this.selectAllVisibleRows();
         }
       })
       ManagementLargeScreenTextButton({
-        label: '删除',
+        label: resolveAppResourceText($r('app.string.settings_delete')),
         isEnabled: this.selectedGuids.length > 0,
         onAction: (): void => {
           this.confirmDeleteSelectedRows();
         }
       })
       ManagementLargeScreenTextButton({
-        label: '完成',
+        label: resolveAppResourceText($r('app.string.settings_site_info_done')),
         onAction: (): void => {
           this.exitSelectionMode();
         }
@@ -352,7 +353,7 @@ export struct BrowserDownloadManagementScreen {
     } else if (this.shouldShowLargeScreenDownloadSettings()) {
       ManagementLargeScreenIconButton({
         iconId: 'settings.general',
-        label: '下载设置',
+        label: resolveAppResourceText($r('app.string.settings_web_download_settings')),
         onAction: (): void => {
           this.openDownloadSettingsDialog();
         }
@@ -364,7 +365,7 @@ export struct BrowserDownloadManagementScreen {
   private buildDesktopContent() {
     Column() {
       if (this.isSessionEphemeral) {
-        Text('当前只显示这个私密窗口里的下载。')
+        Text(resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_033')))
           .width('100%')
           .fontSize(12)
           .fontColor(this.storedSecondaryTextColor)
@@ -466,14 +467,14 @@ export struct BrowserDownloadManagementScreen {
           actions: [
             {
               airaIconId: 'browser.toolbar.selectAll',
-              title: '全选',
+              title: resolveAppResourceText($r('app.string.ui_select_all')),
               action: (): void => {
                 this.selectAllVisibleRows();
               }
             },
             {
               airaIconId: 'browser.tabs.delete',
-              title: '删除',
+              title: resolveAppResourceText($r('app.string.settings_delete')),
               action: (): void => {
                 this.confirmDeleteSelectedRows();
               }
@@ -494,7 +495,7 @@ export struct BrowserDownloadManagementScreen {
     if (this.isSelectionMode) {
       return buildDownloadSelectionTitle(this.selectedGuids.length);
     }
-    return '下载';
+    return resolveAppResourceText($r('app.string.settings_web_downloads'));
   }
 
   @Builder
@@ -565,7 +566,7 @@ export struct BrowserDownloadManagementScreen {
 
   @Builder
   private buildLargeScreenDownloadSettingsButton() {
-    Button('下载设置', { type: ButtonType.Normal })
+    Button(resolveAppResourceText($r('app.string.settings_web_download_settings')), { type: ButtonType.Normal })
       .height(LARGE_SCREEN_DOWNLOAD_SETTINGS_BUTTON_HEIGHT_VP)
       .padding({ left: 16, right: 16 })
       .fontSize(13)
@@ -575,7 +576,7 @@ export struct BrowserDownloadManagementScreen {
       .border({ width: 1, color: this.storedDividerColor })
       .borderRadius(LARGE_SCREEN_DOWNLOAD_SETTINGS_BUTTON_HEIGHT_VP / 2)
       .stateEffect(true)
-      .accessibilityText('打开下载设置')
+      .accessibilityText(resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_037')))
       .onClick((): void => {
         this.openDownloadSettingsDialog();
       })
@@ -613,12 +614,12 @@ export struct BrowserDownloadManagementScreen {
     const settingsViewModel = new DownloadSettingsViewModel();
     try {
       if (!directoryService.isFolderSelectionSupported()) {
-        this.showToast('当前设备不支持选择文件夹，将使用系统下载目录。');
+        this.showToast(resolveAppResourceText($r('app.string.settings_web_download_folder_unsupported_fallback')));
       } else {
         const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
         const result = await directoryService.selectDirectory(context);
         if (result.status === 'unusable_folder') {
-          this.showToast('这个文件夹不可用，请换一个再试。');
+          this.showToast(resolveAppResourceText($r('app.string.settings_web_download_folder_unavailable')));
         } else if (result.status === 'selected' && result.selection !== undefined) {
           const selection = result.selection;
           // Advisory probe: a false negative must not discard the user's pick,
@@ -637,14 +638,14 @@ export struct BrowserDownloadManagementScreen {
             void directoryService.releaseDirectory(currentSettings.customLocationUri);
           }
           if (!isWritable) {
-            this.showToast('已选择该文件夹。若下载时无法写入，将回退到系统下载目录。');
+            this.showToast(resolveAppResourceText($r('app.string.settings_web_download_folder_selected_fallback')));
           } else if (!result.isPersisted) {
-            this.showToast('已选择该文件夹。重启应用后需要重新授权。');
+            this.showToast(resolveAppResourceText($r('app.string.settings_web_download_folder_selected_reauth')));
           }
         }
       }
     } catch (error) {
-      this.showToast('选择下载位置失败');
+      this.showToast(resolveAppResourceText($r('app.string.settings_web_download_folder_failed')));
       hilog.error(
         DOWNLOAD_MANAGEMENT_DOMAIN,
         DOWNLOAD_MANAGEMENT_TAG,
@@ -663,7 +664,7 @@ export struct BrowserDownloadManagementScreen {
     }
     const actions: ManagementHdsMenuAction[] = [
       {
-        label: '下载设置',
+        label: resolveAppResourceText($r('app.string.settings_web_download_settings')),
         icon: $r('sys.symbol.gearshape_fill'),
         action: () => {
           this.openDownloadSettingsPage();
@@ -676,17 +677,17 @@ export struct BrowserDownloadManagementScreen {
   @Builder
   private buildPrivateBoundaryCard() {
     Column({ space: 8 }) {
-      Text('下载管理仅限当前私密会话')
+      Text(resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_008')))
         .width('100%')
         .fontSize(16)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.storedPrimaryTextColor)
-      Text('下载管理入口来自私密会话；此页不会读取或展示常规浏览资料。')
+      Text(resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_009')))
         .width('100%')
         .fontSize(12)
         .lineHeight(18)
         .fontColor(this.storedSecondaryTextColor)
-      Text('当前页只显示这个私密窗口里的下载任务；下载设置为设备范围。')
+      Text(resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_036')))
         .width('100%')
         .fontSize(12)
         .lineHeight(18)
@@ -804,8 +805,8 @@ export struct BrowserDownloadManagementScreen {
   private buildEmptyState() {
     AppEmptyState({
       airaIconId: 'settings.downloads',
-      title: '没有下载内容',
-      message: '开始下载后，这里会显示文件、进度和完成状态。'
+      title: resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_043')),
+      message: resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_019'))
     })
   }
 
@@ -856,7 +857,7 @@ export struct BrowserDownloadManagementScreen {
       );
     } catch (error) {
       this.downloadListState = createEmptyDownloadManagementListState();
-      this.statusText = '下载列表加载失败';
+      this.statusText = resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_004'));
       this.stopAutoRefreshTimer();
       hilog.error(
         DOWNLOAD_MANAGEMENT_DOMAIN,
@@ -927,7 +928,7 @@ export struct BrowserDownloadManagementScreen {
   private requestDownloadRepositoryInitialization(): void {
     void sharedDownloadRuntimeService.initializeRepository()
       .catch((error: Error) => {
-        this.statusText = '下载列表加载失败';
+        this.statusText = resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_004'));
         hilog.error(
           DOWNLOAD_MANAGEMENT_DOMAIN,
           DOWNLOAD_MANAGEMENT_TAG,
@@ -1094,18 +1095,18 @@ export struct BrowserDownloadManagementScreen {
       return;
     }
     showCenteredAlertDialog({
-      title: '取消下载？',
-      message: `这会删除当前下载任务和已下载的临时文件。\n\n${this.cancelConfirmFileName}`,
+      title: resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_017')),
+      message: resolveAppResourceText($r('app.string.download_cancel_message', this.cancelConfirmFileName)),
       autoCancel: true,
       primaryButton: {
-        value: '继续下载',
+        value: resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_045')),
         action: () => {
           this.cancelConfirmGuid = '';
           this.cancelConfirmFileName = '';
         }
       },
       secondaryButton: {
-        value: '确认取消',
+        value: resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_044')),
         action: () => {
           const guid = this.cancelConfirmGuid;
           this.cancelConfirmGuid = '';
@@ -1124,7 +1125,7 @@ export struct BrowserDownloadManagementScreen {
     const item = sharedDownloadRuntimeService.listTasksSnapshot(this.getCurrentDownloadBoundary())
       .find((candidate) => candidate.guid === guid);
     this.cancelConfirmGuid = guid;
-    this.cancelConfirmFileName = item?.suggestedFileName ?? '当前下载';
+    this.cancelConfirmFileName = item?.suggestedFileName ?? resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_020'));
     this.presentCancelDialogIfNeeded();
   }
 
@@ -1135,7 +1136,7 @@ export struct BrowserDownloadManagementScreen {
     if (!succeeded) {
       this.showTaskLocally(guid);
     }
-    this.completeAsyncDownloadTaskAction(succeeded, '下载已取消并删除。', '当前下载暂时不能取消。');
+    this.completeAsyncDownloadTaskAction(succeeded, resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_005')), resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_024')));
   }
 
   private presentCompletedDeleteDialogIfNeeded(): void {
@@ -1144,19 +1145,19 @@ export struct BrowserDownloadManagementScreen {
     }
     const deleteFile = this.completedDeleteConfirmMode === 'task_and_file';
     showCenteredAlertDialog({
-      title: deleteFile ? '删除任务和文件？' : '仅删除下载任务？',
+      title: deleteFile ? resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_016')) : resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_012')),
       message: deleteFile
-        ? `下载任务会从 Aira 中删除，对应文件将移入系统回收站。\n\n${this.completedDeleteConfirmFileName}`
-        : `只删除 Aira 中的下载任务，对应文件会保留。\n\n${this.completedDeleteConfirmFileName}`,
+        ? resolveAppResourceText($r('app.string.download_delete_file_message', this.completedDeleteConfirmFileName))
+        : resolveAppResourceText($r('app.string.download_delete_task_message', this.completedDeleteConfirmFileName)),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: resolveAppResourceText($r('app.string.settings_account_cancel')),
         action: () => {
           this.clearCompletedDeleteConfirmation();
         }
       },
       secondaryButton: {
-        value: deleteFile ? '删除任务和文件' : '仅删除任务',
+        value: deleteFile ? resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_015')) : resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_013')),
         action: () => {
           const guid = this.completedDeleteConfirmGuid;
           const mode = this.completedDeleteConfirmMode;
@@ -1178,7 +1179,7 @@ export struct BrowserDownloadManagementScreen {
     const item = sharedDownloadRuntimeService.listTasksSnapshot(this.getCurrentDownloadBoundary())
       .find((candidate) => candidate.guid === guid);
     this.completedDeleteConfirmGuid = guid;
-    this.completedDeleteConfirmFileName = item?.suggestedFileName ?? '当前下载';
+    this.completedDeleteConfirmFileName = item?.suggestedFileName ?? resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_020'));
     this.completedDeleteConfirmMode = mode;
     this.presentCompletedDeleteDialogIfNeeded();
   }
@@ -1198,8 +1199,8 @@ export struct BrowserDownloadManagementScreen {
     }
     this.completeDownloadTaskAction(
       succeeded,
-      '下载任务已删除，文件已保留。',
-      '当前下载任务暂时不能删除。'
+      resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_001')),
+      resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_021'))
     );
   }
 
@@ -1210,15 +1211,15 @@ export struct BrowserDownloadManagementScreen {
     if (!result.recordRemoved) {
       this.showTaskLocally(guid);
       const failureText = result.fileStatus === 'not_found'
-        ? '当前下载记录已发生变化，请刷新后重试。'
-        : '文件删除失败，下载任务已保留。';
+        ? resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_030'))
+        : resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_039'));
       this.showToast(failureText);
       this.completeAsyncDownloadTaskAction(false, '', failureText);
       return;
     }
     const successText = result.fileStatus === 'deleted'
-      ? '下载任务已删除，文件已移入回收站。'
-      : '文件已不存在，下载任务已删除。';
+      ? resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_002'))
+      : resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_040'));
     this.showToast(successText);
     this.completeAsyncDownloadTaskAction(true, successText, '');
   }
@@ -1232,7 +1233,7 @@ export struct BrowserDownloadManagementScreen {
         privacyMode: this.getCurrentDownloadBoundary().privacyMode
       }
     }).catch((error: Error) => {
-      this.statusText = `打开下载设置失败：${this.stringifyError(error)}`;
+      this.statusText = resolveAppResourceText($r('app.string.download_settings_open_failed', this.stringifyError(error)));
     });
   }
 
@@ -1285,12 +1286,12 @@ export struct BrowserDownloadManagementScreen {
     const boundary = this.getCurrentDownloadBoundary();
     if (action === 'pause') {
       const succeeded = await sharedDownloadRuntimeService.pauseTaskForBoundary(guid, boundary);
-      this.completeControlAction(guid, succeeded, '下载已暂停。', '当前下载暂时不能暂停。');
+      this.completeControlAction(guid, succeeded, resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_006')), resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_027')));
       return;
     }
     if (action === 'resume') {
       const succeeded = await sharedDownloadRuntimeService.resumeTaskForBoundary(guid, boundary);
-      this.completeControlAction(guid, succeeded, '下载已继续。', '当前下载暂时不能继续。');
+      this.completeControlAction(guid, succeeded, resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_007')), resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_028')));
       return;
     }
     if (action === 'cancel') {
@@ -1302,27 +1303,27 @@ export struct BrowserDownloadManagementScreen {
       if (!succeeded) {
         this.showTaskLocally(guid);
       }
-      this.completeDownloadTaskAction(succeeded, '下载记录已移除。', '当前下载记录暂时不能移除。');
+      this.completeDownloadTaskAction(succeeded, resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_010')), resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_032')));
       return;
     }
     if (action === 'retry') {
       const succeeded = await sharedDownloadRuntimeService.retryTaskForBoundary(guid, boundary);
-      this.completeAsyncDownloadTaskAction(succeeded, '下载任务已重新开始。', '当前下载暂时不能重试。');
+      this.completeAsyncDownloadTaskAction(succeeded, resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_003')), resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_029')));
       return;
     }
     if (action === 'open_file') {
       const succeeded = await sharedDownloadRuntimeService.openFileForBoundary(guid, boundary);
-      this.completeAsyncDownloadTaskAction(succeeded, '正在打开下载文件。', '当前下载暂时不能打开。');
+      this.completeAsyncDownloadTaskAction(succeeded, resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_041')), resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_026')));
       return;
     }
     if (action === 'open_location') {
       const succeeded = await sharedDownloadRuntimeService.openLocationForBoundary(guid, boundary);
-      this.completeAsyncDownloadTaskAction(succeeded, '正在打开文件位置。', '当前下载暂时不能定位。');
+      this.completeAsyncDownloadTaskAction(succeeded, resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_042')), resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_025')));
       return;
     }
     if (action === 'save_to_system') {
       const succeeded = await sharedDownloadRuntimeService.saveTaskToSystemDownloadsForBoundary(guid, boundary);
-      this.completeAsyncDownloadTaskAction(succeeded, '已保存到系统下载目录。', '当前下载暂时不能保存到系统下载目录。');
+      this.completeAsyncDownloadTaskAction(succeeded, resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_018')), resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_022')));
       return;
     }
     if (action === 'copy_link') {
@@ -1392,15 +1393,15 @@ export struct BrowserDownloadManagementScreen {
       .find((candidate) => candidate.guid === guid);
     const url = task?.request.url.trim() ?? '';
     if (url.length === 0) {
-      this.showToast('当前没有可复制的下载链接。');
-      this.completeDownloadTaskAction(false, '', '当前没有可复制的下载链接。');
+      this.showToast(resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_034')));
+      this.completeDownloadTaskAction(false, '', resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_034')));
       return;
     }
     try {
       const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, url);
       await pasteboard.getSystemPasteboard().setData(data);
-      this.showToast('下载链接已复制。');
-      this.completeDownloadTaskAction(true, '下载链接已复制。', '');
+      this.showToast(resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_011')));
+      this.completeDownloadTaskAction(true, resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_011')), '');
     } catch (error) {
       hilog.warn(
         DOWNLOAD_MANAGEMENT_DOMAIN,
@@ -1409,8 +1410,8 @@ export struct BrowserDownloadManagementScreen {
         guid,
         this.stringifyError(error)
       );
-      this.showToast('复制失败，请稍后重试。');
-      this.completeDownloadTaskAction(false, '', '复制失败，请稍后重试。');
+      this.showToast(resolveAppResourceText($r('app.string.ui_copy_failed')));
+      this.completeDownloadTaskAction(false, '', resolveAppResourceText($r('app.string.ui_copy_failed')));
     }
   }
 
@@ -1634,7 +1635,7 @@ export struct BrowserDownloadManagementScreen {
     if (this.isSelectionMode) {
       return '';
     }
-    return `${this.resolveDesktopRows().length} 项`;
+    return resolveAppResourceText($r('app.string.history_item_count', this.resolveDesktopRows().length));
   }
 
   private findVisibleRowByGuid(guid: string): DownloadManagementRowState | undefined {
@@ -1659,7 +1660,7 @@ export struct BrowserDownloadManagementScreen {
 
   private enterSelectionMode(initialGuid?: string): void {
     if (!this.canEnterSelectionMode()) {
-      this.showToast('当前没有可多选的下载任务。');
+      this.showToast(resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_035')));
       return;
     }
     this.isSelectionMode = true;
@@ -1735,31 +1736,31 @@ export struct BrowserDownloadManagementScreen {
 
   private confirmDeleteSelectedRows(): void {
     if (this.selectedGuids.length === 0) {
-      this.showToast(DOWNLOAD_SELECTION_EMPTY_TOAST);
+      this.showToast(downloadSelectionEmptyToast());
       return;
     }
     const selectedCount = this.selectedGuids.length;
     showCenteredAlertDialog({
-      title: '删除下载',
-      message: `确定删除选中的 ${selectedCount} 项下载吗？\n\n“仅删除任务”会让文件保留在设备上；“删除任务和文件”会把文件移入系统回收站。`,
+      title: resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_014')),
+      message: resolveAppResourceText($r('app.string.download_delete_selected_message', selectedCount)),
       autoCancel: true,
       buttonDirection: DialogButtonDirection.VERTICAL,
       buttons: [
         {
-          value: '仅删除任务',
+          value: resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_013')),
           action: (): void => {
             this.deleteSelectedRows('records_only');
           }
         },
         {
-          value: '删除任务和文件',
+          value: resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_015')),
           fontColor: $r('app.color.permission_blocked'),
           action: (): void => {
             this.deleteSelectedRows('records_and_files');
           }
         },
         {
-          value: '取消',
+          value: resolveAppResourceText($r('app.string.settings_account_cancel')),
           action: (): void => {
           }
         }
@@ -1786,7 +1787,9 @@ export struct BrowserDownloadManagementScreen {
         removedCount += 1;
       }
     });
-    this.showToast(removedCount > 0 ? `已删除 ${removedCount} 项下载记录。` : '当前下载记录暂时不能删除。');
+    this.showToast(removedCount > 0
+      ? resolveAppResourceText($r('app.string.download_deleted_records', removedCount))
+      : resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_031')));
     this.refreshState();
   }
 
@@ -1802,7 +1805,9 @@ export struct BrowserDownloadManagementScreen {
         removedCount += 1;
       }
     }
-    this.showToast(removedCount > 0 ? `已删除 ${removedCount} 项下载。` : '当前下载暂时不能删除。');
+    this.showToast(removedCount > 0
+      ? resolveAppResourceText($r('app.string.download_deleted_items', removedCount))
+      : resolveAppResourceText($r('app.string.browser_ui_browser_download_management_screen_023')));
     this.refreshState();
   }
 

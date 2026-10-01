@@ -48,7 +48,7 @@ struct BrowserTabletInterfaceModeSettingsPage {
   build() {
     Column() {
       SettingsHdsScaffold({
-        title: '界面模式',
+        title: $r('app.string.settings_appearance_interface_mode'),
         backIconKind: 'back',
         pageBackground: this.storedPageBackgroundColor,
         headerButtonBackground: this.storedPressedBackgroundColor,

@@ -254,7 +254,7 @@ export class BrowserShellRouteCoordinator {
     this.pushRoute(
       BOOKMARK_MANAGER_ROUTE,
       this.bookmarkScopeService.buildRouteParams(routeContext.dataScope, routeContext.privacyMode),
-      '打开书签管理失败'
+      resolveAppResourceText($r('app.string.offline_bookmarks_open_failed'))
     );
   }
 
@@ -266,7 +266,7 @@ export class BrowserShellRouteCoordinator {
     this.pushRoute(
       HISTORY_MANAGER_ROUTE,
       this.buildBoundaryRouteParams(),
-      '打开历史记录失败'
+      resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_003'))
     );
   }
 
@@ -274,7 +274,7 @@ export class BrowserShellRouteCoordinator {
     this.pushRoute(
       SYNC_SETTINGS_ROUTE,
       this.buildBoundaryRouteParams(),
-      '打开同步设置失败'
+      resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_004'))
     );
   }
 
@@ -282,16 +282,18 @@ export class BrowserShellRouteCoordinator {
     this.pushRoute(
       BROWSER_TRACKING_PROTECTION_SETTINGS_ROUTE,
       this.buildBoundaryRouteParams(),
-      '打开防跟踪设置失败'
+      resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_015'))
     );
   }
 
   openSearchSettingsPage(): void {
-    this.pushRoute(SEARCH_SETTINGS_ROUTE, undefined, '打开搜索设置失败');
+    this.pushRoute(SEARCH_SETTINGS_ROUTE, undefined,
+      resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_007')));
   }
 
   openAdBlockSettingsPage(): void {
-    this.pushRoute(AD_BLOCK_SETTINGS_ROUTE, undefined, '打开网页内容过滤设置失败');
+    this.pushRoute(AD_BLOCK_SETTINGS_ROUTE, undefined,
+      resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_011')));
   }
 
   openUserScriptsPage(): void {
@@ -311,7 +313,7 @@ export class BrowserShellRouteCoordinator {
     this.pushRoute(
       USER_SCRIPT_DETAIL_ROUTE,
       { scriptId: scriptId },
-      '打开脚本详情失败'
+      resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_012'))
     );
   }
 
@@ -323,7 +325,7 @@ export class BrowserShellRouteCoordinator {
     this.pushRoute(
       SETTINGS_CENTER_ROUTE,
       this.buildBoundaryRouteParams(),
-      '打开设置失败'
+      resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_013'))
     );
   }
 
@@ -331,7 +333,7 @@ export class BrowserShellRouteCoordinator {
     this.pushRoute(
       SETTINGS_CHANGELOG_ROUTE,
       this.buildBoundaryRouteParams(),
-      '打开更新日志失败'
+      resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_008'))
     );
   }
 
@@ -346,7 +348,7 @@ export class BrowserShellRouteCoordinator {
     this.pushRoute(
       AIRA_PRO_ROUTE,
       this.buildBoundaryRouteParams(),
-      '打开 Aira Pro 失败'
+      resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_001'))
     );
   }
 
@@ -361,7 +363,7 @@ export class BrowserShellRouteCoordinator {
     this.pushRoute(
       SETTINGS_DETAIL_ROUTE,
       settingsDetailRouteParams,
-      '打开设置详情失败'
+      resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_014'))
     );
   }
 
@@ -390,7 +392,7 @@ export class BrowserShellRouteCoordinator {
     this.pushRoute(
       hostName.length > 0 || origin.length > 0 ? SITE_CUSTOMIZATION_DETAIL_ROUTE : SITE_CONTROLS_MANAGEMENT_ROUTE,
       routeParams,
-      '打开站点自定义失败'
+      resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_010'))
     );
   }
 
@@ -426,7 +428,7 @@ export class BrowserShellRouteCoordinator {
     this.pushRoute(
       NOVEL_BOOKSHELF_ROUTE,
       this.buildBoundaryRouteParams(),
-      '打开我的书架失败'
+      resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_006'))
     );
   }
 
@@ -436,7 +438,8 @@ export class BrowserShellRouteCoordinator {
       this.host.openLargeScreenNativeRoute({ scene: 'app_proxy' });
       return;
     }
-    this.openSimpleRoute(APP_PROXY_SETTINGS_ROUTE, '打开应用内代理设置失败');
+    this.openSimpleRoute(APP_PROXY_SETTINGS_ROUTE,
+      resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_005')));
   }
 
   openDownloadManagementPage(): void {
@@ -452,7 +455,9 @@ export class BrowserShellRouteCoordinator {
       url: DOWNLOAD_MANAGEMENT_ROUTE,
       params: routeParams
     }).catch((error: Error) => {
-      this.host.presentRouteFailure(`打开下载管理失败：${JSON.stringify(error)}`);
+      this.host.presentRouteFailure(resolveAppResourceText($r('app.string.browser_shell_route_failed_detail',
+        resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_002')),
+        JSON.stringify(error))));
     });
   }
 
@@ -484,7 +489,7 @@ export class BrowserShellRouteCoordinator {
       this.phoneNativeTabHandoffKey = '';
       void this.dependencies.resolveTabCloseCoordinator().closeCurrentTabForUserReturnHome({
         activeTab: activeTab,
-        helperMessage: '已回到主页',
+        helperMessage: resolveAppResourceText($r('app.string.browser_shell_008')),
         homeOptions: {
           profileId: activeTab.profileId,
           privacyMode: activeTab.privacyMode,
@@ -513,9 +518,9 @@ export class BrowserShellRouteCoordinator {
 
   resolveSiteSecurityTitle(currentUrl: string, addressInput: string): string {
     if (isSecureCurrentSiteUrl(currentUrl, addressInput)) {
-      return '访问安全';
+      return resolveAppResourceText($r('app.string.bottom_panel_secure'));
     }
-    return '连接未验证';
+    return resolveAppResourceText($r('app.string.bottom_panel_unverified'));
   }
 
   resolveSiteSecurityIcon(currentUrl: string, addressInput: string): Resource {
@@ -572,19 +577,39 @@ export class BrowserShellRouteCoordinator {
             bookmarkScope: bookmarkParams.bookmarkScope,
             folderId: bookmarkRoute.folderId
           },
-          failurePrefix: '打开书签管理失败'
+          failurePrefix: resolveAppResourceText($r('app.string.offline_bookmarks_open_failed'))
         };
       }
       case 'history':
-        return { url: HISTORY_MANAGER_ROUTE, params: boundaryParams, failurePrefix: '打开历史记录失败' };
+        return {
+          url: HISTORY_MANAGER_ROUTE,
+          params: boundaryParams,
+          failurePrefix: resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_003'))
+        };
       case 'settings':
-        return { url: SETTINGS_CENTER_ROUTE, params: boundaryParams, failurePrefix: '打开设置失败' };
+        return {
+          url: SETTINGS_CENTER_ROUTE,
+          params: boundaryParams,
+          failurePrefix: resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_013'))
+        };
       case 'downloads':
-        return { url: DOWNLOAD_MANAGEMENT_ROUTE, params: boundaryParams, failurePrefix: '打开下载管理失败' };
+        return {
+          url: DOWNLOAD_MANAGEMENT_ROUTE,
+          params: boundaryParams,
+          failurePrefix: resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_002'))
+        };
       case 'user_scripts':
-        return { url: USER_SCRIPTS_ROUTE, params: boundaryParams, failurePrefix: '打开用户脚本失败' };
+        return {
+          url: USER_SCRIPTS_ROUTE,
+          params: boundaryParams,
+          failurePrefix: resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_009'))
+        };
       case 'app_proxy':
-        return { url: APP_PROXY_SETTINGS_ROUTE, params: boundaryParams, failurePrefix: '打开应用内代理设置失败' };
+        return {
+          url: APP_PROXY_SETTINGS_ROUTE,
+          params: boundaryParams,
+          failurePrefix: resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_005'))
+        };
       case 'saved_pages':
         return {
           url: OFFLINE_PAGES_ROUTE,
@@ -592,7 +617,11 @@ export class BrowserShellRouteCoordinator {
           failurePrefix: resolveAppResourceText($r('app.string.offline_route_open_failed'))
         };
       case 'bookshelf':
-        return { url: NOVEL_BOOKSHELF_ROUTE, params: boundaryParams, failurePrefix: '打开我的书架失败' };
+        return {
+          url: NOVEL_BOOKSHELF_ROUTE,
+          params: boundaryParams,
+          failurePrefix: resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_006'))
+        };
       default:
         return {
           url: OFFLINE_PAGES_ROUTE,
@@ -632,7 +661,8 @@ export class BrowserShellRouteCoordinator {
         return;
       }
       onFailed?.();
-      this.host.presentRouteFailure(`${failurePrefix}：${JSON.stringify(error)}`);
+      this.host.presentRouteFailure(resolveAppResourceText(
+        $r('app.string.browser_shell_route_failed_detail', failurePrefix, JSON.stringify(error))));
     }
   }
 
@@ -673,7 +703,8 @@ export class BrowserShellRouteCoordinator {
       onCommitted?.();
     }).catch((error: Error) => {
       onFailed?.();
-      this.host.presentRouteFailure(`${failurePrefix}：${JSON.stringify(error)}`);
+      this.host.presentRouteFailure(resolveAppResourceText(
+        $r('app.string.browser_shell_route_failed_detail', failurePrefix, JSON.stringify(error))));
     });
   }
 }
