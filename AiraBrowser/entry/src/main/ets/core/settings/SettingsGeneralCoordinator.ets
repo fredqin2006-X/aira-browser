@@ -1,6 +1,7 @@
 import {
   APP_LANGUAGE_ENGLISH,
-  APP_LANGUAGE_FOLLOW_SYSTEM
+  APP_LANGUAGE_FOLLOW_SYSTEM,
+  APP_LANGUAGE_TRADITIONAL_CHINESE
 } from '../resources/AppLanguageCatalog';
 
 import { BrowserPreferences } from '../../common/models/BrowserModels';
@@ -68,6 +69,9 @@ export class SettingsGeneralCoordinator {
     }
     if (appLanguage === APP_LANGUAGE_ENGLISH) {
       return 'English';
+    }
+    if (appLanguage === APP_LANGUAGE_TRADITIONAL_CHINESE) {
+      return '繁體中文';
     }
     return '简体中文';
   }
@@ -163,6 +167,8 @@ export function localizeGeneralSettingsCopy(value: ResourceStr): ResourceStr {
       return $r('app.string.settings_general_language_follow_system');
     case '简体中文':
       return $r('app.string.settings_general_language_chinese');
+    case '繁體中文':
+      return $r('app.string.settings_general_language_traditional');
     default:
       break;
   }

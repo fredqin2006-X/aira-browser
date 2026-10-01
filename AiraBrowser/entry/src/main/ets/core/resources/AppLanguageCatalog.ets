@@ -7,10 +7,13 @@
  * {@link AppLanguageService}.
  *
  * `base` and `zh_CN` carry the same Chinese values, so Simplified Chinese is one option,
- * not two. Every other system language falls back to `base`, which is why the picker offers
- * exactly these and why `default` (follow the system) is the default choice.
+ * not two. `zh_Hant` carries the Traditional Chinese catalog and covers both Taiwan and
+ * Hong Kong system locales. Every other system language falls back to `base`, which is why
+ * the picker offers exactly these and why `default` (follow the system) is the default
+ * choice.
  */
 export const APP_LANGUAGE_SIMPLIFIED_CHINESE: string = 'zh-Hans';
+export const APP_LANGUAGE_TRADITIONAL_CHINESE: string = 'zh-Hant';
 export const APP_LANGUAGE_ENGLISH: string = 'en';
 /** Sentinel meaning "follow the system language". */
 export const APP_LANGUAGE_FOLLOW_SYSTEM: string = 'default';
@@ -18,6 +21,7 @@ export const APP_LANGUAGE_FOLLOW_SYSTEM: string = 'default';
 const SUPPORTED_APP_LANGUAGES: string[] = [
   APP_LANGUAGE_FOLLOW_SYSTEM,
   APP_LANGUAGE_SIMPLIFIED_CHINESE,
+  APP_LANGUAGE_TRADITIONAL_CHINESE,
   APP_LANGUAGE_ENGLISH
 ];
 

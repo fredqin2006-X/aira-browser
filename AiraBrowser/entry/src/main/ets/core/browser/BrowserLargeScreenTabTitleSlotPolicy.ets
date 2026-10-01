@@ -1,3 +1,5 @@
+import { shortenBrowserDisplayTitle } from './BrowserDisplayTitlePolicy';
+
 // Desktop tab titles share one fixed-height strip. The slot beside the favicon
 // and close button is often only a few glyphs wide, so the hide-vs-ellipsis
 // decision has to use that slot, not the whole tab width.
@@ -71,7 +73,7 @@ export const HIDDEN_BROWSER_LARGE_SCREEN_TAB_TITLE_SLOT: BrowserLargeScreenTabTi
 };
 
 export function resolveBrowserLargeScreenTabDisplayTitle(title: string): string {
-  const trimmed = title.trim();
+  const trimmed = shortenBrowserDisplayTitle(title);
   return trimmed.length > 0 ? trimmed : EMPTY_TAB_TITLE;
 }
 

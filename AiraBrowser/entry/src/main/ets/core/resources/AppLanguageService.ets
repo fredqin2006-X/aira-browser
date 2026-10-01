@@ -10,6 +10,7 @@ export {
   APP_LANGUAGE_ENGLISH,
   APP_LANGUAGE_FOLLOW_SYSTEM,
   APP_LANGUAGE_SIMPLIFIED_CHINESE,
+  APP_LANGUAGE_TRADITIONAL_CHINESE,
   isSupportedAppLanguage,
   resolveAppPreferredLanguage
 } from './AppLanguageCatalog';

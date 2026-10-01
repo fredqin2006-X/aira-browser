@@ -2,6 +2,7 @@ import { BrowserTabState } from '../tabs/TabManager';
 import { BrowserLargeScreenTabProjectionInput } from './BrowserLargeScreenTabStripViewModel';
 import { AiraRenderableIconId } from '../resources/GeneratedAiraIconCatalog';
 import { browserNativeTabSceneService } from './BrowserNativeTabSceneService';
+import { shortenBrowserDisplayTitle } from './BrowserDisplayTitlePolicy';
 import { BrowserTabsOverviewSectionPolicy } from './tabsOverview/BrowserTabsOverviewSectionPolicy';
 
 export interface BrowserLargeScreenTabCapabilityFacts {
@@ -53,7 +54,7 @@ export class BrowserLargeScreenTabSnapshotAdapter {
     if (tab.isHome) {
       return tab.privacyMode === 'private' ? '隐私标签页' : '新标签页';
     }
-    const title = tab.title.trim();
+    const title = shortenBrowserDisplayTitle(tab.title);
     return title.length > 0 ? title : tab.url;
   }
 

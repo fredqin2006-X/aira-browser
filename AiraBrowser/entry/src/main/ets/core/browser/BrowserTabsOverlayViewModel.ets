@@ -11,6 +11,7 @@ import {
   BrowserTabsOverviewSectionPolicy
 } from './tabsOverview/BrowserTabsOverviewSectionPolicy';
 import { SiteIdentityService } from '../../services/web/SiteIdentityService';
+import { shortenBrowserDisplayTitle } from './BrowserDisplayTitlePolicy';
 import { resolveSiteIconFallbackLabel } from '../../common/utils/SiteIconFallbackUtils';
 import {
   SiteIconListPresenter,
@@ -421,7 +422,7 @@ export class BrowserTabsOverlayViewModel {
     if (tab.isHome) {
       return '新标签页';
     }
-    const title = tab.title.trim();
+    const title = shortenBrowserDisplayTitle(tab.title);
     if (title.length > 0) {
       return title;
     }

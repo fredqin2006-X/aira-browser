@@ -6,7 +6,7 @@
  * preference that the next cold start reads.
  *
  * The failure this guard closes is silent: the picker, the storage normalizer, and the
- * `app.string` catalogs are three separate lists, and if they disagree the app either
+ * `app.string` catalogs are four separate lists, and if they disagree the app either
  * offers a language it cannot render (falling back to Chinese with no explanation) or
  * accepts a stored value it will not honor. Neither shows up as a build error.
  *
@@ -37,7 +37,7 @@ const CATALOG_REL = `${ETS}/core/resources/AppLanguageCatalog.ets`;
 const PAGE_REL = `${ETS}/app/pages/GeneralLanguageSettingsPage.ets`;
 const PREFERENCES_REL = `${ETS}/data/preferences/PreferencesRepository.ets`;
 const RESOURCES_DIR = 'AiraBrowser/entry/src/main/resources';
-const LOCALES = ['base', 'zh_CN', 'en_US'];
+const LOCALES = ['base', 'zh_CN', 'zh_Hant', 'en_US'];
 
 let failures = 0;
 
@@ -58,7 +58,7 @@ function main() {
 
   // 1. The catalog owns the language identities; the service re-exports them and owns the
   //    platform call. The preferences layer may only depend on the catalog.
-  for (const name of ['APP_LANGUAGE_FOLLOW_SYSTEM', 'APP_LANGUAGE_SIMPLIFIED_CHINESE', 'APP_LANGUAGE_ENGLISH']) {
+  for (const name of ['APP_LANGUAGE_FOLLOW_SYSTEM', 'APP_LANGUAGE_SIMPLIFIED_CHINESE', 'APP_LANGUAGE_TRADITIONAL_CHINESE', 'APP_LANGUAGE_ENGLISH']) {
     if (!new RegExp(`export const ${name}\\b`).test(catalog)) {
       fail(`${CATALOG_REL} must export ${name}`);
     }
@@ -91,6 +91,7 @@ function main() {
     for (const name of [
       'APP_LANGUAGE_FOLLOW_SYSTEM',
       'APP_LANGUAGE_SIMPLIFIED_CHINESE',
+      'APP_LANGUAGE_TRADITIONAL_CHINESE',
       'APP_LANGUAGE_ENGLISH'
     ]) {
       if (!block.includes(name)) {
@@ -101,6 +102,7 @@ function main() {
     const expected = [
       'APP_LANGUAGE_FOLLOW_SYSTEM',
       'APP_LANGUAGE_SIMPLIFIED_CHINESE',
+      'APP_LANGUAGE_TRADITIONAL_CHINESE',
       'APP_LANGUAGE_ENGLISH'
     ];
     if (offered.join(',') !== expected.join(',')) {
@@ -110,8 +112,8 @@ function main() {
 
   // 3. Every offered language is one the catalogs actually carry.
   const shipped = LOCALES.filter((locale) => locale !== 'base');
-  if (!shipped.includes('zh_CN') || !shipped.includes('en_US')) {
-    fail(`${RESOURCES_DIR} must ship zh_CN and en_US string catalogs`);
+  if (!shipped.includes('zh_CN') || !shipped.includes('zh_Hant') || !shipped.includes('en_US')) {
+    fail(`${RESOURCES_DIR} must ship zh_CN, zh_Hant and en_US string catalogs`);
   }
   const keySets = LOCALES.map((locale) => {
     const parsed = JSON.parse(read(`${RESOURCES_DIR}/${locale}/element/string.json`));
@@ -147,7 +149,7 @@ function main() {
 }
 
 function expectedSummary() {
-  return '3 options';
+  return '4 options';
 }
 
 main();

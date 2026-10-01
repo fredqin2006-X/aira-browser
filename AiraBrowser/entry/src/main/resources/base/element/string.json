@@ -23351,6 +23351,10 @@
     {
       "name": "web_protection_report_a11y",
       "value": "%1$s，打开网页保护报告"
+    },
+    {
+      "name": "settings_general_language_traditional",
+      "value": "繁體中文"
     }
   ]
 }

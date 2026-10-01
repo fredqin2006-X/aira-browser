@@ -174,7 +174,7 @@ def main():
         print(f'wrote mapping to {args.prefix_out} (dry run)')
         return 0
 
-    for locale in ('base', 'zh_CN', 'en_US'):
+    for locale in ('base', 'zh_CN', 'zh_Hant', 'en_US'):
         data = load_locale(locale)
         names = {entry['name'] for entry in data['string']}
         added = 0

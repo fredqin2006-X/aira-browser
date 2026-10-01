@@ -39,7 +39,7 @@ RENDER_LINE = re.compile(
 
 def load_resource_values():
     values = collections.defaultdict(list)
-    for locale in ('base', 'zh_CN', 'en_US'):
+    for locale in ('base', 'zh_CN', 'zh_Hant', 'en_US'):
         path = os.path.join(RES, locale, 'element/string.json')
         with open(path, encoding='utf-8') as handle:
             data = json.load(handle)

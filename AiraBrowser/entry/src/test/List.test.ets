@@ -88,6 +88,7 @@ import communityUpdateCheckCoordinatorTest from './CommunityUpdateCheckCoordinat
 import browserLargeScreenWebZoomPolicyTest from './BrowserLargeScreenWebZoomPolicy.test';
 import browserToolbarActionInsertPolicyTest from './BrowserToolbarActionInsertPolicy.test';
 import browserLargeScreenTabTitleSlotPolicyTest from './BrowserLargeScreenTabTitleSlotPolicy.test';
+import browserDisplayTitlePolicyTest from './BrowserDisplayTitlePolicy.test';
 import browserLargeScreenTabStripBlankAreaPolicyTest from './BrowserLargeScreenTabStripBlankAreaPolicy.test';
 import browserLargeScreenVerticalTabsPolicyTest from './BrowserLargeScreenVerticalTabsPolicy.test';
 import browserFullscreenExitHintPolicyTest from './BrowserFullscreenExitHintPolicy.test';
@@ -202,6 +203,7 @@ export default function tests(): void {
   browserLargeScreenWebZoomPolicyTest();
   browserToolbarActionInsertPolicyTest();
   browserLargeScreenTabTitleSlotPolicyTest();
+  browserDisplayTitlePolicyTest();
   browserLargeScreenTabStripBlankAreaPolicyTest();
   browserLargeScreenVerticalTabsPolicyTest();
   browserFullscreenExitHintPolicyTest();

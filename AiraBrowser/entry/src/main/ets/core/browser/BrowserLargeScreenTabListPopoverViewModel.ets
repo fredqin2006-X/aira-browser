@@ -4,6 +4,7 @@ import { AppWindowModalLayoutService } from '../../services/layout/AppWindowModa
 import { AiraRenderableIconId } from '../resources/GeneratedAiraIconCatalog';
 import { SiteIconListRenderState } from '../siteicons/SiteIconListPresenter';
 import { formatTopChromeAddress } from './AddressDisplayFormatter';
+import { shortenBrowserDisplayTitle } from './BrowserDisplayTitlePolicy';
 import { BrowserLargeScreenInputProfile, BrowserLargeScreenTabStripPresentation } from './BrowserLargeScreenTabStripViewModel';
 import { BrowserRecentlyClosedApplicationSnapshot } from './BrowserRecentlyClosedApplicationCoordinator';
 import { HomeRecentlyClosedIconState } from './HomeRecentlyClosedIconHydrationCoordinator';
@@ -94,7 +95,8 @@ export class BrowserLargeScreenTabListPopoverViewModel {
     facts: BrowserLargeScreenTabListPopoverFacts
   ): BrowserLargeScreenTabListOpenRowPresentation[] {
     return facts.tabStrip.allTabs.map((tab): BrowserLargeScreenTabListOpenRowPresentation => {
-      const title = tab.title.trim().length > 0 ? tab.title.trim() : '新标签页';
+      const shortenedTitle = shortenBrowserDisplayTitle(tab.title);
+      const title = shortenedTitle.length > 0 ? shortenedTitle : '新标签页';
       const formattedAddress = formatTopChromeAddress(tab.url);
       const subtitle = formattedAddress.length > 0
         ? formattedAddress
@@ -128,8 +130,9 @@ export class BrowserLargeScreenTabListPopoverViewModel {
     const now = facts.now ?? Date.now();
     return facts.recentlyClosed.records.map((record): BrowserLargeScreenTabListRecentRowPresentation => {
       const url = this.resolveRecentlyClosedUrl(record.tab.url, record.tab.lastGoodUrl, record.tab.pendingUrl);
-      const title = record.tab.title.trim().length > 0
-        ? record.tab.title.trim()
+      const shortenedTitle = shortenBrowserDisplayTitle(record.tab.title);
+      const title = shortenedTitle.length > 0
+        ? shortenedTitle
         : (url.length > 0 ? url : '未命名标签页');
       const formattedAddress = formatTopChromeAddress(url);
       const iconState = this.findRecentlyClosedIconState(facts.recentlyClosed.icons, record.id);

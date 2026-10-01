@@ -12,8 +12,8 @@
  * on a device set to English. This guard closes that gap:
  *
  *   1. every title and every breadcrumb path segment in the catalog has a table case;
- *   2. every resource the table names exists in `base`, `zh_CN`, and `en_US`;
- *   3. the three catalogs carry the same key set, so a locale cannot be half-translated;
+ *   2. every resource the table names exists in `base`, `zh_CN`, `zh_Hant`, and `en_US`;
+ *   3. the four catalogs carry the same key set, so a locale cannot be half-translated;
  *   4. the `base` value of each mapped resource still equals the catalog literal, which is
  *      the identity the search index and the unit tests match on.
  *
@@ -31,7 +31,7 @@ const COPY_REL = `${ETS}/core/settings/SettingsCatalogCopy.ets`;
 // settings string crosses from an identity to something rendered or matched.
 const SETTINGS_COPY_REL = `${ETS}/core/settings/SettingsCopy.ets`;
 const ENGLISH_INDEX_REL = `${ETS}/core/settings/SettingsCatalogEnglishIndex.ets`;
-const RESOURCE_LOCALES = ['base', 'zh_CN', 'en_US'];
+const RESOURCE_LOCALES = ['base', 'zh_CN', 'zh_Hant', 'en_US'];
 const RESOURCE_REL = (locale) => `AiraBrowser/entry/src/main/resources/${locale}/element/string.json`;
 
 let failures = 0;

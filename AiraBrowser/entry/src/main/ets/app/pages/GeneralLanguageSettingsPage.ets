@@ -27,7 +27,8 @@ import { AppModeSwitchRestartService } from '../../services/settings/AppModeSwit
 import {
   APP_LANGUAGE_ENGLISH,
   APP_LANGUAGE_FOLLOW_SYSTEM,
-  APP_LANGUAGE_SIMPLIFIED_CHINESE
+  APP_LANGUAGE_SIMPLIFIED_CHINESE,
+  APP_LANGUAGE_TRADITIONAL_CHINESE
 } from '../../core/resources/AppLanguageCatalog';
 import {
   applyAppPreferredLanguage,
@@ -40,13 +41,14 @@ interface AppLanguageOption {
 }
 
 /**
- * The languages the app ships. `default` follows the system; the other two are the
- * catalogs that exist. A language the app does not carry is not offered, because picking
- * it would silently fall back to Chinese.
+ * The languages the app ships. `default` follows the system; the others are the catalogs
+ * that exist. A language the app does not carry is not offered, because picking it would
+ * silently fall back to Chinese.
  */
 const APP_LANGUAGE_OPTIONS: AppLanguageOption[] = [
   { id: APP_LANGUAGE_FOLLOW_SYSTEM, title: $r('app.string.settings_general_language_follow_system') },
   { id: APP_LANGUAGE_SIMPLIFIED_CHINESE, title: $r('app.string.settings_general_language_chinese') },
+  { id: APP_LANGUAGE_TRADITIONAL_CHINESE, title: $r('app.string.settings_general_language_traditional') },
   { id: APP_LANGUAGE_ENGLISH, title: $r('app.string.settings_general_language_english') }
 ];
 
