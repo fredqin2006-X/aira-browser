@@ -48,6 +48,14 @@ import {
 } from '../../../core/deviceTabs/CrossDeviceTabPresenceCoordinator';
 import { AiraIcon } from '../common/AiraIcon';
 import {
+  BROWSER_IMMERSIVE_SHEET_HEADER_CONTENT_TOP_INSET,
+  BROWSER_SHEET_IMMERSIVE_BOTTOM_PADDING,
+  BrowserFeatureSheetHeader,
+  BrowserImmersiveSheetLayout,
+  browserSheetHeaderBlurModifier,
+  resolveBrowserSheetHeaderBlurRadius
+} from './BrowserModalBottomSheet';
+import {
   RECORD_LIST_ROW_FALLBACK_FONT_SIZE,
   RECORD_LIST_ROW_FAVICON_CONTENT_RATIO,
   RECORD_LIST_ROW_FAVICON_SIZE,
@@ -136,6 +144,16 @@ export struct BrowserCrossDeviceTabsSheet {
    */
   @Prop contentTopInset: number = 8;
   @Prop contentBottomInset: number = 18;
+  /**
+   * Settings presents this list as a sheet. The system title bar cropped the
+   * scrollport, so the sheet draws its own title, glass close, and top blur.
+   */
+  @Prop immersiveSheet: boolean = false;
+  @Prop sheetTitle: ResourceStr = '';
+  onClose: () => void = (): void => {};
+  @State private sheetHeaderBlurRadius: number = 0;
+  @State private sheetScrollOffset: number = 0;
+  private sheetBlurScroller: Scroller = new Scroller();
 
   aboutToAppear(): void {
     this.siteIconListPresenter.bindDomainUpdates(
@@ -151,11 +169,18 @@ export struct BrowserCrossDeviceTabsSheet {
 
   build() {
     Column() {
-      this.buildRemoteDeviceContent()
+      if (this.immersiveSheet) {
+        this.buildImmersiveSheet()
+      } else {
+        this.buildRemoteDeviceContent()
+      }
     }
     .width('100%')
     .height('100%')
-    .padding({ left: 16, right: 16 })
+    .padding({
+      left: this.immersiveSheet ? 0 : 16,
+      right: this.immersiveSheet ? 0 : 16
+    })
     .justifyContent(FlexAlign.Start)
     .alignItems(HorizontalAlign.Start)
     .bindSheet($$this.loginSheetVisible, this.buildHuaweiLoginSheet(), applyDesktopDialogSheetChrome({
@@ -180,6 +205,9 @@ export struct BrowserCrossDeviceTabsSheet {
   }
 
   private resolveContentTopInset(): number {
+    if (this.immersiveSheet) {
+      return BROWSER_IMMERSIVE_SHEET_HEADER_CONTENT_TOP_INSET;
+    }
     return Number.isFinite(this.contentTopInset) ? Math.max(0, this.contentTopInset) : 0;
   }
 
@@ -206,31 +234,118 @@ export struct BrowserCrossDeviceTabsSheet {
         this.buildEmptyPresentation(this.panelState.empty)
       } else if (this.resolveVisibleDevices().length === 0) {
         this.buildEmptyPresentation(buildCrossDeviceTabsEmptyPresentation('no_devices'))
+      } else if (this.immersiveSheet) {
+        this.buildImmersiveDeviceList()
       } else {
-        List({ space: 12 }) {
-          ForEach(this.resolveVisibleDevices(), (device: CrossDeviceTabPresenceDevice) => {
-            ListItem() {
-              this.buildDeviceGroup(device)
-            }
-            .width('100%')
-          }, (device: CrossDeviceTabPresenceDevice): string => device.deviceId)
-        }
-        .width('100%')
-        .height('100%')
-        // Content offsets, not container padding: the list keeps its full immersive
-        // height and the first/last rows stop where the chrome does.
-        .contentStartOffset(this.resolveContentTopInset())
-        .contentEndOffset(this.resolveContentBottomInset())
-        .alignListItem(ListItemAlign.Start)
-        .scrollBar(BarState.Off)
-        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+        this.buildEmbeddedDeviceList()
       }
     }
     .width('100%')
     .layoutWeight(1)
     .justifyContent(FlexAlign.Start)
     .alignItems(HorizontalAlign.Start)
-    .clip(true)
+    .clip(!this.immersiveSheet)
+  }
+
+  @Builder
+  private buildImmersiveSheet() {
+    BrowserImmersiveSheetLayout({
+      closeVisible: true,
+      closeAccessibilityLabel: $r('app.string.ui_close'),
+      onClose: (): void => {
+        this.onClose();
+      },
+      scrollContent: (): void => {
+        this.buildRemoteDeviceContent()
+      },
+      header: (): void => {
+        this.buildImmersiveHeader()
+      }
+    })
+  }
+
+  @Builder
+  private buildImmersiveHeader() {
+    BrowserFeatureSheetHeader({
+      title: this.sheetTitle,
+      titleColor: this.storedPrimaryTextColor
+    })
+  }
+
+  @Builder
+  private buildImmersiveDeviceList() {
+    List({ scroller: this.sheetBlurScroller, space: 12 }) {
+      ListItem() {
+        Column()
+          .width('100%')
+          .height(BROWSER_IMMERSIVE_SHEET_HEADER_CONTENT_TOP_INSET)
+      }
+
+      this.buildDeviceListItems()
+
+      ListItem() {
+        Column()
+          .width('100%')
+          .height(Math.max(this.resolveContentBottomInset(), BROWSER_SHEET_IMMERSIVE_BOTTOM_PADDING))
+      }
+    }
+    .width('100%')
+    .height('100%')
+    .padding({ left: 16, right: 16 })
+    .alignListItem(ListItemAlign.Start)
+    .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+    .clip(false)
+    .attributeModifier(browserSheetHeaderBlurModifier(this.sheetHeaderBlurRadius))
+    .onAppear((): void => {
+      this.resetSheetHeaderBlur();
+    })
+    .onDidScroll((_scrollOffset: number): void => {
+      this.noteSheetScrollOffset(this.sheetBlurScroller.currentOffset().yOffset);
+    })
+  }
+
+  @Builder
+  private buildEmbeddedDeviceList() {
+    List({ space: 12 }) {
+      this.buildDeviceListItems()
+    }
+    .width('100%')
+    .height('100%')
+    // Content offsets, not container padding: the list keeps its full immersive
+    // height and the first/last rows stop where the chrome does.
+    .contentStartOffset(this.resolveContentTopInset())
+    .contentEndOffset(this.resolveContentBottomInset())
+    .alignListItem(ListItemAlign.Start)
+    .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+  }
+
+  @Builder
+  private buildDeviceListItems() {
+    ForEach(this.resolveVisibleDevices(), (device: CrossDeviceTabPresenceDevice) => {
+      ListItem() {
+        this.buildDeviceGroup(device)
+      }
+      .width('100%')
+    }, (device: CrossDeviceTabPresenceDevice): string => device.deviceId)
+  }
+
+  private noteSheetScrollOffset(offset: number): void {
+    if (!Number.isFinite(offset)) {
+      return;
+    }
+    const next = Math.max(0, offset);
+    if (next === this.sheetScrollOffset) {
+      return;
+    }
+    this.sheetScrollOffset = next;
+    this.sheetHeaderBlurRadius = resolveBrowserSheetHeaderBlurRadius(next);
+  }
+
+  private resetSheetHeaderBlur(): void {
+    this.sheetScrollOffset = 0;
+    this.sheetHeaderBlurRadius = 0;
   }
 
   @Builder

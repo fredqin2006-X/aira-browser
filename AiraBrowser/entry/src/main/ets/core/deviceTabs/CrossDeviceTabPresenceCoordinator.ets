@@ -219,8 +219,14 @@ export class CrossDeviceTabPresenceCoordinator {
       return;
     }
     this.entitlementBlocked = false;
-    if (enabledPreference !== true) {
+    // A member who has never touched the switch starts on. An explicit off stays off.
+    if (enabledPreference === undefined) {
       await this.preferencesRepository.setEnabled(uid, true);
+    }
+    if (enabledPreference === false) {
+      this.clearPublishTimer();
+      this.stopHeartbeat();
+      return;
     }
     if (this.hasForegroundWindow()) {
       this.startHeartbeat();
@@ -282,7 +288,33 @@ export class CrossDeviceTabPresenceCoordinator {
     if (context === undefined) {
       return false;
     }
-    return await this.preferencesRepository.isEnabled(context.preferenceScope);
+    return await this.resolveLinkEnabled(context);
+  }
+
+  /**
+   * Unset means the user has not chosen. Members, and a paired personal server, start on.
+   * A stored false is a choice and is not rewritten.
+   */
+  private async resolveLinkEnabled(context: CrossDeviceTabPresenceProviderContext): Promise<boolean> {
+    const preference = await this.preferencesRepository.readEnabledPreference(context.preferenceScope);
+    if (preference !== undefined) {
+      return preference === true;
+    }
+    if (!this.shouldDefaultLinkEnabled(context)) {
+      return false;
+    }
+    await this.preferencesRepository.setEnabled(context.preferenceScope, true);
+    return true;
+  }
+
+  private shouldDefaultLinkEnabled(context: CrossDeviceTabPresenceProviderContext): boolean {
+    if (context.kind === 'self_hosted') {
+      return true;
+    }
+    if (this.membershipStateReader === undefined) {
+      return false;
+    }
+    return this.isActiveProState(this.membershipStateReader(), context.uid);
   }
 
   private async withdrawSnapshot(context: CrossDeviceTabPresenceProviderContext): Promise<void> {
@@ -397,7 +429,7 @@ export class CrossDeviceTabPresenceCoordinator {
       this.entitlementBlocked = false;
       this.startHeartbeat();
     }
-    if (!await this.preferencesRepository.isEnabled(context.preferenceScope)) {
+    if (!await this.resolveLinkEnabled(context)) {
       this.stopHeartbeat();
       return;
     }
@@ -496,7 +528,7 @@ export class CrossDeviceTabPresenceCoordinator {
   private async loadEnabledPanel(
     context: CrossDeviceTabPresenceProviderContext
   ): Promise<CrossDeviceTabPresencePanelState> {
-    const enabled = await this.preferencesRepository.isEnabled(context.preferenceScope);
+    const enabled = await this.resolveLinkEnabled(context);
     if (!enabled) {
       return this.buildPanelState(
         'disabled',

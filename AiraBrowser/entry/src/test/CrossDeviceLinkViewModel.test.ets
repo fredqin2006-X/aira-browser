@@ -195,6 +195,25 @@ export default function crossDeviceLinkViewModelTest(): void {
       expect(buildState(facts).devices[0].title).assertEqual('我的台式机');
     });
 
+    it('grays the computer rows and hides sync settings without an active membership', 0, () => {
+      const required = buildFacts('aira_cloud');
+      required.cloudEntitlement = 'pro_required';
+      const requiredState = buildState(required);
+      expect(requiredState.deviceActionsEnabled).assertFalse();
+      expect(requiredState.devicesPlaceholderTitle).assertEqual('当前没有在线电脑');
+      expect(requiredState.addDeviceTitle).assertEqual('添加设备');
+
+      const expired = buildFacts('aira_cloud');
+      expired.cloudEntitlement = 'pro_expired';
+      expect(buildState(expired).deviceActionsEnabled).assertFalse();
+
+      const selfHosted = buildFacts('self_hosted');
+      selfHosted.cloudEntitlement = 'pro_required';
+      expect(buildState(selfHosted).deviceActionsEnabled).assertTrue();
+
+      expect(buildState(buildFacts('aira_cloud')).deviceActionsEnabled).assertTrue();
+    });
+
     it('always offers adding a device, whatever the computer list looks like', 0, () => {
       const emptyState = buildState(buildFacts('aira_cloud'));
       expect(emptyState.devicesPlaceholderVisible).assertTrue();

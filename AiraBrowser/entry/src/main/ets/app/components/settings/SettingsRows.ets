@@ -922,6 +922,7 @@ export struct SettingsSwitchRow {
   @Prop description: ResourceStr = '';
   @Prop checked: boolean = false;
   @Prop icon?: Resource = undefined;
+  @Prop airaIconId: AiraRenderableIconId | undefined = undefined;
   @Prop imageIcon: Resource | undefined = undefined;
   @Prop imageIconSize: number = 18;
   @Prop imageIconCircular: boolean = false;
@@ -952,14 +953,20 @@ export struct SettingsSwitchRow {
 
   build() {
     Row({ space: SETTINGS_ROW_SPACE }) {
-      if (this.icon || this.imageIcon !== undefined) {
+      if (this.icon || this.airaIconId !== undefined || this.imageIcon !== undefined) {
         Stack({ alignContent: Alignment.Center }) {
           SettingsColoredIconBackground({
             color: this.resolveIconBackgroundColor(),
             iconSize: SETTINGS_ROW_ICON_SIZE
           })
 
-          if (this.imageIcon !== undefined) {
+          if (this.airaIconId !== undefined) {
+            AiraIcon({
+              airaIconId: this.airaIconId as AiraRenderableIconId,
+              iconSize: 18,
+              iconColor: this.resolveIconColor()
+            })
+          } else if (this.imageIcon !== undefined) {
             Image(this.imageIcon as Resource)
               .width(this.imageIconSize)
               .height(this.imageIconSize)

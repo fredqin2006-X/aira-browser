@@ -6581,6 +6581,14 @@
       "value": "View steps"
     },
     {
+      "name": "settings_link_view_demo",
+      "value": "View demo"
+    },
+    {
+      "name": "settings_link_scan",
+      "value": "Scan"
+    },
+    {
       "name": "settings_link_switch_detail",
       "value": "Cross-device tabs and page push stay separate from data sync."
     },
@@ -8829,6 +8837,14 @@
       "value": "Zoom text"
     },
     {
+      "name": "bottom_panel_action_web_zoom",
+      "value": "Page zoom"
+    },
+    {
+      "name": "bottom_panel_action_web_zoom_subtitle",
+      "value": "Zoom the page"
+    },
+    {
       "name": "bottom_panel_action_full_screen_mode",
       "value": "Full screen"
     },
@@ -9163,6 +9179,10 @@
     {
       "name": "bottom_panel_release_text_zoom",
       "value": "Release to open text size"
+    },
+    {
+      "name": "bottom_panel_release_web_zoom",
+      "value": "Release to open page zoom"
     },
     {
       "name": "bottom_panel_release_full_screen_mode",
@@ -9659,6 +9679,10 @@
     {
       "name": "bottom_panel_home_text_zoom",
       "value": "Open a page before changing text size."
+    },
+    {
+      "name": "bottom_panel_home_web_zoom",
+      "value": "Open a page before zooming."
     },
     {
       "name": "bottom_panel_home_tool",

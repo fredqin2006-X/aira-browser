@@ -6581,6 +6581,14 @@
       "value": "查看步骤"
     },
     {
+      "name": "settings_link_view_demo",
+      "value": "查看演示"
+    },
+    {
+      "name": "settings_link_scan",
+      "value": "扫一扫"
+    },
+    {
       "name": "settings_link_switch_detail",
       "value": "跨设备标签页和网页推送，和数据同步互不影响。"
     },
@@ -8829,6 +8837,14 @@
       "value": "字号缩放"
     },
     {
+      "name": "bottom_panel_action_web_zoom",
+      "value": "网页缩放"
+    },
+    {
+      "name": "bottom_panel_action_web_zoom_subtitle",
+      "value": "整页缩放"
+    },
+    {
       "name": "bottom_panel_action_full_screen_mode",
       "value": "全屏模式"
     },
@@ -9163,6 +9179,10 @@
     {
       "name": "bottom_panel_release_text_zoom",
       "value": "松手打开网页文字大小"
+    },
+    {
+      "name": "bottom_panel_release_web_zoom",
+      "value": "松手打开网页缩放"
     },
     {
       "name": "bottom_panel_release_full_screen_mode",
@@ -9659,6 +9679,10 @@
     {
       "name": "bottom_panel_home_text_zoom",
       "value": "请先打开网页后调整文字大小。"
+    },
+    {
+      "name": "bottom_panel_home_web_zoom",
+      "value": "请先打开网页后再缩放。"
     },
     {
       "name": "bottom_panel_home_tool",

@@ -103,6 +103,16 @@ export class CrossDeviceLinkGuideCoordinator {
     }
   }
 
+  /** Shows the first clip again. A completed lesson can still be reopened from 互联教程. */
+  replay(): void {
+    this.presentGeneration += 1;
+    if (this.presentTimer >= 0) {
+      clearTimeout(this.presentTimer);
+      this.presentTimer = -1;
+    }
+    this.publishStep(0);
+  }
+
   handleAction(action: CrossDeviceLinkGuideAction): void {
     if (!this.snapshot.visible && action !== 'dismiss') {
       return;

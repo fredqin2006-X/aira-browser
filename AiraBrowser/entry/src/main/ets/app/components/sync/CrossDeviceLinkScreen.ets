@@ -53,6 +53,7 @@ import {
 const DEVICE_GLYPH: AiraRenderableIconId = 'browser.toolbar.tabs';
 const ADD_DEVICE_GLYPH: AiraRenderableIconId = 'browser.toolbar.scanQr';
 const EXTENSION_GLYPH: AiraRenderableIconId = 'site.setting.externalActions';
+const LINK_SWITCH_GLYPH: AiraRenderableIconId = 'browser.toolbar.sendToDesktop';
 const SELF_HOSTED_GLYPH: AiraRenderableIconId = 'settings.webdav';
 const LOCAL_DEVICE_GLYPH: AiraRenderableIconId = 'crossDeviceLink.localDevice';
 
@@ -155,7 +156,9 @@ export struct CrossDeviceLinkScreen {
           .textAlign(TextAlign.Center)
       }
       this.buildDeviceSection()
-      this.buildSyncSection()
+      if (this.state.deviceActionsEnabled) {
+        this.buildSyncSection()
+      }
       this.buildSelfHostedSection()
     }
     .width('100%')
@@ -282,44 +285,23 @@ export struct CrossDeviceLinkScreen {
   }
 
   /**
-   * Two different things, deliberately kept apart: 与电脑互联 is this page's own switch (tab
-   * handoff and page push), while 同步设置 only hands the user to the sync owner for data
-   * sync. Pausing bookmarks and history must not break tab handoff, so this page never carries
-   * a second data-sync master switch of its own.
+   * 同步设置 only hands the user to the sync owner. The cross-device switch lives in the top
+   * card, so pausing bookmarks and history still cannot break tab handoff.
    */
   @Builder
   private buildSyncSection() {
     SettingsSection({
-      title: localizeCrossDeviceLinkCopy(this.state.linkSwitchTitle),
+      title: '',
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
       }) {
-        // Rebuilt from the authoritative value whenever an attempt settles, because a refused
-        // change cannot move the boolean and ArkUI would not re-apply `isOn` on its own.
-        ForEach([`${this.state.linkEnabled}:${this.switchSettledRevision}`], (_key: string) => {
-          SettingsSwitchRow({
-            title: localizeCrossDeviceLinkCopy(this.state.linkSwitchTitle),
-            checked: this.state.linkEnabled,
-            rowPosition: 'first',
-            isEnabled: this.state.linkSwitchEnabled && !this.isBusy,
-            primaryTextColor: this.storedPrimaryTextColor,
-            secondaryTextColor: this.storedSecondaryTextColor,
-            desktopPresentation: this.desktopPresentation,
-            onChange: (checked: boolean): void => {
-              this.onToggleLink(checked);
-            }
-          })
-        }, (key: string): string => key)
-
-        SettingsGroupDivider({ dividerColor: this.storedDividerColor })
-
         SettingsNavigationRow({
           title: $r('app.string.settings_sync_settings'),
           value: localizeCrossDeviceLinkCopy(this.state.syncSettingsValue),
-          rowPosition: 'last',
+          rowPosition: 'single',
           isEnabled: !this.isBusy,
           primaryTextColor: this.storedPrimaryTextColor,
           secondaryTextColor: this.storedSecondaryTextColor,
@@ -330,13 +312,6 @@ export struct CrossDeviceLinkScreen {
           }
         })
       }
-
-      Text(localizeCrossDeviceLinkCopy(this.state.linkSwitchDescription))
-        .width('100%')
-        .fontSize(13)
-        .lineHeight(19)
-        .fontColor(this.storedSecondaryTextColor)
-        .padding({ left: 6, right: 6, top: 8 })
     }
   }
 
@@ -406,7 +381,7 @@ export struct CrossDeviceLinkScreen {
           iconBackgroundColor: this.settingsIconBackgrounds.addDevice,
           iconColor: this.storedSettingsIconForegroundColor,
           rowPosition: 'last',
-          isEnabled: !this.isBusy,
+          isEnabled: this.state.deviceActionsEnabled && !this.isBusy,
           primaryTextColor: this.storedPrimaryTextColor,
           secondaryTextColor: this.storedSecondaryTextColor,
           pressedBackgroundColor: this.storedPressedBackgroundColor,
@@ -432,7 +407,7 @@ export struct CrossDeviceLinkScreen {
       iconBackgroundColor: this.settingsIconBackgrounds.userAgent,
       iconColor: this.storedSettingsIconForegroundColor,
       rowPosition: 'middle',
-      isEnabled: !this.isBusy,
+      isEnabled: this.state.deviceActionsEnabled && !this.isBusy,
       primaryTextColor: this.storedPrimaryTextColor,
       secondaryTextColor: this.storedSecondaryTextColor,
       pressedBackgroundColor: this.storedPressedBackgroundColor,
@@ -444,26 +419,48 @@ export struct CrossDeviceLinkScreen {
   }
 
   /**
-   * The recipe lives one level down, so the overview stays a status page.
-   * The entry itself sits above the marquee, as the first thing on this page.
+   * The switch and the tutorial share the top card. The switch is first; the recipe still
+   * lives one level down, so the overview stays a status page.
    */
   @Builder
   private buildSetupSection() {
     SettingsSection({
-      title: $r('app.string.settings_link_setup_section'),
+      title: '',
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
       }) {
+        // Rebuilt from the authoritative value whenever an attempt settles, because a refused
+        // change cannot move the boolean and ArkUI would not re-apply `isOn` on its own.
+        ForEach([`${this.state.linkEnabled}:${this.switchSettledRevision}`], (_key: string) => {
+          SettingsSwitchRow({
+            title: localizeCrossDeviceLinkCopy(this.state.linkSwitchTitle),
+            checked: this.state.linkEnabled,
+            airaIconId: LINK_SWITCH_GLYPH,
+            iconBackgroundColor: this.settingsIconBackgrounds.crossDeviceLink,
+            iconColor: this.storedSettingsIconForegroundColor,
+            rowPosition: 'first',
+            isEnabled: this.state.linkSwitchEnabled && !this.isBusy,
+            primaryTextColor: this.storedPrimaryTextColor,
+            secondaryTextColor: this.storedSecondaryTextColor,
+            desktopPresentation: this.desktopPresentation,
+            onChange: (checked: boolean): void => {
+              this.onToggleLink(checked);
+            }
+          })
+        }, (key: string): string => key)
+
+        SettingsGroupDivider({ dividerColor: this.storedDividerColor })
+
         SettingsNavigationRow({
           title: $r('app.string.settings_link_tutorial'),
           value: $r('app.string.settings_link_view_steps'),
           airaIconId: EXTENSION_GLYPH,
           iconBackgroundColor: this.settingsIconBackgrounds.siteCustomization,
           iconColor: this.storedSettingsIconForegroundColor,
-          rowPosition: 'single',
+          rowPosition: 'last',
           isEnabled: !this.isBusy,
           primaryTextColor: this.storedPrimaryTextColor,
           secondaryTextColor: this.storedSecondaryTextColor,
@@ -474,6 +471,13 @@ export struct CrossDeviceLinkScreen {
           }
         })
       }
+
+      Text(localizeCrossDeviceLinkCopy(this.state.linkSwitchDescription))
+        .width('100%')
+        .fontSize(13)
+        .lineHeight(19)
+        .fontColor(this.storedSecondaryTextColor)
+        .padding({ left: 6, right: 6, top: 8 })
     }
   }
 

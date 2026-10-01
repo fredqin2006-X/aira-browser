@@ -103,6 +103,12 @@ require_pattern "${SCREEN_REL}" "linkEnabled.*switchSettledRevision" \
   "the switch row must be rebuilt from the authoritative value, not left on its flipped look."
 require_pattern "${SCREEN_REL}" "this.onAction\\('open_sync_settings'\\)" \
   "the 同步设置 row must be the way out to the sync owner."
+require_pattern "${SCREEN_REL}" "if \\(this.state.deviceActionsEnabled\\)" \
+  "同步设置 must disappear when the account is not an active member."
+require_pattern "${SCREEN_REL}" "isEnabled: this.state.deviceActionsEnabled && !this.isBusy" \
+  "the empty-computer row and 添加设备 must gray out without an active membership."
+require_pattern "${VIEW_MODEL_REL}" "deviceActionsEnabled: this.resolveDeviceActionsEnabled" \
+  "membership, not the screen, decides whether those rows can be used."
 reject_pattern "${VIEW_MODEL_REL}" "UNAVAILABLE_LABEL|buildCapabilityRow" \
   "the per-capability rows must not come back beside the one switch."
 reject_pattern "${SCREEN_REL}" "SettingsSection\(\{ title: '可以做什么'" \
@@ -249,6 +255,19 @@ require_pattern "${NAV_COORDINATOR_REL}" "openCrossDeviceLinkSetup" \
   "the navigation owner must open the sub-page."
 require_pattern "${MAIN_PAGES_REL}" "app/pages/CrossDeviceLinkSetupPage" \
   "the sub-page must be registered as a routable page."
+DEVICE_TABS_SHEET_REL="${ETS_DIR}/app/components/browser/BrowserCrossDeviceTabsOverlay.ets"
+require_pattern "${HOST_REL}" "immersiveSheet: true" \
+  "the device-tabs sheet must draw its own header instead of the system title bar."
+reject_pattern "${HOST_REL}" "title: \\{ title:" \
+  "the system title bar must not crop the device-tabs sheet."
+require_pattern "${DEVICE_TABS_SHEET_REL}" "BrowserImmersiveSheetLayout" \
+  "the device-tabs sheet must use the shared immersive header."
+require_pattern "${DEVICE_TABS_SHEET_REL}" "closeVisible: true" \
+  "the device-tabs sheet must use the glass close button."
+require_pattern "${DEVICE_TABS_SHEET_REL}" "browserSheetHeaderBlurModifier" \
+  "the device-tabs list must blur under the title as it scrolls."
+require_pattern "${DEVICE_TABS_SHEET_REL}" "\\.clip\\(false\\)" \
+  "the device-tabs list must scroll under the header instead of being cropped."
 
 # Icons follow the rest of settings: varied token colors, and a document glyph for the
 # help action instead of whatever default the scaffold would fall back to.
@@ -256,12 +275,19 @@ require_pattern "${SCREEN_REL}" "settingsIconBackgrounds: BrowserSettingsIconBac
   "the screen must take the settings icon color tokens."
 require_pattern "${SCREEN_REL}" "buildSyncSection\\(\\)" \
   "the sync section must have one builder."
-# The tutorial entry is the first thing under the title, above the browser marquee.
+# The top card, switch then tutorial, sits under the title and above the browser marquee.
 tutorial_entry_line="$(grep -n 'this.buildSetupSection()' "${REPO_ROOT}/${SCREEN_REL}" | head -1 | cut -d: -f1)"
 marquee_line="$(grep -n 'this.buildMarquee()' "${REPO_ROOT}/${SCREEN_REL}" | head -1 | cut -d: -f1)"
 if [ -z "${tutorial_entry_line}" ] || [ -z "${marquee_line}" ] || [ "${tutorial_entry_line}" -ge "${marquee_line}" ]; then
-  fail "the 互联教程 entry must be the first thing on the page, above the marquee."
+  fail "the top card must sit above the marquee."
 fi
+switch_line="$(grep -n 'this.onToggleLink' "${REPO_ROOT}/${SCREEN_REL}" | head -1 | cut -d: -f1)"
+tutorial_row_line="$(grep -n 'settings_link_tutorial' "${REPO_ROOT}/${SCREEN_REL}" | head -1 | cut -d: -f1)"
+if [ -z "${switch_line}" ] || [ -z "${tutorial_row_line}" ] || [ "${switch_line}" -ge "${tutorial_row_line}" ]; then
+  fail "the 与电脑互联 switch must sit above the 互联教程 row in the same card."
+fi
+require_pattern "${SCREEN_REL}" "LINK_SWITCH_GLYPH: AiraRenderableIconId = 'browser.toolbar.sendToDesktop'" \
+  "the cross-device switch must carry the same send-to-desktop icon as the settings entry."
 reject_pattern "${SCREEN_REL}" "iconBackgroundColor: this.storedAccentColor" \
   "capability and list icons must not all collapse to one flat color."
 # The header carries no help action: a document icon in the title bar competed with the
@@ -454,6 +480,12 @@ require_pattern "${EMPTY_PRESENTATION_REL}" "device_tabs_no_computer_title" \
   "no online computer must stay an empty page, not a route."
 require_pattern "${PRESENCE_COORDINATOR_REL}" "resolveCloudProEmptyKind" \
   "Pro is classified after sign-in, inside the panel state."
+require_pattern "${PRESENCE_COORDINATOR_REL}" "A member who has never touched the switch starts on" \
+  "an active member with no saved choice must default the cross-device switch on."
+require_pattern "${PRESENCE_COORDINATOR_REL}" "enabledPreference === undefined" \
+  "the member default must apply only when the switch has never been set."
+require_pattern "${PRESENCE_COORDINATOR_REL}" "A stored false is a choice and is not rewritten" \
+  "an explicit off must stay off."
 require_pattern "${SHELL_REL}" "section: 'devices'" \
   "choosing the cross-device segment must enter that section."
 reject_pattern "${SHELL_REL}" "requestOpenPanel" \
@@ -506,6 +538,14 @@ require_pattern "${GUIDE_COORDINATOR_REL}" "primaryAction: last [?] 'open_guide'
   "only the last lesson step opens the interconnect guide; the first step stays next."
 require_pattern "${GUIDE_COORDINATOR_REL}" "CROSS_DEVICE_LINK_GUIDE_NEXT_TITLE: string = '下一个'" \
   "the first lesson step must keep the next button."
+require_pattern "${GUIDE_COORDINATOR_REL}" "replay\\(\\): void" \
+  "the lesson can be opened again from 互联教程."
+require_pattern "${SETUP_SCREEN_REL}" "settings_link_view_demo" \
+  "互联教程 must offer 查看演示 above the scan button."
+require_pattern "${SETUP_SCREEN_REL}" "settings_link_scan" \
+  "互联教程 must keep a primary 扫一扫 button."
+require_pattern "${SETUP_SCREEN_REL}" "CrossDeviceLinkGuideOverlay" \
+  "查看演示 must reuse the first-visit lesson sheet."
 require_pattern "${GUIDE_COORDINATOR_REL}" "CROSS_DEVICE_LINK_GUIDE_OPEN_TITLE: string = '查看互联教程'" \
   "the second lesson step's primary button opens the interconnect guide."
 require_pattern "${HOST_REL}" "openInterconnectGuide" \

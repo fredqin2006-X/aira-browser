@@ -60,6 +60,11 @@ export interface CrossDeviceLinkViewState {
   linkSwitchDescription: string;
   linkEnabled: boolean;
   linkSwitchEnabled: boolean;
+  /**
+   * False when official cloud is blocked because this account is not an active member.
+   * The empty-computer row and 添加设备 stay visible but inert, and 同步设置 is omitted.
+   */
+  deviceActionsEnabled: boolean;
   /** The one row that leaves the page for the sync owner; its value names the active mode. */
   syncSettingsValue: ResourceStr;
   /**
@@ -405,6 +410,7 @@ export class CrossDeviceLinkViewModel {
       // A blocked switch is shown off. The saved preference stays where the presence owner left it.
       linkEnabled: facts.linkEnabled && this.resolveDisplayedLinkSwitchEnabled(facts),
       linkSwitchEnabled: this.resolveDisplayedLinkSwitchEnabled(facts),
+      deviceActionsEnabled: this.resolveDeviceActionsEnabled(facts),
       syncSettingsValue: this.resolveSyncSettingsValue(facts),
       localDeviceRow: this.buildLocalDeviceRow(facts.localDevice),
       devices: this.buildDevices(facts.devices),
@@ -482,6 +488,17 @@ export class CrossDeviceLinkViewModel {
     if (!facts.linkSwitchEnabled) {
       return false;
     }
+    if (facts.providerKind === 'self_hosted' || !facts.desktopLinkAvailable) {
+      return true;
+    }
+    return facts.cloudEntitlement === 'active';
+  }
+
+  /**
+   * A personal server and a Community build do not ask for membership. Official cloud
+   * does: without an active membership the device rows must not look actionable.
+   */
+  private resolveDeviceActionsEnabled(facts: CrossDeviceLinkFacts): boolean {
     if (facts.providerKind === 'self_hosted' || !facts.desktopLinkAvailable) {
       return true;
     }

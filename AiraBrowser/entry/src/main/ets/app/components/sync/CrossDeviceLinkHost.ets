@@ -255,6 +255,9 @@ export struct CrossDeviceLinkHost {
           desktopPresentation: this.desktopPresentation,
           providerKind: this.providerKind,
           onOpenExternalUrl: this.onOpenExternalUrl,
+          onScan: (): void => {
+            this.addDevice();
+          },
           onExit: (): void => {
             this.showSetupInline = false;
           }
@@ -328,9 +331,8 @@ export struct CrossDeviceLinkHost {
       .bindSheet($$this.deviceTabsSheetVisible, this.buildDeviceTabsSheet(), applyDesktopDialogSheetChrome({
         preferType: this.desktopPresentation ? SheetType.CENTER : SheetType.BOTTOM,
         height: SheetSize.LARGE,
-        title: { title: $r('app.string.settings_link_tabs') },
         dragBar: !this.desktopPresentation,
-        showClose: true
+        showClose: false
       }, 'm', this.desktopPresentation))
 
     CrossDeviceLinkGuideOverlay({
@@ -373,8 +375,8 @@ export struct CrossDeviceLinkHost {
   }
 
   /**
-   * The sheet title comes from the host, exactly like the browser shell presents this
-   * list, so the header spacing and the close button are the shared sheet's.
+   * The list owns its title and glass close. The system title bar cropped the
+   * scrollport, so this sheet does not ask bindSheet for either.
    */
   @Builder
   private buildDeviceTabsSheet() {
@@ -382,6 +384,11 @@ export struct CrossDeviceLinkHost {
       deviceIdFilter: this.deviceTabsFilter,
       dataScope: this.boundary.dataScope,
       privacyMode: this.boundary.privacyMode,
+      immersiveSheet: true,
+      sheetTitle: $r('app.string.settings_link_tabs'),
+      onClose: (): void => {
+        this.deviceTabsSheetVisible = false;
+      },
       onNavigate: (action: CrossDeviceTabsEmptyAction): boolean => this.handleDeviceTabsNavigate(action),
       onOpenRemoteTab: (url: string, _title: string): void => {
         this.deviceTabsSheetVisible = false;
