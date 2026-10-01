@@ -88,6 +88,7 @@ export class SettingsDetailStateBuilder {
         customHomepageLabel: generalState.customHomepageLabel,
         startupBehaviorLabel: generalState.startupBehaviorLabel,
         tabAutoCloseLabel: generalState.tabAutoCloseLabel,
+        appLanguageLabel: generalState.appLanguageLabel,
         defaultBrowserLabel: generalState.defaultBrowserLabel,
         historyRetentionLabel: generalState.historyRetentionLabel,
         privateBrowsingLabel: generalState.privateBrowsingLabel,

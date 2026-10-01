@@ -106,6 +106,10 @@ import {
 } from '../../router/SettingsDetailNavigationActionCoordinator';
 import { SystemSettingsLaunchService } from '../../../services/system/SystemSettingsLaunchService';
 import { AppModeSwitchRestartService } from '../../../services/settings/AppModeSwitchRestartService';
+import {
+  applyAppPreferredLanguage,
+  resolveAppPreferredLanguage
+} from '../../../core/resources/AppLanguageService';
 import { AlwaysPrivateModeConfirmationDialog } from './AlwaysPrivateModeConfirmationDialog';
 import { ClearBrowsingDataContent, ClearBrowsingDataDialog } from './ClearBrowsingDataDialog';
 import { SettingsDetailContent } from './SettingsDetailContent';
@@ -400,7 +404,8 @@ export struct SettingsInlineDetailPanel {
       historyRetention: preferences.historyRetention,
       retentionProfileId: this.retentionSettings.profileId,
       sitePermissionDefaults: preferences.sitePermissionDefaults,
-      appServiceMode: preferences.appServiceMode
+      appServiceMode: preferences.appServiceMode,
+      appLanguage: preferences.appLanguage
     };
   }
 
@@ -790,6 +795,10 @@ export struct SettingsInlineDetailPanel {
       void this.applyDesktopBookmarkBarVisibility(optionId as DesktopBookmarkBarVisibility);
       return;
     }
+    if (action === 'open_general_language_settings') {
+      void this.applyAppLanguage(optionId);
+      return;
+    }
     if (action === 'open_general_startup_settings') {
       void this.applyStartupRestorePolicy(optionId as BrowserStartupRestorePolicy);
       return;
@@ -857,6 +866,27 @@ export struct SettingsInlineDetailPanel {
 
   private async applyPrivateTabRestorePolicy(policy: BrowserPrivateTabRestorePolicy): Promise<void> {
     await this.applyGeneralSettings(this.buildNextGeneralSettings({ privateTabRestorePolicy: policy }), $r('app.string.settings_privacy_restore_failed'));
+  }
+
+  /**
+   * Applies a language choice from the large-screen dropdown. The preference is saved
+   * first and the platform call follows, so a rejected language cannot lose the user's
+   * choice; a successful change restarts the app because the platform only takes the new
+   * language on a cold start.
+   */
+  private async applyAppLanguage(optionId: string): Promise<void> {
+    const language = resolveAppPreferredLanguage(optionId);
+    try {
+      await sharedPreferencesRepository.updateAppLanguage(language);
+    } catch (_error) {
+      this.showToast($r('app.string.settings_general_language_failed'));
+      return;
+    }
+    if (!applyAppPreferredLanguage(language)) {
+      this.showToast($r('app.string.settings_general_language_failed'));
+      return;
+    }
+    this.appModeSwitchRestartService.scheduleRestartForModeSwitch();
   }
 
   private async applyHistoryRetentionOption(optionId: string): Promise<void> {

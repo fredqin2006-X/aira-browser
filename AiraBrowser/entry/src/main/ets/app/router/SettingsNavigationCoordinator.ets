@@ -28,6 +28,7 @@ import {
   GENERAL_HISTORY_RETENTION_SETTINGS_ROUTE,
   GENERAL_PRIVATE_TABS_SETTINGS_ROUTE,
   GENERAL_STARTUP_SETTINGS_ROUTE,
+  GENERAL_LANGUAGE_SETTINGS_ROUTE,
   GENERAL_TAB_AUTO_CLOSE_SETTINGS_ROUTE,
   RETENTION_RUNTIME_POLICY_SETTINGS_ROUTE,
   HUAWEI_ACCOUNT_INFO_ROUTE,
@@ -381,6 +382,10 @@ export class SettingsNavigationCoordinator {
 
   openCustomHomepageDeveloperGuide(boundary: BrowserBoundaryRouteState, onError?: () => void): void {
     this.pushUrl(CUSTOM_HOMEPAGE_DEVELOPER_GUIDE_ROUTE, this.buildParams(boundary), onError);
+  }
+
+  openGeneralLanguageSettings(boundary: BrowserBoundaryRouteState, onError?: () => void): void {
+    this.pushUrl(GENERAL_LANGUAGE_SETTINGS_ROUTE, this.buildParams(boundary), onError);
   }
 
   openGeneralStartupSettings(boundary: BrowserBoundaryRouteState, onError?: () => void): void {

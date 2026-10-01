@@ -79,6 +79,7 @@ export type SettingsDetailRowAction =
   'open_general_tab_auto_close_settings' |
   'open_general_private_tabs_settings' |
   'open_general_history_retention_settings' |
+  'open_general_language_settings' |
   'open_retention_runtime_policy_settings' |
   'open_local_backup' |
   'open_keyboard_shortcuts_settings' |
@@ -167,6 +168,7 @@ export interface SettingsSingleChoiceSelectionSnapshot {
   retentionProfileId: BrowserRetentionProfileId;
   sitePermissionDefaults: SitePermissionDefaultSettings;
   appServiceMode: BrowserAppServiceMode;
+  appLanguage: string;
 }
 
 export interface SettingsSitePolicyDisplayState {
@@ -180,6 +182,7 @@ export interface SettingsExternalNavigationDisplayState {
 }
 
 export interface SettingsGeneralDisplayState {
+  appLanguageLabel: string;
   homeLayoutLabel: string;
   customHomepageLabel: string;
   startupBehaviorLabel: string;
@@ -287,6 +290,7 @@ export class SettingsDetailViewModel {
     themeMode: BrowserThemeMode = 'system',
     searchEngineId: SearchEngineId = 'bing',
     general: SettingsGeneralDisplayState = {
+      appLanguageLabel: '跟随系统',
       homeLayoutLabel: '搜索和书签',
       customHomepageLabel: '系统主页',
       startupBehaviorLabel: '恢复常规标签',
@@ -1004,6 +1008,13 @@ export class SettingsDetailViewModel {
               general.defaultBrowserLabel,
               '到系统默认浏览器设置中更改',
               'open_default_browser_settings'
+            ),
+            this.navigationRow(
+              'app_language',
+              '语言',
+              general.appLanguageLabel,
+              '默认跟随系统语言',
+              'open_general_language_settings'
             )
           ]
         },
@@ -1943,6 +1954,13 @@ export class SettingsDetailViewModel {
     rowEnabled: boolean,
     snapshot: SettingsSingleChoiceSelectionSnapshot
   ): SettingsDetailOption[] | undefined {
+    if (action === 'open_general_language_settings') {
+      return [
+        this.dropdownOption('default', '跟随系统', '', snapshot.appLanguage === 'default', rowEnabled),
+        this.dropdownOption('zh-Hans', '简体中文', '', snapshot.appLanguage === 'zh-Hans', rowEnabled),
+        this.dropdownOption('en', 'English', '', snapshot.appLanguage === 'en', rowEnabled)
+      ];
+    }
     if (action === 'open_general_startup_settings') {
       return [
         this.dropdownOption('restore_regular_tabs', '恢复常规标签页', '', snapshot.startupRestorePolicy === 'restore_regular_tabs', rowEnabled),

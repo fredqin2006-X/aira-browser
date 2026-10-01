@@ -1,3 +1,8 @@
+import {
+  APP_LANGUAGE_ENGLISH,
+  APP_LANGUAGE_FOLLOW_SYSTEM
+} from '../resources/AppLanguageCatalog';
+
 import { BrowserPreferences } from '../../common/models/BrowserModels';
 import {
   CustomHomepageItem,
@@ -8,6 +13,7 @@ import { PreferencesRepository } from '../../data/preferences/PreferencesReposit
 import { GeneralTabAutoCloseSettingsViewModel } from './GeneralTabAutoCloseSettingsViewModel';
 
 export interface SettingsGeneralState {
+  appLanguageLabel: string;
   homeLayoutLabel: string;
   customHomepageLabel: string;
   startupBehaviorLabel: string;
@@ -41,6 +47,7 @@ export class SettingsGeneralCoordinator {
       startupBehaviorLabel: this.resolveStartupBehaviorLabel(preferences),
       tabAutoCloseLabel: this.tabAutoCloseSettingsViewModel.resolveLabel(preferences.general.tabAutoClosePolicy),
       defaultBrowserLabel: '由系统设置管理',
+      appLanguageLabel: this.resolveAppLanguageLabel(preferences.appLanguage),
       historyRetentionLabel: this.resolveHistoryRetentionLabel(preferences),
       privateBrowsingLabel: this.resolvePrivateBrowsingLabel(preferences),
       privateModeAuthenticationEnabled: preferences.general.privateModeAuthenticationEnabled,
@@ -49,6 +56,20 @@ export class SettingsGeneralCoordinator {
       enhancedTrackingProtectionEnabled: preferences.general.enhancedTrackingProtectionEnabled === true,
       allowUserScriptsInPrivateMode: preferences.general.allowUserScriptsInPrivateMode !== false
     };
+  }
+
+  /**
+   * The value line names the language the app renders in, so a follow-system choice shows
+   * the language the system resolved to rather than a bare "跟随系统".
+   */
+  private resolveAppLanguageLabel(appLanguage: string): string {
+    if (appLanguage === APP_LANGUAGE_FOLLOW_SYSTEM) {
+      return '跟随系统';
+    }
+    if (appLanguage === APP_LANGUAGE_ENGLISH) {
+      return 'English';
+    }
+    return '简体中文';
   }
 
   private resolveHomeLayoutLabel(_homeLayout: string): string {

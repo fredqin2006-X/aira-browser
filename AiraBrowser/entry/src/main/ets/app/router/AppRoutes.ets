@@ -59,6 +59,7 @@ export const GENERAL_STARTUP_SETTINGS_ROUTE: string = 'app/pages/GeneralStartupS
 export const GENERAL_TAB_AUTO_CLOSE_SETTINGS_ROUTE: string = 'app/pages/GeneralTabAutoCloseSettingsPage';
 export const GENERAL_PRIVATE_TABS_SETTINGS_ROUTE: string = 'app/pages/GeneralPrivateTabsSettingsPage';
 export const GENERAL_HISTORY_RETENTION_SETTINGS_ROUTE: string = 'app/pages/GeneralHistoryRetentionSettingsPage';
+export const GENERAL_LANGUAGE_SETTINGS_ROUTE: string = 'app/pages/GeneralLanguageSettingsPage';
 export const RETENTION_RUNTIME_POLICY_SETTINGS_ROUTE: string = 'app/pages/RetentionRuntimePolicySettingsPage';
 export const KEYBOARD_SHORTCUTS_SETTINGS_ROUTE: string = 'app/pages/KeyboardShortcutsSettingsPage';
 export const APP_PROXY_SETTINGS_ROUTE: string = 'app/pages/AppProxySettingsPage';

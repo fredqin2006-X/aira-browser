@@ -189,6 +189,8 @@ const GENERAL_TARGETS: SettingsDestinationCatalogTarget[] = [
     ['历史记录保留'], ['保留时间', '保留条数']),
   target('keyboard_shortcuts', 'general', 'general', '键盘快捷键', '通用 / 键盘', 'subpage', '',
     'keyboard_shortcuts', ['快捷键'], ['外接键盘']),
+  target('app_language', 'general', 'general', '语言', '通用 / 系统', 'subpage', '',
+    'app_language', ['显示语言', '简体中文', 'English'], ['语言切换', '跟随系统']),
   target('appearance_toolbar', 'appearance_toolbar', 'appearance_toolbar', '外观设置', '通用', 'root', '', '',
     ['外观'], ['主题', '网页深色', '应用图标']),
   target('theme_mode', 'appearance_toolbar', 'appearance_toolbar', '主题模式', '通用 / 外观设置', 'row',
@@ -559,6 +561,7 @@ const SETTINGS_DESTINATION_SUBPAGE_DESCRIPTORS: SettingsDestinationSubpageDescri
     'keyboard_shortcuts', 'keyboard_shortcuts', 'general', 'keyboard_shortcuts'
   ),
   new SettingsDestinationSubpageDescriptor('app_icon', 'app_icon', 'appearance_toolbar', 'app_icon'),
+  new SettingsDestinationSubpageDescriptor('app_language', 'app_language', 'general', 'settings_destination'),
   new SettingsDestinationSubpageDescriptor(
     'theme_palette', 'theme_palette', 'appearance_toolbar', 'theme_palette'
   ),
