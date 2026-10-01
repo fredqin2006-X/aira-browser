@@ -9156,7 +9156,6 @@ struct BrowserShellPage {
   private usesWallpaperSplitToolbarChrome(): boolean {
     return shouldClearSplitToolbarOverWallpaper(
       this.showHomePage,
-      this.isCenteredHomePageStyleActive(),
       this.resolveHomeWallpaperPresentationState().kind
     );
   }

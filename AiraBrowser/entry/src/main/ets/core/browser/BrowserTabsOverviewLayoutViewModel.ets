@@ -5,6 +5,7 @@ import {
 } from '../../services/layout/AppWindowResponsiveLayoutService';
 import {
   BROWSER_TABS_OVERVIEW_GRID_BOTTOM_CROP_FRACTION,
+  BROWSER_TABS_OVERVIEW_GRID_TOP_CROP_FRACTION,
   BROWSER_TABS_OVERVIEW_IDENTITY_HEADER_HEIGHT,
   BROWSER_TABS_OVERVIEW_IDENTITY_PREVIEW_GAP,
   BROWSER_TABS_OVERVIEW_IDENTITY_TITLE_FONT_SIZE,
@@ -303,9 +304,9 @@ export class BrowserTabsOverviewLayoutViewModel {
   private resolvePreviewHeight(input: BrowserTabsOverviewLayoutInput, cardWidth: number): number {
     const pageWidth = Math.max(1, input.sheetWidth);
     const pageHeight = Math.max(1, input.sheetHeight);
-    // 卡片平铺不再按整页等比。高度是裁掉底部 1/3 之后的高度，图片顶边对齐，多出来的底部由卡片裁掉，
-    // 不能把整张图压进这个更矮的框，否则页面会被压扁。
-    const visibleFraction = 1 - BROWSER_TABS_OVERVIEW_GRID_BOTTOM_CROP_FRACTION;
+    // 卡片平铺只留中间。底部裁 1/3，顶部再裁 1/9，不能把整张图压进这个更矮的框。
+    const visibleFraction = 1 - BROWSER_TABS_OVERVIEW_GRID_BOTTOM_CROP_FRACTION -
+      BROWSER_TABS_OVERVIEW_GRID_TOP_CROP_FRACTION;
     return Math.max(
       TAB_OVERVIEW_LAYOUT_MIN_PREVIEW_HEIGHT,
       Math.round(cardWidth * pageHeight / pageWidth * visibleFraction)

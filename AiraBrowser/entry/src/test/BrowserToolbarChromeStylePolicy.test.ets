@@ -222,15 +222,15 @@ describe('BrowserToolbarChromeStylePolicy', () => {
     })).assertEqual('#FFFFFF');
   });
 
-  it('clears centered and minimal bars only over a painted wallpaper', 0, () => {
-    expect(shouldClearSplitToolbarOverWallpaper(true, true, 'image')).assertTrue();
-    expect(shouldClearSplitToolbarOverWallpaper(true, true, 'solid')).assertTrue();
-    expect(shouldClearSplitToolbarOverWallpaper(true, true, 'auto')).assertTrue();
+  it('clears every system home bar over a painted wallpaper', 0, () => {
+    expect(shouldClearSplitToolbarOverWallpaper(true, 'image')).assertTrue();
+    expect(shouldClearSplitToolbarOverWallpaper(true, 'video')).assertTrue();
+    expect(shouldClearSplitToolbarOverWallpaper(true, 'solid')).assertTrue();
+    expect(shouldClearSplitToolbarOverWallpaper(true, 'auto')).assertTrue();
     expect(SPLIT_TOOLBAR_CLEARED_BAR_COLOR).assertEqual('#00000000');
-    expect(shouldClearSplitToolbarOverWallpaper(true, true, 'default')).assertFalse();
-    expect(shouldClearSplitToolbarOverWallpaper(true, false, 'image')).assertFalse();
-    expect(shouldClearSplitToolbarOverWallpaper(false, true, 'image')).assertFalse();
-    expect(shouldClearSplitToolbarOverWallpaper(true, false, 'solid')).assertFalse();
+    expect(shouldClearSplitToolbarOverWallpaper(true, 'default')).assertFalse();
+    expect(shouldClearSplitToolbarOverWallpaper(false, 'image')).assertFalse();
+    expect(shouldClearSplitToolbarOverWallpaper(false, 'video')).assertFalse();
   });
 
   it('keeps split scroll fixed unless the user chose hide, then collapses both bars together', 0, () => {

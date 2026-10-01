@@ -16,7 +16,12 @@ const DONATE_PRO_INTRO_ROW_DESC_SIZE: number = 14;
 const DONATE_PRO_INTRO_NOTE_SIZE: number = 13;
 const DONATE_PRO_INTRO_LINK_SIZE: number = 16;
 const DONATE_PRO_INTRO_ICON_SIZE: number = 32;
+const DONATE_PRO_INTRO_MARK_SIZE: number = 64;
+const DONATE_PRO_INTRO_MARK_RADIUS: number = 18;
+const DONATE_PRO_INTRO_MARK_ICON_SIZE: number = 32;
 const DONATE_PRO_INTRO_ROW_GAP: number = 26;
+/** Pulls the feature column in from the sheet padding so the rows are not flush with the edges. */
+const DONATE_PRO_INTRO_BODY_SIDE_INSET: number = 20;
 const DONATE_PRO_INTRO_REPO_BUTTON_HEIGHT: number = 44;
 const DONATE_PRO_INTRO_FOOTER_GAP: number = 8;
 /** Clears the floating repo link and the primary action beneath the body. */
@@ -64,6 +69,22 @@ export struct AiraDonateProIntroSheet {
   private buildScrollContent() {
     Scroll(this.sheetBlurScroller) {
       Column() {
+        Row() {
+          Stack({ alignContent: Alignment.Center }) {
+            Image($r('app.media.donate_pro_intro_crow'))
+              .width(DONATE_PRO_INTRO_MARK_ICON_SIZE)
+              .height(DONATE_PRO_INTRO_MARK_ICON_SIZE)
+              .objectFit(ImageFit.Contain)
+          }
+          .width(DONATE_PRO_INTRO_MARK_SIZE)
+          .height(DONATE_PRO_INTRO_MARK_SIZE)
+          .borderRadius(DONATE_PRO_INTRO_MARK_RADIUS)
+          .backgroundColor(this.accentColor)
+        }
+        .width('100%')
+        .justifyContent(FlexAlign.Center)
+        .margin({ bottom: 16 })
+
         Text($r('app.string.settings_pro_donate_intro_title'))
           .width('100%')
           .fontSize(DONATE_PRO_INTRO_TITLE_SIZE)
@@ -84,6 +105,10 @@ export struct AiraDonateProIntroSheet {
           this.buildBody()
         }
         .width('100%')
+        .padding({
+          left: DONATE_PRO_INTRO_BODY_SIDE_INSET,
+          right: DONATE_PRO_INTRO_BODY_SIDE_INSET
+        })
         .layoutWeight(1)
         .justifyContent(FlexAlign.Center)
       }

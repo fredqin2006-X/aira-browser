@@ -392,7 +392,7 @@ export struct BrowserTabOverviewCard {
   /**
    * The strip and the deck fill the shared card (`Cover`). The card box is the page's own
    * aspect, so the screenshot reaches the edges instead of sitting inside a white border.
-   * 卡片平铺的预览比整页矮三分之一。图片按自己的比例顶边对齐画进去，底部被卡片裁掉，不能压扁。
+   * 卡片平铺只留中间。图片按自己的比例画，上移九分之一切掉地址栏，底部再被更矮的卡片切掉，不能压扁。
    */
   private resolveSnapshotImageFit(): ImageFit {
     if (this.snapshotCoverEnabled) {
@@ -434,7 +434,7 @@ export struct BrowserTabOverviewCard {
   }
 
   private resolveSnapshotPreviewImageRect(): BrowserTabsOverlayRect {
-    return this.tabsOverlayViewModel.buildSharedSnapshotPreviewImageRect(
+    return this.tabsOverlayViewModel.buildGridCroppedPreviewImageRect(
       Math.max(1, this.cardWidth),
       Math.max(1, this.previewHeight),
       this.resolveSnapshotImageWidth(),

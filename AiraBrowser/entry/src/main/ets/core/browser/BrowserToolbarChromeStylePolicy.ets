@@ -357,9 +357,8 @@ export function resolveSplitToolbarCanGoForward(
 
 /**
  * Homepage bars follow the painted home backdrop. A theme-color home blends the bars into that
- * color. A classic-frame wallpaper or a custom web home keeps the neutral light/dark surface,
- * because those backdrops are not a single theme color. Centered and minimal homes clear the
- * bars over a painted wallpaper instead; see shouldClearSplitToolbarOverWallpaper.
+ * color. A custom web home keeps the neutral light/dark surface. A painted wallpaper clears the
+ * bars on every system home instead; see shouldClearSplitToolbarOverWallpaper.
  */
 export type SplitToolbarHomeBackdrop = 'theme_color' | 'wallpaper' | 'web_home';
 
@@ -395,16 +394,16 @@ export function resolveSplitToolbarBarBackgroundColor(input: SplitToolbarBarBack
 export const SPLIT_TOOLBAR_CLEARED_BAR_COLOR: string = '#00000000';
 
 /**
- * 简约 and 极简 paint the wallpaper edge to edge, photo or flat color. Their split bars drop the
- * fill so that wallpaper shows through, and their icons follow the same black-or-white tone as
- * the wordmark. A theme-color home, the classic frame, and any web page keep the normal bar fill.
+ * Classic, 简约 and 极简 paint a chosen wallpaper edge to edge: a photo, a looping video, a flat
+ * color, or auto black/white. Their split bars drop the fill so that wallpaper shows through, and
+ * their icons follow the same black-or-white tone as the page. A theme-color home and any web
+ * page keep the normal bar fill.
  */
 export function shouldClearSplitToolbarOverWallpaper(
   homeScene: boolean,
-  centeredHomeFrame: boolean,
   wallpaperKind: HomeWallpaperPresentationKind
 ): boolean {
-  return homeScene && centeredHomeFrame && paintsHomeBackdrop(wallpaperKind);
+  return homeScene && paintsHomeBackdrop(wallpaperKind);
 }
 
 /**

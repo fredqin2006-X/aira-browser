@@ -5,6 +5,7 @@ import {
   BROWSER_TAB_PREVIEW_PIXEL_HEIGHT,
   BROWSER_TAB_PREVIEW_PIXEL_WIDTH
 } from './BrowserTabPreviewMetrics';
+import { BROWSER_TABS_OVERVIEW_GRID_TOP_CROP_FRACTION } from './BrowserTabsOverviewVisualTokens';
 import {
   BrowserTabsOverviewSection,
   BrowserTabsOverviewSectionPolicy
@@ -278,8 +279,8 @@ export class BrowserTabsOverlayViewModel {
   }
 
   /**
-   * 容器从整页大小飞向卡片。前半段把图片底部裁掉，顶边始终贴着容器；裁完后再落入卡片。
-   * 退出是同一条路倒放：先带着裁完的画面飞出来，接近整页时再把底部放回来。
+   * 容器从整页大小飞向卡片。前半段同时裁掉底部 1/3 和顶部 1/9，再落入卡片。
+   * 顶部那截是安全区或地址栏，留下的是中间的页面。退出时把这两头再放回来。
    */
   private buildBottomCropVisualState(
     input: BrowserTabsSharedSnapshotInput,
@@ -308,12 +309,13 @@ export class BrowserTabsOverlayViewModel {
       ? this.buildFullWebSnapshotSourceImageRect(sourceFrame.width, sourceFrame.height,
         input.imageWidth, input.imageHeight, input.sourceImageTopInset)
       : this.buildCoverImageRect(sourceFrame.width, sourceFrame.height);
-    // 图片宽度跟容器走，高度按截图自己的比例，顶边贴着容器。容器比图片矮的部分就是被裁掉的底部。
+    // 图片宽度跟容器走，高度按截图自己的比例。裁切进度把图片上移，顶部 1/9 被容器切掉，底部由更矮的容器切掉。
+    const imageHeight = width * imageAspect;
     const imageFrame: BrowserTabsOverlayRect = {
       left: 0,
-      top: this.lerp(sourceImageRect.top, 0, moveParam),
+      top: this.lerp(sourceImageRect.top, -imageHeight * BROWSER_TABS_OVERVIEW_GRID_TOP_CROP_FRACTION, motion.cropT),
       width: width,
-      height: width * imageAspect
+      height: imageHeight
     };
     const cornerRadius = input.cornerRadiusFollowsProgress === false ?
       input.previewCornerRadius :
@@ -356,6 +358,24 @@ export class BrowserTabsOverlayViewModel {
     _virtualTopInsetPixels: number = 0
   ): BrowserTabsOverlayRect {
     return this.buildAspectFillImageRect(containerWidth, containerHeight, imageWidth, imageHeight);
+  }
+
+  /**
+   * 卡片平铺的预览图。整张按宽度等比画出，再上移 1/9，卡片框裁掉顶部地址栏和底部 1/3。
+   */
+  buildGridCroppedPreviewImageRect(
+    containerWidth: number,
+    containerHeight: number,
+    imageWidth: number,
+    imageHeight: number
+  ): BrowserTabsOverlayRect {
+    const filled = this.buildAspectFillImageRect(containerWidth, containerHeight, imageWidth, imageHeight);
+    return {
+      left: filled.left,
+      top: filled.top - filled.height * BROWSER_TABS_OVERVIEW_GRID_TOP_CROP_FRACTION,
+      width: filled.width,
+      height: filled.height
+    };
   }
 
   private buildIdentityPresentation(

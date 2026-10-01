@@ -5,14 +5,17 @@ import {
   BrowserTabsSharedSnapshotInput
 } from '../main/ets/core/browser/BrowserTabsOverlayViewModel';
 import { BrowserTabsOverviewStyleEntryPolicy } from '../main/ets/core/browser/tabsOverview/BrowserTabsOverviewStyleEntryPolicy';
-import { BROWSER_TABS_OVERVIEW_GRID_BOTTOM_CROP_FRACTION } from '../main/ets/core/browser/BrowserTabsOverviewVisualTokens';
+import {
+  BROWSER_TABS_OVERVIEW_GRID_BOTTOM_CROP_FRACTION,
+  BROWSER_TABS_OVERVIEW_GRID_TOP_CROP_FRACTION
+} from '../main/ets/core/browser/BrowserTabsOverviewVisualTokens';
 
 const SOURCE_WIDTH: number = 400;
 const SOURCE_HEIGHT: number = 800;
 const TARGET_LEFT: number = 16;
 const TARGET_TOP: number = 80;
 const TARGET_WIDTH: number = 180;
-const TARGET_HEIGHT: number = 240;
+const TARGET_HEIGHT: number = 200;
 
 function close(actual: number, expected: number, tolerance: number = 0.05): void {
   expect(Math.abs(actual - expected) <= tolerance).assertTrue();
@@ -47,14 +50,15 @@ export default function browserTabsOverviewGridBottomCropTest(): void {
       expect(policy.resolve('list').bottomCropFraction).assertEqual(0);
     });
 
-    it('sizes a tiled card to the page with the bottom third removed', 0, () => {
+    it('sizes a tiled card to the middle of the page', 0, () => {
       const state = new BrowserTabsOverviewLayoutViewModel().buildState({
         gridWidth: 360,
         sheetWidth: 392,
         sheetHeight: 800,
         layoutStyle: 'grid'
       });
-      const visible = 1 - BROWSER_TABS_OVERVIEW_GRID_BOTTOM_CROP_FRACTION;
+      const visible = 1 - BROWSER_TABS_OVERVIEW_GRID_BOTTOM_CROP_FRACTION -
+        BROWSER_TABS_OVERVIEW_GRID_TOP_CROP_FRACTION;
       const expected = Math.max(118, Math.round(state.cardWidth * 800 / 392 * visible));
       expect(state.layoutStyle).assertEqual('grid');
       expect(state.previewHeight).assertEqual(expected);
@@ -85,9 +89,11 @@ export default function browserTabsOverviewGridBottomCropTest(): void {
       close(cropped.frame.top, TARGET_TOP * 0.36);
       const croppedWidth = SOURCE_WIDTH + (TARGET_WIDTH - SOURCE_WIDTH) * 0.36;
       close(cropped.frame.width, croppedWidth);
-      close(cropped.frame.height, croppedWidth * (SOURCE_HEIGHT / SOURCE_WIDTH) * (2 / 3));
+      const visible = 1 - BROWSER_TABS_OVERVIEW_GRID_BOTTOM_CROP_FRACTION -
+        BROWSER_TABS_OVERVIEW_GRID_TOP_CROP_FRACTION;
+      close(cropped.frame.height, croppedWidth * (SOURCE_HEIGHT / SOURCE_WIDTH) * visible);
       expect(cropped.imageFrame.height > cropped.frame.height).assertTrue();
-      close(cropped.imageFrame.top, 0);
+      close(cropped.imageFrame.top, -cropped.imageFrame.height * BROWSER_TABS_OVERVIEW_GRID_TOP_CROP_FRACTION);
       close(cropped.imageFrame.width, cropped.frame.width);
 
       const landed = model.buildSharedSnapshotVisualState(cropInput(1));
@@ -95,7 +101,7 @@ export default function browserTabsOverviewGridBottomCropTest(): void {
       close(landed.frame.top, TARGET_TOP);
       close(landed.frame.width, TARGET_WIDTH);
       close(landed.frame.height, TARGET_HEIGHT);
-      close(landed.imageFrame.top, 0);
+      close(landed.imageFrame.top, -landed.imageFrame.height * BROWSER_TABS_OVERVIEW_GRID_TOP_CROP_FRACTION);
       expect(landed.imageFrame.height > landed.frame.height).assertTrue();
     });
 
@@ -105,6 +111,7 @@ export default function browserTabsOverviewGridBottomCropTest(): void {
       close(leaving.frame.left, TARGET_LEFT);
       close(leaving.frame.width, TARGET_WIDTH);
       close(leaving.frame.height, TARGET_HEIGHT);
+      close(leaving.imageFrame.top, -leaving.imageFrame.height * BROWSER_TABS_OVERVIEW_GRID_TOP_CROP_FRACTION);
       const back = model.buildSharedSnapshotVisualState(cropInput(1, 'exit'));
       close(back.frame.left, 0);
       close(back.frame.width, SOURCE_WIDTH);

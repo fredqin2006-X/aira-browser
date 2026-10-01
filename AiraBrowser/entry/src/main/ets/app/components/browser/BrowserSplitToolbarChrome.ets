@@ -1097,14 +1097,14 @@ export struct BrowserSplitToolbarButtonRow {
     .height(SPLIT_TOOLBAR_NAV_BUTTON_HEIGHT)
     .type(ButtonType.Normal)
     .buttonStyle(ButtonStyleMode.TEXTUAL)
-    .backgroundColor(this.pressedSlotId === button.slotId ? this.pressedBackgroundColor : Color.Transparent)
+    .backgroundColor(this.resolveButtonPressedFill(button))
     .borderRadius(SPLIT_TOOLBAR_NAV_PRESS_RADIUS)
     .clip(true)
     .stateEffect(false)
     .enabled(button.enabled)
     .accessibilityText(resolveAppResourceText(button.title))
     .onTouch((event: TouchEvent) => {
-      this.updatePressed(button.slotId, event.type, button.enabled);
+      this.updatePressed(button.slotId, event.type, button.enabled, !this.showsPressedFill(button));
     })
     .gesture(
       GestureGroup(
@@ -1169,9 +1169,26 @@ export struct BrowserSplitToolbarButtonRow {
     return this.formatTabCount().length > 1 ? 11 : 13;
   }
 
-  private updatePressed(slotId: string, type: TouchType, enabled: boolean): void {
-    if (!enabled) {
-      this.pressedSlotId = '';
+  /**
+   * On a webpage the tab button opens the overview immediately. The fill flashes
+   * against the page, so only the home tab button keeps the press color.
+   */
+  private showsPressedFill(button: BrowserSplitToolbarButtonPresentation): boolean {
+    return this.homeScene || !button.usesTabBadge;
+  }
+
+  private resolveButtonPressedFill(button: BrowserSplitToolbarButtonPresentation): ResourceColor {
+    if (!this.showsPressedFill(button) || this.pressedSlotId !== button.slotId) {
+      return Color.Transparent;
+    }
+    return this.pressedBackgroundColor;
+  }
+
+  private updatePressed(slotId: string, type: TouchType, enabled: boolean, suppressFill: boolean): void {
+    if (!enabled || suppressFill) {
+      if (this.pressedSlotId === slotId) {
+        this.pressedSlotId = '';
+      }
       return;
     }
     if (type === TouchType.Down) {

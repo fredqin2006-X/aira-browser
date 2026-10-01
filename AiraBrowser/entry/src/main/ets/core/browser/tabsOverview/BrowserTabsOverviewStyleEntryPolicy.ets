@@ -29,8 +29,8 @@ export interface BrowserTabsOverviewStyleEntryProfile {
   snapshotMotion: BrowserTabsOverviewSnapshotMotion;
   pinImageToSource: boolean;
   /**
-   * How much of the page picture the grid card throws away from the bottom.
-   * 0 keeps the page aspect. Only 卡片平铺 is non-zero.
+   * Turns on the grid crop motion. 0 keeps the page aspect. Only 卡片平铺 is non-zero.
+   * The motion also drops the top ninth; the fractions live with the layout tokens.
    */
   bottomCropFraction: number;
   cornerRadius: number;
