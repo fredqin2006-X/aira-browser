@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
 import {
   BrowserLargeScreenInputProfile,
@@ -164,7 +165,7 @@ export struct BrowserLargeScreenTabStripSurface {
           .height(this.resolveTitleBarHeightVp())
           .hitTestBehavior(HitTestMode.None)
 
-        this.buildFixedAction('browser.tabs.add', '新建标签页', {
+        this.buildFixedAction('browser.tabs.add', resolveAppResourceText($r('app.string.bottom_panel_new_tab_page')), {
           kind: 'new_tab',
           tabId: ''
         })
@@ -221,7 +222,7 @@ export struct BrowserLargeScreenTabStripSurface {
         this.buildTabStripBlankContextMenuResponse,
         buildBrowserDesktopMenuOptions({ preview: MenuPreviewMode.NONE })
       )
-      .accessibilityText('拖动窗口')
+      .accessibilityText($r('app.string.browser_ui_browser_large_screen_tab_strip_surface_001'))
   }
 
   /**
@@ -375,7 +376,7 @@ export struct BrowserLargeScreenTabStripSurface {
       .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
       .stateEffect(false)
       .hoverEffect(HoverEffect.None)
-      .accessibilityText(`切换到${this.resolveTabTitle(tab)}`)
+      .accessibilityText(resolveAppResourceText($r('app.string.tab_a11y_switch', this.resolveTabTitle(tab))))
       .onTouch((event: TouchEvent): void => {
         this.noteTabPointer(tab.id, event);
       })
@@ -402,7 +403,7 @@ export struct BrowserLargeScreenTabStripSurface {
         .height(BROWSER_LARGE_SCREEN_TAB_ACTION_BUTTON_SIZE_VP)
         .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
         .stateEffect(true)
-        .accessibilityText(`关闭${this.resolveTabTitle(tab)}`)
+        .accessibilityText(resolveAppResourceText($r('app.string.tab_a11y_close', this.resolveTabTitle(tab))))
         .onTouch((event: TouchEvent): void => {
           this.noteTabPointer(tab.id, event);
         })
@@ -433,7 +434,7 @@ export struct BrowserLargeScreenTabStripSurface {
     .backgroundColor(this.resolveTabBackground(tab))
     .stateEffect(false)
     .hoverEffect(HoverEffect.None)
-    .accessibilityText(`切换到${this.resolveTabTitle(tab)}`)
+    .accessibilityText(resolveAppResourceText($r('app.string.tab_a11y_switch', this.resolveTabTitle(tab))))
     .onTouch((event: TouchEvent): void => {
       this.noteTabPointer(tab.id, event);
     })
@@ -458,7 +459,9 @@ export struct BrowserLargeScreenTabStripSurface {
     .height(BROWSER_LARGE_SCREEN_TAB_ACTION_BUTTON_SIZE_VP)
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
     .stateEffect(true)
-    .accessibilityText(tab.muted ? `解除${this.resolveTabTitle(tab)}静音` : `将${this.resolveTabTitle(tab)}静音`)
+    .accessibilityText(tab.muted
+      ? resolveAppResourceText($r('app.string.tab_a11y_unmute', this.resolveTabTitle(tab)))
+      : resolveAppResourceText($r('app.string.tab_a11y_mute', this.resolveTabTitle(tab))))
     .onClick(() => {
       this.onIntent({ kind: 'tab_context_action', tabId: tab.id, actionId: 'toggle_mute' });
     })
@@ -477,36 +480,40 @@ export struct BrowserLargeScreenTabStripSurface {
   private buildTabContextMenu(tab: BrowserLargeScreenTabProjection) {
     BrowserDesktopContextMenu({ menuWidthVp: BROWSER_DESKTOP_MENU_TAB_CONTEXT_WIDTH_VP }) {
       MenuItemGroup() {
-        this.buildTabContextMenuItem(tab, 'new_tab_to_right', '在右侧新增标签页', '', true)
-        this.buildTabContextMenuItem(tab, 'move_to_new_window', '将标签页移至新窗口', '', true)
+        this.buildTabContextMenuItem(tab, 'new_tab_to_right', resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_vertical_tabs_sidebar_005')), '', true)
+        this.buildTabContextMenuItem(tab, 'move_to_new_window', resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_vertical_tabs_sidebar_006')), '', true)
       }
 
       MenuItemGroup() {
-        this.buildTabContextMenuItem(tab, 'reload', '重新加载', 'Ctrl + R', tab.contextMenu.reloadEnabled)
-        this.buildTabContextMenuItem(tab, 'duplicate', '复制', '', tab.contextMenu.duplicateEnabled)
+        this.buildTabContextMenuItem(tab, 'reload', resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_vertical_tabs_sidebar_010')), 'Ctrl + R', tab.contextMenu.reloadEnabled)
+        this.buildTabContextMenuItem(tab, 'duplicate', resolveAppResourceText($r('app.string.tab_menu_duplicate')), '', tab.contextMenu.duplicateEnabled)
       }
 
       MenuItemGroup() {
         this.buildTabContextMenuItem(
           tab,
           'toggle_pin',
-          tab.pinned ? '取消固定' : '固定',
+          tab.pinned
+            ? resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_vertical_tabs_sidebar_003'))
+            : resolveAppResourceText($r('app.string.tab_menu_pin')),
           '',
           tab.contextMenu.pinEnabled
         )
         this.buildTabContextMenuItem(
           tab,
           'toggle_mute',
-          tab.muted ? '解除静音' : '将此网站静音',
+          tab.muted
+            ? resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_vertical_tabs_sidebar_009'))
+            : resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_vertical_tabs_sidebar_007')),
           '',
           tab.contextMenu.muteEnabled
         )
       }
 
       MenuItemGroup() {
-        this.buildTabContextMenuItem(tab, 'close', '关闭', 'Ctrl + W', tab.contextMenu.closeEnabled)
-        this.buildTabContextMenuItem(tab, 'close_others', '关闭其他标签页', '', tab.contextMenu.closeOthersEnabled)
-        this.buildTabContextMenuItem(tab, 'close_to_right', '关闭右侧标签页', '', tab.contextMenu.closeRightEnabled)
+        this.buildTabContextMenuItem(tab, 'close', resolveAppResourceText($r('app.string.ui_close')), 'Ctrl + W', tab.contextMenu.closeEnabled)
+        this.buildTabContextMenuItem(tab, 'close_others', resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_vertical_tabs_sidebar_001')), '', tab.contextMenu.closeOthersEnabled)
+        this.buildTabContextMenuItem(tab, 'close_to_right', resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_vertical_tabs_sidebar_002')), '', tab.contextMenu.closeRightEnabled)
       }
     }
   }

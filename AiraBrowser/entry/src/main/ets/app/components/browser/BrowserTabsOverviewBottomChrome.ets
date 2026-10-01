@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BROWSER_BOTTOM_ADDRESS_PANEL_FLOATING_BOTTOM_GAP,
   BROWSER_BOTTOM_ADDRESS_PANEL_FLOATING_HORIZONTAL_INSET,
@@ -103,9 +104,9 @@ export struct BrowserTabsOverviewBottomChrome {
 
   build() {
     Row({ space: BROWSER_TABS_OVERVIEW_BOTTOM_CHROME_BLOCK_GAP }) {
-      this.buildOuterButton('return', 'browser.toolbar.back', '返回进入标签管理前的网页')
+      this.buildOuterButton('return', 'browser.toolbar.back', resolveAppResourceText($r('app.string.browser_ui_browser_tabs_overview_bottom_chrome_003')))
       this.buildSectionSwitcher()
-      this.buildOuterButton('create-home', 'browser.tabs.overviewAdd', '回到主页')
+      this.buildOuterButton('create-home', 'browser.tabs.overviewAdd', resolveAppResourceText($r('app.string.browser_ui_browser_tabs_overview_bottom_chrome_002')))
     }
     .width(this.resolveChromeWidth())
     .height(BROWSER_TABS_OVERVIEW_BOTTOM_CHROME_HEIGHT)
@@ -380,7 +381,7 @@ export struct BrowserTabsOverviewBottomChrome {
               iconColor: this.resolvePrimaryColor()
             })
               .hitTestBehavior(HitTestMode.None)
-            Text(BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_LABEL)
+            Text(resolveAppResourceText($r('app.string.tabs_overview_close_all')))
               .fontSize(BROWSER_TABS_OVERVIEW_CLOSE_ALL_MENU_TEXT_SIZE)
               .fontWeight(FontWeight.Medium)
               .fontColor(this.resolvePrimaryColor())
@@ -519,7 +520,9 @@ export struct BrowserTabsOverviewBottomChrome {
   }
 
   private resolveCloseAllMenuAccessibilityText(): string {
-    return this.closeAllMenuSection === 'privacy' ? '关闭所有隐私标签页' : '关闭所有普通标签页';
+    return this.closeAllMenuSection === 'privacy'
+      ? resolveAppResourceText($r('app.string.tabs_overview_close_all_private'))
+      : resolveAppResourceText($r('app.string.tabs_overview_close_all_regular'));
   }
 
   private dispatchSegmentAction(target: string): void {
@@ -598,10 +601,14 @@ export struct BrowserTabsOverviewBottomChrome {
 
   private resolveSegmentAccessibilityText(target: string): string {
     if (target === 'privacy') {
-      return this.privacyTabsLabel;
+      return this.privacyTabsLabel === '隐私标签页'
+        ? resolveAppResourceText($r('app.string.browser_ui_browser_tabs_overview_bottom_chrome_004'))
+        : this.privacyTabsLabel;
     }
     if (target === 'device') {
-      return this.crossDeviceTabsLabel;
+      return this.crossDeviceTabsLabel === '跨设备标签页'
+        ? resolveAppResourceText($r('app.string.settings_link_tabs'))
+        : this.crossDeviceTabsLabel;
     }
     return this.regularTabsLabel;
   }

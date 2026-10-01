@@ -366,11 +366,6 @@ interface BrowserTabsOverviewRuntimeEventEffect {
   tabId: string;
 }
 
-interface BrowserTabsOverviewCloseAllConfirmationEffect {
-  type: 'show_close_all_confirmation';
-  plan: BrowserTabsOverviewDeletePlan;
-}
-
 interface BrowserTabsOverviewConfirmPrivateModeSwitchEffect {
   type: 'confirm_private_mode_switch';
   plan: BrowserPrivateModeTogglePlan;
@@ -408,7 +403,6 @@ export type BrowserTabsOverviewSessionEffect =
   | BrowserTabsOverviewOptimisticHomeRevealEffect
   | BrowserTabsOverviewSectionChangeEffect
   | BrowserTabsOverviewRuntimeEventEffect
-  | BrowserTabsOverviewCloseAllConfirmationEffect
   | BrowserTabsOverviewConfirmPrivateModeSwitchEffect
   | BrowserTabsOverviewKeyboardMessageEffect
   | BrowserTabsOverviewArkUiAnimationEffect
@@ -542,10 +536,6 @@ export interface BrowserTabsOverviewSessionRequestCloseAllAction {
   type: 'request_close_all';
 }
 
-export interface BrowserTabsOverviewSessionConfirmCloseAllAction {
-  type: 'confirm_close_all';
-}
-
 export interface BrowserTabsOverviewSessionCloseAllAnimationFinishedAction {
   type: 'close_all_animation_finished';
 }
@@ -582,7 +572,6 @@ export type BrowserTabsOverviewSessionAction =
   | BrowserTabsOverviewSessionEnterPrivateAction
   | BrowserTabsOverviewSessionCloseTabAction
   | BrowserTabsOverviewSessionRequestCloseAllAction
-  | BrowserTabsOverviewSessionConfirmCloseAllAction
   | BrowserTabsOverviewSessionCloseAllAnimationFinishedAction
   | BrowserTabsOverviewSessionChangeSectionAction
   | BrowserTabsOverviewSessionActivateSectionHomeAction
@@ -603,7 +592,6 @@ export class BrowserTabsOverviewSessionCoordinator {
   private operationGeneration: number = 0;
   private interruptedSelectionCompletionGeneration: number = -1;
   private homeSurfaceCloseGeneration: number = -1;
-  private closeAllConfirmationGeneration: number = -1;
   private backdropSettleRunId: number = 0;
   private backdropHomeRevealRunId: number = 0;
   private lockedSnapshotTabId: string = '';
@@ -1240,14 +1228,6 @@ export class BrowserTabsOverviewSessionCoordinator {
         return;
       case 'request_close_all':
         this.requestCloseAllTabs(host, this.beginOperation());
-        return;
-      case 'confirm_close_all':
-        if (this.closeAllConfirmationGeneration < 0 ||
-          !this.isOperationCurrent(this.closeAllConfirmationGeneration)) {
-          return;
-        }
-        this.closeAllConfirmationGeneration = -1;
-        this.confirmCloseAllTabs(host);
         return;
       case 'close_all_animation_finished':
         void this.finishCloseAllTabsAfterOverviewAnimation(host, this.beginOperation());
@@ -2798,8 +2778,8 @@ export class BrowserTabsOverviewSessionCoordinator {
       }
       return;
     }
-    this.closeAllConfirmationGeneration = generation;
-    host.executeEffect({ type: 'show_close_all_confirmation', plan: plan });
+    // The menu itself is opened by a long press, so confirming it closes immediately.
+    this.confirmCloseAllTabs(host);
   }
 
   private confirmCloseAllTabs(host: BrowserTabsOverviewSessionHost): void {
@@ -3055,14 +3035,12 @@ export class BrowserTabsOverviewSessionCoordinator {
   private beginOperation(): number {
     this.operationGeneration += 1;
     this.interruptedSelectionCompletionGeneration = -1;
-    this.closeAllConfirmationGeneration = -1;
     return this.operationGeneration;
   }
 
   private invalidateOperations(): void {
     this.operationGeneration += 1;
     this.interruptedSelectionCompletionGeneration = -1;
-    this.closeAllConfirmationGeneration = -1;
   }
 
   private isOperationCurrent(generation: number): boolean {

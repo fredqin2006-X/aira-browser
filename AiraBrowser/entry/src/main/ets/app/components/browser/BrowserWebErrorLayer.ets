@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { WebLoadErrorPresentation } from '../../../services/web/WebLoadErrorPresentationService';
 import { BrowserWebLoadErrorSurfaceAction } from '../../../core/browser/BrowserWebPageLifecycleApplicationCoordinator';
 import { BrowserWebErrorSurface } from './BrowserWebErrorSurface';
@@ -9,10 +10,10 @@ export struct BrowserWebErrorLayer {
     title: '',
     summary: '',
     host: '',
-    primaryActionLabel: '重新加载',
-    secondaryActionLabel: '打开首页',
-    tertiaryActionLabel: '复制详情',
-    detailLabel: '错误详情',
+    primaryActionLabel: resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_vertical_tabs_sidebar_010')),
+    secondaryActionLabel: resolveAppResourceText($r('app.string.settings_general_open_home')),
+    tertiaryActionLabel: resolveAppResourceText($r('app.string.settings_sync_advanced_copy_details')),
+    detailLabel: resolveAppResourceText($r('app.string.browser_ui_browser_web_error_surface_003')),
     detailText: '',
     hints: []
   };

@@ -26,7 +26,7 @@ export struct HomeSettingsActionRow {
           surfaceRadius: HOME_SETTINGS_ACTION_BUTTON_HEIGHT / 2,
           tintColor: resolveBrowserFloatingGlassMaterialTintForMode(this.storedResolvedThemeMode)
         }) {
-          Text('设置')
+          Text($r('app.string.bottom_panel_action_settings'))
             .fontSize(13)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.storedPrimaryTextColor)

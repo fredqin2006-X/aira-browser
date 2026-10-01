@@ -274,6 +274,67 @@ assert.equal(chatFixture({ shellPosition: 'static' }).run(), 'absent', 'static p
 assert.equal(chatFixture({ pin: false }).run(), 'absent', 'unpinned row only visible because the list is scrolled');
 assert.equal(chatFixture({ shellHeight: 160 }).run(), 'absent', 'short absolute sheet is not a chat shell');
 
+function composerFixture({
+  position = 'fixed', width = 390, viewportHeight = 800, field = 'TEXTAREA',
+  fieldWidth = 320, fieldHeight = 44, gap = 0, shell = false, scrolled = false
+} = {}) {
+  const nodes = [];
+  function node(tagName, left, top, w, h, parent, attrs = {}, style = {}) {
+    const item = {
+      tagName, nodeType: 1, isConnected: true, parentElement: parent, attrs, children: [],
+      disabled: false, scrollTop: 0, scrollLeft: 0,
+      style: { position: 'static', display: 'block', visibility: 'visible', opacity: '1',
+        pointerEvents: 'auto', cursor: 'auto', bottom: 'auto', ...style },
+      getBoundingClientRect: () => ({ left, top, width: w, height: h, right: left + w, bottom: top + h }),
+      getAttribute: key => attrs[key] ?? null,
+      hasAttribute: key => Object.prototype.hasOwnProperty.call(attrs, key),
+      contains(other) { for (; other; other = other.parentElement) if (other === this) return true; return false; },
+      closest: () => null
+    };
+    if (parent) parent.children.push(item);
+    nodes.push(item);
+    return item;
+  }
+  const body = node('BODY', 0, 0, width, viewportHeight, null);
+  const host = shell
+    ? node('DIV', 0, 0, width, viewportHeight, body, {}, { position: 'static', height: '100vh' })
+    : body;
+  const top = viewportHeight - gap - fieldHeight;
+  const fieldNode = node(field, (width - fieldWidth) / 2, top, fieldWidth, fieldHeight, host,
+    field === 'DIV' ? { contenteditable: 'true' } : {},
+    { position, bottom: position === 'static' ? 'auto' : '0px' });
+  if (scrolled) host.scrollTop = 240;
+  const document = {
+    hidden: false, fullscreenElement: null, body, documentElement: { clientWidth: width },
+    elementFromPoint(x, y) {
+      return [...nodes].reverse().find(item => {
+        const rect = item.getBoundingClientRect();
+        return x >= rect.left && x < rect.right && y >= rect.top && y < rect.bottom;
+      }) || null;
+    },
+    createTreeWalker(parent) {
+      const list = nodes.filter(item => item !== parent && parent.contains(item));
+      let index = 0;
+      return { nextNode: () => list[index++] || null };
+    }
+  };
+  const window = { innerHeight: viewportHeight, visualViewport: { scale: 1, height: viewportHeight } };
+  return {
+    run: () => vm.runInNewContext(script, {
+      document, window, performance: { now: () => 0 }, getComputedStyle: item => item.style
+    }),
+    field: fieldNode
+  };
+}
+assert.equal(composerFixture().run(), 'detected', 'fixed textarea composer');
+assert.equal(composerFixture({ field: 'DIV' }).run(), 'detected', 'contenteditable composer');
+assert.equal(composerFixture({ position: 'static', shell: true }).run(), 'detected',
+  'normal-flow composer in a full-viewport shell');
+assert.equal(composerFixture({ position: 'static', shell: true, scrolled: true }).run(), 'absent',
+  'scrolled shell is not a pinned composer');
+assert.equal(composerFixture({ gap: 180 }).run(), 'absent', 'editor away from the toolbar zone');
+assert.equal(composerFixture({ fieldWidth: 40 }).run(), 'absent', 'tiny field is not a composer');
+
 const { BrowserWebViewportCoordinator: Viewport } = load('core/browser/BrowserWebViewportCoordinator.ets');
 const geometry = { hostHeightPx: 844, visualTopInsetPx: 40, visualBottomInsetPx: 101,
   fullViewport: false, largeScreenShellActive: false, nativeVideoTakeoverActive: false };

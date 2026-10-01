@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BrowserWebCapabilityPromptApplicationCoordinator,
   BrowserWebCapabilityPromptApplicationEffect
@@ -30,13 +31,13 @@ export class BrowserWebCapabilityAlertDialogPresenter {
         message: dialog.presentation.message,
         autoCancel: false,
         primaryButton: {
-          value: '取消',
+          value: resolveAppResourceText($r('app.string.settings_custom_home_cancel')),
           action: () => {
             this.coordinator.cancelJavaScriptConfirm();
           }
         },
         secondaryButton: {
-          value: '确定',
+          value: resolveAppResourceText($r('app.string.ui_ok')),
           action: () => {
             this.coordinator.confirmJavaScriptConfirm();
           }
@@ -50,7 +51,7 @@ export class BrowserWebCapabilityAlertDialogPresenter {
         message: dialog.presentation.message,
         autoCancel: false,
         primaryButton: {
-          value: '知道了',
+          value: resolveAppResourceText($r('app.string.settings_advanced_backup_confirm')),
           action: () => {
             this.coordinator.confirmJavaScriptAlert();
           }
@@ -82,13 +83,13 @@ export class BrowserWebCapabilityAlertDialogPresenter {
       message: dialog.message,
       autoCancel: false,
       primaryButton: {
-        value: '取消',
+        value: resolveAppResourceText($r('app.string.settings_custom_home_cancel')),
         action: () => {
           this.coordinator.dismissPendingSystemPermissionSettingsPrompt();
         }
       },
       secondaryButton: {
-        value: '去设置',
+        value: resolveAppResourceText($r('app.string.settings_sync_advanced_go_settings')),
         action: () => {
           this.coordinator.requestPendingSystemPermissionSettings();
         }

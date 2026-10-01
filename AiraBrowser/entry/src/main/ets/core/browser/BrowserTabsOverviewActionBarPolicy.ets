@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { BrowserCreateTabOptions, BrowserTabState } from '../tabs/TabManager';
 import { BrowserTabsOverviewSectionPolicy } from './tabsOverview/BrowserTabsOverviewSectionPolicy';
 
@@ -63,12 +64,21 @@ export class BrowserTabsOverviewActionBarPolicy {
       tabIds: tabIds,
       count: tabIds.length,
       homeOptions: privateSection ? PRIVATE_HOME_OPTIONS : REGULAR_HOME_OPTIONS,
-      title: privateSection ? '焚烧隐私标签页' : '关闭普通标签页',
-      message: privateSection ? `确定要焚烧这 ${tabIds.length} 个隐私标签页吗？` :
-        `确定要关闭这 ${tabIds.length} 个普通标签页吗？`,
-      confirmLabel: privateSection ? '焚烧' : '关闭',
-      emptyMessage: privateSection ? '没有隐私标签页可焚烧。' : '没有普通标签页可关闭。',
-      helperMessage: privateSection ? '已焚烧隐私标签页。' : '已关闭普通标签页。',
+      title: privateSection
+        ? resolveAppResourceText($r('app.string.browser_browser_tabs_overview_action_bar_policy_010'))
+        : resolveAppResourceText($r('app.string.browser_browser_tabs_overview_action_bar_policy_001')),
+      message: privateSection
+        ? resolveAppResourceText($r('app.string.tabs_burn_confirm', tabIds.length))
+        : resolveAppResourceText($r('app.string.tabs_close_regular_confirm', tabIds.length)),
+      confirmLabel: privateSection
+        ? resolveAppResourceText($r('app.string.browser_browser_tabs_overview_action_bar_policy_009'))
+        : resolveAppResourceText($r('app.string.ui_close')),
+      emptyMessage: privateSection
+        ? resolveAppResourceText($r('app.string.browser_browser_tabs_overview_action_bar_policy_008'))
+        : resolveAppResourceText($r('app.string.browser_browser_tabs_overview_action_bar_policy_007')),
+      helperMessage: privateSection
+        ? resolveAppResourceText($r('app.string.browser_browser_tabs_overview_action_bar_policy_003'))
+        : resolveAppResourceText($r('app.string.browser_browser_tabs_overview_action_bar_policy_002')),
       runtimeEventType: privateSection ? 'private_tabs_closed_all' : 'regular_tabs_closed_all',
       homeRevealMotion: 'steady'
     };
@@ -86,14 +96,14 @@ export class BrowserTabsOverviewActionBarPolicy {
           kind: 'tab',
           tabId: tab.id,
           homeOptions: this.buildPrivateHomeOptions(tab),
-          helperMessage: '已返回隐私标签页。'
+          helperMessage: resolveAppResourceText($r('app.string.browser_browser_tabs_overview_action_bar_policy_005'))
         };
       }
       return {
         kind: 'home',
         tabId: '',
         homeOptions: PRIVATE_HOME_OPTIONS,
-        helperMessage: '已进入隐私模式'
+        helperMessage: resolveAppResourceText($r('app.string.browser_browser_tabs_overview_action_bar_policy_006'))
       };
     }
     const regularTab = this.resolveSelectedTabForSection('tabs', tabs, activeTabId);
@@ -102,14 +112,14 @@ export class BrowserTabsOverviewActionBarPolicy {
         kind: 'tab',
         tabId: regularTab.id,
         homeOptions: this.buildRegularHomeOptions(regularTab),
-        helperMessage: '已返回普通标签页。'
+        helperMessage: resolveAppResourceText($r('app.string.browser_browser_tabs_overview_action_bar_policy_004'))
       };
     }
     return {
       kind: 'home',
       tabId: '',
       homeOptions: REGULAR_HOME_OPTIONS,
-      helperMessage: '已回到主页'
+      helperMessage: resolveAppResourceText($r('app.string.browser_shell_008'))
     };
   }
 

@@ -5965,10 +5965,6 @@
       "value": "Page identity saved. This site keeps using the Aira compatibility identity."
     },
     {
-      "name": "web_ua_runtime_deferred",
-      "value": "Page identity saved. This tab keeps the previous identity to preserve back and forward history; it applies after the web runtime is rebuilt."
-    },
-    {
       "name": "settings_site_info_cancel",
       "value": "Cancel"
     },
@@ -22931,6 +22927,382 @@
     {
       "name": "wallpaper_select_video_failed",
       "value": "Couldn't choose the video wallpaper. Try again later."
+    },
+    {
+      "name": "tab_a11y_switch",
+      "value": "Switch to %1$s"
+    },
+    {
+      "name": "tab_a11y_close",
+      "value": "Close %1$s"
+    },
+    {
+      "name": "tab_a11y_unmute",
+      "value": "Unmute %1$s"
+    },
+    {
+      "name": "tab_a11y_mute",
+      "value": "Mute %1$s"
+    },
+    {
+      "name": "tab_menu_pin",
+      "value": "Pin"
+    },
+    {
+      "name": "tab_menu_duplicate",
+      "value": "Duplicate"
+    },
+    {
+      "name": "home_settings_title",
+      "value": "Home settings"
+    },
+    {
+      "name": "home_settings_keep_one",
+      "value": "Keep at least one of favorites, recently closed, or the home settings button."
+    },
+    {
+      "name": "home_settings_keep_one_plain",
+      "value": "Keep at least one of favorites, recently closed, or the home settings button"
+    },
+    {
+      "name": "home_settings_keep_one_centered",
+      "value": "Keep at least one of favorites or the home settings button"
+    },
+    {
+      "name": "recent_delete_named",
+      "value": "Delete “%1$s”? This cannot be undone."
+    },
+    {
+      "name": "recent_shortcut_update_failed",
+      "value": "Couldn't update the home shortcut: %1$s"
+    },
+    {
+      "name": "recent_private_cannot_edit_home",
+      "value": "This private session cannot change regular home shortcuts."
+    },
+    {
+      "name": "recent_regular_access",
+      "value": "Recently closed actions can use the current regular browsing data."
+    },
+    {
+      "name": "recent_private_isolated",
+      "value": "This private session does not show, restore, or change regular recently closed records."
+    },
+    {
+      "name": "private_clear_and_close",
+      "value": "Clear private data and close %1$d private tabs"
+    },
+    {
+      "name": "tabs_burn_confirm",
+      "value": "Burn these %1$d private tabs?"
+    },
+    {
+      "name": "tabs_close_regular_confirm",
+      "value": "Close these %1$d regular tabs?"
+    },
+    {
+      "name": "tab_list_reopen",
+      "value": "Reopen %1$s"
+    },
+    {
+      "name": "tab_list_delete",
+      "value": "Delete %1$s"
+    },
+    {
+      "name": "device_tab_count",
+      "value": "%1$d"
+    },
+    {
+      "name": "private_auth_success",
+      "value": "Verified"
+    },
+    {
+      "name": "private_auth_unavailable",
+      "value": "This device cannot start system authentication."
+    },
+    {
+      "name": "private_auth_canceled",
+      "value": "Verification canceled"
+    },
+    {
+      "name": "private_auth_timeout",
+      "value": "Verification timed out. Try again"
+    },
+    {
+      "name": "private_auth_locked",
+      "value": "System authentication is temporarily locked. Try again later"
+    },
+    {
+      "name": "private_auth_failed",
+      "value": "Verification failed. Try again"
+    },
+    {
+      "name": "permission_none_needed",
+      "value": "No extra system permission is needed."
+    },
+    {
+      "name": "permission_granted",
+      "value": "System permissions are granted."
+    },
+    {
+      "name": "permission_location_off",
+      "value": "Location services are off."
+    },
+    {
+      "name": "permission_incomplete",
+      "value": "System permissions are not fully on."
+    },
+    {
+      "name": "permission_still_incomplete",
+      "value": "System permissions are still not fully on."
+    },
+    {
+      "name": "print_cannot_create",
+      "value": "This page cannot create print content right now."
+    },
+    {
+      "name": "print_done",
+      "value": "Print job finished."
+    },
+    {
+      "name": "print_failed",
+      "value": "Print job failed."
+    },
+    {
+      "name": "print_canceled",
+      "value": "Printing canceled."
+    },
+    {
+      "name": "print_blocked",
+      "value": "The print job is temporarily blocked."
+    },
+    {
+      "name": "print_opening",
+      "value": "Opening system printing."
+    },
+    {
+      "name": "print_cannot_start",
+      "value": "Printing cannot start right now."
+    },
+    {
+      "name": "print_permission",
+      "value": "Print permission is missing, so this page cannot be printed right now."
+    },
+    {
+      "name": "link_opening",
+      "value": "Opening the link"
+    },
+    {
+      "name": "link_opened_private_tab",
+      "value": "Opened the link in a private tab."
+    },
+    {
+      "name": "link_opened_private_window",
+      "value": "Opened the link in a new private window."
+    },
+    {
+      "name": "link_copy_failed_detail",
+      "value": "Copy failed: %1$s"
+    },
+    {
+      "name": "file_picker_opening",
+      "value": "Opening the file picker"
+    },
+    {
+      "name": "file_pick_failed",
+      "value": "The page could not choose a file"
+    },
+    {
+      "name": "file_pick_failed_retry",
+      "value": "Couldn't choose a file. Try again later."
+    },
+    {
+      "name": "dns_name_required",
+      "value": "Enter a DNS name."
+    },
+    {
+      "name": "dns_name_too_long",
+      "value": "The DNS name cannot be longer than 80 characters."
+    },
+    {
+      "name": "dns_too_many",
+      "value": "You can save up to 32 custom DNS entries."
+    },
+    {
+      "name": "dns_name_exists",
+      "value": "A custom DNS entry with this name already exists."
+    },
+    {
+      "name": "dns_endpoint_exists",
+      "value": "This DoH address is already saved."
+    },
+    {
+      "name": "dns_https_required",
+      "value": "Enter an HTTPS DoH address."
+    },
+    {
+      "name": "dns_https_only",
+      "value": "Only HTTPS addresses are supported."
+    },
+    {
+      "name": "dns_https_invalid",
+      "value": "Enter a valid HTTPS DoH address."
+    },
+    {
+      "name": "home_shortcut_missing",
+      "value": "This shortcut was not found."
+    },
+    {
+      "name": "home_system_entry_limited",
+      "value": "System entries can only be opened, moved, or removed from the homepage."
+    },
+    {
+      "name": "home_config_read_failed",
+      "value": "Couldn't read the homepage settings. Try again later."
+    },
+    {
+      "name": "home_config_save_failed",
+      "value": "Couldn't save the homepage settings. Try again later."
+    },
+    {
+      "name": "home_open_site_settings_failed",
+      "value": "Couldn't open site settings"
+    },
+    {
+      "name": "home_open_translation_failed",
+      "value": "Couldn't open webpage translation settings"
+    },
+    {
+      "name": "home_open_password_failed",
+      "value": "Couldn't open password settings"
+    },
+    {
+      "name": "home_open_ua_failed",
+      "value": "Couldn't open page identity settings"
+    },
+    {
+      "name": "home_open_download_failed",
+      "value": "Couldn't open download settings"
+    },
+    {
+      "name": "home_open_homepage_failed",
+      "value": "Couldn't open homepage settings"
+    },
+    {
+      "name": "home_open_startup_failed",
+      "value": "Couldn't open startup settings"
+    },
+    {
+      "name": "home_open_private_tabs_failed",
+      "value": "Couldn't open private tab settings"
+    },
+    {
+      "name": "home_open_history_failed",
+      "value": "Couldn't open history retention settings"
+    },
+    {
+      "name": "home_open_theme_failed",
+      "value": "Couldn't open theme settings"
+    },
+    {
+      "name": "home_open_shortcuts_failed",
+      "value": "Couldn't open keyboard shortcut settings"
+    },
+    {
+      "name": "home_engine_unavailable",
+      "value": "This search engine is unavailable right now."
+    },
+    {
+      "name": "home_engine_save_failed",
+      "value": "Couldn't save the search engine. Try again later."
+    },
+    {
+      "name": "home_opening_link",
+      "value": "Opening the link from the homepage"
+    },
+    {
+      "name": "home_link_unsupported",
+      "value": "This link cannot be opened from the homepage yet."
+    },
+    {
+      "name": "home_render_failed",
+      "value": "The homepage failed to render. Try again."
+    },
+    {
+      "name": "home_load_timeout",
+      "value": "Load failed: the homepage did not respond."
+    },
+    {
+      "name": "home_reloading",
+      "value": "Reloading the homepage"
+    },
+    {
+      "name": "tablet_touch_warning",
+      "value": "A phone using the desktop interface may look crowded, with small buttons or layouts that do not fit. Confirm before switching."
+    },
+    {
+      "name": "tablet_fold_note",
+      "value": "A small foldable still uses the touch interface when unfolded, because the screen is narrow. A manual desktop choice is the exception."
+    },
+    {
+      "name": "tablet_auto_fold",
+      "value": "Automatic mode uses the desktop interface when the device is unfolded and returns to touch when folded. It keeps the current interface when half-folded or unknown."
+    },
+    {
+      "name": "tablet_auto_pointer",
+      "value": "Automatic mode uses the desktop interface when a mouse or trackpad is connected, and returns to touch when it disconnects. A physical keyboard can still use shortcuts in the touch interface."
+    },
+    {
+      "name": "search_intro_title",
+      "value": "Choose the default search engine"
+    },
+    {
+      "name": "search_intro_subtitle",
+      "value": "Address-bar searches will use it. You can change it later in Settings."
+    },
+    {
+      "name": "search_engine_bing",
+      "value": "Bing"
+    },
+    {
+      "name": "search_engine_baidu",
+      "value": "Baidu"
+    },
+    {
+      "name": "search_engine_google",
+      "value": "Google"
+    },
+    {
+      "name": "search_engine_sogou",
+      "value": "Sogou"
+    },
+    {
+      "name": "search_engine_360",
+      "value": "360 Search"
+    },
+    {
+      "name": "search_engine_shenma",
+      "value": "Shenma"
+    },
+    {
+      "name": "tabs_overview_count",
+      "value": "%1$d tabs"
+    },
+    {
+      "name": "tabs_overview_close_all",
+      "value": "Close all"
+    },
+    {
+      "name": "tabs_overview_close_all_private",
+      "value": "Close all private tabs"
+    },
+    {
+      "name": "tabs_overview_close_all_regular",
+      "value": "Close all regular tabs"
+    },
+    {
+      "name": "web_protection_report_a11y",
+      "value": "%1$s, open the web protection report"
     }
   ]
 }

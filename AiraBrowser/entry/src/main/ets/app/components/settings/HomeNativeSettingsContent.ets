@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   HOME_PAGE_PRESENTATION_HOME_PAGE_STYLE_KEY,
   HOME_PAGE_PRESENTATION_SHOW_FAVORITES_TITLE_KEY,
@@ -445,7 +446,7 @@ export struct HomeNativeSettingsContent {
           .fontColor(this.storedPrimaryTextColor)
           .layoutWeight(1)
 
-        Text(`${this.recentlyClosedLimit} 条`)
+        Text(resolveAppResourceText($r('app.string.settings_home_05', this.recentlyClosedLimit)))
           .fontSize(14)
           .fontColor(this.storedSecondaryTextColor)
       }

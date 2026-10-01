@@ -581,15 +581,13 @@ export class BrowserWebLoadRuntimeCoordinator implements BrowserWebLoadExecution
     const facts = this.bindings.readFacts();
     const context = this.resolveUserAgentRuntimeContext(tabId, targetUrl, facts.currentProfileId);
     const resolution = this.resolveUserAgentForContext(context, false);
-    return this.acceptUserAgentPreparation(
-      this.dependencies.resolveUserAgentRuntimeService().prepareWebMainFrameNavigation(
-        this.runtimeLifecyclePort,
-        context.tabId,
-        targetUrl,
-        resolution,
-        startsNewTransaction
-      )
-    );
+    return this.dependencies.resolveUserAgentRuntimeService().prepareWebMainFrameNavigation(
+      this.runtimeLifecyclePort,
+      context.tabId,
+      targetUrl,
+      resolution,
+      startsNewTransaction
+    ).allowed;
   }
 
   prepareHistoryNavigation(
@@ -601,16 +599,14 @@ export class BrowserWebLoadRuntimeCoordinator implements BrowserWebLoadExecution
     const facts = this.bindings.readFacts();
     const context = this.resolveUserAgentRuntimeContext(tabId, targetUrl, facts.currentProfileId);
     const fallbackResolution = this.resolveUserAgentForContext(context, false);
-    return this.acceptUserAgentPreparation(
-      this.dependencies.resolveUserAgentRuntimeService().prepareHistoryNavigation(
-        this.runtimeLifecyclePort,
-        context.tabId,
-        targetUrl,
-        targetHistoryIndex,
-        direction,
-        fallbackResolution
-      )
-    );
+    return this.dependencies.resolveUserAgentRuntimeService().prepareHistoryNavigation(
+      this.runtimeLifecyclePort,
+      context.tabId,
+      targetUrl,
+      targetHistoryIndex,
+      direction,
+      fallbackResolution
+    ).allowed;
   }
 
   commitUserAgentNavigation(tabId: string, committedUrl: string, isMainFrame: boolean): void {
@@ -884,24 +880,13 @@ export class BrowserWebLoadRuntimeCoordinator implements BrowserWebLoadExecution
     );
     this.clearUserAgentAffinityForExplicitNavigation(context);
     const resolution = this.resolveUserAgentForContext(context, false);
-    return this.acceptUserAgentPreparation(
-      this.dependencies.resolveUserAgentRuntimeService().prepareNavigation(
-        this.runtimeLifecyclePort,
-        context.tabId,
-        targetUrl,
-        resolution,
-        'app_load'
-      )
-    );
-  }
-
-  private acceptUserAgentPreparation(preparation: BrowserUserAgentNavigationPreparation): boolean {
-    if (preparation.transitionNoticeRequired) {
-      this.bindings.showRuntimeToast(
-        '为保留返回与前进历史，当前标签仍使用原网页标识；Web 运行时重建后生效。'
-      );
-    }
-    return preparation.allowed;
+    return this.dependencies.resolveUserAgentRuntimeService().prepareNavigation(
+      this.runtimeLifecyclePort,
+      context.tabId,
+      targetUrl,
+      resolution,
+      'app_load'
+    ).allowed;
   }
 
   private resolveUserAgentRuntimeContext(

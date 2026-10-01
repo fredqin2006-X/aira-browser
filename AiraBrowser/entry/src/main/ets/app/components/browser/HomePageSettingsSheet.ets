@@ -278,7 +278,7 @@ export struct HomePageSettingsContent {
       icon: $r('sys.symbol.xmark'),
       iconSize: BROWSER_FEATURE_SHEET_HEADER_ICON_SIZE,
       buttonSize: BROWSER_FEATURE_SHEET_HEADER_BUTTON_SIZE,
-      accessibilityLabel: '关闭主页设置',
+      accessibilityLabel: $r('app.string.browser_ui_home_page_settings_sheet_002'),
       immersiveMaterialEnabled: true,
       onAction: (): void => {
         this.onClose();
@@ -422,7 +422,7 @@ export struct HomePageSettingsContent {
     BrowserPhoneSettingsSheetHeader({
       title: this.resolveSheetTitle(),
       showBackButton: this.sheetPage !== 'main',
-      backAccessibilityText: '返回主页设置',
+      backAccessibilityText: $r('app.string.browser_ui_home_page_settings_sheet_003'),
       onBack: (): void => {
         this.popSheetNavigation();
       }
@@ -561,9 +561,9 @@ export struct HomePageSettingsContent {
       return resolveAppResourceText($r('app.string.settings_home_wallpaper'));
     }
     if (this.sheetPage === 'logo') {
-      return 'Logo设置';
+      return homeSheetText($r('app.string.settings_home_logo_settings'), 'Logo设置');
     }
-    return '主页设置';
+    return homeSheetText($r('app.string.home_settings_title'), '主页设置');
   }
 
   private refreshLogoSelection(): void {
@@ -580,7 +580,7 @@ export struct HomePageSettingsContent {
       })
       .catch((error: Error) => {
         this.refreshLogoSelection();
-        this.showToast(error.message.length > 0 ? error.message : '选择 Logo 失败，请稍后重试。');
+        this.showToast(error.message.length > 0 ? error.message : resolveAppResourceText($r('app.string.settings_home_04')));
       });
   }
 
@@ -626,7 +626,7 @@ export struct HomePageSettingsContent {
       .catch((error: Error) => {
         this.logoBusy = false;
         this.refreshLogoSelection();
-        this.showToast(error.message.length > 0 ? error.message : '上传 Logo 失败，请稍后重试。');
+        this.showToast(error.message.length > 0 ? error.message : resolveAppResourceText($r('app.string.browser_ui_home_page_settings_sheet_001')));
       });
   }
 
@@ -703,4 +703,9 @@ export struct HomePageSettingsContent {
     } catch (_error) {
     }
   }
+}
+
+function homeSheetText(resource: Resource, fallback: string): string {
+  const resolved = resolveAppResourceText(resource);
+  return resolved.length > 0 ? resolved : fallback;
 }

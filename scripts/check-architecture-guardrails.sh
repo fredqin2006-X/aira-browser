@@ -4519,7 +4519,7 @@ check_file_contains_rule "${BROWSER_WEB_PRINT_SERVICE}" "${BROWSER_WEB_PRINT_SER
   'canPrintCurrentPage\(facts: BrowserWebPrintAvailabilityFacts\)' \
   "Web Print must own current-page availability policy."
 check_file_contains_rule "${BROWSER_WEB_PRINT_SERVICE}" "${BROWSER_WEB_PRINT_SERVICE_REL}" \
-  'onStatusMessage\?\.\(.打印任务已完成。' \
+  'app\.string\.print_done' \
   "Web Print must map platform task status to its user-facing completion message."
 check_file_not_contains_rule "${BROWSER_WEB_PRINT_SERVICE}" "${BROWSER_WEB_PRINT_SERVICE_REL}" \
   'BrowserWebPrintStatus|onStatus\?:' \
@@ -5303,8 +5303,12 @@ check_file_contains_rule "${TABLET_INTERFACE_MODE_SETTINGS}" "${TABLET_INTERFACE
   'this\.interfaceModePolicy\.isKnownSmallFoldable\(' \
   "the interface-mode setting must reuse the policy's pocket-foldable classification."
 check_file_contains_rule "${TABLET_INTERFACE_MODE_SETTINGS}" "${TABLET_INTERFACE_MODE_SETTINGS_REL}" \
-  '小折叠屏展开后仍使用触屏界面' \
+  'app\.string\.tablet_fold_note' \
   "the foldable footer must state the pocket-foldable rule the shell actually applies."
+check_file_contains_rule "${REPO_ROOT}/AiraBrowser/entry/src/main/resources/base/element/string.json" \
+  "AiraBrowser/entry/src/main/resources/base/element/string.json" \
+  '小折叠屏展开后仍使用触屏界面' \
+  "the foldable footer copy must keep the pocket-foldable rule the shell actually applies."
 # The policy can only classify a pocket foldable if the platform adapter hands
 # it the platform-reported identity.
 check_file_contains_rule "${PRESENTATION_PROFILE_INPUT_SERVICE}" "${PRESENTATION_PROFILE_INPUT_SERVICE_REL}" \

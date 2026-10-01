@@ -1,4 +1,5 @@
 import urlUtils from '@ohos.url';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export type SecureDnsSelectionId = 'system' | 'auto' | 'alidns' | 'dnspod' | 'cloudflare' | 'google' | 'custom';
 
@@ -247,19 +248,19 @@ export class SecureDnsSettingsModel {
     const normalizedName = name.trim();
     let nameError = '';
     if (normalizedName.length === 0) {
-      nameError = '请输入 DNS 名称。';
+      nameError = resolveAppResourceText($r('app.string.dns_name_required'));
     } else if (normalizedName.length > 80) {
-      nameError = 'DNS 名称不能超过 80 个字符。';
+      nameError = resolveAppResourceText($r('app.string.dns_name_too_long'));
     } else if (editingProfileId.trim().length === 0 && profiles.length >= MAX_CUSTOM_DNS_PROFILES) {
-      nameError = '最多可保存 32 个自定义 DNS。';
+      nameError = resolveAppResourceText($r('app.string.dns_too_many'));
     } else if (this.hasDuplicateProfileName(profiles, editingProfileId, normalizedName)) {
-      nameError = '已有同名的自定义 DNS。';
+      nameError = resolveAppResourceText($r('app.string.dns_name_exists'));
     }
     const endpointValidation = this.validateEndpoint(endpoint);
     let endpointError = endpointValidation.errorMessage;
     if (endpointValidation.valid &&
       this.hasDuplicateProfileEndpoint(profiles, editingProfileId, endpointValidation.endpoint)) {
-      endpointError = '这个 DoH 地址已经保存。';
+      endpointError = resolveAppResourceText($r('app.string.dns_endpoint_exists'));
     }
     return {
       valid: nameError.length === 0 && endpointError.length === 0,
@@ -273,15 +274,15 @@ export class SecureDnsSettingsModel {
   private validateEndpoint(value: string): SecureDnsEndpointValidation {
     const endpoint = value.trim();
     if (endpoint.length === 0) {
-      return this.invalidEndpoint('请输入 HTTPS DoH 地址。');
+      return this.invalidEndpoint(resolveAppResourceText($r('app.string.dns_https_required')));
     }
     if (!endpoint.toLowerCase().startsWith('https://')) {
-      return this.invalidEndpoint('仅支持 HTTPS 地址。');
+      return this.invalidEndpoint(resolveAppResourceText($r('app.string.dns_https_only')));
     }
     try {
       const parsed = urlUtils.URL.parseURL(endpoint);
       if (parsed.protocol.toLowerCase() !== 'https:' || parsed.hostname.trim().length === 0) {
-        return this.invalidEndpoint('请输入有效的 HTTPS DoH 地址。');
+        return this.invalidEndpoint(resolveAppResourceText($r('app.string.dns_https_invalid')));
       }
       return {
         valid: true,
@@ -289,7 +290,7 @@ export class SecureDnsSettingsModel {
         errorMessage: ''
       };
     } catch (_error) {
-      return this.invalidEndpoint('请输入有效的 HTTPS DoH 地址。');
+      return this.invalidEndpoint(resolveAppResourceText($r('app.string.dns_https_invalid')));
     }
   }
 

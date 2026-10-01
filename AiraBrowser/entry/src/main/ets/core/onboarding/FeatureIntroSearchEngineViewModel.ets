@@ -1,3 +1,5 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
+
 export type FeatureIntroSearchEngineChoiceId =
   'bing' |
   'baidu' |
@@ -46,19 +48,19 @@ export function resolveFeatureIntroSearchEngineChoice(value: string): FeatureInt
 
 export class FeatureIntroSearchEngineViewModel {
   title(): string {
-    return FEATURE_INTRO_SEARCH_ENGINE_TITLE;
+    return searchIntroText($r('app.string.search_intro_title'), FEATURE_INTRO_SEARCH_ENGINE_TITLE);
   }
 
   subtitle(): string {
-    return FEATURE_INTRO_SEARCH_ENGINE_SUBTITLE;
+    return searchIntroText($r('app.string.search_intro_subtitle'), FEATURE_INTRO_SEARCH_ENGINE_SUBTITLE);
   }
 
   continueLabel(): string {
-    return FEATURE_INTRO_SEARCH_ENGINE_CONTINUE_LABEL;
+    return searchIntroText($r('app.string.settings_sync_next'), FEATURE_INTRO_SEARCH_ENGINE_CONTINUE_LABEL);
   }
 
   skipLabel(): string {
-    return FEATURE_INTRO_SEARCH_ENGINE_SKIP_LABEL;
+    return searchIntroText($r('app.string.onboarding_ui_feature_intro_skip_control_001'), FEATURE_INTRO_SEARCH_ENGINE_SKIP_LABEL);
   }
 
   defaultChoiceId(): FeatureIntroSearchEngineChoiceId {
@@ -66,6 +68,33 @@ export class FeatureIntroSearchEngineViewModel {
   }
 
   choices(): FeatureIntroSearchEngineChoice[] {
-    return FEATURE_INTRO_SEARCH_ENGINE_CHOICES;
+    return FEATURE_INTRO_SEARCH_ENGINE_CHOICES.map((choice: FeatureIntroSearchEngineChoice): FeatureIntroSearchEngineChoice => {
+      return {
+        id: choice.id,
+        label: this.localizeChoiceLabel(choice)
+      };
+    });
   }
+
+  private localizeChoiceLabel(choice: FeatureIntroSearchEngineChoice): string {
+    switch (choice.id) {
+      case 'baidu':
+        return searchIntroText($r('app.string.search_engine_baidu'), choice.label);
+      case 'google':
+        return searchIntroText($r('app.string.search_engine_google'), choice.label);
+      case 'sogou':
+        return searchIntroText($r('app.string.search_engine_sogou'), choice.label);
+      case 'qihoo':
+        return searchIntroText($r('app.string.search_engine_360'), choice.label);
+      case 'shenma':
+        return searchIntroText($r('app.string.search_engine_shenma'), choice.label);
+      default:
+        return searchIntroText($r('app.string.search_engine_bing'), choice.label);
+    }
+  }
+}
+
+function searchIntroText(resource: Resource, fallback: string): string {
+  const resolved = resolveAppResourceText(resource);
+  return resolved.length > 0 ? resolved : fallback;
 }

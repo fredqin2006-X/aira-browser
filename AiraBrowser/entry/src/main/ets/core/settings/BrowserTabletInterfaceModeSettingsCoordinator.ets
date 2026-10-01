@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { BrowserDataBoundaryInput } from '../../common/models/BrowserModels';
 import { BrowserTabletInterfaceMode } from '../../common/models/BrowserDevicePresentationModels';
 import { BrowserTabletInterfaceModeRepository } from '../../data/preferences/BrowserTabletInterfaceModeRepository';
@@ -143,12 +144,12 @@ export class BrowserTabletInterfaceModeSettingsCoordinator {
 
   private resolveLabel(mode: BrowserTabletInterfaceMode): string {
     if (mode === 'touch') {
-      return '触屏界面';
+      return resolveAppResourceText($r('app.string.settings_appearance_touch'));
     }
     if (mode === 'desktop') {
-      return '桌面界面';
+      return resolveAppResourceText($r('app.string.settings_appearance_desktop'));
     }
-    return '自动';
+    return resolveAppResourceText($r('app.string.settings_appearance_auto'));
   }
 
   private resolveSelectedModeForDevice(
@@ -166,14 +167,14 @@ export class BrowserTabletInterfaceModeSettingsCoordinator {
   ): BrowserTabletInterfaceModeOptionState[] {
     if (device.detectedFormFactor === 'phone' && !device.foldableDevice) {
       return [
-        { mode: 'touch', title: '触屏界面' },
-        { mode: 'desktop', title: '桌面界面' }
+        { mode: 'touch', title: resolveAppResourceText($r('app.string.settings_appearance_touch')) },
+        { mode: 'desktop', title: resolveAppResourceText($r('app.string.settings_appearance_desktop')) }
       ];
     }
     return [
-      { mode: 'auto', title: '自动' },
-      { mode: 'touch', title: '触屏界面' },
-      { mode: 'desktop', title: '桌面界面' }
+      { mode: 'auto', title: resolveAppResourceText($r('app.string.settings_appearance_auto')) },
+      { mode: 'touch', title: resolveAppResourceText($r('app.string.settings_appearance_touch')) },
+      { mode: 'desktop', title: resolveAppResourceText($r('app.string.settings_appearance_desktop')) }
     ];
   }
 
@@ -181,15 +182,15 @@ export class BrowserTabletInterfaceModeSettingsCoordinator {
     device: BrowserTabletInterfaceModeDeviceFacts
   ): string {
     if (device.detectedFormFactor === 'phone' && !device.foldableDevice) {
-      return '手机使用桌面界面可能出现内容过密、按钮过小或部分布局不适配。切换到桌面界面前需要再次确认。';
+      return resolveAppResourceText($r('app.string.tablet_touch_warning'));
     }
     if (device.smallFoldableDevice) {
-      return '小折叠屏展开后仍使用触屏界面，因为展开后的屏幕较窄；手动选择桌面界面时除外。';
+      return resolveAppResourceText($r('app.string.tablet_fold_note'));
     }
     if (device.foldableDevice) {
-      return '自动模式会在设备展开时使用桌面界面，收起时恢复触屏界面；半折叠或状态未知时保持当前界面。';
+      return resolveAppResourceText($r('app.string.tablet_auto_fold'));
     }
-    return '自动模式会在连接鼠标或触控板时使用桌面界面，断开后恢复触屏界面。物理键盘仍可在触屏界面中使用快捷键。';
+    return resolveAppResourceText($r('app.string.tablet_auto_pointer'));
   }
 
   private canWriteDevicePreference(boundaryInput: BrowserDataBoundaryInput): boolean {

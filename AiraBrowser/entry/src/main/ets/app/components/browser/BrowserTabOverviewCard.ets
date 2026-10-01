@@ -255,7 +255,7 @@ export struct BrowserTabOverviewCard {
     })
     .enabled(this.shouldShowCloseButton())
     .hitTestBehavior(this.shouldShowCloseButton() ? HitTestMode.Default : HitTestMode.None)
-    .accessibilityText('关闭标签页')
+    .accessibilityText($r('app.string.browser_ui_browser_tab_overview_card_001'))
     .zIndex(5)
     .animation({
       duration: TAB_OVERVIEW_CARD_CLOSE_BUTTON_REVEAL_MS,
@@ -290,7 +290,7 @@ export struct BrowserTabOverviewCard {
       .backgroundColor(this.storedSurfaceBackgroundColor)
       .borderRadius(22)
 
-      Text('新建标签页')
+      Text($r('app.string.bottom_panel_new_tab_page'))
         .fontSize(16)
         .fontWeight(FontWeight.Medium)
         .fontColor(this.storedPrimaryTextColor)

@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY,
   BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY
@@ -25,7 +26,7 @@ struct BrowserSitePermissionPromptDialog {
 
   build() {
     Column({ space: 8 }) {
-      Text(this.presentation.title.length > 0 ? this.presentation.title : '站点权限请求')
+      Text(this.presentation.title.length > 0 ? this.presentation.title : resolveAppResourceText($r('app.string.browser_ui_browser_site_permission_prompt_host_004')))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -40,9 +41,9 @@ struct BrowserSitePermissionPromptDialog {
         .textAlign(TextAlign.Center)
 
       Column({ space: 4 }) {
-        this.buildActionButton('仅使用期间允许', 'allow_during_use')
-        this.buildActionButton('本次使用允许', 'allow_for_session')
-        this.buildActionButton('不允许', 'deny')
+        this.buildActionButton(resolveAppResourceText($r('app.string.browser_ui_browser_site_permission_prompt_host_002')), 'allow_during_use')
+        this.buildActionButton(resolveAppResourceText($r('app.string.browser_ui_browser_site_permission_prompt_host_003')), 'allow_for_session')
+        this.buildActionButton(resolveAppResourceText($r('app.string.browser_ui_browser_site_permission_prompt_host_001')), 'deny')
       }
       .width('100%')
     }

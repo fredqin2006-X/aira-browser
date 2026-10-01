@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   BrowserClipboardCopyResult,
   BrowserClipboardService
@@ -110,7 +111,7 @@ export class WebLinkContextMenuFixedActionApplication implements WebLinkContextM
       title: url,
       intent: 'current_tab',
       source: 'app_ui',
-      helperMessage: '正在打开链接',
+      helperMessage: resolveAppResourceText($r('app.string.link_opening')),
       profileId: createOptions.profileId,
       privacyMode: createOptions.privacyMode,
       dataScope: createOptions.dataScope,
@@ -126,17 +127,17 @@ export class WebLinkContextMenuFixedActionApplication implements WebLinkContextM
       options: this.dependencies.privateTabCoordinator.buildPrivateTabCreateOptions(),
       runtimeOptions: {}
     }).then((): void => {
-      this.shell.publishHelper('已在隐私标签页中打开链接。');
+      this.shell.publishHelper(resolveAppResourceText($r('app.string.link_opened_private_tab')));
     });
   }
 
   private openPrivateWindow(url: string): void {
     void this.dependencies.privateTabCoordinator.openPrivateWindow(url).then((opened: boolean): void => {
       if (!opened) {
-        this.shell.showToast('隐私窗口打开失败，请重试。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.browser_browser_private_tab_coordinator_006')));
         return;
       }
-      this.shell.publishHelper('已在新的隐私窗口中打开链接。');
+      this.shell.publishHelper(resolveAppResourceText($r('app.string.link_opened_private_window')));
     });
   }
 
@@ -156,14 +157,14 @@ export class WebLinkContextMenuFixedActionApplication implements WebLinkContextM
   private copyLink(url: string): void {
     this.dependencies.clipboardService.copyText({
       value: url,
-      emptyMessage: '当前没有可复制的链接。',
-      successMessage: '链接已复制。'
+      emptyMessage: resolveAppResourceText($r('app.string.history_copy_empty')),
+      successMessage: resolveAppResourceText($r('app.string.reader_copy_link_done'))
     }).then((result: BrowserClipboardCopyResult): void => {
       this.shell.publishHelper(result.message);
       this.shell.showToast(result.message);
     }).catch((error: Object): void => {
-      this.shell.publishError(`复制失败：${JSON.stringify(error)}`);
-      this.shell.showToast('复制失败，请稍后重试。');
+      this.shell.publishError(resolveAppResourceText($r('app.string.link_copy_failed_detail', JSON.stringify(error))));
+      this.shell.showToast(resolveAppResourceText($r('app.string.reader_copy_link_failed')));
     });
   }
 
@@ -173,7 +174,7 @@ export class WebLinkContextMenuFixedActionApplication implements WebLinkContextM
       title: title,
       url: url
     }).catch((_error: Error): void => {
-      this.shell.showToast('分享失败，请稍后重试。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.reader_share_failed')));
     });
   }
 }

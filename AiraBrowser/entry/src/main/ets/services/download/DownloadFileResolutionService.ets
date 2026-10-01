@@ -422,87 +422,198 @@ export class DownloadFileResolutionService implements DownloadFileResolutionAdap
     return new fileUri.FileUri(uri).path;
   }
 
+  /**
+   * Copy into a picker folder through the file URI, not a path-to-path copy.
+   *
+   * `copyFile(sandboxPath, FileUri.path)` can create the name the file manager
+   * shows and leave that entry at 0 bytes, while a stat of the converted path
+   * still reports the full size. Treating that as success then deletes the
+   * temp file, so the only copy the user can find is empty. A URI copy, or a
+   * descriptor copy opened from the URI, is what the file manager actually
+   * indexes. A failed attempt must not be accepted just because the source
+   * size could not be read.
+   */
   private async copyLocalPathToUri(sourcePath: string, targetUri: string, sourceSize: number, label: string): Promise<void> {
-    const targetPath = this.resolvePathFromUri(targetUri);
+    if (sourceSize < 0) {
+      throw new Error('copy_source_unreadable');
+    }
     hilog.info(
       DOWNLOAD_FILE_RESOLUTION_DOMAIN,
       DOWNLOAD_FILE_RESOLUTION_TAG,
-      'copy attempt label=%{public}s targetPath=%{public}s',
+      'copy attempt label=%{public}s sourceSize=%{public}d targetUri=%{public}s',
       label,
-      targetPath
+      sourceSize,
+      targetUri
     );
+    const sourceUri = this.resolveUriFromLocalPath(sourcePath);
     try {
-      await fileIo.copyFile(sourcePath, targetPath);
-      const copiedSize = await this.getFileSize(targetPath);
-      hilog.info(
-        DOWNLOAD_FILE_RESOLUTION_DOMAIN,
-        DOWNLOAD_FILE_RESOLUTION_TAG,
-        'copy copyFile label=%{public}s sourceSize=%{public}d targetSize=%{public}d',
-        label,
-        sourceSize,
-        copiedSize
-      );
-      if (sourceSize <= 0 || copiedSize === sourceSize) {
-        return;
-      }
-      hilog.warn(
-        DOWNLOAD_FILE_RESOLUTION_DOMAIN,
-        DOWNLOAD_FILE_RESOLUTION_TAG,
-        'copy copyFile size_mismatch label=%{public}s sourceSize=%{public}d targetSize=%{public}d',
-        label,
-        sourceSize,
-        copiedSize
-      );
+      await fileIo.copy(sourceUri, targetUri);
+      await this.assertExportedSize(targetUri, sourceSize, label, 'uri_copy');
+      return;
     } catch (error) {
       hilog.error(
         DOWNLOAD_FILE_RESOLUTION_DOMAIN,
         DOWNLOAD_FILE_RESOLUTION_TAG,
-        'copy copyFile failed label=%{public}s error=%{public}s',
+        'copy uri failed label=%{public}s error=%{public}s',
         label,
         this.stringifyError(error)
       );
+      await this.deleteZeroByteExport(targetUri);
     }
-    await this.rewriteLocalPathToPath(sourcePath, targetPath);
-    const rewrittenSize = await this.getFileSize(targetPath);
-    hilog.info(
-      DOWNLOAD_FILE_RESOLUTION_DOMAIN,
-      DOWNLOAD_FILE_RESOLUTION_TAG,
-      'copy rewrite label=%{public}s sourceSize=%{public}d targetSize=%{public}d',
-      label,
-      sourceSize,
-      rewrittenSize
-    );
-    if (sourceSize > 0 && rewrittenSize !== sourceSize) {
-      throw new Error(`copy_size_mismatch source=${sourceSize} target=${rewrittenSize}`);
+    try {
+      await this.copyByFileDescriptor(sourcePath, targetUri, sourceSize, label);
+    } catch (error) {
+      await this.deleteZeroByteExport(targetUri);
+      throw error instanceof Error ? error : new Error(this.stringifyError(error));
     }
   }
 
-  private async rewriteLocalPathToPath(sourcePath: string, targetPath: string): Promise<void> {
+  private async copyByFileDescriptor(
+    sourcePath: string,
+    targetUri: string,
+    sourceSize: number,
+    label: string
+  ): Promise<void> {
     const input = await fileIo.open(sourcePath, fileIo.OpenMode.READ_ONLY);
-    const output = await fileIo.open(targetPath, fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+    let output: fileIo.File | undefined = undefined;
     try {
-      let inputOffset = 0;
-      let outputOffset = 0;
-      while (true) {
-        const chunk = new ArrayBuffer(LOCAL_COPY_CHUNK_BYTES);
-        const bytesRead = await fileIo.read(input.fd, chunk, {
-          offset: inputOffset,
-          length: LOCAL_COPY_CHUNK_BYTES
-        });
-        if (bytesRead <= 0) {
-          return;
+      output = await this.openExportDestination(targetUri);
+      try {
+        await fileIo.copyFile(input.fd, output.fd);
+      } catch (copyError) {
+        hilog.error(
+          DOWNLOAD_FILE_RESOLUTION_DOMAIN,
+          DOWNLOAD_FILE_RESOLUTION_TAG,
+          'copy fd copyFile failed label=%{public}s error=%{public}s',
+          label,
+          this.stringifyError(copyError)
+        );
+        const failedOutput = output;
+        output = undefined;
+        if (failedOutput !== undefined) {
+          try {
+            await fileIo.close(failedOutput);
+          } catch (_closeError) {
+          }
         }
-        const payload = bytesRead === chunk.byteLength ? chunk : chunk.slice(0, bytesRead);
-        const bytesWritten = await fileIo.write(output.fd, payload, {
-          offset: outputOffset,
-          length: payload.byteLength
-        });
-        inputOffset += bytesRead;
-        outputOffset += bytesWritten;
+        output = await this.openExportDestination(targetUri);
+        await this.rewriteFileDescriptors(input.fd, output.fd);
+      }
+      try {
+        await fileIo.fsync(output.fd);
+      } catch (syncError) {
+        hilog.warn(
+          DOWNLOAD_FILE_RESOLUTION_DOMAIN,
+          DOWNLOAD_FILE_RESOLUTION_TAG,
+          'copy fsync failed label=%{public}s error=%{public}s',
+          label,
+          this.stringifyError(syncError)
+        );
       }
     } finally {
       await fileIo.close(input);
-      await fileIo.close(output);
+      if (output !== undefined) {
+        await fileIo.close(output);
+      }
+    }
+    await this.assertExportedSize(targetUri, sourceSize, label, 'fd_copy');
+  }
+
+  private async openExportDestination(targetUri: string): Promise<fileIo.File> {
+    const mode = fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC;
+    try {
+      return await fileIo.open(targetUri, mode);
+    } catch (error) {
+      hilog.warn(
+        DOWNLOAD_FILE_RESOLUTION_DOMAIN,
+        DOWNLOAD_FILE_RESOLUTION_TAG,
+        'open export uri failed, falling back to path error=%{public}s',
+        this.stringifyError(error)
+      );
+      return await fileIo.open(this.resolvePathFromUri(targetUri), mode);
+    }
+  }
+
+  private async rewriteFileDescriptors(inputFd: number, outputFd: number): Promise<void> {
+    let inputOffset = 0;
+    while (true) {
+      const chunk = new ArrayBuffer(LOCAL_COPY_CHUNK_BYTES);
+      const bytesRead = await fileIo.read(inputFd, chunk, {
+        offset: inputOffset,
+        length: LOCAL_COPY_CHUNK_BYTES
+      });
+      if (bytesRead <= 0) {
+        return;
+      }
+      const payload = bytesRead === chunk.byteLength ? chunk : chunk.slice(0, bytesRead);
+      // read() offset is the file position. write() does not take that same
+      // number: the official copy sample only passes the buffer length and lets
+      // the destination descriptor advance. Passing the file position here drops
+      // everything after the first chunk.
+      const bytesWritten = await fileIo.write(outputFd, payload, {
+        length: payload.byteLength
+      });
+      if (bytesWritten <= 0) {
+        throw new Error('copy_write_stalled');
+      }
+      inputOffset += bytesRead;
+    }
+  }
+
+  private async assertExportedSize(
+    targetUri: string,
+    sourceSize: number,
+    label: string,
+    stage: string
+  ): Promise<void> {
+    const exportedSize = await this.readCommittedExportSize(targetUri);
+    hilog.info(
+      DOWNLOAD_FILE_RESOLUTION_DOMAIN,
+      DOWNLOAD_FILE_RESOLUTION_TAG,
+      'copy size label=%{public}s stage=%{public}s sourceSize=%{public}d targetSize=%{public}d',
+      label,
+      stage,
+      sourceSize,
+      exportedSize
+    );
+    if (exportedSize !== sourceSize) {
+      throw new Error(`copy_size_mismatch source=${sourceSize} target=${exportedSize}`);
+    }
+  }
+
+  /**
+   * A picker folder can report two sizes for one name: the URI the file
+   * manager indexes, and the converted path. If they disagree, the smaller one
+   * is what the user can actually open, so a full path stat must not hide an
+   * empty file-manager entry.
+   */
+  private async readCommittedExportSize(targetUri: string): Promise<number> {
+    const uriSize = await this.getFileSize(targetUri);
+    let pathSize = -1;
+    try {
+      pathSize = await this.getFileSize(this.resolvePathFromUri(targetUri));
+    } catch (_error) {
+      pathSize = -1;
+    }
+    if (uriSize >= 0 && pathSize >= 0 && uriSize !== pathSize) {
+      return Math.min(uriSize, pathSize);
+    }
+    return uriSize >= 0 ? uriSize : pathSize;
+  }
+
+  private async deleteZeroByteExport(targetUri: string): Promise<void> {
+    const visibleSize = await this.readCommittedExportSize(targetUri);
+    if (visibleSize !== 0) {
+      return;
+    }
+    try {
+      await fileIo.unlink(targetUri);
+      return;
+    } catch (_error) {
+    }
+    try {
+      await fileIo.unlink(this.resolvePathFromUri(targetUri));
+    } catch (_error) {
     }
   }
 

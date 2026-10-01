@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
 import { WebLoadErrorPresentation } from '../../../services/web/WebLoadErrorPresentationService';
 import {
@@ -172,11 +173,23 @@ export struct BrowserWebErrorSurface {
 
   private resolvePrimaryActionLabel(): string {
     const label = this.presentation.primaryActionLabel.trim();
-    return label.length > 0 ? label : '再试一次';
+    if (label.length === 0 || label === '再试一次') {
+      return resolveAppResourceText($r('app.string.browser_ui_browser_web_error_surface_001'));
+    }
+    if (label === '重新加载') {
+      return resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_vertical_tabs_sidebar_010'));
+    }
+    return label;
   }
 
   private resolveSecondaryActionLabel(): string {
     const label = this.presentation.secondaryActionLabel.trim();
-    return label.length > 0 ? label : '转到系统设置';
+    if (label.length === 0 || label === '转到系统设置') {
+      return resolveAppResourceText($r('app.string.browser_ui_browser_web_error_surface_002'));
+    }
+    if (label === '打开首页') {
+      return resolveAppResourceText($r('app.string.settings_general_open_home'));
+    }
+    return label;
   }
 }

@@ -51,7 +51,6 @@ export interface BrowserUserAgentNavigationPlan {
 export interface BrowserUserAgentNavigationPreparation {
   allowed: boolean;
   applicationStatus: BrowserUserAgentApplicationStatus;
-  transitionNoticeRequired: boolean;
 }
 
 export interface BrowserUserAgentNativeHistorySnapshot {
@@ -154,7 +153,6 @@ export class BrowserUserAgentRuntimeService implements BrowserHostedRuntimeRelea
   private committedEntryPlansByTabId:
     Record<string, Record<string, BrowserUserAgentCommittedEntryPlan | undefined> | undefined> = {};
   private affinityByTabId: Record<string, BrowserBrowsingIdentityRuntimeAffinity | undefined> = {};
-  private transitionNoticeSignatureByTabId: Record<string, string | undefined> = {};
   private nextTransactionId: number = 0;
 
   constructor(
@@ -191,8 +189,7 @@ export class BrowserUserAgentRuntimeService implements BrowserHostedRuntimeRelea
       this.logRuntimeDecision('redirect-reuse', activePlan, activePlan.applicationStatus);
       return {
         allowed: activePlan.applicationStatus !== 'failed',
-        applicationStatus: activePlan.applicationStatus,
-        transitionNoticeRequired: false
+        applicationStatus: activePlan.applicationStatus
       };
     }
     return this.startNavigation(
@@ -358,7 +355,6 @@ export class BrowserUserAgentRuntimeService implements BrowserHostedRuntimeRelea
     this.committedEntryPlansByTabId[tabId] = undefined;
     this.affinityByTabId[tabId] = undefined;
     this.bindingByTabId[tabId] = undefined;
-    this.transitionNoticeSignatureByTabId[tabId] = undefined;
     if (controller !== undefined) {
       this.releaseController(controller);
     }
@@ -367,7 +363,6 @@ export class BrowserUserAgentRuntimeService implements BrowserHostedRuntimeRelea
   releaseControllerBinding(tabId: string, controller: webview.WebviewController | undefined): void {
     this.activeNavigationPlanByTabId[tabId] = undefined;
     this.bindingByTabId[tabId] = undefined;
-    this.transitionNoticeSignatureByTabId[tabId] = undefined;
     if (controller !== undefined) {
       this.releaseController(controller);
     }
@@ -407,8 +402,7 @@ export class BrowserUserAgentRuntimeService implements BrowserHostedRuntimeRelea
     if (controller === undefined) {
       return {
         allowed: false,
-        applicationStatus: 'failed',
-        transitionNoticeRequired: false
+        applicationStatus: 'failed'
       };
     }
     const applicationStatus = this.applyToController(tabId, controller, resolution, allowControllerMutation);
@@ -416,8 +410,7 @@ export class BrowserUserAgentRuntimeService implements BrowserHostedRuntimeRelea
       this.activeNavigationPlanByTabId[tabId] = undefined;
       return {
         allowed: false,
-        applicationStatus: applicationStatus,
-        transitionNoticeRequired: false
+        applicationStatus: applicationStatus
       };
     }
     this.nextTransactionId += 1;
@@ -434,18 +427,12 @@ export class BrowserUserAgentRuntimeService implements BrowserHostedRuntimeRelea
     if (activePlan !== undefined) {
       this.logRuntimeDecision('prepare', activePlan, applicationStatus);
     }
-    const transitionNoticeRequired = this.updateTransitionNoticeState(
-      tabId,
-      applicationStatus,
-      resolution
-    );
     // A transition-required plan deliberately preserves native history under
     // the current Controller identity. Only a platform mutation failure blocks
     // a navigation from being issued.
     return {
       allowed: true,
-      applicationStatus: applicationStatus,
-      transitionNoticeRequired: transitionNoticeRequired
+      applicationStatus: applicationStatus
     };
   }
 
@@ -532,22 +519,6 @@ export class BrowserUserAgentRuntimeService implements BrowserHostedRuntimeRelea
   private releaseController(controller: webview.WebviewController): void {
     this.controllerBindings.delete(controller);
     this.platformAdapter.releaseController(controller);
-  }
-
-  private updateTransitionNoticeState(
-    tabId: string,
-    applicationStatus: BrowserUserAgentApplicationStatus,
-    resolution: BrowserBrowsingIdentityDecision
-  ): boolean {
-    if (applicationStatus !== 'identity_transition_required') {
-      this.transitionNoticeSignatureByTabId[tabId] = undefined;
-      return false;
-    }
-    const currentIdentityId = this.bindingByTabId[tabId]?.resolution.profile.identityId ?? 'custom';
-    const signature = `${currentIdentityId}->${resolution.profile.identityId}`;
-    const noticeRequired = this.transitionNoticeSignatureByTabId[tabId] !== signature;
-    this.transitionNoticeSignatureByTabId[tabId] = signature;
-    return noticeRequired;
   }
 
   private logRuntimeDecision(

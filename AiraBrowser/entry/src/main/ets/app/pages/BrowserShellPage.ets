@@ -108,6 +108,7 @@ import { BrowserUserAgentClientHintsService } from '../../services/web/BrowserUs
 import { BrowserUserAgentRuntimeService } from '../../services/web/BrowserUserAgentRuntimeService';
 import { WebScrollSmoothModeService } from '../../services/web/WebScrollSmoothModeService';
 import { BrowserWebBottomSafeAreaCoordinator } from '../../core/browser/BrowserWebBottomSafeAreaCoordinator';
+import { BrowserWebToolbarClearanceCoordinator } from '../../core/browser/BrowserWebToolbarClearanceCoordinator';
 import {
   DocumentViewerChromeContext,
   DocumentViewerFileInfo,
@@ -2553,18 +2554,6 @@ struct BrowserShellPage {
         case 'record_runtime_event':
           this.recordRuntimeEvent(effect.eventType, effect.message, effect.tabId);
           return;
-        case 'show_close_all_confirmation':
-          this.browserNativeAlertDialogPresenter.confirm({
-            title: effect.plan.title,
-            message: effect.plan.message,
-            cancelLabel: $r('app.string.settings_account_cancel'),
-            confirmLabel: effect.plan.confirmLabel,
-            confirmTone: 'alert',
-            onConfirm: () => {
-              this.dispatchTabsOverviewSession({ type: 'confirm_close_all' });
-            }
-          });
-          return;
         case 'confirm_private_mode_switch':
           this.presentPrivateModeToggleConfirmation(
             this.browserPrivateTabCoordinator.buildModeSwitchConfirmationState(
@@ -3300,8 +3289,10 @@ struct BrowserShellPage {
       syncWebNavigationStateSoon: (): void => this.browserWebNavigationStateSyncCoordinator.syncSoon(),
       handleWebpageTranslationRefreshOrHistory: (tabId: string, url: string): void =>
         this.webpageTranslationCoordinator.handleRefreshOrBackForwardForRuntimeTab(tabId, this.activeTabId, url),
-      handleActiveTabChanged: (change: BrowserWebActiveTabChange): void =>
-        this.browserWebPageLifecycleApplicationCoordinator.handleActiveTabChanged(change)
+      handleActiveTabChanged: (change: BrowserWebActiveTabChange): void => {
+        this.browserWebPageLifecycleApplicationCoordinator.handleActiveTabChanged(change);
+        this.syncWebToolbarClearance(true);
+      }
     };
   }
 
@@ -4247,6 +4238,7 @@ struct BrowserShellPage {
     resolveSurfaceFacts: (): BrowserFullscreenSurfaceFacts => this.buildBrowserFullscreenSurfaceFacts(),
     publishPresentation: (presentation: BrowserFullscreenSessionPresentation): void => {
       this.browserFullscreenSessionPresentation = presentation;
+      this.syncWebToolbarClearance();
     },
     applyEffect: (effect: BrowserFullscreenSessionEffect): void => {
       this.applyBrowserFullscreenSessionEffect(effect);
@@ -4709,6 +4701,24 @@ struct BrowserShellPage {
       applyBottomInset: (insetVp: number): void => {
         this.webBottomSafeAreaInsetVp = insetVp;
         this.refreshWebViewportPresentation();
+        this.syncWebToolbarClearance();
+      }
+    });
+  private browserWebToolbarClearanceCoordinator: BrowserWebToolbarClearanceCoordinator =
+    new BrowserWebToolbarClearanceCoordinator({
+      readFacts: () => ({
+        tabId: this.activeTabId,
+        overlayActive: this.isFloatingWebToolbarOverlayActive(),
+        viewportReserved: this.webBottomSafeAreaInsetVp > 0 &&
+          this.resolveWebViewportVisualBottomInsetVp() > 0,
+        bottomLiftVp: this.resolveCockpitFloatingChromeBottomLiftVp()
+      }),
+      runScript: (tabId: string, script: string): void => {
+        const controller = this.browserRuntimeLifecyclePort.resolveController(tabId);
+        if (controller === undefined) return;
+        try {
+          void controller.runJavaScript(script);
+        } catch (_) {}
       }
     });
   private browserThemeModeCoordinator: BrowserThemeModeCoordinator =
@@ -6567,6 +6577,7 @@ struct BrowserShellPage {
       const appearance = sharedPreferencesRepository.getPreferences().appearance;
       this.toolbarChromeStyle = appearance.toolbarChromeStyle;
       this.syncWebBottomSafeAreaEnabled();
+      this.syncWebToolbarClearance();
       if (this.toolbarChromeStyle === 'split' && !this.isLargeScreenShellFamilyActive()) {
         this.browserWebScrollInteractionCoordinator.applyBottomToolbarScrollBehavior(
           resolveSplitToolbarScrollBehavior(appearance.bottomToolbarScrollBehavior),
@@ -6737,6 +6748,7 @@ struct BrowserShellPage {
     this.browserTabSwipeCoverCoordinator.dispose();
     this.browserTabSwipePreviewCoordinator.dispose();
     this.browserWebBottomSafeAreaCoordinator.dispose();
+    this.browserWebToolbarClearanceCoordinator.dispose();
     this.rootBottomPanelToolbarSystemSheetRequested = false;
     this.clientUpdatePolicyUnsubscribe?.();
     this.clientUpdatePolicyUnsubscribe = undefined;
@@ -7158,6 +7170,7 @@ struct BrowserShellPage {
       if (viewportChanged) {
         this.browserAddressBarTabSwipeCoordinator.cancel();
         this.browserWebBottomSafeAreaCoordinator.requestCheck(this.activeTabId);
+        this.syncWebToolbarClearance();
       }
     })
   }
@@ -7254,6 +7267,7 @@ struct BrowserShellPage {
     this.browserAddressBarTabSwipeCoordinator.reconcile();
     this.browserTabSwipePreviewCoordinator.reconcile();
     this.browserWebBottomSafeAreaCoordinator.retainTabs(this.tabs.map((tab: BrowserTabState): string => tab.id));
+    this.browserWebToolbarClearanceCoordinator.retainTabs(this.tabs.map((tab: BrowserTabState): string => tab.id));
     this.browserWebBottomSafeAreaCoordinator.reconcile();
     if (this.showHomePage) {
       this.homeSurfacePaintedOnce = true;
@@ -10356,6 +10370,20 @@ struct BrowserShellPage {
     );
   }
 
+  // Floating capsule over a web document. Split and large-screen frames already shorten the web
+  // view, and the document viewer is its own page, so neither gets a trailing spacer.
+  private isFloatingWebToolbarOverlayActive(): boolean {
+    return this.isWebBottomSafeAreaChromeActive() &&
+      !this.shouldHideRootBottomChromeForImmersion() &&
+      !this.buildCurrentDocumentViewerChromeContext().policy.active;
+  }
+
+  private syncWebToolbarClearance(force: boolean = false): void {
+    // Snapshot callbacks can run while later fields are still initializing.
+    if (this.browserWebToolbarClearanceCoordinator === undefined) return;
+    this.browserWebToolbarClearanceCoordinator.apply(this.activeTabId, force);
+  }
+
   private resolveWebViewportVisualBottomInsetVp(): number {
     const systemInsetVp = this.webScrollExperimentSettings.webBottomSafeAreaEnabled &&
       this.isWebBottomSafeAreaChromeActive() &&
@@ -12194,24 +12222,28 @@ struct BrowserShellPage {
         this.browserWebTopImmersionSessionCoordinator.handleBeforeWebBuild(tabId);
         this.browserMediaRuntimeObservationApplicationCoordinator.beginDocument(tabId);
         this.browserWebBottomSafeAreaCoordinator.handleDocumentBegin(tabId);
+        this.browserWebToolbarClearanceCoordinator.handleDocumentBegin(tabId);
       },
       onPageVisible: (tabId: string, _event: OnPageVisibleEvent) => {
         this.browserAddressBarTabSwipeCoordinator.noteSurfaceVisible(tabId,
           this.browserHostedRuntimeSurfacePort.getHostedNodeGeneration(tabId));
         this.browserWebTopImmersionSessionCoordinator.handlePageVisible(tabId);
         this.browserWebBottomSafeAreaCoordinator.requestCheck(tabId);
+        this.browserWebToolbarClearanceCoordinator.apply(tabId, true);
       },
       onPageBegin: (tabId: string, event: OnPageBeginEvent) => {
         this.browserLargeScreenWebZoomCoordinator.handleDocumentBegin(tabId);
         this.browserAddressBarTabSwipeCoordinator.noteDocumentBegin(tabId);
         this.browserTabSwipePreviewCoordinator.noteDocumentBegin(tabId);
         this.browserWebBottomSafeAreaCoordinator.handleDocumentBegin(tabId);
+        this.browserWebToolbarClearanceCoordinator.handleDocumentBegin(tabId);
         this.browserWebPageLifecycleApplicationCoordinator.handlePageBegin(tabId, event);
       },
       onPageEnd: (tabId: string, event: OnPageEndEvent) => {
         this.browserLargeScreenWebZoomCoordinator.handleDocumentEnd(tabId);
         this.browserWebPageLifecycleApplicationCoordinator.handlePageEnd(tabId, event);
         this.browserWebBottomSafeAreaCoordinator.requestCheck(tabId);
+        this.browserWebToolbarClearanceCoordinator.apply(tabId, true);
         this.novelReaderApplication.handlePageReady(
           this.novelReaderSession, tabId, this.activeTabId, this.isWebPageVisible(), event.url);
         if (this.shouldHandleActiveWebTab(tabId)) {
@@ -12299,6 +12331,7 @@ struct BrowserShellPage {
       onHistoryApiUrlChange: (tabId: string, payloadJson: string) => {
         this.browserWebPageLifecycleApplicationCoordinator.handleHistoryApiUrlChange(tabId, payloadJson);
         this.browserWebBottomSafeAreaCoordinator.requestCheck(tabId);
+        this.browserWebToolbarClearanceCoordinator.apply(tabId, true);
       },
       onPageChromeThemeSignal: (tabId: string, payloadJson: string) => {
         this.browserPageChromeThemeSamplingCoordinator.handleThemeSignal(
@@ -12437,6 +12470,7 @@ struct BrowserShellPage {
     this.browserControllerAttachmentRuntimeCoordinator.handleControllerAttachedSignal(tabId);
     this.browserWebTopImmersionSessionCoordinator.handleControllerAttached(tabId);
     this.browserPageFindCoordinator.handleControllerAttached(tabId);
+    this.browserWebToolbarClearanceCoordinator.apply(tabId, true);
   }
 
   private async captureCurrentTabPreviewBeforeLeavingOpenerTab(

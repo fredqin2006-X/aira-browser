@@ -1,4 +1,5 @@
 import { KeyCode } from '@kit.InputKit';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
 import {
   BrowserLargeScreenInputProfile,
@@ -117,7 +118,7 @@ export struct BrowserLargeScreenTabListPopover {
       ? this.storedControlBackgroundColor
       : $r('sys.color.ohos_id_color_background_transparent'))
     .stateEffect(true)
-    .accessibilityText('标签页列表')
+    .accessibilityText($r('app.string.browser_ui_browser_large_screen_tab_list_popover_007'))
     .onTouch((event: TouchEvent): void => {
       this.updateInteractionMode(event);
     })
@@ -168,7 +169,7 @@ export struct BrowserLargeScreenTabListPopover {
       Scroll() {
         Column({ space: 2 }) {
           if (this.resolvePresentation().openTabs.length <= 0) {
-            this.buildEmptyState('暂无打开的标签页')
+            this.buildEmptyState(resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_tab_list_popover_004')))
           } else {
             ForEach(this.resolvePresentation().openTabs, (tab: BrowserLargeScreenTabListOpenRowPresentation) => {
               this.buildOpenTabRow(tab)
@@ -192,7 +193,7 @@ export struct BrowserLargeScreenTabListPopover {
         Scroll() {
           Column({ space: 2 }) {
             if (this.resolvePresentation().recentlyClosedTabs.length <= 0) {
-              this.buildEmptyState('暂无最近关闭的标签页')
+              this.buildEmptyState(resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_tab_list_popover_005')))
             } else {
               ForEach(this.resolvePresentation().recentlyClosedTabs,
                 (record: BrowserLargeScreenTabListRecentRowPresentation) => {
@@ -222,7 +223,7 @@ export struct BrowserLargeScreenTabListPopover {
   @Builder
   private buildOpenTabsHeader(openTabCount: number) {
     Row({ space: 8 }) {
-      Text('打开的标签页')
+      Text($r('app.string.browser_ui_browser_large_screen_tab_list_popover_002'))
         .layoutWeight(1)
         .fontSize(14)
         .fontWeight(FontWeight.Medium)
@@ -243,7 +244,7 @@ export struct BrowserLargeScreenTabListPopover {
   private buildRecentlyClosedHeader(recentlyClosedCount: number) {
     Button({ type: ButtonType.Normal }) {
       Row({ space: 8 }) {
-        Text('最近关闭的标签页')
+        Text($r('app.string.browser_ui_browser_large_screen_tab_list_popover_006'))
           .layoutWeight(1)
           .fontSize(14)
           .fontWeight(FontWeight.Medium)
@@ -270,7 +271,9 @@ export struct BrowserLargeScreenTabListPopover {
     .padding({ left: 16, right: 16 })
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
     .stateEffect(true)
-    .accessibilityText(this.recentlyClosedExpanded ? '收起最近关闭的标签页' : '展开最近关闭的标签页')
+    .accessibilityText(this.recentlyClosedExpanded
+      ? resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_tab_list_popover_003'))
+      : resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_tab_list_popover_001')))
     .onClick(() => {
       this.recentlyClosedExpanded = !this.recentlyClosedExpanded;
     })
@@ -310,7 +313,7 @@ export struct BrowserLargeScreenTabListPopover {
       .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
       .stateEffect(false)
       .hoverEffect(HoverEffect.None)
-      .accessibilityText(`切换到${tab.title}`)
+      .accessibilityText(resolveAppResourceText($r('app.string.tab_a11y_switch', tab.title)))
       .onClick(() => {
         this.closePopup();
         this.onIntent({ kind: 'select_tab', tabId: tab.tabId });
@@ -318,7 +321,7 @@ export struct BrowserLargeScreenTabListPopover {
 
       this.buildCloseButton(
         tab.actionVisible,
-        `关闭${tab.title}`,
+        resolveAppResourceText($r('app.string.tab_a11y_close', tab.title)),
         (): void => {
           this.onIntent({ kind: 'close_tab', tabId: tab.tabId });
         }
@@ -381,7 +384,7 @@ export struct BrowserLargeScreenTabListPopover {
       .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
       .stateEffect(false)
       .hoverEffect(HoverEffect.None)
-      .accessibilityText(`重新打开${record.title}`)
+      .accessibilityText(resolveAppResourceText($r('app.string.tab_list_reopen', record.title)))
       .onClick(() => {
         this.closePopup();
         this.onIntent({ kind: 'restore_recently_closed', tabId: '', recordId: record.recordId });
@@ -389,7 +392,7 @@ export struct BrowserLargeScreenTabListPopover {
 
       this.buildCloseButton(
         record.actionVisible,
-        `删除${record.title}`,
+        resolveAppResourceText($r('app.string.tab_list_delete', record.title)),
         (): void => {
           this.closePopup();
           this.onIntent({ kind: 'request_delete_recently_closed', tabId: '', recordId: record.recordId });

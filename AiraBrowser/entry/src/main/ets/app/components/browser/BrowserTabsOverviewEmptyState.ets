@@ -19,7 +19,7 @@ export struct BrowserTabsOverviewEmptyState {
         })
           .margin({ bottom: 4 })
 
-        Text('这里是你的隐私空间')
+        Text($r('app.string.browser_ui_browser_tabs_overview_empty_state_003'))
           .width('100%')
           .constraintSize({ maxWidth: PRIVACY_EMPTY_STATE_CONTENT_WIDTH })
           .fontSize(20)
@@ -28,7 +28,7 @@ export struct BrowserTabsOverviewEmptyState {
           .textAlign(TextAlign.Center)
           .maxLines(2)
 
-        Text('新打开的网页会使用独立的临时会话，不写入常规浏览历史。关闭全部隐私标签页后，本次会话数据会按你的隐私设置处理。')
+        Text($r('app.string.browser_ui_browser_tabs_overview_empty_state_001'))
           .width('100%')
           .constraintSize({ maxWidth: PRIVACY_EMPTY_STATE_CONTENT_WIDTH })
           .fontSize(14)
@@ -36,7 +36,7 @@ export struct BrowserTabsOverviewEmptyState {
           .fontColor(this.textColor)
           .textAlign(TextAlign.Center)
       } else {
-        Text('暂无标签页')
+        Text($r('app.string.browser_ui_browser_tabs_overview_empty_state_002'))
           .fontSize(15)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.textColor)

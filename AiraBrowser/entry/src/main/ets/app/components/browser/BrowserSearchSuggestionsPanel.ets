@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { SearchSuggestion } from '../../../common/models/BrowserModels';
 import {
   BROWSER_THEME_STORAGE_CONTROL_BACKGROUND_KEY,
@@ -155,7 +156,7 @@ export struct BrowserSearchSuggestionsPanel {
       .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
       .hitTestBehavior(this.blankAreaBackEnabled ? HitTestMode.Block : HitTestMode.None)
       .focusable(false)
-      .accessibilityText('收起搜索')
+      .accessibilityText($r('app.string.browser_ui_browser_search_suggestions_panel_001'))
       .onClick(() => {
         if (this.blankAreaBackEnabled) {
           this.onBlankAreaBack();
@@ -575,21 +576,21 @@ struct BrowserSearchSuggestionCard {
     Row({ space: CURRENT_SUGGESTION_ACTION_BUTTON_GAP }) {
       this.buildCurrentSuggestionImageAction(
         'browser.toolbar.shareDocument',
-        '分享',
+        resolveAppResourceText($r('app.string.offline_action_share_short')),
         () => {
           this.onCurrentSuggestionShare(this.suggestion);
         }
       )
       this.buildCurrentSuggestionImageAction(
         'site.permission.clipboard',
-        '复制',
+        resolveAppResourceText($r('app.string.settings_link_ext_copy')),
         () => {
           this.onCurrentSuggestionCopy(this.suggestion);
         }
       )
       this.buildCurrentSuggestionImageAction(
         'browser.toolbar.edit',
-        '编辑',
+        resolveAppResourceText($r('app.string.ui_edit')),
         () => {
           this.onCurrentSuggestionEdit(this.suggestion);
         }

@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   BrowserCreateTabOptions,
   BrowserTabState
@@ -89,7 +90,7 @@ export class BrowserPrivateTabCoordinator {
   buildEnterPrivateModePlan(): BrowserPrivateModeEntryPlan {
     return {
       options: this.buildPrivateTabCreateOptions(),
-      helperMessage: '已进入隐私模式'
+      helperMessage: resolveAppResourceText($r('app.string.browser_browser_tabs_overview_action_bar_policy_006'))
     };
   }
 
@@ -129,10 +130,10 @@ export class BrowserPrivateTabCoordinator {
     if (plan.target === 'confirm_enter_private') {
       return {
         kind: 'enter_private',
-        title: '进入隐私模式',
-        message: '进入后，新打开的网页将使用独立的隐私会话。是否进入隐私模式？',
-        cancelLabel: '取消',
-        confirmLabel: '进入隐私模式',
+        title: resolveAppResourceText($r('app.string.browser_browser_private_tab_coordinator_004')),
+        message: resolveAppResourceText($r('app.string.browser_browser_private_tab_coordinator_003')),
+        cancelLabel: resolveAppResourceText($r('app.string.settings_custom_home_cancel')),
+        confirmLabel: resolveAppResourceText($r('app.string.browser_browser_private_tab_coordinator_004')),
         showClearPrivateDataOption: false,
         clearPrivateDataLabel: ''
       };
@@ -140,14 +141,14 @@ export class BrowserPrivateTabCoordinator {
     const safePrivateTabCount = Math.max(0, Math.floor(privateTabCount));
     return {
       kind: 'exit_private',
-      title: '退出隐私模式',
-      message: '退出后将回到普通首页。私密标签页和隐私会话数据默认保留。',
-      cancelLabel: '取消',
-      confirmLabel: '退出隐私模式',
+      title: resolveAppResourceText($r('app.string.bottom_panel_exit_private')),
+      message: resolveAppResourceText($r('app.string.browser_browser_private_tab_coordinator_005')),
+      cancelLabel: resolveAppResourceText($r('app.string.settings_custom_home_cancel')),
+      confirmLabel: resolveAppResourceText($r('app.string.bottom_panel_exit_private')),
       showClearPrivateDataOption: true,
       clearPrivateDataLabel: safePrivateTabCount > 0
-        ? `清除隐私数据并关闭 ${safePrivateTabCount} 个私密标签页`
-        : '清除隐私数据'
+        ? resolveAppResourceText($r('app.string.private_clear_and_close', safePrivateTabCount))
+        : resolveAppResourceText($r('app.string.browser_browser_private_tab_coordinator_002'))
     };
   }
 
@@ -167,7 +168,7 @@ export class BrowserPrivateTabCoordinator {
     if (confirmation.kind === 'enter_private') {
       if (host.isLargeScreenShellActive() && this.privateWindowPolicyService.resolveTarget() === 'new_window') {
         if (!await this.openPrivateWindow()) {
-          host.showMessage('隐私窗口打开失败，请重试。');
+          host.showMessage(resolveAppResourceText($r('app.string.browser_browser_private_tab_coordinator_006')));
         }
         return;
       }
@@ -198,7 +199,7 @@ export class BrowserPrivateTabCoordinator {
         this.resolveNextActiveTabId(remainingTabs) : activeTabId;
       host.applyTabsAfterPrivateModeExit(remainingTabs, nextActiveTabId);
     }
-    host.showRegularHomeSurface('已退出隐私模式', this.buildRegularTabCreateOptions());
+    host.showRegularHomeSurface(resolveAppResourceText($r('app.string.browser_browser_private_tab_coordinator_001')), this.buildRegularTabCreateOptions());
     host.setTabsOverviewSection('tabs');
     this.privateModeLockCoordinator.synchronizeCurrentBoundary();
   }

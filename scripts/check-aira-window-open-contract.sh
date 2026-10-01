@@ -382,10 +382,15 @@ require_order "${UA_RUNTIME_POLICY_COORDINATOR}" \
   'runtimeTransitionCoordinator.transitionToNative(' \
   '        reloadReason' \
   'must carry the policy-owned reload reason into the native Controller transition.'
-require_order "${UA_ACTION_COORDINATOR}" \
+require_literal "${UA_ACTION_COORDINATOR}" \
   "result.status === 'transition_deferred'" \
+  'must keep a deferred identity transition from falling through to a success notice.'
+forbid_regex "${UA_ACTION_COORDINATOR}" \
   'web_ua_runtime_deferred' \
-  'must use the delayed notice only after the immediate runtime transition declines or is unavailable.'
+  'must not toast when a saved identity waits for a later Web runtime rebuild.'
+forbid_regex "${WEB_LOAD_RUNTIME}" \
+  '为保留返回与前进历史' \
+  'must not toast when a navigation keeps the current identity to preserve history.'
 require_order "${UA_RUNTIME_TRANSITION_COORDINATOR}" \
   'isBrowserDataBoundarySessionEphemeralTabLike({' \
   'snapshotStore.saveSnapshot(tabId, serializedWebState)' \

@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { BusinessError, print } from '@kit.BasicServicesKit';
 import { webview } from '@kit.ArkWeb';
 import { BrowserRuntimeLifecyclePort } from './BrowserRuntimeLifecyclePort';
@@ -48,7 +49,7 @@ export class BrowserWebPrintService {
     if (controller === undefined) {
       return {
         ok: false,
-        message: '当前页面暂时无法打印。'
+        message: resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_025'))
       };
     }
     return await this.printCurrentPage({
@@ -66,7 +67,7 @@ export class BrowserWebPrintService {
       request.controller.setPrintBackground(request.printBackground);
       adapter = request.controller.createWebPrintDocumentAdapter(this.resolveJobName(request.title));
     } catch (error) {
-      return this.buildFailureResult(error, '当前页面暂时无法创建打印内容。');
+      return this.buildFailureResult(error, resolveAppResourceText($r('app.string.print_cannot_create')));
     }
 
     try {
@@ -74,23 +75,23 @@ export class BrowserWebPrintService {
       const task: print.PrintTask = await print.print(this.resolveJobName(request.title), adapter, attributes,
         request.context);
       task.on('succeed', () => {
-        request.onStatusMessage?.('打印任务已完成。');
+        request.onStatusMessage?.(resolveAppResourceText($r('app.string.print_done')));
       });
       task.on('fail', () => {
-        request.onStatusMessage?.('打印任务失败。');
+        request.onStatusMessage?.(resolveAppResourceText($r('app.string.print_failed')));
       });
       task.on('cancel', () => {
-        request.onStatusMessage?.('已取消打印。');
+        request.onStatusMessage?.(resolveAppResourceText($r('app.string.print_canceled')));
       });
       task.on('block', () => {
-        request.onStatusMessage?.('打印任务暂时受阻。');
+        request.onStatusMessage?.(resolveAppResourceText($r('app.string.print_blocked')));
       });
       return {
         ok: true,
-        message: '正在打开系统打印。'
+        message: resolveAppResourceText($r('app.string.print_opening'))
       };
     } catch (error) {
-      return this.buildFailureResult(error, '打印暂时无法启动。');
+      return this.buildFailureResult(error, resolveAppResourceText($r('app.string.print_cannot_start')));
     }
   }
 
@@ -110,7 +111,7 @@ export class BrowserWebPrintService {
     if (businessError?.code === 201) {
       return {
         ok: false,
-        message: '缺少打印权限，暂时无法打印网页。',
+        message: resolveAppResourceText($r('app.string.print_permission')),
         code: businessError.code
       };
     }

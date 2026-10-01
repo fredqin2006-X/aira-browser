@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
 import { BROWSER_GLOBAL_SYMBOL_WEIGHT } from './BrowserIconStyle';
 import { BrowserPrivateModeLockUserAction } from '../../../core/privacy/BrowserPrivateModeLockCoordinator';
@@ -80,7 +81,7 @@ export struct BrowserPrivateModeLockOverlay {
       .height(PRIVATE_LOCK_ICON_FRAME_SIZE)
       .borderRadius(PRIVATE_LOCK_ICON_FRAME_SIZE / 2)
 
-      Text('隐私模式已锁定')
+      Text($r('app.string.browser_ui_browser_private_mode_lock_overlay_004'))
         .fontSize(22)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.storedPrimaryTextColor)
@@ -97,7 +98,9 @@ export struct BrowserPrivateModeLockOverlay {
 
       Row() {
         BrowserSheetActionButton({
-          label: this.authenticationInProgress ? '正在验证' : '解锁',
+          label: this.authenticationInProgress
+            ? resolveAppResourceText($r('app.string.browser_ui_browser_private_mode_lock_overlay_002'))
+            : resolveAppResourceText($r('app.string.browser_ui_browser_private_mode_lock_overlay_003')),
           emphasis: 'primary',
           accentColor: this.storedAccentColor,
           fillAvailableWidth: false,
@@ -113,7 +116,7 @@ export struct BrowserPrivateModeLockOverlay {
 
       Row() {
         BrowserSheetActionButton({
-          label: '回到普通模式',
+          label: resolveAppResourceText($r('app.string.browser_ui_browser_private_mode_lock_overlay_001')),
           fillAvailableWidth: false,
           buttonWidth: PRIVATE_LOCK_ACTION_WIDTH,
           buttonHeight: 40,

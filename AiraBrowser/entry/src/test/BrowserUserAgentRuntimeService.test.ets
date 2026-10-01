@@ -309,7 +309,6 @@ export default function browserUserAgentRuntimeServiceTest(): void {
       );
 
       expect(transition.applicationStatus).assertEqual('identity_transition_required');
-      expect(transition.transitionNoticeRequired).assertTrue();
       expect(fixture.platformAdapter.appliedCustomUserAgents.length).assertEqual(1);
       expect(fixture.runtime.requiresControllerTransition('tab-runtime', nativeDecision)).assertTrue();
     });
@@ -374,27 +373,22 @@ export default function browserUserAgentRuntimeServiceTest(): void {
         desktopDecision
       );
       expect(prepared.applicationStatus).assertEqual('custom_applied');
-      expect(prepared.transitionNoticeRequired).assertFalse();
 
       const scope = fixture.navigationGuard.openTabNavigationScope('tab-runtime');
       let duringRefresh: BrowserUserAgentApplicationStatus = 'failed';
-      let noticeRequired = true;
       try {
-        const duringCallback = fixture.runtime.prepareWebMainFrameNavigation(
+        duringRefresh = fixture.runtime.prepareWebMainFrameNavigation(
           fixture.controllerResolver,
           'tab-runtime',
           'https://example.com/page',
           desktopDecision,
           true
-        );
-        duringRefresh = duringCallback.applicationStatus;
-        noticeRequired = duringCallback.transitionNoticeRequired;
+        ).applicationStatus;
       } finally {
         scope.close();
       }
 
       expect(duringRefresh).assertEqual('unchanged');
-      expect(noticeRequired).assertFalse();
       expect(fixture.platformAdapter.appliedCustomUserAgents.length).assertEqual(2);
     });
 

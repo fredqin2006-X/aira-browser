@@ -1,3 +1,5 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
+
 export type HomePageRecoveryEntry = 'favorites' | 'recently_closed' | 'settings_button';
 
 export interface HomePageRecoveryEntryVisibility {
@@ -83,8 +85,13 @@ export class HomePageRecoveryEntryPolicyService {
 
   private resolveBlockedMessage(entries: HomePageRecoveryEntry[]): string {
     if (entries.indexOf('recently_closed') >= 0) {
-      return HOME_PAGE_RECOVERY_ENTRY_REQUIRED_MESSAGE;
+      return homeRecoveryText($r('app.string.home_settings_keep_one_plain'), HOME_PAGE_RECOVERY_ENTRY_REQUIRED_MESSAGE);
     }
-    return CENTERED_HOME_PAGE_RECOVERY_ENTRY_REQUIRED_MESSAGE;
+    return homeRecoveryText($r('app.string.home_settings_keep_one_centered'), CENTERED_HOME_PAGE_RECOVERY_ENTRY_REQUIRED_MESSAGE);
   }
+}
+
+function homeRecoveryText(resource: Resource, fallback: string): string {
+  const resolved = resolveAppResourceText(resource);
+  return resolved.length > 0 ? resolved : fallback;
 }

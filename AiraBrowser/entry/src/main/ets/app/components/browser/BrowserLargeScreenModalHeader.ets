@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BROWSER_LARGE_SCREEN_MODAL_HEADER_ACTION_GAP_VP,
   BROWSER_LARGE_SCREEN_MODAL_HEADER_ACTION_SIZE_VP,
@@ -35,7 +36,7 @@ export struct BrowserLargeScreenModalHeader {
     Column({ space: 0 }) {
       Row({ space: BROWSER_LARGE_SCREEN_MODAL_HEADER_ACTION_GAP_VP }) {
         if (this.showBackButton) {
-          this.buildActionButton('browser.toolbar.back', '返回', this.onBack)
+          this.buildActionButton('browser.toolbar.back', resolveAppResourceText($r('app.string.settings_sync_back')), this.onBack)
         } else if (this.dialogMode) {
           Blank()
             .width(BROWSER_LARGE_SCREEN_MODAL_HEADER_ACTION_SIZE_VP)
@@ -52,10 +53,10 @@ export struct BrowserLargeScreenModalHeader {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
 
         if (this.showRefreshButton) {
-          this.buildActionButton('browser.toolbar.refresh', '刷新', this.onRefresh)
+          this.buildActionButton('browser.toolbar.refresh', resolveAppResourceText($r('app.string.offline_action_refresh')), this.onRefresh)
         }
 
-        this.buildActionButton('browser.tabs.delete', '关闭', this.onClose)
+        this.buildActionButton('browser.tabs.delete', resolveAppResourceText($r('app.string.ui_close')), this.onClose)
       }
       .width('100%')
       .height(BROWSER_LARGE_SCREEN_MODAL_HEADER_HEIGHT_VP)

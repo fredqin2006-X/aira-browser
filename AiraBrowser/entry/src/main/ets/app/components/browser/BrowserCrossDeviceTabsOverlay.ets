@@ -1,4 +1,5 @@
 import { BusinessError } from '@kit.BasicServicesKit';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { loginComponentManager } from '@kit.AccountKit';
 import router from '@ohos.router';
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
@@ -200,7 +201,7 @@ export struct BrowserCrossDeviceTabsSheet {
   private buildRemoteDeviceContent() {
     Column() {
       if (this.loading) {
-        this.buildMessageState('正在读取在线电脑...', true)
+        this.buildMessageState(resolveAppResourceText($r('app.string.browser_ui_browser_cross_device_tabs_overlay_002')), true)
       } else if (this.panelState.empty.kind !== 'none') {
         this.buildEmptyPresentation(this.panelState.empty)
       } else if (this.resolveVisibleDevices().length === 0) {
@@ -349,7 +350,7 @@ export struct BrowserCrossDeviceTabsSheet {
         .layoutWeight(1)
         .constraintSize({ minWidth: 0 })
 
-        Text(`${device.tabCount} 个`)
+        Text(resolveAppResourceText($r('app.string.device_tab_count', device.tabCount)))
           .fontSize(12)
           .fontColor(this.storedSecondaryTextColor)
           .maxLines(1)
@@ -464,7 +465,7 @@ export struct BrowserCrossDeviceTabsSheet {
   private beginSignIn(): void {
     const boundary = this.buildBoundaryInput();
     if (!sharedHuaweiAccountMutationCoordinator.canSignIn(boundary)) {
-      this.showToast('请回到普通会话后登录华为账号。');
+      this.showToast(resolveAppResourceText($r('app.string.settings_pro_sign_in_private')));
       return;
     }
     this.loginSheetVisible = true;
@@ -476,12 +477,12 @@ export struct BrowserCrossDeviceTabsSheet {
   ): void {
     if (error !== undefined) {
       if (error.code !== 1001502012) {
-        this.showToast(error.message.length > 0 ? error.message : '华为账号登录失败');
+        this.showToast(error.message.length > 0 ? error.message : resolveAppResourceText($r('app.string.settings_pro_sign_in_failed')));
       }
       return;
     }
     if (response.authorizationCode.trim().length <= 0 && response.openID.trim().length <= 0) {
-      this.showToast('华为账号登录未完成');
+      this.showToast(resolveAppResourceText($r('app.string.settings_pro_sign_in_incomplete')));
       return;
     }
     this.loginSheetVisible = false;
@@ -495,7 +496,7 @@ export struct BrowserCrossDeviceTabsSheet {
         void this.refresh();
       })
       .catch((): void => {
-        this.showToast('华为账号登录失败');
+        this.showToast(resolveAppResourceText($r('app.string.settings_pro_sign_in_failed')));
       });
   }
 
@@ -526,7 +527,7 @@ export struct BrowserCrossDeviceTabsSheet {
       kind: kind
     };
     router.pushUrl({ url: url, params: params }).catch((): void => {
-      this.showToast('暂时无法打开该页面');
+      this.showToast(resolveAppResourceText($r('app.string.browser_ui_browser_cross_device_tabs_overlay_001')));
     });
   }
 
@@ -538,7 +539,7 @@ export struct BrowserCrossDeviceTabsSheet {
       kind: ''
     };
     router.pushUrl({ url: url, params: params }).catch((): void => {
-      this.showToast('暂时无法打开该页面');
+      this.showToast(resolveAppResourceText($r('app.string.browser_ui_browser_cross_device_tabs_overlay_001')));
     });
   }
 
@@ -562,7 +563,7 @@ export struct BrowserCrossDeviceTabsSheet {
     if (browserName.length > 0 && platform.length > 0) {
       return `${browserName} ${platform}`;
     }
-    return browserName || platform || device.deviceName.trim() || device.model.trim() || '电脑';
+    return browserName || platform || device.deviceName.trim() || device.model.trim() || resolveAppResourceText($r('app.string.browser_ui_browser_cross_device_tabs_overlay_003'));
   }
 
   private syncSiteIcons(): void {

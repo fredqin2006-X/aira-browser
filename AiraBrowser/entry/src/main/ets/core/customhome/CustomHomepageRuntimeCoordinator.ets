@@ -1,4 +1,5 @@
 import { UIContext } from '@kit.ArkUI';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import {
@@ -100,10 +101,10 @@ const HIDDEN_CUSTOM_HOMEPAGE_LOAD_FAILURE_STATE: CustomHomepageLoadFailureState 
     title: '',
     summary: '',
     host: '',
-    primaryActionLabel: '再试一次',
-    secondaryActionLabel: '编辑主页',
+    primaryActionLabel: resolveAppResourceText($r('app.string.browser_ui_browser_web_error_surface_001')),
+    secondaryActionLabel: resolveAppResourceText($r('app.string.web_error_edit_homepage')),
     tertiaryActionLabel: '',
-    detailLabel: '错误详情',
+    detailLabel: resolveAppResourceText($r('app.string.browser_ui_browser_web_error_surface_003')),
     detailText: '',
     hints: []
   }
@@ -569,7 +570,7 @@ export class CustomHomepageRuntimeCoordinator {
     if (action === 'open_homepage_settings') {
       this.dependencies.routeCoordinator.openSimpleRoute(
         CUSTOM_HOMEPAGE_SETTINGS_ROUTE,
-        '打开主页设置失败'
+        resolveAppResourceText($r('app.string.home_open_homepage_failed'))
       );
       return;
     }
@@ -621,7 +622,7 @@ export class CustomHomepageRuntimeCoordinator {
       case 'open_homepage_settings':
         this.dependencies.routeCoordinator.openSimpleRoute(
           CUSTOM_HOMEPAGE_SETTINGS_ROUTE,
-          '打开主页设置失败'
+          resolveAppResourceText($r('app.string.home_open_homepage_failed'))
         );
         return;
       case 'open_url':
@@ -936,12 +937,12 @@ export class CustomHomepageRuntimeCoordinator {
     if (scheme === 'http' || scheme === 'https' || scheme === 'file' || scheme === 'data' || scheme === 'about') {
       this.dependencies.appUrlOpenCoordinator.openCurrentAppUi(
         normalizedUrl,
-        '正在从主页打开链接',
+        resolveAppResourceText($r('app.string.home_opening_link')),
         this.shellHost.resolveFacts().createOptions
       );
       return;
     }
-    this.executeShellEffect({ type: 'show_message', message: '暂不支持从主页打开此链接。' });
+    this.executeShellEffect({ type: 'show_message', message: resolveAppResourceText($r('app.string.home_link_unsupported')) });
   }
 
   private executeBridgeShellAction(action: CustomHomepageBridgeShellAction): void {
@@ -1055,7 +1056,7 @@ export class CustomHomepageRuntimeCoordinator {
     const hostedWebNode = runtime.getNodeController();
     if (this.shouldAttachHostedSurfaceDuringStaging() && hostedWebNode.attachSurface() !== true) {
       this.recordContractViolation('prepared_surface_attach_failed', `${generation}`);
-      this.markLoadFailure(this.desiredUrl, '主页渲染失败，请重试。');
+      this.markLoadFailure(this.desiredUrl, resolveAppResourceText($r('app.string.home_render_failed')));
       this.releaseHostedWebGeneration();
       return this.buildTransition([]);
     }
@@ -1249,7 +1250,7 @@ export class CustomHomepageRuntimeCoordinator {
     this.failedUrl = normalizedUrl;
     const message = this.networkAvailabilityService.shouldFastFailNavigation(normalizedUrl)
       ? this.networkAvailabilityService.buildOfflineMessage()
-      : '加载失败：主页长时间没有响应。';
+      : resolveAppResourceText($r('app.string.home_load_timeout'));
     this.markLoadFailure(normalizedUrl, message);
     this.cancelLoadTimeout();
     return this.buildTransition([this.buildCancelTimeoutEffect()]);
@@ -1390,7 +1391,7 @@ export class CustomHomepageRuntimeCoordinator {
   private buildFailureActionTransition(action: CustomHomepageFailureAction): CustomHomepageRuntimeTransition {
     const effects: CustomHomepageRuntimeEffect[] = [];
     if (action === 'retry') {
-      effects.push(this.buildShowToastEffect('正在重新加载主页'));
+      effects.push(this.buildShowToastEffect(resolveAppResourceText($r('app.string.home_reloading'))));
       this.desiredGeneration += 1;
       this.releaseHostedWebGeneration();
       this.clearLoadFailure();
@@ -1938,12 +1939,12 @@ export class CustomHomepageRuntimeCoordinator {
     const hostedWebNode = this.hostedWebGeneration?.getNodeController();
     if (!this.isHostedGeneration(generation) || hostedWebNode === undefined) {
       this.recordContractViolation('staged_surface_attach_failed', reason);
-      this.markLoadFailure(this.desiredUrl, '主页渲染失败，请重试。');
+      this.markLoadFailure(this.desiredUrl, resolveAppResourceText($r('app.string.home_render_failed')));
       return;
     }
     if (!hostedWebNode.isSurfaceAttached() && hostedWebNode.attachSurface() !== true) {
       this.recordContractViolation('staged_surface_attach_failed', reason);
-      this.markLoadFailure(this.desiredUrl, '主页渲染失败，请重试。');
+      this.markLoadFailure(this.desiredUrl, resolveAppResourceText($r('app.string.home_render_failed')));
       return;
     }
     this.documentCommitted = true;

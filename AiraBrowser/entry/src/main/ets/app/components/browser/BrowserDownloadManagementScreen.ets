@@ -188,31 +188,8 @@ export struct BrowserDownloadManagementScreen {
   @LocalStorageProp(BROWSER_WINDOW_SAFE_TOP_INSET_STORAGE_KEY) private topSafeInsetVp: number = 0;
   private downloadSettingsDialogOpen: boolean = false;
   private pageActive: boolean = true;
-  private downloadSettingsDialogController: CustomDialogController = new CustomDialogController({
-    builder: BrowserDownloadSettingsDialog({
-      openRevision: $downloadSettingsDialogRevision,
-      resolveBoundary: (): DownloadTaskBoundary => {
-        return this.getCurrentDownloadBoundary();
-      },
-      onClose: (): void => {
-        this.closeDownloadSettingsDialog();
-      },
-      onChooseCustomLocation: (): void => {
-        this.pickCustomDownloadLocationFromDialog();
-      }
-    }),
-    alignment: DialogAlignment.Center,
-    autoCancel: true,
-    customStyle: false,
-    backgroundColor: resolveCenteredDialogSurfaceColor(),
-    backgroundBlurStyle: BlurStyle.NONE,
-    cornerRadius: CENTERED_DIALOG_CORNER_RADIUS_VP,
-    width: resolveCenteredDialogControllerWidth('m'),
-    onWillDismiss: (dismissDialogAction: DismissDialogAction): void => {
-      this.downloadSettingsDialogOpen = false;
-      dismissDialogAction.dismiss();
-    }
-  });
+  private downloadSettingsDialogController?: CustomDialogController = undefined;
+
   private groupSwiperController: SwiperController = new SwiperController();
   private optimisticControlByGuid: Map<string, OptimisticControlSnapshot> = new Map();
 
@@ -236,6 +213,7 @@ export struct BrowserDownloadManagementScreen {
         BrowserWindowRuntime.getActiveWindowId()
       );
       this.isSessionEphemeral = this.privateBoundaryNavigationService.isSessionEphemeralRoute(routeParams);
+      this.downloadSettingsDialogController = this.createDownloadSettingsDialogController();
       this.logDownloadManagementLifecycle('about_to_appear');
       this.bindDownloadUpdates();
       this.requestDownloadRepositoryInitialization();
@@ -586,9 +564,54 @@ export struct BrowserDownloadManagementScreen {
     if (this.downloadSettingsDialogOpen) {
       return;
     }
+    // The folder picker has to close this dialog first. Reusing that controller
+    // keeps the previous settings screen, so the location row can still show
+    // the old path after the new folder has been saved. A new controller is
+    // born against the saved settings.
     this.downloadSettingsDialogRevision += 1;
+    this.replaceDownloadSettingsDialogController();
+    const controller = this.downloadSettingsDialogController;
+    if (controller === undefined) {
+      return;
+    }
     this.downloadSettingsDialogOpen = true;
-    this.downloadSettingsDialogController.open();
+    controller.open();
+  }
+
+  private createDownloadSettingsDialogController(): CustomDialogController {
+    return new CustomDialogController({
+      builder: BrowserDownloadSettingsDialog({
+        openRevision: $downloadSettingsDialogRevision,
+        resolveBoundary: (): DownloadTaskBoundary => {
+          return this.getCurrentDownloadBoundary();
+        },
+        onClose: (): void => {
+          this.closeDownloadSettingsDialog();
+        },
+        onChooseCustomLocation: (): void => {
+          this.pickCustomDownloadLocationFromDialog();
+        }
+      }),
+      alignment: DialogAlignment.Center,
+      autoCancel: true,
+      customStyle: false,
+      backgroundColor: resolveCenteredDialogSurfaceColor(),
+      backgroundBlurStyle: BlurStyle.NONE,
+      cornerRadius: CENTERED_DIALOG_CORNER_RADIUS_VP,
+      width: resolveCenteredDialogControllerWidth('m'),
+      onWillDismiss: (dismissDialogAction: DismissDialogAction): void => {
+        this.downloadSettingsDialogOpen = false;
+        dismissDialogAction.dismiss();
+      }
+    });
+  }
+
+  private replaceDownloadSettingsDialogController(): void {
+    try {
+      this.downloadSettingsDialogController?.close();
+    } catch (_error) {
+    }
+    this.downloadSettingsDialogController = this.createDownloadSettingsDialogController();
   }
 
   private closeDownloadSettingsDialog(): void {
@@ -597,7 +620,7 @@ export struct BrowserDownloadManagementScreen {
     }
     this.downloadSettingsDialogOpen = false;
     try {
-      this.downloadSettingsDialogController.close();
+      this.downloadSettingsDialogController?.close();
     } catch (_error) {
     }
   }

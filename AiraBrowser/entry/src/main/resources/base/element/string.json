@@ -5965,10 +5965,6 @@
       "value": "网页标识选择已保存；当前网站继续使用 Aira 兼容标识。"
     },
     {
-      "name": "web_ua_runtime_deferred",
-      "value": "网页标识选择已保存。为保留返回与前进历史，当前标签仍使用原网页标识；Web 运行时重建后生效。"
-    },
-    {
       "name": "settings_site_info_cancel",
       "value": "取消"
     },
@@ -22931,6 +22927,382 @@
     {
       "name": "wallpaper_select_video_failed",
       "value": "选择视频壁纸失败，请稍后重试。"
+    },
+    {
+      "name": "tab_a11y_switch",
+      "value": "切换到%1$s"
+    },
+    {
+      "name": "tab_a11y_close",
+      "value": "关闭%1$s"
+    },
+    {
+      "name": "tab_a11y_unmute",
+      "value": "解除%1$s静音"
+    },
+    {
+      "name": "tab_a11y_mute",
+      "value": "将%1$s静音"
+    },
+    {
+      "name": "tab_menu_pin",
+      "value": "固定"
+    },
+    {
+      "name": "tab_menu_duplicate",
+      "value": "复制"
+    },
+    {
+      "name": "home_settings_title",
+      "value": "主页设置"
+    },
+    {
+      "name": "home_settings_keep_one",
+      "value": "收藏、最近关闭和主页设置按钮至少保留一项。"
+    },
+    {
+      "name": "home_settings_keep_one_plain",
+      "value": "收藏、最近关闭和主页设置按钮至少保留一项"
+    },
+    {
+      "name": "home_settings_keep_one_centered",
+      "value": "收藏和主页设置按钮至少保留一项"
+    },
+    {
+      "name": "recent_delete_named",
+      "value": "确定删除“%1$s”吗？此操作无法撤销。"
+    },
+    {
+      "name": "recent_shortcut_update_failed",
+      "value": "更新主页快捷方式失败：%1$s"
+    },
+    {
+      "name": "recent_private_cannot_edit_home",
+      "value": "当前私密会话不可修改常规首页快捷方式。"
+    },
+    {
+      "name": "recent_regular_access",
+      "value": "最近关闭操作可访问当前常规浏览资料。"
+    },
+    {
+      "name": "recent_private_isolated",
+      "value": "当前私密会话不会展示、恢复或修改常规最近关闭记录。"
+    },
+    {
+      "name": "private_clear_and_close",
+      "value": "清除隐私数据并关闭 %1$d 个私密标签页"
+    },
+    {
+      "name": "tabs_burn_confirm",
+      "value": "确定要焚烧这 %1$d 个隐私标签页吗？"
+    },
+    {
+      "name": "tabs_close_regular_confirm",
+      "value": "确定要关闭这 %1$d 个普通标签页吗？"
+    },
+    {
+      "name": "tab_list_reopen",
+      "value": "重新打开%1$s"
+    },
+    {
+      "name": "tab_list_delete",
+      "value": "删除%1$s"
+    },
+    {
+      "name": "device_tab_count",
+      "value": "%1$d 个"
+    },
+    {
+      "name": "private_auth_success",
+      "value": "验证成功"
+    },
+    {
+      "name": "private_auth_unavailable",
+      "value": "当前设备无法发起系统身份验证。"
+    },
+    {
+      "name": "private_auth_canceled",
+      "value": "已取消验证"
+    },
+    {
+      "name": "private_auth_timeout",
+      "value": "验证超时，请重试"
+    },
+    {
+      "name": "private_auth_locked",
+      "value": "系统身份验证暂时锁定，请稍后重试"
+    },
+    {
+      "name": "private_auth_failed",
+      "value": "验证失败，请重试"
+    },
+    {
+      "name": "permission_none_needed",
+      "value": "无需额外系统权限。"
+    },
+    {
+      "name": "permission_granted",
+      "value": "系统权限已授予。"
+    },
+    {
+      "name": "permission_location_off",
+      "value": "系统位置信息开关未开启。"
+    },
+    {
+      "name": "permission_incomplete",
+      "value": "系统权限未完全开启。"
+    },
+    {
+      "name": "permission_still_incomplete",
+      "value": "系统权限仍未完全开启。"
+    },
+    {
+      "name": "print_cannot_create",
+      "value": "当前页面暂时无法创建打印内容。"
+    },
+    {
+      "name": "print_done",
+      "value": "打印任务已完成。"
+    },
+    {
+      "name": "print_failed",
+      "value": "打印任务失败。"
+    },
+    {
+      "name": "print_canceled",
+      "value": "已取消打印。"
+    },
+    {
+      "name": "print_blocked",
+      "value": "打印任务暂时受阻。"
+    },
+    {
+      "name": "print_opening",
+      "value": "正在打开系统打印。"
+    },
+    {
+      "name": "print_cannot_start",
+      "value": "打印暂时无法启动。"
+    },
+    {
+      "name": "print_permission",
+      "value": "缺少打印权限，暂时无法打印网页。"
+    },
+    {
+      "name": "link_opening",
+      "value": "正在打开链接"
+    },
+    {
+      "name": "link_opened_private_tab",
+      "value": "已在隐私标签页中打开链接。"
+    },
+    {
+      "name": "link_opened_private_window",
+      "value": "已在新的隐私窗口中打开链接。"
+    },
+    {
+      "name": "link_copy_failed_detail",
+      "value": "复制失败：%1$s"
+    },
+    {
+      "name": "file_picker_opening",
+      "value": "正在打开文件选择器"
+    },
+    {
+      "name": "file_pick_failed",
+      "value": "网页选择文件失败"
+    },
+    {
+      "name": "file_pick_failed_retry",
+      "value": "选择文件失败，请稍后重试。"
+    },
+    {
+      "name": "dns_name_required",
+      "value": "请输入 DNS 名称。"
+    },
+    {
+      "name": "dns_name_too_long",
+      "value": "DNS 名称不能超过 80 个字符。"
+    },
+    {
+      "name": "dns_too_many",
+      "value": "最多可保存 32 个自定义 DNS。"
+    },
+    {
+      "name": "dns_name_exists",
+      "value": "已有同名的自定义 DNS。"
+    },
+    {
+      "name": "dns_endpoint_exists",
+      "value": "这个 DoH 地址已经保存。"
+    },
+    {
+      "name": "dns_https_required",
+      "value": "请输入 HTTPS DoH 地址。"
+    },
+    {
+      "name": "dns_https_only",
+      "value": "仅支持 HTTPS 地址。"
+    },
+    {
+      "name": "dns_https_invalid",
+      "value": "请输入有效的 HTTPS DoH 地址。"
+    },
+    {
+      "name": "home_shortcut_missing",
+      "value": "未找到这个快捷方式。"
+    },
+    {
+      "name": "home_system_entry_limited",
+      "value": "系统入口只能打开、移动或从主页移除。"
+    },
+    {
+      "name": "home_config_read_failed",
+      "value": "主页配置读取失败，请稍后重试。"
+    },
+    {
+      "name": "home_config_save_failed",
+      "value": "主页配置保存失败，请稍后重试。"
+    },
+    {
+      "name": "home_open_site_settings_failed",
+      "value": "打开站点设置失败"
+    },
+    {
+      "name": "home_open_translation_failed",
+      "value": "打开网页翻译设置失败"
+    },
+    {
+      "name": "home_open_password_failed",
+      "value": "打开密码设置失败"
+    },
+    {
+      "name": "home_open_ua_failed",
+      "value": "打开网页标识设置失败"
+    },
+    {
+      "name": "home_open_download_failed",
+      "value": "打开下载设置失败"
+    },
+    {
+      "name": "home_open_homepage_failed",
+      "value": "打开主页设置失败"
+    },
+    {
+      "name": "home_open_startup_failed",
+      "value": "打开启动设置失败"
+    },
+    {
+      "name": "home_open_private_tabs_failed",
+      "value": "打开隐私标签设置失败"
+    },
+    {
+      "name": "home_open_history_failed",
+      "value": "打开历史保留设置失败"
+    },
+    {
+      "name": "home_open_theme_failed",
+      "value": "打开主题配色设置失败"
+    },
+    {
+      "name": "home_open_shortcuts_failed",
+      "value": "打开键盘快捷键设置失败"
+    },
+    {
+      "name": "home_engine_unavailable",
+      "value": "这个搜索引擎当前不可用。"
+    },
+    {
+      "name": "home_engine_save_failed",
+      "value": "搜索引擎保存失败，请稍后重试。"
+    },
+    {
+      "name": "home_opening_link",
+      "value": "正在从主页打开链接"
+    },
+    {
+      "name": "home_link_unsupported",
+      "value": "暂不支持从主页打开此链接。"
+    },
+    {
+      "name": "home_render_failed",
+      "value": "主页渲染失败，请重试。"
+    },
+    {
+      "name": "home_load_timeout",
+      "value": "加载失败：主页长时间没有响应。"
+    },
+    {
+      "name": "home_reloading",
+      "value": "正在重新加载主页"
+    },
+    {
+      "name": "tablet_touch_warning",
+      "value": "手机使用桌面界面可能出现内容过密、按钮过小或部分布局不适配。切换到桌面界面前需要再次确认。"
+    },
+    {
+      "name": "tablet_fold_note",
+      "value": "小折叠屏展开后仍使用触屏界面，因为展开后的屏幕较窄；手动选择桌面界面时除外。"
+    },
+    {
+      "name": "tablet_auto_fold",
+      "value": "自动模式会在设备展开时使用桌面界面，收起时恢复触屏界面；半折叠或状态未知时保持当前界面。"
+    },
+    {
+      "name": "tablet_auto_pointer",
+      "value": "自动模式会在连接鼠标或触控板时使用桌面界面，断开后恢复触屏界面。物理键盘仍可在触屏界面中使用快捷键。"
+    },
+    {
+      "name": "search_intro_title",
+      "value": "选择默认搜索引擎"
+    },
+    {
+      "name": "search_intro_subtitle",
+      "value": "在地址栏搜索时会用它。之后也可以在设置里更改。"
+    },
+    {
+      "name": "search_engine_bing",
+      "value": "必应"
+    },
+    {
+      "name": "search_engine_baidu",
+      "value": "百度"
+    },
+    {
+      "name": "search_engine_google",
+      "value": "谷歌"
+    },
+    {
+      "name": "search_engine_sogou",
+      "value": "搜狗"
+    },
+    {
+      "name": "search_engine_360",
+      "value": "360搜索"
+    },
+    {
+      "name": "search_engine_shenma",
+      "value": "神马"
+    },
+    {
+      "name": "tabs_overview_count",
+      "value": "%1$d 个标签页"
+    },
+    {
+      "name": "tabs_overview_close_all",
+      "value": "关闭全部"
+    },
+    {
+      "name": "tabs_overview_close_all_private",
+      "value": "关闭所有隐私标签页"
+    },
+    {
+      "name": "tabs_overview_close_all_regular",
+      "value": "关闭所有普通标签页"
+    },
+    {
+      "name": "web_protection_report_a11y",
+      "value": "%1$s，打开网页保护报告"
     }
   ]
 }

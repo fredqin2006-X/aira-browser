@@ -1,4 +1,5 @@
 import { userAuth } from '@kit.UserAuthenticationKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { cryptoFramework } from '@kit.CryptoArchitectureKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 
@@ -34,8 +35,8 @@ export class PrivateModeUserAuthService {
         authTrustLevel: userAuth.AuthTrustLevel.ATL3
       };
       const widgetParam: userAuth.WidgetParam = {
-        title: '隐私模式已锁定',
-        navigationButtonText: '取消'
+        title: resolveAppResourceText($r('app.string.browser_ui_browser_private_mode_lock_overlay_004')),
+        navigationButtonText: resolveAppResourceText($r('app.string.settings_custom_home_cancel'))
       };
       const authInstance = userAuth.getUserAuthInstance(authParam, widgetParam);
       this.authInstance = authInstance;
@@ -82,7 +83,7 @@ export class PrivateModeUserAuthService {
       return {
         status: 'success',
         code: result.result,
-        message: '验证成功'
+        message: resolveAppResourceText($r('app.string.private_auth_success'))
       };
     }
     return {
@@ -97,20 +98,20 @@ export class PrivateModeUserAuthService {
     return {
       status: 'unavailable',
       code: businessError?.code ?? -1,
-      message: businessError?.message ?? '当前设备无法发起系统身份验证。'
+      message: businessError?.message ?? resolveAppResourceText($r('app.string.private_auth_unavailable'))
     };
   }
 
   private resolveResultMessage(code: number): string {
     if (code === userAuth.UserAuthResultCode.CANCELED) {
-      return '已取消验证';
+      return resolveAppResourceText($r('app.string.private_auth_canceled'));
     }
     if (code === userAuth.UserAuthResultCode.TIMEOUT) {
-      return '验证超时，请重试';
+      return resolveAppResourceText($r('app.string.private_auth_timeout'));
     }
     if (code === userAuth.UserAuthResultCode.LOCKED) {
-      return '系统身份验证暂时锁定，请稍后重试';
+      return resolveAppResourceText($r('app.string.private_auth_locked'));
     }
-    return '验证失败，请重试';
+    return resolveAppResourceText($r('app.string.private_auth_failed'));
   }
 }

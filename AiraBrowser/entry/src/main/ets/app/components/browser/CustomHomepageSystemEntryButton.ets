@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   CUSTOM_HOMEPAGE_SYSTEM_ENTRY_HIT_SIZE,
   CustomHomepageSystemEntryButtonLayoutViewModel
@@ -79,19 +80,19 @@ export struct CustomHomepageSystemEntryButton {
   @Builder
   private buildMenu() {
     Menu() {
-      MenuItem({ content: '标签页' })
+      MenuItem({ content: resolveAppResourceText($r('app.string.offline_action_tabs')) })
         .onClick(() => {
           this.onOpenTabs();
         })
-      MenuItem({ content: '书签' })
+      MenuItem({ content: resolveAppResourceText($r('app.string.app_shortcut_bookmarks')) })
         .onClick(() => {
           this.onOpenBookmarks();
         })
-      MenuItem({ content: '历史记录' })
+      MenuItem({ content: resolveAppResourceText($r('app.string.app_shortcut_history')) })
         .onClick(() => {
           this.onOpenHistory();
         })
-      MenuItem({ content: '设置' })
+      MenuItem({ content: resolveAppResourceText($r('app.string.app_shortcut_settings')) })
         .onClick(() => {
           this.onOpenSettings();
         })

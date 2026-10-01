@@ -123,7 +123,78 @@ export class WebBottomSafeAreaScriptService {
           }
           return false;
         }
+        function isEditor(node) {
+          if (!node || node.nodeType !== 1) return false;
+          var tag = node.tagName;
+          if (tag === 'TEXTAREA') return true;
+          if (tag === 'INPUT') {
+            var type = (node.getAttribute('type') || 'text').toLowerCase();
+            return type !== 'hidden' && type !== 'checkbox' && type !== 'radio' &&
+              type !== 'button' && type !== 'submit' && type !== 'file' && type !== 'range';
+          }
+          var editable = node.getAttribute('contenteditable');
+          return editable === '' || editable === 'true' || node.isContentEditable === true;
+        }
+        function containsEditor(node) {
+          if (isEditor(node)) return true;
+          var shadow = node.shadowRoot;
+          if (shadow && shadow.querySelector &&
+            shadow.querySelector('textarea, input, [contenteditable="true"], [contenteditable=""]')) {
+            return true;
+          }
+          if (!document.createTreeWalker) return false;
+          var walker = document.createTreeWalker(node, 1);
+          var child;
+          var budget = 24;
+          while (budget-- > 0 && (child = walker.nextNode())) {
+            if (!withinBudget()) return false;
+            if (isEditor(child)) return true;
+          }
+          return false;
+        }
+        function composerGeometry(node) {
+          // Wider than a tab row: a chat field can be taller than 140px and sit a little
+          // above the screen edge, still inside the floating toolbar's cover.
+          var rect = node.getBoundingClientRect();
+          if (rect.width < width * 0.5 || rect.height < 28 || rect.height > 240 ||
+            rect.left > width * 0.25 || rect.right < width * 0.75 ||
+            Math.abs(height - rect.bottom) > 96 || !visible(node, rect)) return null;
+          return rect;
+        }
+        function fullShell(node) {
+          var rect = node.getBoundingClientRect();
+          if (rect.width < width * 0.85 || rect.height < height * 0.8 || Math.abs(rect.top) > 8) {
+            return false;
+          }
+          return Math.abs(height - rect.bottom) <= 32;
+        }
+        function unscrolledFooter(node) {
+          var parent = node.parentElement;
+          var guard = 8;
+          while (parent && parent !== document.documentElement && guard-- > 0) {
+            if (!withinBudget()) return false;
+            if (Math.abs(parent.scrollTop || 0) > 1) return false;
+            if (fullShell(parent)) return true;
+            parent = parent.parentElement;
+          }
+          return false;
+        }
+        function pinnedComposer(node) {
+          var rect = composerGeometry(node);
+          if (!rect || !containsEditor(node)) return false;
+          var style = getComputedStyle(node);
+          if ((style.position === 'fixed' || style.position === 'sticky') &&
+            !stickyRejected(style, rect) && !insideDialog(node)) return true;
+          if (style.position === 'absolute') {
+            var overlay = nearestOverlay(node);
+            return !!overlay && chainUnscrolled(node, overlay) && !insideDialog(node);
+          }
+          // Flex and normal-flow footers of a full-viewport shell are not position:fixed,
+          // but they stay on the screen bottom while the transcript scrolls beside them.
+          return !insideDialog(node) && unscrolledFooter(node);
+        }
         function matches(node) {
+          if (pinnedComposer(node)) return true;
           var style = getComputedStyle(node);
           var positioned = style.position === 'fixed' || style.position === 'sticky';
           var rect = geometry(node, 32);
@@ -148,13 +219,15 @@ export class WebBottomSafeAreaScriptService {
         for (var y = 0; y < depths.length; y++) {
           for (var x = 0; x < columns.length; x++) {
             var node = document.elementFromPoint(width * columns[x], height - depths[y]);
-            for (var level = 0; node && level < 12 && visited.length < 80; level++, node = node.parentElement) {
+            for (var level = 0; node && level < 14 && visited.length < 80; level++) {
               if (visited.indexOf(node) >= 0) break;
               if (!withinBudget()) return 'deferred';
               visited.push(node);
               var detected = matches(node);
               if (deferred || performance.now() > deadline) return 'deferred';
               if (detected) { remember(node); return 'detected'; }
+              var root = node.getRootNode && node.getRootNode();
+              node = node.parentElement || (root && root.host) || null;
             }
           }
         }

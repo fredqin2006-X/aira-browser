@@ -155,6 +155,14 @@ export function localizeGeneralSettingsCopy(value: ResourceStr): ResourceStr {
       return $r('app.string.settings_pro_value_view');
     case '外接键盘可用的浏览器操作':
       return $r('app.string.settings_general_keyboard_detail');
+    case '语言':
+      return $r('app.string.settings_general_language');
+    case '默认跟随系统语言':
+      return $r('app.string.settings_general_language_detail');
+    case '跟随系统':
+      return $r('app.string.settings_general_language_follow_system');
+    case '简体中文':
+      return $r('app.string.settings_general_language_chinese');
     default:
       break;
   }

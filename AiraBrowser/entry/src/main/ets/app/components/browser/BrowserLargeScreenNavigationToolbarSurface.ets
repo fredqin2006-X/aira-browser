@@ -172,7 +172,7 @@ type BrowserLargeScreenNavigationControlKind = 'back' | 'forward' | 'reload_or_s
 const EMPTY_ACTIVE_TAB_CHROME: BrowserLargeScreenActiveTabChromePresentation = {
   scene: 'home',
   tabId: '',
-  title: '新标签页',
+  title: resolveAppResourceText($r('app.string.browser_shell_015')),
   displayUrl: '',
   nativeRouteUrl: '',
   canGoBack: false,
@@ -197,7 +197,7 @@ const EMPTY_BOOKMARK_ACTION_SESSION: BrowserBookmarkActionSessionSnapshot = {
 };
 
 const EMPTY_SEARCH_ENGINE_PRESENTATION: BrowserSearchEngineChromePresentation =
-  new BrowserSearchEngineChromePresentation('bing', [], '搜索或输入网址');
+  new BrowserSearchEngineChromePresentation('bing', [], resolveAppResourceText($r('app.string.aira_search_card_placeholder')));
 
 @Component
 export struct BrowserLargeScreenNavigationToolbarSurface {
@@ -610,8 +610,8 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
     .stateEffect(this.activeTabChrome.scene === 'web')
     .enabled(this.activeTabChrome.scene === 'web')
     .accessibilityText(this.shouldShowSiteInfoProtectionFeedback()
-      ? `${this.siteControlsSnapshot.webProtectionFeedback.accessibilityLabel}，打开网页保护报告`
-      : '站点信息')
+      ? resolveAppResourceText($r('app.string.web_protection_report_a11y', this.siteControlsSnapshot.webProtectionFeedback.accessibilityLabel))
+      : resolveAppResourceText($r('app.string.settings_site_info_title')))
     .onClick(() => {
       this.onIntent({ kind: 'open_site_info', text: '' });
     })
@@ -681,7 +681,7 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
     .height(LARGE_SCREEN_NAVIGATION_BUTTON_SIZE_VP)
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
     .stateEffect(true)
-    .accessibilityText('跨设备标签页')
+    .accessibilityText($r('app.string.settings_link_tabs'))
     .onClick(() => {
       this.crossDeviceTabsPopupVisible = true;
     })
@@ -703,7 +703,7 @@ export struct BrowserLargeScreenNavigationToolbarSurface {
   @Builder
   private buildCrossDeviceTabsPopup() {
     Column() {
-      Text('跨设备标签页')
+      Text($r('app.string.settings_link_tabs'))
         .width('100%')
         .fontSize(16)
         .fontWeight(FontWeight.Medium)

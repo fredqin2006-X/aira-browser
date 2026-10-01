@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { BrowserHomePageStyle } from '../../common/models/HomePagePresentationSettingsModels';
 import { HomePageRecoveryEntry } from './HomePageRecoveryEntryPolicyService';
 
@@ -93,5 +94,13 @@ export function resolveHomePageSettingsRecoveryFooter(style: BrowserHomePageStyl
   if (style === 'centered' || style === 'minimal') {
     return '';
   }
-  return '收藏、最近关闭和主页设置按钮至少保留一项。';
+  return homeSettingsText(
+    $r('app.string.home_settings_keep_one'),
+    '收藏、最近关闭和主页设置按钮至少保留一项。'
+  );
+}
+
+function homeSettingsText(resource: Resource, fallback: string): string {
+  const resolved = resolveAppResourceText(resource);
+  return resolved.length > 0 ? resolved : fallback;
 }

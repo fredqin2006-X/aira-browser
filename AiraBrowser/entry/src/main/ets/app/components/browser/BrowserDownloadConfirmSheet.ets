@@ -31,6 +31,13 @@ struct BrowserDownloadConfirmDialog {
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY) private storedSecondaryTextColor: string = '#5F6875';
   controller?: CustomDialogController;
   @Link @Watch('resetEditingForPrompt') prompt: PendingDownloadPromptState | undefined;
+  /**
+   * Separate from the prompt object on purpose. A custom dialog does not
+   * reliably repaint a by-value object passed into @Builder, so a location
+   * change could be saved while this row kept the path from when the dialog
+   * opened. A primitive @Link is what the dialog actually refreshes.
+   */
+  @Link locationPath: string;
   @Link fileNameDraft: string;
   @State private editingFileName: boolean = false;
   onAction: (action: BrowserDownloadConfirmOverlayAction) => void =
@@ -205,7 +212,7 @@ struct BrowserDownloadConfirmDialog {
     Row({ space: 12 }) {
       this.buildRowLabel(resolveAppResourceText($r('app.string.bookmark_popover_save_to')))
 
-      Text(prompt.locationPath)
+      Text(this.locationPath)
         .layoutWeight(1)
         .constraintSize({ minWidth: 0 })
         .fontSize(14)
@@ -295,6 +302,7 @@ export struct BrowserDownloadConfirmOverlay {
   @Prop @Watch('syncVisibility') visible: boolean = false;
   @Prop @Watch('syncPrompt') prompt: PendingDownloadPromptState | undefined = undefined;
   @State private currentPrompt: PendingDownloadPromptState | undefined = undefined;
+  @State private locationPath: string = '';
   @State private fileNameDraft: string = '';
   onAction: (action: BrowserDownloadConfirmOverlayAction) => void =
     (_action: BrowserDownloadConfirmOverlayAction): void => {};
@@ -303,6 +311,7 @@ export struct BrowserDownloadConfirmOverlay {
   private dialogController: CustomDialogController = new CustomDialogController({
     builder: BrowserDownloadConfirmDialog({
       prompt: $currentPrompt,
+      locationPath: $locationPath,
       fileNameDraft: $fileNameDraft,
       onAction: (action: BrowserDownloadConfirmOverlayAction): void => {
         this.commitAction(action);
@@ -341,6 +350,7 @@ export struct BrowserDownloadConfirmOverlay {
     const nextPrompt = this.prompt;
     if (nextPrompt === undefined) {
       this.currentPrompt = undefined;
+      this.locationPath = '';
       this.fileNameDraft = '';
       this.closeDialog();
       return;
@@ -352,6 +362,7 @@ export struct BrowserDownloadConfirmOverlay {
       this.fileNameDraft = nextPrompt.fileName;
     }
     this.currentPrompt = nextPrompt;
+    this.locationPath = nextPrompt.locationPath;
     this.syncVisibility();
   }
 

@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   ExternalAppSearchPreferences,
   ExternalAppSearchTargetId,
@@ -6,7 +7,6 @@ import {
   SearchSuggestion
 } from '../../../common/models/BrowserModels';
 import { BrowserSearchEnginePresentationViewModel } from '../../../core/browser/BrowserSearchEnginePresentationViewModel';
-import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   SPLIT_TOOLBAR_ADDRESS_BLOCK_VP,
   SPLIT_TOOLBAR_ADDRESS_HORIZONTAL_MARGIN_VP,
@@ -275,7 +275,7 @@ export struct BrowserSplitToolbarChrome {
             iconSize: 20,
             iconColor: this.resolveHomeChromeIconColor()
           })
-          Text('主页')
+          Text($r('app.string.bottom_panel_action_home'))
             .fontSize(18)
             .fontColor(this.resolveHomeChromeIconColor())
             .maxLines(1)
@@ -442,7 +442,7 @@ export struct BrowserSplitToolbarChrome {
         this.engineMenuOpen = !this.engineMenuOpen;
       })
 
-      TextInput({ text: this.query, placeholder: '搜索或输入网址', controller: this.searchInputController })
+      TextInput({ text: this.query, placeholder: $r('app.string.aira_search_card_placeholder'), controller: this.searchInputController })
         .id(SPLIT_TOOLBAR_SEARCH_INPUT_ID)
         .layoutWeight(1)
         .constraintSize({ minWidth: 0 })
@@ -486,7 +486,7 @@ export struct BrowserSplitToolbarChrome {
           this.submitQuery(this.query);
         })
 
-      Button('取消')
+      Button($r('app.string.settings_custom_home_cancel'))
         .fontSize(15)
         .fontColor(this.textColor)
         .buttonStyle(ButtonStyleMode.TEXTUAL)
@@ -538,7 +538,7 @@ export struct BrowserSplitToolbarChrome {
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
           if (engine.id === this.selectedEngineId) {
-            Text('当前')
+            Text($r('app.string.browser_ui_browser_split_toolbar_chrome_001'))
               .fontSize(12)
               .fontColor(this.secondaryTextColor)
           }

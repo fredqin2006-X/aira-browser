@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   BrowserDataScope,
   BrowserResolvedThemeMode,
@@ -476,11 +477,11 @@ export class CustomHomepageBridgeCoordinator {
     const shortcut = shortcuts.find((item: ShortcutRecord): boolean => item.id === shortcutId);
     if (shortcut === undefined) {
       this.requestShortcutSync(documentGeneration);
-      this.showMessage('未找到这个快捷方式。');
+      this.showMessage(resolveAppResourceText($r('app.string.home_shortcut_missing')));
       return true;
     }
     if (isHomeSystemShortcut(shortcut) && !this.isAllowedSystemShortcutAction(action)) {
-      this.showMessage('系统入口只能打开、移动或从主页移除。');
+      this.showMessage(resolveAppResourceText($r('app.string.home_system_entry_limited')));
       return true;
     }
     switch (action) {
@@ -682,8 +683,8 @@ export class CustomHomepageBridgeCoordinator {
             valueJson: '',
             code: this.resolveStorageErrorCode(error, operation),
             message: operation === 'get' ?
-              '主页配置读取失败，请稍后重试。' :
-              '主页配置保存失败，请稍后重试。'
+              resolveAppResourceText($r('app.string.home_config_read_failed')) :
+              resolveAppResourceText($r('app.string.home_config_save_failed'))
           }),
           documentGeneration: documentGeneration
         });
@@ -817,22 +818,22 @@ export class CustomHomepageBridgeCoordinator {
         routeCoordinator.openAdBlockSettingsPage();
         return true;
       case 'site_settings':
-        routeCoordinator.openSimpleRoute(SITE_CONTROLS_MANAGEMENT_ROUTE, '打开站点设置失败');
+        routeCoordinator.openSimpleRoute(SITE_CONTROLS_MANAGEMENT_ROUTE, resolveAppResourceText($r('app.string.home_open_site_settings_failed')));
         return true;
       case 'webpage_translation_settings':
-        routeCoordinator.openSimpleRoute(WEBPAGE_TRANSLATION_SETTINGS_ROUTE, '打开网页翻译设置失败');
+        routeCoordinator.openSimpleRoute(WEBPAGE_TRANSLATION_SETTINGS_ROUTE, resolveAppResourceText($r('app.string.home_open_translation_failed')));
         return true;
       case 'password_settings':
-        routeCoordinator.openSimpleRoute(PASSWORD_SETTINGS_ROUTE, '打开密码设置失败');
+        routeCoordinator.openSimpleRoute(PASSWORD_SETTINGS_ROUTE, resolveAppResourceText($r('app.string.home_open_password_failed')));
         return true;
       case 'user_agent_settings':
-        routeCoordinator.openSimpleRoute(USER_AGENT_SETTINGS_ROUTE, '打开网页标识设置失败');
+        routeCoordinator.openSimpleRoute(USER_AGENT_SETTINGS_ROUTE, resolveAppResourceText($r('app.string.home_open_ua_failed')));
         return true;
       case 'download_settings':
-        routeCoordinator.openSimpleRoute(DOWNLOAD_SETTINGS_ROUTE, '打开下载设置失败');
+        routeCoordinator.openSimpleRoute(DOWNLOAD_SETTINGS_ROUTE, resolveAppResourceText($r('app.string.home_open_download_failed')));
         return true;
       case 'custom_homepage_settings':
-        routeCoordinator.openSimpleRoute(CUSTOM_HOMEPAGE_SETTINGS_ROUTE, '打开主页设置失败');
+        routeCoordinator.openSimpleRoute(CUSTOM_HOMEPAGE_SETTINGS_ROUTE, resolveAppResourceText($r('app.string.home_open_homepage_failed')));
         return true;
       case 'general_settings':
         routeCoordinator.openSettingsDetailPage('general');
@@ -850,19 +851,19 @@ export class CustomHomepageBridgeCoordinator {
         routeCoordinator.openSettingsDetailPage('about');
         return true;
       case 'startup_settings':
-        routeCoordinator.openSimpleRoute(GENERAL_STARTUP_SETTINGS_ROUTE, '打开启动设置失败');
+        routeCoordinator.openSimpleRoute(GENERAL_STARTUP_SETTINGS_ROUTE, resolveAppResourceText($r('app.string.home_open_startup_failed')));
         return true;
       case 'private_tabs_settings':
-        routeCoordinator.openSimpleRoute(GENERAL_PRIVATE_TABS_SETTINGS_ROUTE, '打开隐私标签设置失败');
+        routeCoordinator.openSimpleRoute(GENERAL_PRIVATE_TABS_SETTINGS_ROUTE, resolveAppResourceText($r('app.string.home_open_private_tabs_failed')));
         return true;
       case 'history_retention_settings':
-        routeCoordinator.openSimpleRoute(GENERAL_HISTORY_RETENTION_SETTINGS_ROUTE, '打开历史保留设置失败');
+        routeCoordinator.openSimpleRoute(GENERAL_HISTORY_RETENTION_SETTINGS_ROUTE, resolveAppResourceText($r('app.string.home_open_history_failed')));
         return true;
       case 'theme_palette_settings':
-        routeCoordinator.openSimpleRoute(THEME_PALETTE_SETTINGS_ROUTE, '打开主题配色设置失败');
+        routeCoordinator.openSimpleRoute(THEME_PALETTE_SETTINGS_ROUTE, resolveAppResourceText($r('app.string.home_open_theme_failed')));
         return true;
       case 'keyboard_shortcuts_settings':
-        routeCoordinator.openSimpleRoute(KEYBOARD_SHORTCUTS_SETTINGS_ROUTE, '打开键盘快捷键设置失败');
+        routeCoordinator.openSimpleRoute(KEYBOARD_SHORTCUTS_SETTINGS_ROUTE, resolveAppResourceText($r('app.string.home_open_shortcuts_failed')));
         return true;
       case 'app_proxy_settings':
         routeCoordinator.openAppProxySettingsPage();
@@ -928,7 +929,9 @@ export class CustomHomepageBridgeCoordinator {
       ok: false,
       state: state,
       code: unavailable ? SEARCH_ENGINE_NOT_AVAILABLE_ERROR : 'SEARCH_ENGINE_UPDATE_FAILED',
-      message: unavailable ? '这个搜索引擎当前不可用。' : '搜索引擎保存失败，请稍后重试。'
+      message: unavailable
+        ? resolveAppResourceText($r('app.string.home_engine_unavailable'))
+        : resolveAppResourceText($r('app.string.home_engine_save_failed'))
     };
   }
 }

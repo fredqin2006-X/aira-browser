@@ -74,6 +74,7 @@ import membershipEntitlementRetentionPolicyTest from './MembershipEntitlementRet
 import startupWelcomeIntroTest from './StartupWelcomeIntro.test';
 import featureIntroTest from './FeatureIntro.test';
 import browserWebTopSafeAreaColorTest from './BrowserWebTopSafeAreaColor.test';
+import browserWebToolbarClearancePolicyTest from './BrowserWebToolbarClearancePolicy.test';
 import browserSearchEnginePopupLayoutViewModelTest from './BrowserSearchEnginePopupLayoutViewModel.test';
 import browserTabsOverviewSwipeDismissPolicyTest from './BrowserTabsOverviewSwipeDismissPolicy.test';
 import browserTabsOverviewSelectionDisplacementCoordinatorTest from './BrowserTabsOverviewSelectionDisplacementCoordinator.test';
@@ -184,6 +185,7 @@ export default function tests(): void {
   startupWelcomeIntroTest();
   featureIntroTest();
   browserWebTopSafeAreaColorTest();
+  browserWebToolbarClearancePolicyTest();
   browserSearchEnginePopupLayoutViewModelTest();
   browserTabsOverviewSwipeDismissPolicyTest();
   browserTabsOverviewSelectionDisplacementCoordinatorTest();

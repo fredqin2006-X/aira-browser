@@ -1,4 +1,5 @@
 import { KeyCode } from '@kit.InputKit';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   ExternalAppSearchTargetId,
   SearchSuggestion
@@ -82,7 +83,7 @@ export struct CenteredHomeHeader {
         maxWidthVp: this.logoMaxWidthVp,
         tintColor: this.textColor,
         clickable: this.wordmarkOpensSettings,
-        label: this.wordmarkOpensSettings ? '主页设置' : 'Aira',
+        label: this.wordmarkOpensSettings ? resolveAppResourceText($r('app.string.home_settings_title')) : 'Aira',
         onLogoClick: () => {
           this.onOpenSettings();
         }
@@ -160,7 +161,7 @@ export struct CenteredHomeHeader {
         })
 
       Row() {
-        Text('搜索或输入网址')
+        Text($r('app.string.aira_search_card_placeholder'))
           .layoutWeight(1)
           .fontSize(16)
           .fontColor(this.secondaryTextColor)
@@ -197,7 +198,7 @@ export struct CenteredHomeHeader {
     Row() {
       TextInput({
         text: this.inlineQuery,
-        placeholder: '搜索或输入网址',
+        placeholder: $r('app.string.aira_search_card_placeholder'),
         controller: this.inlineInputController
       })
         .layoutWeight(1)

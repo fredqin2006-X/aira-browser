@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   ExternalAppSearchPreferences,
   ExternalAppSearchTargetId,
@@ -61,7 +62,7 @@ const LARGE_SCREEN_SEARCH_ENGINE_POPUP_PADDING_VP: number = 6;
 const LARGE_SCREEN_SEARCH_ENGINE_POPUP_ROW_RADIUS_VP: number = 12;
 
 function createDefaultSearchEnginePresentation(): BrowserSearchEngineChromePresentation {
-  return new BrowserSearchEngineChromePresentation('bing', [], '搜索或输入网址');
+  return new BrowserSearchEngineChromePresentation('bing', [], resolveAppResourceText($r('app.string.aira_search_card_placeholder')));
 }
 
 @Component
@@ -198,7 +199,7 @@ export struct BrowserLargeScreenSearchEngineButton {
     .height(LARGE_SCREEN_SEARCH_ENGINE_BUTTON_SIZE_VP)
     .backgroundColor(Color.Transparent)
     .stateEffect(true)
-    .accessibilityText('切换搜索引擎')
+    .accessibilityText($r('app.string.browser_ui_browser_large_screen_omnibox_search_surface_001'))
     .onClick((): void => {
       this.popupVisible = !this.popupVisible;
     })
@@ -280,7 +281,7 @@ export struct BrowserLargeScreenSearchEngineButton {
     .stateEffect(true)
     .focusable(false)
     .focusOnTouch(false)
-    .accessibilityText(`切换到${engine.name}`)
+    .accessibilityText(resolveAppResourceText($r('app.string.tab_a11y_switch', engine.name)))
     .onClick((): void => {
       this.popupVisible = false;
       this.onSelectSearchEngine(engine.id);
@@ -474,7 +475,7 @@ export struct BrowserLargeScreenOmniboxSearchSurface {
   @Builder
   private buildHistoryHeaderRow() {
     Row() {
-      Text('搜索历史')
+      Text($r('app.string.settings_catalog_search_history'))
         .fontSize(LARGE_SCREEN_SUGGESTION_HEADER_TITLE_SIZE)
         .fontColor(this.storedSecondaryTextColor)
         .maxLines(1)
@@ -482,7 +483,7 @@ export struct BrowserLargeScreenOmniboxSearchSurface {
       Blank()
 
       Button() {
-        Text('清空')
+        Text($r('app.string.settings_privacy_protection_adblock_clear_confirm'))
           .fontSize(LARGE_SCREEN_SUGGESTION_HEADER_ACTION_SIZE)
           .fontColor(this.storedSecondaryTextColor)
           .maxLines(1)
@@ -496,7 +497,7 @@ export struct BrowserLargeScreenOmniboxSearchSurface {
       .hoverEffect(HoverEffect.None)
       .focusable(false)
       .focusOnTouch(false)
-      .accessibilityText('清空搜索历史')
+      .accessibilityText($r('app.string.browser_ui_browser_large_screen_omnibox_search_surface_004'))
       .onHover((hovered: boolean): void => {
         this.clearHovered = hovered;
       })
@@ -634,7 +635,9 @@ export struct BrowserLargeScreenOmniboxSearchSurface {
   }
 
   private resolveEmptySuggestionLabel(): string {
-    return this.query.trim().length > 0 ? '暂无搜索建议' : '暂无搜索历史';
+    return this.query.trim().length > 0
+      ? resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_omnibox_search_surface_003'))
+      : resolveAppResourceText($r('app.string.browser_ui_browser_large_screen_omnibox_search_surface_002'));
   }
 
   private refreshExternalAppSearchPreferences(): void {

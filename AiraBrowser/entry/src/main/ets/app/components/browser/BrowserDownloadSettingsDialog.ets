@@ -33,6 +33,12 @@ export struct BrowserDownloadSettingsDialog {
   @State private privacyMode: BrowserSessionPrivacyMode = 'regular';
   @State private dataScope: BrowserDataScope = 'profile_persistent';
   @State private appliedOpenRevision: number = -1;
+  /**
+   * Closing this dialog for the system folder picker does not always destroy
+   * it. Reopening would otherwise keep the location label from the previous
+   * open, even after the new folder had already been saved.
+   */
+  @State private settingsRefreshRevision: number = 0;
 
   aboutToAppear(): void {
     this.applyOpenRevision();
@@ -58,6 +64,7 @@ export struct BrowserDownloadSettingsDialog {
             showTitleBar: false,
             useTopSafeInset: false,
             embeddedInDialog: true,
+            refreshRevision: this.settingsRefreshRevision,
             boundary: this.currentBoundary(),
             onOpenEmbeddedSubpage: (subpage: BrowserDownloadSettingsSubpage): void => {
               this.activeSubpage = subpage;
@@ -105,6 +112,7 @@ export struct BrowserDownloadSettingsDialog {
     const boundary = this.resolveBoundary();
     this.privacyMode = boundary.privacyMode;
     this.dataScope = boundary.dataScope;
+    this.settingsRefreshRevision += 1;
   }
 
   private currentBoundary(): DownloadTaskBoundary {

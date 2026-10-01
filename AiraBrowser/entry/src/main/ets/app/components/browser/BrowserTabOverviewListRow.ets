@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { BrowserTabOverviewItemPresentation } from '../../../core/browser/BrowserTabsOverlayViewModel';
 import { BrowserTabState } from '../../../core/tabs/TabManager';
 import {
@@ -158,7 +159,7 @@ export struct BrowserTabOverviewListRow {
     })
     .enabled(this.rowEnabled)
     .hitTestBehavior(this.rowEnabled ? HitTestMode.Default : HitTestMode.None)
-    .accessibilityText(`切换到${this.presentation.identity.label}`)
+    .accessibilityText(resolveAppResourceText($r('app.string.tab_a11y_switch', this.presentation.identity.label)))
     .onAreaChange((_oldArea: Area, newArea: Area) => {
       this.recordPreviewRect(newArea);
     })
@@ -199,7 +200,7 @@ export struct BrowserTabOverviewListRow {
     .backgroundColor(Color.Transparent)
     .enabled(this.rowEnabled)
     .hitTestBehavior(this.rowEnabled ? HitTestMode.Default : HitTestMode.None)
-    .accessibilityText(`关闭${this.presentation.identity.label}`)
+    .accessibilityText(resolveAppResourceText($r('app.string.tab_a11y_close', this.presentation.identity.label)))
     .onTouch((event: TouchEvent) => {
       event.stopPropagation();
     })

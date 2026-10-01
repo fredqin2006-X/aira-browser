@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BrowserExperimentSettings } from '../../common/models/BrowserModels';
 import { AppProxySettingsCoordinator } from '../settings/AppProxySettingsCoordinator';
@@ -317,7 +318,7 @@ export class BrowserWebCapabilityPromptApplicationCoordinator {
     this.emitDialog({
       action: 'open_javascript_prompt',
       presentation: {
-        title: event.url.length > 0 ? event.url : '网页提示',
+        title: event.url.length > 0 ? event.url : resolveAppResourceText($r('app.string.browser_ui_browser_shell_dialogs_004')),
         message: event.message,
         defaultValue: event.value,
         inputValue: event.value
@@ -349,7 +350,7 @@ export class BrowserWebCapabilityPromptApplicationCoordinator {
     this.emitDialog({
       action: 'open_javascript_confirm',
       presentation: {
-        title: event.url.length > 0 ? event.url : '网页确认',
+        title: event.url.length > 0 ? event.url : resolveAppResourceText($r('app.string.browser_browser_web_capability_prompt_application_coordinator_005')),
         message: event.message
       }
     });
@@ -379,7 +380,7 @@ export class BrowserWebCapabilityPromptApplicationCoordinator {
     this.emitDialog({
       action: 'open_javascript_alert',
       presentation: {
-        title: event.url.length > 0 ? event.url : '网页提示',
+        title: event.url.length > 0 ? event.url : resolveAppResourceText($r('app.string.browser_ui_browser_shell_dialogs_004')),
         message: event.message
       }
     });
@@ -410,7 +411,7 @@ export class BrowserWebCapabilityPromptApplicationCoordinator {
   }
 
   handleShowFileSelector(tabId: string, event: OnShowFileSelectorEvent): boolean {
-    this.emitMessage('helper', '正在打开文件选择器');
+    this.emitMessage('helper', resolveAppResourceText($r('app.string.file_picker_opening')));
     this.dependencies.backgroundSessionSyncCoordinator.protect(
       tabId,
       '网页文件选择器打开中，暂不回收 runtime。'
@@ -807,12 +808,12 @@ export class BrowserWebCapabilityPromptApplicationCoordinator {
         `选择文件失败：${JSON.stringify(error)}`
       );
       this.emitMessage('error', fault.userMessage);
-      this.emitMessage('helper', '网页选择文件失败');
+      this.emitMessage('helper', resolveAppResourceText($r('app.string.file_pick_failed')));
       try {
         event.result.handleFileList([]);
       } catch (_innerError) {
       }
-      this.emitMessage('toast', '选择文件失败，请稍后重试。');
+      this.emitMessage('toast', resolveAppResourceText($r('app.string.file_pick_failed_retry')));
     } finally {
       this.dependencies.backgroundSessionSyncCoordinator.release(tabId);
     }

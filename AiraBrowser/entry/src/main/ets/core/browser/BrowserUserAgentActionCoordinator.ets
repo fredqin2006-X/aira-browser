@@ -347,7 +347,7 @@ export class BrowserUserAgentActionCoordinator {
       return;
     }
     if (result.status === 'transition_deferred') {
-      this.showToast(resolveAppResourceText($r('app.string.web_ua_runtime_deferred')));
+      // The choice is already saved. A history-preserving delay is not something to announce.
       return;
     }
     this.showToast(message);

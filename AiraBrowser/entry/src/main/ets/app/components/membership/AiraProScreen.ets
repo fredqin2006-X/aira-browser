@@ -16,7 +16,6 @@ import {
 } from '../../../core/membership/AiraProMembershipRedeemResult';
 import { AiraProOverviewScreen } from './AiraProOverviewScreen';
 import { AiraDonateProIntroSheet } from './AiraDonateProIntroSheet';
-import { AiraDonateProIntroRepository } from '../../../data/onboarding/AiraDonateProIntroRepository';
 import { AIRA_COMMUNITY_REPOSITORY_URL } from '../../../common/constants/AiraCommunityProjectLinks';
 import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../../common/config/AiraDistributionCapabilityOwner';
 import { resolveCenteredDialogControllerWidth,  CENTERED_DIALOG_CORNER_RADIUS_VP } from '../common/CenteredDialogSurface';
@@ -69,6 +68,8 @@ import { MEMBERSHIP_REFRESH_ACCOUNT_VISIBLE_FRESH_MS } from '../../../services/m
 import { applyDesktopDialogSheetChrome } from '../common/DesktopDialogSheetChrome';
 
 type AiraProSheetKind = 'none' | 'login' | 'legalDocument' | 'selfHostingGuide' | 'donateIntro';
+
+/** Temporary while the intro sheet is still being tuned. Turn off before release. */
 export type AiraProPresentationMode = 'page' | 'workspace';
 export type AiraProPageLayoutMode = 'phone' | 'large_screen';
 
@@ -110,8 +111,8 @@ export struct AiraProScreen {
         this.handleHuaweiLoginPanelResult(error, response);
       });
   private contentScroller: Scroller = new Scroller();
-  private donateIntroRepository: AiraDonateProIntroRepository = new AiraDonateProIntroRepository();
-  private donateIntroRequest: number = 0;
+  /** Set when this visit dismisses the intro, so a late membership refresh cannot reopen it. */
+  private donateIntroDismissedThisEntry: boolean = false;
   private themePreferencesListenerKey: string = '';
   @State private dataScope: string = '';
   @State private privacyMode: string = '';
@@ -181,6 +182,7 @@ export struct AiraProScreen {
 
   aboutToAppear(): void {
     this.bindThemePreferencesUpdates();
+    this.donateIntroDismissedThisEntry = false;
     this.refreshState();
     this.presentDonateIntro();
     if (this.isDesktopPresentation()) {
@@ -205,6 +207,7 @@ export struct AiraProScreen {
   }
 
   onPageShow(): void {
+    this.donateIntroDismissedThisEntry = false;
     this.refreshState();
     this.presentDonateIntro();
     this.purchaseCoordinator.handlePageShow(this.purchaseFlowHost, this.buildAiraProDataBoundaryInput());
@@ -250,6 +253,9 @@ export struct AiraProScreen {
       height: this.activeSheetKind === 'donateIntro' ? SheetSize.LARGE : this.resolveActiveSheetHeight(),
       dragBar: this.pageLayoutMode !== 'large_screen',
       showClose: this.activeSheetKind === 'login',
+      onWillDismiss: (action: DismissSheetAction): void => {
+        action.dismiss();
+      },
       backgroundColor: this.resolveActiveSheetBackgroundColor(),
       onDisappear: () => {
         this.handleActiveSheetDisappear();
@@ -541,9 +547,11 @@ export struct AiraProScreen {
     })
       .then(() => {
         this.applyAiraProState();
+        this.presentDonateIntro();
       })
       .catch((_error: Error) => {
         this.applyAiraProState();
+        this.presentDonateIntro();
       });
   }
 
@@ -755,28 +763,23 @@ export struct AiraProScreen {
   }
 
   /**
-   * Official only, and only the first time this device opens the page. Community
-   * has no hosted membership to explain. Marking shown before the sheet opens
-   * means a swipe-away still counts.
+   * Official only. A non-member sees this every time they enter the page.
+   * A current member does not, including a member recognized after refresh.
    */
   private presentDonateIntro(): void {
-    if (AIRA_DISTRIBUTION_CAPABILITY_OWNER.isCommunity() || this.activeSheetVisible) {
+    if (AIRA_DISTRIBUTION_CAPABILITY_OWNER.isCommunity()) {
       return;
     }
-    const request = this.donateIntroRequest + 1;
-    this.donateIntroRequest = request;
-    this.donateIntroRepository.initialize()
-      .then((): void => {
-        if (request !== this.donateIntroRequest || this.donateIntroRepository.hasShown() ||
-          this.activeSheetVisible) {
-          return;
-        }
-        this.donateIntroRepository.markShown().catch((_error: Error): void => {
-        });
-        this.openActiveSheet('donateIntro');
-      })
-      .catch((_error: Error): void => {
-      });
+    if (this.state.showMembershipStatus) {
+      if (this.activeSheetKind === 'donateIntro') {
+        this.closeActiveSheet();
+      }
+      return;
+    }
+    if (this.activeSheetVisible || this.donateIntroDismissedThisEntry) {
+      return;
+    }
+    this.openActiveSheet('donateIntro');
   }
 
   private openActiveSheet(kind: AiraProSheetKind): void {
@@ -786,12 +789,18 @@ export struct AiraProScreen {
   }
 
   private closeActiveSheet(): void {
+    if (this.activeSheetKind === 'donateIntro') {
+      this.donateIntroDismissedThisEntry = true;
+    }
     this.activeSheetVisible = false;
     this.activeSheetMounted = false;
     this.activeSheetKind = 'none';
   }
 
   private handleActiveSheetDisappear(): void {
+    if (this.activeSheetKind === 'donateIntro') {
+      this.donateIntroDismissedThisEntry = true;
+    }
     this.activeSheetVisible = false;
     this.activeSheetMounted = false;
     this.activeSheetKind = 'none';
@@ -815,6 +824,9 @@ export struct AiraProScreen {
     if (this.activeSheetKind === 'legalDocument') {
       return this.resolveLegalDocumentTitle(this.legalDocument.id);
     }
+    if (this.activeSheetKind === 'donateIntro') {
+      return $r('app.string.settings_pro_donate_intro_title');
+    }
     return $r('app.string.settings_pro_enter');
   }
 
@@ -837,7 +849,8 @@ export struct AiraProScreen {
   private shouldShowDesktopDialogHeader(): boolean {
     return this.activeSheetKind === 'login' ||
       this.activeSheetKind === 'legalDocument' ||
-      this.activeSheetKind === 'selfHostingGuide';
+      this.activeSheetKind === 'selfHostingGuide' ||
+      this.activeSheetKind === 'donateIntro';
   }
 
   private signInHuaweiAccount(): void {

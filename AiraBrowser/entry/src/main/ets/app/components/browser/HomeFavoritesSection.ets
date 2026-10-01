@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   HomeContentThemePresentationState,
   HomeShortcutPresentationState,
@@ -60,7 +61,7 @@ export struct HomeFavoritesSection {
     Column({ space: 0 }) {
       if (this.showTitle) {
         HomeExpandableSectionHeader({
-          title: '收藏',
+          title: homeFavoritesTitle($r('app.string.homepage_preview_favorites'), '收藏'),
           expanded: this.expanded,
           toggleEnabled: true,
           leftInset: HOME_SECTION_CONTENT_INSET,
@@ -143,4 +144,9 @@ export struct HomeFavoritesSection {
       Math.max(Math.max(0, this.minimumWidth), contentDrivenWidth)
     );
   }
+}
+
+function homeFavoritesTitle(resource: Resource, fallback: string): string {
+  const resolved = resolveAppResourceText(resource);
+  return resolved.length > 0 ? resolved : fallback;
 }

@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { AiraSyncConfigStore } from '../../services/sync/AiraSyncConfigStore';
 import {
   AiraDesktopLoginConfirmResponseBody,
@@ -103,7 +104,7 @@ export class BrowserQrScanCoordinator {
     if (sessionId.length <= 0 || secret.length <= 0) {
       this.clearDesktopLoginSession();
       this.shell.setSurfaceVisible('desktop_login_confirm', false);
-      this.shell.showToast('二维码登录凭证已失效，请重新扫码。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.browser_browser_qr_scan_coordinator_006')));
       return;
     }
     const generation = this.desktopLoginGeneration;
@@ -141,7 +142,7 @@ export class BrowserQrScanCoordinator {
       } else {
         this.clearDesktopLoginSession();
       }
-      this.shell.showToast(this.resolveErrorMessage(error as Error, 'Aira-sync 扩展登录失败'));
+      this.shell.showToast(this.resolveErrorMessage(error as Error, resolveAppResourceText($r('app.string.browser_browser_qr_scan_coordinator_001'))));
     }
   }
 
@@ -157,9 +158,9 @@ export class BrowserQrScanCoordinator {
     const password = this.snapshot.wifiCredentials?.password ?? '';
     const result = await this.clipboardService.copyText({
       value: password,
-      emptyMessage: '二维码未包含 Wi-Fi 密码。',
-      successMessage: 'Wi-Fi 密码已复制',
-      failureMessage: '复制 Wi-Fi 密码失败，请稍后重试。'
+      emptyMessage: resolveAppResourceText($r('app.string.browser_browser_qr_scan_coordinator_004')),
+      successMessage: resolveAppResourceText($r('app.string.browser_browser_qr_scan_coordinator_003')),
+      failureMessage: resolveAppResourceText($r('app.string.browser_browser_qr_scan_coordinator_008'))
     });
     this.shell.showToast(result.message);
   }
@@ -248,7 +249,7 @@ export class BrowserQrScanCoordinator {
     } catch (error) {
       this.shell.showToast(this.resolveErrorMessage(
         error as Error,
-        '二维码登录凭证不完整，请刷新电脑端二维码。'
+        resolveAppResourceText($r('app.string.browser_browser_qr_scan_coordinator_005'))
       ));
       return;
     }
@@ -280,7 +281,7 @@ export class BrowserQrScanCoordinator {
     if (this.shell.requestAccountSignIn?.() === true) {
       return;
     }
-    this.shell.showToast('请先登录华为账号');
+    this.shell.showToast(resolveAppResourceText($r('app.string.settings_sync_sign_in_huawei')));
     this.shell.openNavigation('account_settings', '');
   }
 
@@ -289,7 +290,7 @@ export class BrowserQrScanCoordinator {
     try {
       credentials = this.wifiQrCodeService.parsePayload(value);
     } catch (error) {
-      this.shell.showToast(this.resolveErrorMessage(error as Error, '无法识别 Wi-Fi 二维码。'));
+      this.shell.showToast(this.resolveErrorMessage(error as Error, resolveAppResourceText($r('app.string.browser_browser_qr_scan_coordinator_009'))));
       return;
     }
     this.clearDesktopLoginSession(false);
@@ -306,11 +307,11 @@ export class BrowserQrScanCoordinator {
 
   private presentDesktopLoginConfirmationResult(result: AiraDesktopLoginConfirmResponseBody): void {
     if (result.ok === true && result.status === 'confirmed') {
-      this.shell.showToast('可以回到电脑继续使用 Aira-sync。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.browser_browser_qr_scan_coordinator_007')));
       return;
     }
-    const message = result.message?.trim() ?? 'Aira-sync 扩展登录确认失败，请刷新二维码后重试。';
-    this.shell.showToast(message.length > 0 ? message : '登录失败');
+    const message = result.message?.trim() ?? resolveAppResourceText($r('app.string.browser_browser_qr_scan_coordinator_002'));
+    this.shell.showToast(message.length > 0 ? message : resolveAppResourceText($r('app.string.browser_browser_qr_scan_coordinator_010')));
   }
 
   private setDesktopLoginConfirming(confirming: boolean): void {

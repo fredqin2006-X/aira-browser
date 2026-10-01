@@ -1,4 +1,5 @@
 import { abilityAccessCtrl, common, Permissions } from '@kit.AbilityKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { geoLocationManager } from '@kit.LocationKit';
 import { SitePermissionKind } from '../../common/models/BrowserModels';
 import { SiteCapabilityCatalogService } from '../web/SiteCapabilityCatalogService';
@@ -25,7 +26,7 @@ export class SystemPermissionService {
         systemDialogShown: false,
         settingsRequired: false,
         locationServiceEnabled: true,
-        message: '无需额外系统权限。'
+        message: resolveAppResourceText($r('app.string.permission_none_needed'))
       };
     }
     if (this.hasRequiredGrantStatuses(kinds, permissions, this.getCurrentGrantStatuses(context, permissions))) {
@@ -35,7 +36,9 @@ export class SystemPermissionService {
         systemDialogShown: false,
         settingsRequired: !locationServiceEnabled,
         locationServiceEnabled: locationServiceEnabled,
-        message: locationServiceEnabled ? '系统权限已授予。' : '系统位置信息开关未开启。'
+        message: locationServiceEnabled
+          ? resolveAppResourceText($r('app.string.permission_granted'))
+          : resolveAppResourceText($r('app.string.permission_location_off'))
       };
     }
     const result = await abilityAccessCtrl.createAtManager().requestPermissionsFromUser(context, permissions);
@@ -54,8 +57,11 @@ export class SystemPermissionService {
       systemDialogShown: systemDialogShown,
       settingsRequired: !granted && (deniedWithoutSystemDialog || !locationServiceEnabled),
       locationServiceEnabled: locationServiceEnabled,
-      message: granted ? '系统权限已授予。' :
-        (locationServiceEnabled ? '系统权限未完全开启。' : '系统位置信息开关未开启。')
+      message: granted
+        ? resolveAppResourceText($r('app.string.permission_granted'))
+        : (locationServiceEnabled
+          ? resolveAppResourceText($r('app.string.permission_incomplete'))
+          : resolveAppResourceText($r('app.string.permission_location_off')))
     };
   }
 
@@ -70,7 +76,7 @@ export class SystemPermissionService {
         systemDialogShown: false,
         settingsRequired: false,
         locationServiceEnabled: true,
-        message: '无需额外系统权限。'
+        message: resolveAppResourceText($r('app.string.permission_none_needed'))
       };
     }
     if (this.hasRequiredGrantStatuses(kinds, permissions, this.getCurrentGrantStatuses(context, permissions))) {
@@ -80,7 +86,9 @@ export class SystemPermissionService {
         systemDialogShown: false,
         settingsRequired: !locationServiceEnabled,
         locationServiceEnabled: locationServiceEnabled,
-        message: locationServiceEnabled ? '系统权限已开启，请重新发起网页请求。' : '系统位置信息开关未开启。'
+        message: locationServiceEnabled
+          ? resolveAppResourceText($r('app.string.web_permission_system_on'))
+          : resolveAppResourceText($r('app.string.permission_location_off'))
       };
     }
     const grantStatuses = await this.requestPermissionsOnSettingOneByOne(context, permissions);
@@ -93,8 +101,11 @@ export class SystemPermissionService {
       systemDialogShown: false,
       settingsRequired: !granted,
       locationServiceEnabled: locationServiceEnabled,
-      message: granted ? '系统权限已开启，请重新发起网页请求。' :
-        (locationServiceEnabled ? '系统权限仍未完全开启。' : '系统位置信息开关未开启。')
+      message: granted
+        ? resolveAppResourceText($r('app.string.web_permission_system_on'))
+        : (locationServiceEnabled
+          ? resolveAppResourceText($r('app.string.permission_still_incomplete'))
+          : resolveAppResourceText($r('app.string.permission_location_off')))
     };
   }
 

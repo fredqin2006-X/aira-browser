@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   BrowserDataScope,
   BrowserProfileId,
@@ -488,14 +489,14 @@ export class BrowserRecentlyClosedApplicationCoordinator {
     }
     this.dependencies.clipboardService.copyText({
       value: lookup.url,
-      emptyMessage: '当前没有可复制的链接。',
-      successMessage: '链接已复制。'
+      emptyMessage: resolveAppResourceText($r('app.string.history_copy_empty')),
+      successMessage: resolveAppResourceText($r('app.string.reader_copy_link_done'))
     })
       .then((result) => {
         this.shell.showToast(result.message);
       })
       .catch((_error: Error) => {
-        this.shell.showToast('复制失败，请稍后重试。');
+        this.shell.showToast(resolveAppResourceText($r('app.string.reader_copy_link_failed')));
       });
   }
 
@@ -509,10 +510,10 @@ export class BrowserRecentlyClosedApplicationCoordinator {
       return;
     }
     this.shell.confirmDelete({
-      title: '删除最近记录',
-      message: `确定删除“${lookup.title}”吗？此操作无法撤销。`,
-      cancelLabel: '取消',
-      confirmLabel: '删除',
+      title: resolveAppResourceText($r('app.string.browser_browser_recently_closed_application_coordinator_001')),
+      message: resolveAppResourceText($r('app.string.recent_delete_named', lookup.title)),
+      cancelLabel: resolveAppResourceText($r('app.string.settings_custom_home_cancel')),
+      confirmLabel: resolveAppResourceText($r('app.string.settings_delete')),
       confirmTone: 'alert',
       onConfirm: (): void => {
         this.handleUserAction({ type: 'confirm_delete_record', recordId: recordId });
@@ -531,7 +532,7 @@ export class BrowserRecentlyClosedApplicationCoordinator {
     }
     const nextRecords = this.records.filter((record: BrowserRecentlyClosedTabRecord) => record.id !== recordId);
     this.applyMutation(nextRecords);
-    this.shell.showToast('记录已删除。');
+    this.shell.showToast(resolveAppResourceText($r('app.string.browser_browser_recently_closed_application_coordinator_005')));
   }
 
   private toggleHomeShortcut(recordId: string): void {
@@ -550,10 +551,15 @@ export class BrowserRecentlyClosedApplicationCoordinator {
     })
       .then((result) => {
         this.shell.refreshHomeShortcuts();
-        this.shell.showToast(result.added ? '已添加到主页。' : '已从主页移除。');
+        this.shell.showToast(result.added
+          ? resolveAppResourceText($r('app.string.history_home_added'))
+          : resolveAppResourceText($r('app.string.history_home_removed')));
       })
       .catch((error: Error) => {
-        this.shell.showDialog('操作失败', `更新主页快捷方式失败：${this.stringifyError(error)}`);
+        this.shell.showDialog(
+          resolveAppResourceText($r('app.string.history_action_failed')),
+          resolveAppResourceText($r('app.string.recent_shortcut_update_failed', this.stringifyError(error)))
+        );
       });
   }
 
@@ -584,7 +590,7 @@ export class BrowserRecentlyClosedApplicationCoordinator {
       this.shell.presentBoundaryBlock(
         'private_persistent_write_blocked',
         policy.summaryLine,
-        '当前私密会话不可修改常规首页快捷方式。'
+        resolveAppResourceText($r('app.string.recent_private_cannot_edit_home'))
       );
     }
     return policy.persistentWriteAllowed;
@@ -606,8 +612,8 @@ export class BrowserRecentlyClosedApplicationCoordinator {
     return {
       allowed: allowed,
       helperText: allowed
-        ? '最近关闭操作可访问当前常规浏览资料。'
-        : '当前私密会话不会展示、恢复或修改常规最近关闭记录。',
+        ? resolveAppResourceText($r('app.string.recent_regular_access'))
+        : resolveAppResourceText($r('app.string.recent_private_isolated')),
       summaryLine: `recentlyClosedBoundary action=${action} dataScope=${dataScope} privacy=${privacyMode} ` +
         `allowed=${allowed ? 1 : 0} read=${policy.persistentReadAllowed ? 1 : 0} ` +
         `write=${policy.persistentWriteAllowed ? 1 : 0}`
@@ -721,14 +727,14 @@ export class BrowserRecentlyClosedApplicationCoordinator {
         title: '',
         url: '',
         originalTabId: '',
-        missingMessage: '这个记录已经不存在。'
+        missingMessage: resolveAppResourceText($r('app.string.browser_browser_recently_closed_application_coordinator_006'))
       };
     }
     const url = this.resolveRecordUrl(record);
     const title = record.tab.title.trim().length > 0 ? record.tab.title.trim() : record.tab.url.trim();
     return {
       found: true,
-      title: title.length > 0 ? title : '未命名标签页',
+      title: title.length > 0 ? title : resolveAppResourceText($r('app.string.settings_custom_home_untitled_tab')),
       url: url,
       originalTabId: record.originalTabId,
       missingMessage: ''

@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../resources/AppResourceText';
 import { BrowserTabState } from '../../tabs/TabManager';
 import {
   BrowserTabsOverviewSection,
@@ -30,7 +31,7 @@ export class BrowserTabsOverviewBottomChromeViewModel {
     const returnTab = this.resolveReturnTab(input, removedTabIds);
     return {
       regularTabCount: regularTabCount,
-      regularTabsLabel: `${regularTabCount} 个标签页`,
+      regularTabsLabel: resolveAppResourceText($r('app.string.tabs_overview_count', regularTabCount)),
       returnKind: returnTab === undefined || returnTab.isHome ? 'home' : 'tab',
       returnTabId: returnTab === undefined || returnTab.isHome ? '' : returnTab.id
     };
