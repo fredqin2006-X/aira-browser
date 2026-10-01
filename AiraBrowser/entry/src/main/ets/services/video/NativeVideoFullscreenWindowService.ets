@@ -12,6 +12,8 @@ const ORIENTATION_REAPPLY_SECOND_DELAY_MS: number = 360;
 export class NativeVideoFullscreenWindowService {
   private orientationReapplyFirstTimer: number = -1;
   private orientationReapplySecondTimer: number = -1;
+  private restoreOrientationReapplyFirstTimer: number = -1;
+  private restoreOrientationReapplySecondTimer: number = -1;
 
   async resolveRestoreOrientation(
     context: common.UIAbilityContext,
@@ -23,15 +25,29 @@ export class NativeVideoFullscreenWindowService {
       return selectedOrientation;
     }
     try {
-      const mainWindow = await window.getLastWindow(context);
-      const windowProperties = mainWindow.getWindowProperties();
-      const currentDisplay = windowProperties.displayId === undefined ?
-        display.getDefaultDisplaySync() :
-        display.getDisplayByIdSync(windowProperties.displayId);
-      return this.resolveSystemRestoreOrientation(currentDisplay.orientation);
+      // Read before the first await. A portrait takeover can rotate the window while
+      // getLastWindow is pending, and a late snapshot would restore portrait.
+      const mainWindow = this.resolveMainWindow(context) ?? await window.getLastWindow(context);
+      return this.resolveSystemRestoreOrientation(this.readDisplayOrientation(mainWindow));
     } catch (_error) {
       return window.Orientation.AUTO_ROTATION_UNSPECIFIED;
     }
+  }
+
+  private resolveMainWindow(context: common.UIAbilityContext): window.Window | undefined {
+    try {
+      return context.windowStage.getMainWindowSync();
+    } catch (_error) {
+      return undefined;
+    }
+  }
+
+  private readDisplayOrientation(mainWindow: window.Window): display.Orientation {
+    const windowProperties = mainWindow.getWindowProperties();
+    const currentDisplay = windowProperties.displayId === undefined ?
+      display.getDefaultDisplaySync() :
+      display.getDisplayByIdSync(windowProperties.displayId);
+    return currentDisplay.orientation;
   }
 
   scheduleOrientationReapply(
@@ -58,6 +74,7 @@ export class NativeVideoFullscreenWindowService {
       clearTimeout(this.orientationReapplySecondTimer);
       this.orientationReapplySecondTimer = -1;
     }
+    this.cancelRestoreOrientationReapply();
   }
 
   async enterFullscreenWindow(
@@ -65,6 +82,7 @@ export class NativeVideoFullscreenWindowService {
     orientation: window.Orientation,
     restoreOrientation: window.Orientation
   ): Promise<boolean> {
+    this.cancelRestoreOrientationReapply();
     try {
       const mainWindow = await window.getLastWindow(context);
       await mainWindow.setWindowLayoutFullScreen(true);
@@ -88,6 +106,7 @@ export class NativeVideoFullscreenWindowService {
     context: common.UIAbilityContext,
     orientation: window.Orientation
   ): Promise<void> {
+    this.cancelRestoreOrientationReapply();
     try {
       const mainWindow = await window.getLastWindow(context);
       try {
@@ -104,6 +123,9 @@ export class NativeVideoFullscreenWindowService {
       }
     } catch (_windowError) {
     }
+    // Exiting element fullscreen can write orientation after this call. Reapply the
+    // pre-takeover direction so a portrait video does not leave a landscape tablet portrait.
+    this.scheduleRestoreOrientationReapply(context, orientation);
   }
 
   private async applyPreferredOrientation(
@@ -133,6 +155,45 @@ export class NativeVideoFullscreenWindowService {
       });
   }
 
+  private scheduleRestoreOrientationReapply(
+    context: common.UIAbilityContext,
+    orientation: window.Orientation
+  ): void {
+    this.restoreOrientationReapplyFirstTimer = setTimeout(() => {
+      this.restoreOrientationReapplyFirstTimer = -1;
+      this.reapplyRestoreOrientation(context, orientation);
+    }, ORIENTATION_REAPPLY_FIRST_DELAY_MS);
+    this.restoreOrientationReapplySecondTimer = setTimeout(() => {
+      this.restoreOrientationReapplySecondTimer = -1;
+      this.reapplyRestoreOrientation(context, orientation);
+    }, ORIENTATION_REAPPLY_SECOND_DELAY_MS);
+  }
+
+  private cancelRestoreOrientationReapply(): void {
+    if (this.restoreOrientationReapplyFirstTimer >= 0) {
+      clearTimeout(this.restoreOrientationReapplyFirstTimer);
+      this.restoreOrientationReapplyFirstTimer = -1;
+    }
+    if (this.restoreOrientationReapplySecondTimer >= 0) {
+      clearTimeout(this.restoreOrientationReapplySecondTimer);
+      this.restoreOrientationReapplySecondTimer = -1;
+    }
+  }
+
+  private reapplyRestoreOrientation(
+    context: common.UIAbilityContext,
+    orientation: window.Orientation
+  ): void {
+    window.getLastWindow(context)
+      .then((mainWindow: window.Window) => {
+        void mainWindow.setPreferredOrientation(orientation)
+          .catch((_error: Error) => {
+          });
+      })
+      .catch((_error: Error) => {
+      });
+  }
+
   private resolveSystemRestoreOrientation(
     orientation: display.Orientation
   ): window.Orientation {
@@ -142,7 +203,10 @@ export class NativeVideoFullscreenWindowService {
         return window.Orientation.USER_ROTATION_PORTRAIT;
       case display.Orientation.LANDSCAPE:
       case display.Orientation.LANDSCAPE_INVERTED:
-        return window.Orientation.AUTO_ROTATION_UNSPECIFIED;
+        // USER_ROTATION_LANDSCAPE snaps the window back to landscape, then follows the
+        // sensor. AUTO_ROTATION_UNSPECIFIED does not snap, so a portrait takeover left
+        // the page portrait after returning to the web page.
+        return window.Orientation.USER_ROTATION_LANDSCAPE;
       default:
         return window.Orientation.AUTO_ROTATION_UNSPECIFIED;
     }
