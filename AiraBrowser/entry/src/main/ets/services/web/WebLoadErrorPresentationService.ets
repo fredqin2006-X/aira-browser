@@ -1,3 +1,5 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
+
 export interface WebLoadErrorPresentationInput {
   url: string;
   pendingUrl: string;
@@ -26,7 +28,9 @@ export class WebLoadErrorPresentationService {
     const host = this.extractHost(targetUrl);
     const normalizedError = this.normalizeErrorMessage(input.errorMessage);
     const isCustomHomepage = input.context === 'custom_homepage';
-    const title = input.crashed ? '标签页暂时无法恢复' : this.resolveTitle(normalizedError, isCustomHomepage);
+    const title = input.crashed
+      ? resolveAppResourceText($r('app.string.web_error_tab_unrecoverable'))
+      : this.resolveTitle(normalizedError, isCustomHomepage);
     const summary = this.resolveSummary(targetUrl, host, input.crashed, isCustomHomepage);
     const detailParts: string[] = [];
     if (input.runtimeDegradedMessage.trim().length > 0) {
@@ -36,11 +40,15 @@ export class WebLoadErrorPresentationService {
     return {
       title: title,
       summary: summary,
-      host: host.length > 0 ? host : '当前网页',
-      primaryActionLabel: '再试一次',
-      secondaryActionLabel: isCustomHomepage ? '编辑主页' : '转到系统设置',
-      tertiaryActionLabel: isCustomHomepage ? '' : '复制详情',
-      detailLabel: '错误详情',
+      host: host.length > 0 ? host : resolveAppResourceText($r('app.string.web_runtime_current_page')),
+      primaryActionLabel: resolveAppResourceText($r('app.string.browser_ui_browser_web_error_surface_001')),
+      secondaryActionLabel: isCustomHomepage
+        ? resolveAppResourceText($r('app.string.web_error_edit_homepage'))
+        : resolveAppResourceText($r('app.string.browser_ui_browser_web_error_surface_002')),
+      tertiaryActionLabel: isCustomHomepage
+        ? ''
+        : resolveAppResourceText($r('app.string.settings_sync_advanced_copy_details')),
+      detailLabel: resolveAppResourceText($r('app.string.browser_ui_browser_web_error_surface_003')),
       detailText: detailParts.join('\n'),
       hints: this.resolveHints(normalizedError, input.crashed, isCustomHomepage)
     };
@@ -48,44 +56,56 @@ export class WebLoadErrorPresentationService {
 
   private resolveTitle(errorMessage: string, isCustomHomepage: boolean): string {
     if (isCustomHomepage) {
-      return '主页无法打开';
+      return resolveAppResourceText($r('app.string.web_error_homepage_title'));
     }
     const normalized = errorMessage.toLowerCase();
     if (normalized.indexOf('ssl') >= 0 || normalized.indexOf('certificate') >= 0 || normalized.indexOf('证书') >= 0) {
-      return '连接安全性需要确认';
+      return resolveAppResourceText($r('app.string.web_error_certificate_title'));
     }
     if (normalized.indexOf('dns') >= 0 || normalized.indexOf('name_not_resolved') >= 0) {
-      return '找不到这个网站';
+      return resolveAppResourceText($r('app.string.web_error_site_not_found'));
     }
-    return '网站暂时无法打开';
+    return resolveAppResourceText($r('app.string.web_error_site_unavailable'));
   }
 
   private resolveSummary(targetUrl: string, host: string, crashed: boolean, isCustomHomepage: boolean): string {
     if (crashed) {
-      return '当前标签页运行时异常，可以重新加载页面或回到首页。';
+      return resolveAppResourceText($r('app.string.web_error_tab_crashed'));
     }
     if (isCustomHomepage) {
-      return host.length > 0 ? host : '当前自定义主页不可用';
+      return host.length > 0 ? host : resolveAppResourceText($r('app.string.web_error_homepage_unavailable'));
     }
     const normalizedTargetUrl = targetUrl.trim();
     if (normalizedTargetUrl.length > 0) {
       return normalizedTargetUrl;
     }
-    return host.length > 0 ? host : '当前网页';
+    return host.length > 0 ? host : resolveAppResourceText($r('app.string.web_runtime_current_page'));
   }
 
   private resolveHints(errorMessage: string, crashed: boolean, isCustomHomepage: boolean): string[] {
     if (crashed) {
-      return ['重新加载页面', '如果仍然失败，先回到首页再打开网站', '复制错误详情用于诊断'];
+      return [
+        resolveAppResourceText($r('app.string.web_error_hint_reload')),
+        resolveAppResourceText($r('app.string.web_error_hint_home_retry')),
+        resolveAppResourceText($r('app.string.web_error_hint_copy'))
+      ];
     }
     if (isCustomHomepage) {
       return [];
     }
     const normalized = errorMessage.toLowerCase();
     if (normalized.indexOf('ssl') >= 0 || normalized.indexOf('certificate') >= 0 || normalized.indexOf('证书') >= 0) {
-      return ['确认设备时间是否正确', '谨慎处理证书异常的网站', '复制错误详情用于诊断'];
+      return [
+        resolveAppResourceText($r('app.string.web_error_hint_time')),
+        resolveAppResourceText($r('app.string.web_error_hint_cert')),
+        resolveAppResourceText($r('app.string.web_error_hint_copy'))
+      ];
     }
-    return ['检查 Wi-Fi 或移动网络', '确认网址没有输入错误', '如果使用了 VPN 或代理，可以稍后再试'];
+    return [
+      resolveAppResourceText($r('app.string.web_error_hint_network')),
+      resolveAppResourceText($r('app.string.web_error_hint_url')),
+      resolveAppResourceText($r('app.string.web_error_hint_proxy'))
+    ];
   }
 
   private resolveTargetUrl(url: string, pendingUrl: string): string {

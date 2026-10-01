@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { http } from '@kit.NetworkKit';
 import {
   TranslationProviderConfig,
@@ -291,7 +292,7 @@ export class TranslationProviderRequestService {
       if (typeof response.result !== 'string') {
         throw new TranslationProviderError(this.failureClassifier.buildFailure(
           'invalid_response',
-          '翻译服务返回格式无效。'
+          resolveAppResourceText($r('app.string.translation_provider_invalid_format'))
         ));
       }
       return providerRequest.responseParser(response.result, items);
@@ -335,21 +336,21 @@ export class TranslationProviderRequestService {
     if (!this.supportsProvider(provider.templateId)) {
       throw new TranslationProviderError(this.failureClassifier.buildFailure(
         'missing_provider',
-        '当前翻译服务模板尚未实现。'
+        resolveAppResourceText($r('app.string.translation_provider_template_unimplemented'))
       ));
     }
     if (provider.templateId === 'aira_system' || this.isPublicWebTemplate(provider.templateId)) {
       return;
     }
     if (provider.templateId === 'custom_http') {
-      this.validateHttpsEndpoint(provider.endpoint, '自定义翻译服务必须使用 HTTPS endpoint。');
+      this.validateHttpsEndpoint(provider.endpoint, resolveAppResourceText($r('app.string.translation_provider_custom_https')));
       const lowerEndpoint = provider.endpoint.trim().toLowerCase();
       if (lowerEndpoint.indexOf('?') >= 0 &&
         (lowerEndpoint.indexOf('key=') >= 0 || lowerEndpoint.indexOf('token=') >= 0 ||
           lowerEndpoint.indexOf('secret=') >= 0 || lowerEndpoint.indexOf('password=') >= 0)) {
         throw new TranslationProviderError(this.failureClassifier.buildFailure(
           'invalid_endpoint',
-          '翻译服务密钥不能放在 URL 查询参数中。'
+          resolveAppResourceText($r('app.string.translation_provider_secret_in_url'))
         ));
       }
       return;
@@ -374,21 +375,21 @@ export class TranslationProviderRequestService {
       case 'deepl':
       case 'google_cloud':
       case 'microsoft':
-        return provider.apiKey.trim().length > 0 ? '' : '请填写该服务商的 API Key。';
+        return provider.apiKey.trim().length > 0 ? '' : resolveAppResourceText($r('app.string.settings_web_translation_validation_api_key'));
       case 'baidu':
       case 'youdao':
         return provider.appId.trim().length > 0 && provider.secretKey.trim().length > 0
           ? ''
-          : '请填写该服务商的应用 ID 和应用密钥。';
+          : resolveAppResourceText($r('app.string.settings_web_translation_validation_app'));
       case 'tencent_cloud':
         return provider.appId.trim().length > 0 && provider.secretKey.trim().length > 0
           ? ''
-          : '请填写腾讯云 SecretId 和 SecretKey。';
+          : resolveAppResourceText($r('app.string.settings_web_translation_validation_tencent'));
       case 'alibaba_cloud':
       case 'volcano':
         return provider.appId.trim().length > 0 && provider.secretKey.trim().length > 0
           ? ''
-          : '请填写 Access Key 和 Secret Key。';
+          : resolveAppResourceText($r('app.string.settings_web_translation_validation_access'));
       default:
         return '';
     }
@@ -411,7 +412,7 @@ export class TranslationProviderRequestService {
       case 'aira_system':
         throw new TranslationProviderError(this.failureClassifier.buildFailure(
           'missing_provider',
-          'Aira 系统翻译必须通过 Aira 自有服务接口调用。'
+          resolveAppResourceText($r('app.string.translation_provider_aira_owned_only'))
         ));
       case 'custom_http':
         return this.buildCustomHttpRequest(provider, items, sourceLanguage, targetLanguage);
@@ -442,7 +443,7 @@ export class TranslationProviderRequestService {
       default:
         throw new TranslationProviderError(this.failureClassifier.buildFailure(
           'missing_provider',
-          '当前翻译服务模板尚未实现。'
+          resolveAppResourceText($r('app.string.translation_provider_template_unimplemented'))
         ));
     }
   }
@@ -579,7 +580,7 @@ export class TranslationProviderRequestService {
     const endpoint = provider.endpoint.trim().length > 0
       ? provider.endpoint.trim()
       : 'https://api-free.deepl.com/v2/translate';
-    this.validateHttpsEndpoint(endpoint, 'DeepL endpoint 必须使用 HTTPS。');
+    this.validateHttpsEndpoint(endpoint, resolveAppResourceText($r('app.string.translation_provider_deepl_https')));
     const body: DeepLTranslationRequestBody = {
       text: items.map((item: WebpageTranslationTextItem): string => item.text),
       source_lang: this.toDeepLLanguage(sourceLanguage),
@@ -607,7 +608,7 @@ export class TranslationProviderRequestService {
     const endpoint = provider.endpoint.trim().length > 0
       ? provider.endpoint.trim()
       : 'https://translation.googleapis.com/language/translate/v2';
-    this.validateHttpsEndpoint(endpoint, 'Google Cloud Translation endpoint 必须使用 HTTPS。');
+    this.validateHttpsEndpoint(endpoint, resolveAppResourceText($r('app.string.translation_provider_google_https')));
     const url = `${endpoint}${endpoint.indexOf('?') >= 0 ? '&' : '?'}key=${encodeURIComponent(provider.apiKey.trim())}`;
     const body: GoogleTranslationRequestBody = {
       q: items.map((item: WebpageTranslationTextItem): string => item.text),
@@ -634,7 +635,7 @@ export class TranslationProviderRequestService {
     const endpoint = provider.endpoint.trim().length > 0
       ? provider.endpoint.trim()
       : 'https://api.cognitive.microsofttranslator.com/translate?api-version=3.0';
-    this.validateHttpsEndpoint(endpoint, 'Microsoft Translator endpoint 必须使用 HTTPS。');
+    this.validateHttpsEndpoint(endpoint, resolveAppResourceText($r('app.string.translation_provider_microsoft_https')));
     const url = `${endpoint}${endpoint.indexOf('?') >= 0 ? '&' : '?'}from=${encodeURIComponent(
       this.toMicrosoftLanguage(sourceLanguage)
     )}&to=${encodeURIComponent(this.toMicrosoftLanguage(targetLanguage))}`;
@@ -664,7 +665,7 @@ export class TranslationProviderRequestService {
     const endpoint = provider.endpoint.trim().length > 0
       ? provider.endpoint.trim()
       : 'https://fanyi-api.baidu.com/api/trans/vip/translate';
-    this.validateHttpsEndpoint(endpoint, '百度翻译 endpoint 必须使用 HTTPS。');
+    this.validateHttpsEndpoint(endpoint, resolveAppResourceText($r('app.string.translation_provider_baidu_https')));
     const text = this.joinTexts(items);
     const salt = `${Date.now()}${Math.floor(Math.random() * 100000)}`;
     const sign = this.cryptoService.md5Hex(`${provider.appId.trim()}${text}${salt}${provider.secretKey.trim()}`);
@@ -694,7 +695,7 @@ export class TranslationProviderRequestService {
     const endpoint = provider.endpoint.trim().length > 0
       ? provider.endpoint.trim()
       : 'https://openapi.youdao.com/api';
-    this.validateHttpsEndpoint(endpoint, '有道智云 endpoint 必须使用 HTTPS。');
+    this.validateHttpsEndpoint(endpoint, resolveAppResourceText($r('app.string.translation_provider_youdao_https')));
     const text = this.joinTexts(items);
     const salt = `${Date.now()}${Math.floor(Math.random() * 100000)}`;
     const curtime = `${Math.floor(Date.now() / 1000)}`;
@@ -728,7 +729,7 @@ export class TranslationProviderRequestService {
     const endpoint = provider.endpoint.trim().length > 0
       ? provider.endpoint.trim()
       : 'https://tmt.tencentcloudapi.com';
-    this.validateHttpsEndpoint(endpoint, '腾讯云机器翻译 endpoint 必须使用 HTTPS。');
+    this.validateHttpsEndpoint(endpoint, resolveAppResourceText($r('app.string.translation_provider_tencent_https')));
     const region = provider.region.trim().length > 0 ? provider.region.trim() : 'ap-guangzhou';
     const timestamp = Math.floor(Date.now() / 1000);
     const payload = JSON.stringify({
@@ -757,7 +758,7 @@ export class TranslationProviderRequestService {
     const endpoint = provider.endpoint.trim().length > 0
       ? provider.endpoint.trim()
       : 'https://mt.cn-hangzhou.aliyuncs.com/';
-    this.validateHttpsEndpoint(endpoint, '阿里云机器翻译 endpoint 必须使用 HTTPS。');
+    this.validateHttpsEndpoint(endpoint, resolveAppResourceText($r('app.string.translation_provider_aliyun_https')));
     const text = this.joinTexts(items);
     const params: ProviderQueryParam[] = [
       { key: 'Action', value: 'TranslateGeneral' },
@@ -799,7 +800,7 @@ export class TranslationProviderRequestService {
     const endpoint = provider.endpoint.trim().length > 0
       ? provider.endpoint.trim()
       : 'https://translate.volcengineapi.com';
-    this.validateHttpsEndpoint(endpoint, '火山引擎机器翻译 endpoint 必须使用 HTTPS。');
+    this.validateHttpsEndpoint(endpoint, resolveAppResourceText($r('app.string.translation_provider_volc_https')));
     const region = provider.region.trim().length > 0 ? provider.region.trim() : 'cn-north-1';
     const payload = JSON.stringify({
       SourceLanguage: this.toVolcanoLanguage(sourceLanguage),
@@ -946,7 +947,7 @@ export class TranslationProviderRequestService {
     if (responseItems.length === 0) {
       throw new TranslationProviderError(this.failureClassifier.buildFailure(
         'invalid_response',
-        '翻译服务没有返回可用译文。'
+        resolveAppResourceText($r('app.string.translation_provider_no_translation'))
       ));
     }
     return this.mapGenericTranslations(sourceItems, responseItems);
@@ -982,9 +983,9 @@ export class TranslationProviderRequestService {
     }
     const safeMessage = this.sanitizeProviderMessage(message, provider);
     if (provider.templateId === 'google_cloud') {
-      return `Google Cloud Translation 返回错误：${safeMessage}`;
+      return resolveAppResourceText($r('app.string.translation_provider_error_named', 'Google Cloud Translation', safeMessage));
     }
-    return `翻译服务返回错误 ${statusCode}：${safeMessage}`;
+    return resolveAppResourceText($r('app.string.translation_provider_error_status', statusCode, safeMessage));
   }
 
   private extractProviderErrorMessage(rawBody: string): string {
@@ -1045,7 +1046,7 @@ export class TranslationProviderRequestService {
     if (parsed.error_code !== undefined && parsed.error_code.length > 0) {
       throw new TranslationProviderError(this.failureClassifier.buildFailure(
         'invalid_response',
-        `百度翻译返回错误：${parsed.error_msg ?? parsed.error_code}`
+        resolveAppResourceText($r('app.string.translation_provider_baidu_error', parsed.error_msg ?? parsed.error_code))
       ));
     }
     return this.splitJoinedTranslation(
@@ -1059,7 +1060,7 @@ export class TranslationProviderRequestService {
     if (parsed.errorCode !== undefined && parsed.errorCode !== '0') {
       throw new TranslationProviderError(this.failureClassifier.buildFailure(
         'invalid_response',
-        `有道智云返回错误：${parsed.errorCode}`
+        resolveAppResourceText($r('app.string.translation_provider_youdao_error', parsed.errorCode))
       ));
     }
     const text = (parsed.translation ?? []).join('\n');
@@ -1093,7 +1094,7 @@ export class TranslationProviderRequestService {
     }
     throw new TranslationProviderError(this.failureClassifier.buildFailure(
       'invalid_response',
-      'Tencent 没有返回可用译文。'
+      resolveAppResourceText($r('app.string.translation_provider_tencent_empty'))
     ));
   }
 
@@ -1108,7 +1109,7 @@ export class TranslationProviderRequestService {
     if (text.trim().length === 0) {
       throw new TranslationProviderError(this.failureClassifier.buildFailure(
         'invalid_response',
-        `${providerName} 没有返回可用译文。`
+        resolveAppResourceText($r('app.string.translation_provider_no_translation_named', providerName))
       ));
     }
     return this.splitJoinedTranslation(sourceItems, text);
@@ -1120,7 +1121,7 @@ export class TranslationProviderRequestService {
     } catch (_error) {
       throw new TranslationProviderError(this.failureClassifier.buildFailure(
         'invalid_response',
-        '翻译服务返回的 JSON 无法解析。'
+        resolveAppResourceText($r('app.string.translation_provider_json_invalid'))
       ));
     }
   }
@@ -1159,7 +1160,7 @@ export class TranslationProviderRequestService {
     if (results.length === 0) {
       throw new TranslationProviderError(this.failureClassifier.buildFailure(
         'invalid_response',
-        '翻译服务返回的译文为空。'
+        resolveAppResourceText($r('app.string.translation_provider_empty_translation'))
       ));
     }
     return results;
@@ -1184,7 +1185,7 @@ export class TranslationProviderRequestService {
     if (results.length === 0) {
       throw new TranslationProviderError(this.failureClassifier.buildFailure(
         'invalid_response',
-        '翻译服务返回的译文为空。'
+        resolveAppResourceText($r('app.string.translation_provider_empty_translation'))
       ));
     }
     return results;
@@ -1203,7 +1204,7 @@ export class TranslationProviderRequestService {
     }
     throw new TranslationProviderError(this.failureClassifier.buildFailure(
       'invalid_response',
-      '翻译服务返回的译文数量与原文不一致。'
+      resolveAppResourceText($r('app.string.translation_provider_count_mismatch'))
     ));
   }
 

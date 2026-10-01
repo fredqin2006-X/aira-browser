@@ -256,6 +256,12 @@ require_pattern "${SCREEN_REL}" "settingsIconBackgrounds: BrowserSettingsIconBac
   "the screen must take the settings icon color tokens."
 require_pattern "${SCREEN_REL}" "buildSyncSection\\(\\)" \
   "the sync section must have one builder."
+# The tutorial entry is the first thing under the title, above the browser marquee.
+tutorial_entry_line="$(grep -n 'this.buildSetupSection()' "${REPO_ROOT}/${SCREEN_REL}" | head -1 | cut -d: -f1)"
+marquee_line="$(grep -n 'this.buildMarquee()' "${REPO_ROOT}/${SCREEN_REL}" | head -1 | cut -d: -f1)"
+if [ -z "${tutorial_entry_line}" ] || [ -z "${marquee_line}" ] || [ "${tutorial_entry_line}" -ge "${marquee_line}" ]; then
+  fail "the 互联教程 entry must be the first thing on the page, above the marquee."
+fi
 reject_pattern "${SCREEN_REL}" "iconBackgroundColor: this.storedAccentColor" \
   "capability and list icons must not all collapse to one flat color."
 # The header carries no help action: a document icon in the title bar competed with the
@@ -438,13 +444,13 @@ TABS_OVERLAY_REL="${ETS_DIR}/app/components/browser/BrowserTabsFloatingOverlay.e
 SHELL_REL="${ETS_DIR}/app/pages/BrowserShellPage.ets"
 EMPTY_PRESENTATION_REL="${ETS_DIR}/core/deviceTabs/CrossDeviceTabsEmptyPresentation.ets"
 PRESENCE_COORDINATOR_REL="${ETS_DIR}/core/deviceTabs/CrossDeviceTabPresenceCoordinator.ets"
-require_pattern "${EMPTY_PRESENTATION_REL}" "登录后查看跨设备标签页" \
+require_pattern "${EMPTY_PRESENTATION_REL}" "device_tabs_sign_in_title" \
   "the signed-out empty page must stay in the cross-device section."
-require_pattern "${EMPTY_PRESENTATION_REL}" "跨设备标签页需要 Aira Pro" \
+require_pattern "${EMPTY_PRESENTATION_REL}" "device_tabs_pro_required_title" \
   "a non-Pro account must see the Pro empty page instead of being routed away."
-require_pattern "${EMPTY_PRESENTATION_REL}" "与电脑互联未开启" \
+require_pattern "${EMPTY_PRESENTATION_REL}" "device_tabs_link_disabled_title" \
   "a closed link must have its own empty page."
-require_pattern "${EMPTY_PRESENTATION_REL}" "当前没有在线电脑" \
+require_pattern "${EMPTY_PRESENTATION_REL}" "device_tabs_no_computer_title" \
   "no online computer must stay an empty page, not a route."
 require_pattern "${PRESENCE_COORDINATOR_REL}" "resolveCloudProEmptyKind" \
   "Pro is classified after sign-in, inside the panel state."

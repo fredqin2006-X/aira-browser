@@ -1,4 +1,5 @@
 import { webview } from '@kit.ArkWeb';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { BrowserDownloadNavigationStateCoordinator } from '../browser/BrowserDownloadNavigationStateCoordinator';
 import { BrowserTabState } from '../tabs/TabManager';
 
@@ -61,10 +62,10 @@ export interface WebSslWarningModel {
   confirmLabel: string;
 }
 
-const WEB_FILE_FILTER_IMAGES: string = '图片|.jpg,.jpeg,.png,.gif,.bmp,.webp,.svg,.heic,.heif';
-const WEB_FILE_FILTER_VIDEOS: string = '视频|.mp4,.mov,.m4v,.mkv,.webm,.avi';
-const WEB_FILE_FILTER_AUDIOS: string = '音频|.mp3,.m4a,.aac,.wav,.flac,.ogg,.opus';
-const WEB_FILE_FILTER_TEXTS: string = '文本|.txt,.md,.csv,.json,.xml,.log';
+const WEB_FILE_FILTER_IMAGE_SUFFIXES: string = '.jpg,.jpeg,.png,.gif,.bmp,.webp,.svg,.heic,.heif';
+const WEB_FILE_FILTER_VIDEO_SUFFIXES: string = '.mp4,.mov,.m4v,.mkv,.webm,.avi';
+const WEB_FILE_FILTER_AUDIO_SUFFIXES: string = '.mp3,.m4a,.aac,.wav,.flac,.ogg,.opus';
+const WEB_FILE_FILTER_TEXT_SUFFIXES: string = '.txt,.md,.csv,.json,.xml,.log';
 export const WEB_TRANSIENT_LOADING_TITLE: string = '页面加载中';
 
 export class WebRuntimeBridge {
@@ -79,7 +80,7 @@ export class WebRuntimeBridge {
   }
 
   getDefaultSearchPlaceholder(): string {
-    return '搜索或输入网址';
+    return resolveAppResourceText($r('app.string.aira_search_card_placeholder'));
   }
 
   getInitialHomeUrl(): string {
@@ -107,7 +108,9 @@ export class WebRuntimeBridge {
       tabId: tab.id,
       snapshotPath: tab.webStatePath,
       targetUrl: this.resolveSessionRestoreTargetUrl(tab),
-      helperMessage: reason === 'controller-attach' ? '正在恢复标签页内容' : '正在切换标签页内容'
+      helperMessage: reason === 'controller-attach'
+        ? resolveAppResourceText($r('app.string.browser_browser_shell_view_model_038'))
+        : resolveAppResourceText($r('app.string.web_runtime_switching_tab'))
     };
   }
 
@@ -116,7 +119,7 @@ export class WebRuntimeBridge {
       currentUrl: event.url,
       addressInput: addressDisplayText,
       currentTitle: WEB_TRANSIENT_LOADING_TITLE,
-      helperMessage: '页面正在加载',
+      helperMessage: resolveAppResourceText($r('app.string.web_runtime_page_loading')),
       pageProgress: 0,
       isLoading: true
     };
@@ -127,7 +130,7 @@ export class WebRuntimeBridge {
       currentUrl: event.url,
       addressInput: addressDisplayText,
       currentTitle: currentTitle,
-      helperMessage: '页面已加载完成',
+      helperMessage: resolveAppResourceText($r('app.string.web_runtime_page_loaded')),
       pageProgress: 100,
       isLoading: false
     };
@@ -192,7 +195,7 @@ export class WebRuntimeBridge {
       const result: WebNavigateHistoryResult = {
         handled: true,
         navigation: navigation,
-        errorMessage: `历史记录切换失败：${JSON.stringify(error)}`
+        errorMessage: resolveAppResourceText($r('app.string.web_runtime_history_failed', JSON.stringify(error)))
       };
       return result;
     }
@@ -210,7 +213,7 @@ export class WebRuntimeBridge {
       return {
         type: 'ignore',
         targetUrl: '',
-        helperMessage: '网页没有提供可打开的地址',
+        helperMessage: resolveAppResourceText($r('app.string.web_runtime_no_address')),
         title: ''
       };
     }
@@ -219,7 +222,7 @@ export class WebRuntimeBridge {
       return {
         type: 'download',
         targetUrl: trimmedUrl,
-        helperMessage: `尝试处理外部资源：${trimmedUrl}`,
+        helperMessage: resolveAppResourceText($r('app.string.web_runtime_external_resource', trimmedUrl)),
         title: trimmedUrl
       };
     }
@@ -227,8 +230,10 @@ export class WebRuntimeBridge {
     return {
       type: 'new_tab',
       targetUrl: trimmedUrl,
-      helperMessage: isAlert ? '已在新标签页中打开弹出页面' : '已在新标签页中打开链接',
-      title: isAlert ? '新窗口页面' : trimmedUrl
+      helperMessage: isAlert
+        ? resolveAppResourceText($r('app.string.web_runtime_popup_opened'))
+        : resolveAppResourceText($r('app.string.web_runtime_link_opened')),
+      title: isAlert ? resolveAppResourceText($r('app.string.web_runtime_new_window')) : trimmedUrl
     };
   }
 
@@ -268,22 +273,22 @@ export class WebRuntimeBridge {
   }
 
   buildSslWarningModel(event: SslErrorEvent): WebSslWarningModel {
-    const url = event.url.length > 0 ? event.url : '当前网页';
+    const url = event.url.length > 0 ? event.url : resolveAppResourceText($r('app.string.web_runtime_current_page'));
     return {
-      title: '证书安全警告',
-      message: `${url} 的证书校验失败。继续访问可能存在风险。`,
-      cancelLabel: '返回安全页面',
-      confirmLabel: '继续访问'
+      title: resolveAppResourceText($r('app.string.web_runtime_cert_title')),
+      message: resolveAppResourceText($r('app.string.web_runtime_cert_message', url)),
+      cancelLabel: resolveAppResourceText($r('app.string.web_runtime_back_safe')),
+      confirmLabel: resolveAppResourceText($r('app.string.web_runtime_continue'))
     };
   }
 
   buildHttpsFirstFallbackWarningModel(failedUrl: string, fallbackUrl: string): WebSslWarningModel {
-    const url = failedUrl.length > 0 ? failedUrl : '当前网页';
+    const url = failedUrl.length > 0 ? failedUrl : resolveAppResourceText($r('app.string.web_runtime_current_page'));
     return {
-      title: '无法建立安全连接',
-      message: `${url} 无法通过 HTTPS 安全访问。你可以返回，或继续使用不安全的 HTTP 连接 ${fallbackUrl}。`,
-      cancelLabel: '返回安全页面',
-      confirmLabel: '使用 HTTP 继续'
+      title: resolveAppResourceText($r('app.string.web_runtime_https_title')),
+      message: resolveAppResourceText($r('app.string.web_runtime_https_message', url, fallbackUrl)),
+      cancelLabel: resolveAppResourceText($r('app.string.web_runtime_back_safe')),
+      confirmLabel: resolveAppResourceText($r('app.string.web_runtime_use_http'))
     };
   }
 
@@ -326,16 +331,16 @@ export class WebRuntimeBridge {
       }
       switch (acceptType) {
         case 'image/*':
-          mappedFilters.push(WEB_FILE_FILTER_IMAGES);
+          mappedFilters.push(this.buildFileFilter($r('app.string.media_resource_kind_image'), WEB_FILE_FILTER_IMAGE_SUFFIXES));
           return;
         case 'video/*':
-          mappedFilters.push(WEB_FILE_FILTER_VIDEOS);
+          mappedFilters.push(this.buildFileFilter($r('app.string.media_resource_tab_video'), WEB_FILE_FILTER_VIDEO_SUFFIXES));
           return;
         case 'audio/*':
-          mappedFilters.push(WEB_FILE_FILTER_AUDIOS);
+          mappedFilters.push(this.buildFileFilter($r('app.string.media_resource_kind_audio'), WEB_FILE_FILTER_AUDIO_SUFFIXES));
           return;
         case 'text/*':
-          mappedFilters.push(WEB_FILE_FILTER_TEXTS);
+          mappedFilters.push(this.buildFileFilter($r('app.string.browser_ui_browser_download_management_row_003'), WEB_FILE_FILTER_TEXT_SUFFIXES));
           return;
         case 'application/pdf':
           extensionFilters.push('.pdf');
@@ -365,9 +370,13 @@ export class WebRuntimeBridge {
     const uniqueMappedFilters = Array.from(new Set(mappedFilters));
     const uniqueExtensions = Array.from(new Set(extensionFilters));
     if (uniqueExtensions.length > 0) {
-      uniqueMappedFilters.push(`网页允许的文件|${uniqueExtensions.join(',')}`);
+      uniqueMappedFilters.push(this.buildFileFilter($r('app.string.web_runtime_allowed_files'), uniqueExtensions.join(',')));
     }
     return uniqueMappedFilters;
+  }
+
+  private buildFileFilter(label: ResourceStr, suffixes: string): string {
+    return `${resolveAppResourceText(label)}|${suffixes}`;
   }
 
   private normalizeNavigationTarget(url: string): string {

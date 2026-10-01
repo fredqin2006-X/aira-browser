@@ -863,6 +863,7 @@ import {
   BottomToolbarGuideSurface,
   createHiddenBottomToolbarGuideSnapshot
 } from '../../core/onboarding/BottomToolbarGuideCoordinator';
+import { tabsOverviewSegmentGuideBackGate } from '../../core/onboarding/TabsOverviewSegmentGuidePolicy';
 import { CrossDeviceTabsEmptyAction } from '../../core/deviceTabs/CrossDeviceTabsEmptyPresentation';
 import { CROSS_DEVICE_LINK_SETUP_ROUTE, SYNC_DESKTOP_BOOKMARK_GUIDE_ROUTE } from '../router/AppRoutes';
 import { dismissOnboardingStackIfRequested } from '../router/OnboardingNavigation';
@@ -7306,6 +7307,9 @@ struct BrowserShellPage {
   }
 
   onBackPress(): boolean {
+    if (tabsOverviewSegmentGuideBackGate.consumeBack()) {
+      return true;
+    }
     if (this.airaCloudBookmarkV4BootstrapState.visible) {
       return true;
     }

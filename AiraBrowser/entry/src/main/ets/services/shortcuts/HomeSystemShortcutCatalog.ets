@@ -3,6 +3,7 @@ import {
   ShortcutKind,
   ShortcutRecord
 } from '../../common/models/BrowserModels';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export type HomeSystemShortcutIconId =
   'browser.shortcut.bookmarks' |
@@ -35,7 +36,41 @@ const HOME_SYSTEM_SHORTCUT_DEFINITIONS: HomeSystemShortcutDefinition[] = [
 ];
 
 export function getHomeSystemShortcutDefinitions(): HomeSystemShortcutDefinition[] {
-  return HOME_SYSTEM_SHORTCUT_DEFINITIONS.slice();
+  return HOME_SYSTEM_SHORTCUT_DEFINITIONS.map(withLocalizedHomeSystemShortcutTitle);
+}
+
+function withLocalizedHomeSystemShortcutTitle(
+  definition: HomeSystemShortcutDefinition
+): HomeSystemShortcutDefinition {
+  return {
+    target: definition.target,
+    title: resolveHomeSystemShortcutTitle(definition.target),
+    url: definition.url,
+    iconId: definition.iconId
+  };
+}
+
+function resolveHomeSystemShortcutTitle(target: HomeSystemShortcutTarget): string {
+  switch (target) {
+    case 'bookmarks':
+      return resolveAppResourceText($r('app.string.app_shortcut_bookmarks'));
+    case 'history':
+      return resolveAppResourceText($r('app.string.app_shortcut_history'));
+    case 'downloads':
+      return resolveAppResourceText($r('app.string.app_shortcut_downloads'));
+    case 'saved_pages':
+      return resolveAppResourceText($r('app.string.offline_pages_desktop_title'));
+    case 'tabs':
+      return resolveAppResourceText($r('app.string.offline_action_tabs'));
+    case 'user_scripts':
+      return resolveAppResourceText($r('app.string.settings_pro_benefit_scripts'));
+    case 'ad_block':
+      return resolveAppResourceText($r('app.string.home_shortcut_ad_block'));
+    case 'settings':
+      return resolveAppResourceText($r('app.string.app_shortcut_settings'));
+    default:
+      return '';
+  }
 }
 
 export function resolveHomeShortcutKind(kind: ShortcutKind | undefined): ShortcutKind {
@@ -49,9 +84,10 @@ export function isHomeSystemShortcut(shortcut: ShortcutRecord): boolean {
 export function resolveHomeSystemShortcutDefinition(
   target: HomeSystemShortcutTarget
 ): HomeSystemShortcutDefinition | undefined {
-  return HOME_SYSTEM_SHORTCUT_DEFINITIONS.find((definition: HomeSystemShortcutDefinition) => {
-    return definition.target === target;
+  const definition = HOME_SYSTEM_SHORTCUT_DEFINITIONS.find((item: HomeSystemShortcutDefinition) => {
+    return item.target === target;
   });
+  return definition === undefined ? undefined : withLocalizedHomeSystemShortcutTitle(definition);
 }
 
 export function resolveHomeSystemShortcutDefinitionByUrl(

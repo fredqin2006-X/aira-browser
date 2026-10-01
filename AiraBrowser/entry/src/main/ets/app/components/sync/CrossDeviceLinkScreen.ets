@@ -128,10 +128,11 @@ export struct CrossDeviceLinkScreen {
           desktopPresentation: this.desktopPresentation,
           expandToParent: true,
           contentSpace: 0,
-          topPadding: 0,
+          topPadding: 8,
           bottomPadding: 28,
           scroller: this.contentScroller
         }) {
+          this.buildSetupSection()
           this.buildMarquee()
           this.buildScrollingCover()
         }
@@ -155,7 +156,6 @@ export struct CrossDeviceLinkScreen {
       }
       this.buildDeviceSection()
       this.buildSyncSection()
-      this.buildSetupSection()
       this.buildSelfHostedSection()
     }
     .width('100%')
@@ -175,7 +175,7 @@ export struct CrossDeviceLinkScreen {
       this.buildMarqueeRow(1)
     }
     .width('100%')
-    .padding({ top: 20, bottom: 12 })
+    .padding({ top: 16, bottom: 12 })
     .hitTestBehavior(HitTestMode.None)
     .onAppear((): void => {
       this.startMarquee();
@@ -445,6 +445,7 @@ export struct CrossDeviceLinkScreen {
 
   /**
    * The recipe lives one level down, so the overview stays a status page.
+   * The entry itself sits above the marquee, as the first thing on this page.
    */
   @Builder
   private buildSetupSection() {

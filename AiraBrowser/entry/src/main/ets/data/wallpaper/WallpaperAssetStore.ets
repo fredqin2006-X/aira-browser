@@ -1,4 +1,5 @@
 import { fileIo, fileUri } from '@kit.CoreFileKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { AppRuntimeContext } from '../../app/runtime/AppRuntimeContext';
 import {
   BrowserHomepageBackdropAppearanceState
@@ -27,14 +28,14 @@ export class WallpaperAssetStore {
     nowMs: number = Date.now()
   ): Promise<WallpaperAsset> {
     if (assetId.trim().length === 0 || payload.byteLength <= 0 || payload.byteLength > MAX_IMPORTED_IMAGE_BYTES) {
-      throw new Error('壁纸图片下载失败。');
+      throw new Error(resolveAppResourceText($r('app.string.wallpaper_download_failed')));
     }
 
     await this.ensureDirectories();
     const id = this.sanitizeAssetId(assetId);
     const contentSignature = this.sanitizeAssetId(foregroundAnalysis.contentSignature);
     if (contentSignature.length <= 0) {
-      throw new Error('壁纸图片内容标识无效。');
+      throw new Error(resolveAppResourceText($r('app.string.wallpaper_signature_invalid')));
     }
     const fileName = `${id}-${contentSignature}.jpg`;
     const tempPath = `${this.getDownloadsDir()}/${fileName}.download`;
@@ -73,7 +74,7 @@ export class WallpaperAssetStore {
       height: 0,
       mimeType: 'image/jpeg',
       byteSize: payload.byteLength,
-      title: title.trim().length > 0 ? title.trim() : 'Bing 每日壁纸',
+      title: title.trim().length > 0 ? title.trim() : resolveAppResourceText($r('app.string.wallpaper_bing_daily')),
       attribution: attribution.trim(),
       createdAt: nowMs,
       updatedAt: nowMs,
@@ -105,13 +106,13 @@ export class WallpaperAssetStore {
   ): Promise<WallpaperAsset> {
     const normalizedSourceUri = sourceUri.trim();
     if (normalizedSourceUri.length <= 0 || assetId.trim().length <= 0) {
-      throw new Error('未选择壁纸图片。');
+      throw new Error(resolveAppResourceText($r('app.string.wallpaper_none_selected')));
     }
     await this.ensureDirectories();
     const id = this.sanitizeAssetId(assetId);
     const contentSignature = this.sanitizeAssetId(foregroundAnalysis.contentSignature);
     if (contentSignature.length <= 0) {
-      throw new Error('壁纸图片内容标识无效。');
+      throw new Error(resolveAppResourceText($r('app.string.wallpaper_signature_invalid')));
     }
     const extension = this.resolveImportedImageExtension(sourceFileName);
     const fileName = `${id}-${contentSignature}.${extension}`;
@@ -122,10 +123,10 @@ export class WallpaperAssetStore {
       await fileIo.copy(normalizedSourceUri, fileUri.getUriFromPath(tempPath));
       const stat = await fileIo.stat(tempPath);
       if (stat.isDirectory() || stat.size <= 0) {
-        throw new Error('壁纸图片不可用。');
+        throw new Error(resolveAppResourceText($r('app.string.wallpaper_unavailable')));
       }
       if (stat.size > MAX_IMPORTED_IMAGE_BYTES) {
-        throw new Error('壁纸图片超过 30 MB。');
+        throw new Error(resolveAppResourceText($r('app.string.wallpaper_too_large')));
       }
       if (await this.fileExists(finalPath)) {
         await this.deleteIfExists(tempPath);
@@ -150,7 +151,7 @@ export class WallpaperAssetStore {
         height: Math.max(1, Math.floor(height)),
         mimeType: this.resolveImportedMimeType(extension),
         byteSize: Math.max(0, Math.floor(stat.size)),
-        title: '自定义壁纸',
+        title: resolveAppResourceText($r('app.string.wallpaper_custom_title')),
         attribution: '',
         createdAt: nowMs,
         updatedAt: nowMs,
@@ -161,7 +162,7 @@ export class WallpaperAssetStore {
       if (error instanceof Error && error.message.length > 0) {
         throw error;
       }
-      throw new Error('无法保存这张壁纸，请换一张再试。');
+      throw new Error(resolveAppResourceText($r('app.string.wallpaper_save_failed')));
     }
   }
 
@@ -197,13 +198,13 @@ export class WallpaperAssetStore {
   ): Promise<WallpaperAsset> {
     const normalizedSourceUri = sourceUri.trim();
     if (normalizedSourceUri.length <= 0 || assetId.trim().length <= 0) {
-      throw new Error('未选择视频壁纸。');
+      throw new Error(resolveAppResourceText($r('app.string.wallpaper_video_none')));
     }
     await this.ensureDirectories();
     const id = this.sanitizeAssetId(assetId);
     const contentSignature = this.sanitizeAssetId(foregroundAnalysis.contentSignature);
     if (contentSignature.length <= 0) {
-      throw new Error('视频壁纸内容标识无效。');
+      throw new Error(resolveAppResourceText($r('app.string.wallpaper_video_signature_invalid')));
     }
     const extension = this.resolveImportedVideoExtension(sourceFileName);
     const fileName = `${id}-${contentSignature}.${extension}`;
@@ -214,10 +215,10 @@ export class WallpaperAssetStore {
       await fileIo.copy(normalizedSourceUri, fileUri.getUriFromPath(tempPath));
       const stat = await fileIo.stat(tempPath);
       if (stat.isDirectory() || stat.size <= 0) {
-        throw new Error('这个视频不可用。');
+        throw new Error(resolveAppResourceText($r('app.string.wallpaper_video_unavailable')));
       }
       if (stat.size > MAX_IMPORTED_VIDEO_BYTES) {
-        throw new Error('视频超过 100 MB，请换一个短一些的再试。');
+        throw new Error(resolveAppResourceText($r('app.string.wallpaper_video_too_large')));
       }
       if (await this.fileExists(finalPath)) {
         await this.deleteIfExists(tempPath);
@@ -243,7 +244,7 @@ export class WallpaperAssetStore {
         height: Math.max(1, Math.floor(height)),
         mimeType: this.resolveImportedVideoMimeType(extension),
         byteSize: Math.max(0, Math.floor(stat.size)),
-        title: '视频壁纸',
+        title: resolveAppResourceText($r('app.string.wallpaper_video_title')),
         attribution: '',
         createdAt: nowMs,
         updatedAt: nowMs,
@@ -254,7 +255,7 @@ export class WallpaperAssetStore {
       if (error instanceof Error && error.message.length > 0) {
         throw error;
       }
-      throw new Error('无法保存这个视频，请换一个再试。');
+      throw new Error(resolveAppResourceText($r('app.string.wallpaper_video_save_failed')));
     }
   }
 

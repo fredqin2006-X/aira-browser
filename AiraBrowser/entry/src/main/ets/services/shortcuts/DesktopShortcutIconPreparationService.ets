@@ -1,5 +1,6 @@
 import { fileIo } from '@kit.CoreFileKit';
 import { image } from '@kit.ImageKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 const DESKTOP_SHORTCUT_ICON_MAX_BYTES: number = 100 * 1024;
 const DESKTOP_SHORTCUT_ICON_EDGE_LENGTHS: number[] = [512, 384, 256, 192, 128];
@@ -9,10 +10,10 @@ export class DesktopShortcutIconPreparationService {
     const normalizedSourceUri = sourceUri.trim();
     const normalizedTargetPath = targetPath.trim();
     if (normalizedSourceUri.length === 0 || normalizedTargetPath.length === 0) {
-      throw new Error('未提供可用的桌面图标。');
+      throw new Error(resolveAppResourceText($r('app.string.desktop_shortcut_icon_missing')));
     }
     if (this.toFilePath(normalizedSourceUri) === normalizedTargetPath) {
-      throw new Error('桌面图标来源与输出路径不能相同。');
+      throw new Error(resolveAppResourceText($r('app.string.desktop_shortcut_icon_same_path')));
     }
 
     let sourceFile: fileIo.File | undefined = undefined;
@@ -26,7 +27,7 @@ export class DesktopShortcutIconPreparationService {
       const sourceWidth = Math.floor(imageInfo.size.width);
       const sourceHeight = Math.floor(imageInfo.size.height);
       if (sourceWidth <= 0 || sourceHeight <= 0) {
-        throw new Error('这张图片的尺寸不可用。');
+        throw new Error(resolveAppResourceText($r('app.string.desktop_shortcut_icon_bad_size')));
       }
       const cropSize = Math.min(sourceWidth, sourceHeight);
       const cropRegion: image.Region = {
@@ -59,12 +60,12 @@ export class DesktopShortcutIconPreparationService {
           return normalizedTargetPath;
         }
       }
-      throw new Error('这张图片无法压缩到鸿蒙桌面图标要求，请换一张再试。');
+      throw new Error(resolveAppResourceText($r('app.string.desktop_shortcut_icon_too_large')));
     } catch (error) {
       if (error instanceof Error && error.message.trim().length > 0) {
         throw error;
       }
-      throw new Error('无法处理这张图片，请换一张再试。');
+      throw new Error(resolveAppResourceText($r('app.string.settings_web_app_install_icon_invalid')));
     } finally {
       try {
         await imagePacker.release();

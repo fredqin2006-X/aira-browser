@@ -2,14 +2,15 @@ import {
   TranslationProviderTemplate,
   TranslationProviderTemplateId
 } from '../../common/models/BrowserModels';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export class TranslationProviderTemplateService {
   listTemplates(): TranslationProviderTemplate[] {
     return [
       {
         id: 'aira_system',
-        displayName: 'Aira 系统翻译',
-        description: '由 Aira 提供的网页翻译服务，可能使用 Aira 云服务和必要第三方机器翻译服务处理页面文字。',
+        displayName: resolveAppResourceText($r('app.string.translation_template_aira_name')),
+        description: resolveAppResourceText($r('app.string.translation_template_aira_desc')),
         setupStatus: 'configured',
         requiresSecret: false,
         supportsDirectClientRequest: false,
@@ -18,8 +19,8 @@ export class TranslationProviderTemplateService {
       },
       {
         id: 'edge_web',
-        displayName: 'Microsoft Edge 网页翻译',
-        description: '免密钥。清风直接请求 Edge 公开翻译接口，适合一次翻译多个段落。',
+        displayName: resolveAppResourceText($r('app.string.translation_template_edge_name')),
+        description: resolveAppResourceText($r('app.string.translation_template_edge_desc')),
         setupStatus: 'configured',
         requiresSecret: false,
         supportsDirectClientRequest: true,
@@ -28,8 +29,8 @@ export class TranslationProviderTemplateService {
       },
       {
         id: 'google_web',
-        displayName: 'Google 网页翻译',
-        description: '免密钥。清风直接请求 Google 公开翻译接口，每次发送一段文字。',
+        displayName: resolveAppResourceText($r('app.string.translation_template_google_web_name')),
+        description: resolveAppResourceText($r('app.string.translation_template_google_web_desc')),
         setupStatus: 'configured',
         requiresSecret: false,
         supportsDirectClientRequest: true,
@@ -38,8 +39,8 @@ export class TranslationProviderTemplateService {
       },
       {
         id: 'tencent_web',
-        displayName: '腾讯交互翻译',
-        description: '免密钥。清风直接请求腾讯交互翻译公开接口。',
+        displayName: resolveAppResourceText($r('app.string.translation_template_tencent_web_name')),
+        description: resolveAppResourceText($r('app.string.translation_template_tencent_web_desc')),
         setupStatus: 'configured',
         requiresSecret: false,
         supportsDirectClientRequest: true,
@@ -48,8 +49,8 @@ export class TranslationProviderTemplateService {
       },
       {
         id: 'yandex_web',
-        displayName: 'Yandex 网页翻译',
-        description: '免密钥。清风直接请求 Yandex 公开翻译接口，每次发送一段文字。',
+        displayName: resolveAppResourceText($r('app.string.translation_template_yandex_name')),
+        description: resolveAppResourceText($r('app.string.translation_template_yandex_desc')),
         setupStatus: 'configured',
         requiresSecret: false,
         supportsDirectClientRequest: true,
@@ -58,8 +59,8 @@ export class TranslationProviderTemplateService {
       },
       {
         id: 'custom_http',
-        displayName: '自定义接口',
-        description: '使用你自己的 HTTPS 翻译接口，适合把官方服务商鉴权放在自有服务端代理里。',
+        displayName: resolveAppResourceText($r('app.string.translation_template_custom_name')),
+        description: resolveAppResourceText($r('app.string.translation_template_custom_desc')),
         setupStatus: 'configured',
         requiresSecret: false,
         supportsDirectClientRequest: true,
@@ -69,7 +70,7 @@ export class TranslationProviderTemplateService {
       {
         id: 'deepl',
         displayName: 'DeepL',
-        description: '填写自己的 API Key，清风会请求 DeepL 官方翻译接口。',
+        description: resolveAppResourceText($r('app.string.translation_template_deepl_desc')),
         setupStatus: 'configured',
         requiresSecret: true,
         supportsDirectClientRequest: true,
@@ -79,7 +80,7 @@ export class TranslationProviderTemplateService {
       {
         id: 'google_cloud',
         displayName: 'Google Cloud Translation',
-        description: '填写自己的 API Key，清风会请求 Google Cloud Translation 官方接口。',
+        description: resolveAppResourceText($r('app.string.translation_template_google_cloud_desc')),
         setupStatus: 'configured',
         requiresSecret: true,
         supportsDirectClientRequest: true,
@@ -88,8 +89,8 @@ export class TranslationProviderTemplateService {
       },
       {
         id: 'tencent_cloud',
-        displayName: '腾讯云机器翻译',
-        description: '填写 SecretId、SecretKey 和地域，清风会使用腾讯云 API3 签名请求。',
+        displayName: resolveAppResourceText($r('app.string.translation_template_tencent_cloud_name')),
+        description: resolveAppResourceText($r('app.string.translation_template_tencent_cloud_desc')),
         setupStatus: 'configured',
         requiresSecret: true,
         supportsDirectClientRequest: true,
@@ -98,8 +99,8 @@ export class TranslationProviderTemplateService {
       },
       {
         id: 'baidu',
-        displayName: '百度翻译',
-        description: '填写 App ID 与密钥，清风会请求百度翻译开放平台接口。',
+        displayName: resolveAppResourceText($r('app.string.translation_template_baidu_name')),
+        description: resolveAppResourceText($r('app.string.translation_template_baidu_desc')),
         setupStatus: 'configured',
         requiresSecret: true,
         supportsDirectClientRequest: true,
@@ -109,7 +110,7 @@ export class TranslationProviderTemplateService {
       {
         id: 'microsoft',
         displayName: 'Microsoft Translator',
-        description: '填写订阅 Key 和区域，清风会请求 Microsoft Translator 官方接口。',
+        description: resolveAppResourceText($r('app.string.translation_template_microsoft_desc')),
         setupStatus: 'configured',
         requiresSecret: true,
         supportsDirectClientRequest: true,
@@ -118,8 +119,8 @@ export class TranslationProviderTemplateService {
       },
       {
         id: 'alibaba_cloud',
-        displayName: '阿里云机器翻译',
-        description: '填写 AccessKey ID、AccessKey Secret 和地域，清风会使用阿里云签名请求。',
+        displayName: resolveAppResourceText($r('app.string.translation_template_alibaba_name')),
+        description: resolveAppResourceText($r('app.string.translation_template_alibaba_desc')),
         setupStatus: 'configured',
         requiresSecret: true,
         supportsDirectClientRequest: true,
@@ -128,8 +129,8 @@ export class TranslationProviderTemplateService {
       },
       {
         id: 'volcano',
-        displayName: '火山引擎机器翻译',
-        description: '填写 Access Key、Secret Key 和区域，清风会使用火山引擎签名请求。',
+        displayName: resolveAppResourceText($r('app.string.translation_template_volcano_name')),
+        description: resolveAppResourceText($r('app.string.translation_template_volcano_desc')),
         setupStatus: 'configured',
         requiresSecret: true,
         supportsDirectClientRequest: true,
@@ -138,8 +139,8 @@ export class TranslationProviderTemplateService {
       },
       {
         id: 'youdao',
-        displayName: '有道智云翻译',
-        description: '填写应用 ID 与应用密钥，清风会请求有道智云官方接口。',
+        displayName: resolveAppResourceText($r('app.string.translation_template_youdao_name')),
+        description: resolveAppResourceText($r('app.string.translation_template_youdao_desc')),
         setupStatus: 'configured',
         requiresSecret: true,
         supportsDirectClientRequest: true,
@@ -163,6 +164,61 @@ export class TranslationProviderTemplateService {
 
   buildTemplateLabel(templateId: TranslationProviderTemplateId | string): string {
     const template = this.listTemplates().find((item: TranslationProviderTemplate) => item.id === templateId);
-    return template?.displayName ?? '自定义接口';
+    return template?.displayName ?? resolveAppResourceText($r('app.string.translation_template_custom_name'));
+  }
+}
+
+export function resolveDisplayedTranslationProviderName(templateId: string, storedName: string): string {
+  const stored = storedName.trim();
+  const service = new TranslationProviderTemplateService();
+  const localized = service.buildTemplateLabel(templateId);
+  if (stored.length === 0 || isHistoricalTranslationTemplateName(templateId, stored)) {
+    return localized;
+  }
+  return stored;
+}
+
+function isHistoricalTranslationTemplateName(templateId: string, storedName: string): boolean {
+  const historicalNames = historicalTranslationTemplateNames(templateId);
+  for (let index = 0; index < historicalNames.length; index++) {
+    if (historicalNames[index] === storedName) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function historicalTranslationTemplateNames(templateId: string): string[] {
+  switch (templateId) {
+    case 'aira_system':
+      return ['Aira 系统翻译'];
+    case 'edge_web':
+      return ['Microsoft Edge 网页翻译'];
+    case 'google_web':
+      return ['Google 网页翻译'];
+    case 'tencent_web':
+      return ['腾讯交互翻译'];
+    case 'yandex_web':
+      return ['Yandex 网页翻译'];
+    case 'custom_http':
+      return ['自定义接口'];
+    case 'deepl':
+      return ['DeepL'];
+    case 'google_cloud':
+      return ['Google Cloud Translation'];
+    case 'tencent_cloud':
+      return ['腾讯云机器翻译', '腾讯云翻译'];
+    case 'baidu':
+      return ['百度翻译'];
+    case 'microsoft':
+      return ['Microsoft Translator'];
+    case 'alibaba_cloud':
+      return ['阿里云机器翻译', '阿里云翻译'];
+    case 'volcano':
+      return ['火山引擎机器翻译', '火山翻译'];
+    case 'youdao':
+      return ['有道智云翻译', '有道智云'];
+    default:
+      return [];
   }
 }

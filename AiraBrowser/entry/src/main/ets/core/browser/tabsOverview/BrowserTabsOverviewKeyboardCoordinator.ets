@@ -1,4 +1,5 @@
 import { KeyCode } from '@kit.InputKit';
+import { resolveAppResourceText } from '../../resources/AppResourceText';
 import {
   BrowserTabsOverviewKeyboardMove,
   BrowserTabsOverviewKeyboardViewModel
@@ -66,7 +67,7 @@ export class BrowserTabsOverviewKeyboardCoordinator {
   handleNumberShortcut(digit: number, host: BrowserTabsOverviewKeyboardApplicationHost): void {
     const targetTabId = this.viewModel.resolveNumberedBrowserTabId(this.resolveSectionTabs(host), digit);
     if (targetTabId.length <= 0) {
-      host.showShortcutMessage('没有对应的标签页。');
+      host.showShortcutMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_029')));
       return;
     }
     host.applySelection(targetTabId, false, false);

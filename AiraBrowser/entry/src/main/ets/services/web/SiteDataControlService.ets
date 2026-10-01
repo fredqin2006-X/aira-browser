@@ -228,19 +228,34 @@ export class SiteDataControlService {
   }
 
   buildPolicySummary(snapshot: SiteDataBoundarySnapshot): SiteDataPolicySummary {
-    const cookieLabel = snapshot.acceptCookies ? '当前允许站点 Cookie' : '当前已禁用站点 Cookie';
-    const thirdPartyLabel = snapshot.acceptThirdPartyCookies ? '当前允许第三方 Cookie' : '当前已拦截第三方 Cookie';
+    const cookieLabel = snapshot.acceptCookies
+      ? resolveAppResourceText($r('app.string.site_data_cookies_allowed'))
+      : resolveAppResourceText($r('app.string.site_data_cookies_blocked'));
+    const thirdPartyLabel = snapshot.acceptThirdPartyCookies
+      ? resolveAppResourceText($r('app.string.site_data_third_party_allowed'))
+      : resolveAppResourceText($r('app.string.site_data_third_party_blocked'));
     const profileLabel = snapshot.profileId === DEFAULT_BROWSER_PROFILE_ID
-      ? '当前资料：常规浏览资料'
-      : `当前资料：${snapshot.profileId}`;
-    const privacyLabel = snapshot.privacyMode === 'private' ? '当前会话边界：私密会话' : '当前会话边界：常规会话';
+      ? resolveAppResourceText($r('app.string.site_data_profile_regular'))
+      : resolveAppResourceText($r('app.string.site_data_profile_named', snapshot.profileId));
+    const privacyLabel = snapshot.privacyMode === 'private'
+      ? resolveAppResourceText($r('app.string.site_data_session_private'))
+      : resolveAppResourceText($r('app.string.site_data_session_regular'));
     if (snapshot.dataScope === 'session_ephemeral') {
       return {
         profileId: snapshot.profileId,
         privacyMode: snapshot.privacyMode,
         dataScope: snapshot.dataScope,
-        summaryLine: `${profileLabel}；${cookieLabel}；${thirdPartyLabel}；${privacyLabel}；数据范围：仅本次私密会话。平台不支持按当前站点清除私密 Cookie 或站点存储，请使用“清除本次私密数据”统一清理。`,
-        permissionSummaryLine: `当前仅显示本次私密会话的站点权限；会话权限规则 ${snapshot.sessionPermissionCount} 条；不会读取或列出常规浏览资料中的站点权限规则。`,
+        summaryLine: resolveAppResourceText($r(
+          'app.string.site_data_summary_private',
+          profileLabel,
+          cookieLabel,
+          thirdPartyLabel,
+          privacyLabel
+        )),
+        permissionSummaryLine: resolveAppResourceText($r(
+          'app.string.site_data_permissions_private',
+          snapshot.sessionPermissionCount
+        )),
         canExposeProfilePermissionRules: false
       };
     }
@@ -248,8 +263,17 @@ export class SiteDataControlService {
       profileId: snapshot.profileId,
       privacyMode: snapshot.privacyMode,
       dataScope: snapshot.dataScope,
-      summaryLine: `${profileLabel}；${cookieLabel}；${thirdPartyLabel}；${privacyLabel}；数据范围：常规浏览资料。当前站点清理只处理按来源隔离的站点存储；Cookie、缓存和全部站点存储在“隐私防护”中统一清理。`,
-      permissionSummaryLine: `已保存 ${snapshot.savedPermissionCount} 条站点权限。当前站点清理不会删除 Cookie 或共享网页缓存。`,
+      summaryLine: resolveAppResourceText($r(
+        'app.string.site_data_summary_regular',
+        profileLabel,
+        cookieLabel,
+        thirdPartyLabel,
+        privacyLabel
+      )),
+      permissionSummaryLine: resolveAppResourceText($r(
+        'app.string.site_data_permissions_saved',
+        snapshot.savedPermissionCount
+      )),
       canExposeProfilePermissionRules: true
     };
   }
@@ -301,7 +325,12 @@ export class SiteDataControlService {
       dataScope: summary.dataScope,
       allowCount: allowCount,
       blockCount: blockCount,
-      summaryLine: `${summary.permissionSummaryLine} 其中允许 ${allowCount} 项，阻止 ${blockCount} 项。`
+      summaryLine: resolveAppResourceText($r(
+        'app.string.site_data_permission_counts',
+        summary.permissionSummaryLine,
+        allowCount,
+        blockCount
+      ))
     };
   }
 
@@ -370,12 +399,12 @@ export class SiteDataControlService {
   async restorePreservedPrivateModeCookies(): Promise<PrivateModeCookiePreservationResult> {
     const repository = this.privateCookieSnapshotRepository;
     if (repository === undefined) {
-      return new PrivateModeCookiePreservationResultRecord(false, 0, 0, 0, '未启用隐私 Cookie 快照。');
+      return new PrivateModeCookiePreservationResultRecord(false, 0, 0, 0, resolveAppResourceText($r('app.string.site_data_cookie_snapshot_off')));
     }
     try {
       const snapshot = await repository.readSnapshot();
       if (snapshot.cookies.length <= 0) {
-        return new PrivateModeCookiePreservationResultRecord(false, 0, 0, 0, '没有可恢复的隐私 Cookie。');
+        return new PrivateModeCookiePreservationResultRecord(false, 0, 0, 0, resolveAppResourceText($r('app.string.site_data_cookie_nothing_to_restore')));
       }
       let restoredCookieCount = 0;
       let failedCookieCount = 0;
@@ -395,7 +424,7 @@ export class SiteDataControlService {
         snapshot.cookies.length,
         restoredCookieCount,
         failedCookieCount,
-        `隐私 Cookie 已恢复 ${restoredCookieCount} 条，失败 ${failedCookieCount} 条。`
+        resolveAppResourceText($r('app.string.site_data_cookie_restored', restoredCookieCount, failedCookieCount))
       );
     } catch (error) {
       return new PrivateModeCookiePreservationResultRecord(
@@ -403,7 +432,7 @@ export class SiteDataControlService {
         0,
         0,
         0,
-        `恢复隐私 Cookie 失败：${JSON.stringify(error)}`
+        resolveAppResourceText($r('app.string.site_data_cookie_restore_failed', JSON.stringify(error)))
       );
     }
   }
@@ -416,7 +445,7 @@ export class SiteDataControlService {
         savedCookieCount,
         0,
         0,
-        `隐私 Cookie 已保存 ${savedCookieCount} 条。`
+        resolveAppResourceText($r('app.string.site_data_cookie_saved', savedCookieCount))
       );
     } catch (error) {
       return new PrivateModeCookiePreservationResultRecord(
@@ -424,7 +453,7 @@ export class SiteDataControlService {
         0,
         0,
         0,
-        `保存隐私 Cookie 失败：${JSON.stringify(error)}`
+        resolveAppResourceText($r('app.string.site_data_cookie_save_failed', JSON.stringify(error)))
       );
     }
   }
@@ -450,13 +479,13 @@ export class SiteDataControlService {
       return {
         hasError: false,
         message: options.preserveCookieSnapshot
-          ? `私密会话数据已清除，已保留 ${savedCookieCount} 条 Cookie 快照。`
-          : '私密会话数据已清除。'
+          ? resolveAppResourceText($r('app.string.site_data_private_cleared_kept', savedCookieCount))
+          : resolveAppResourceText($r('app.string.site_data_private_cleared'))
       };
     } catch (error) {
       return {
         hasError: true,
-        message: `清除私密会话数据失败：${JSON.stringify(error)}`
+        message: resolveAppResourceText($r('app.string.site_data_private_clear_failed', JSON.stringify(error)))
       };
     }
   }
@@ -516,14 +545,14 @@ export class SiteDataControlService {
     if (context === undefined) {
       return {
         hasError: true,
-        message: '浏览数据范围不一致，未执行清理。'
+        message: resolveAppResourceText($r('app.string.settings_site_info_erasure_scope_mismatch'))
       };
     }
     const normalizedOrigin = this.normalizeOrigin(origin);
     if (normalizedOrigin.length === 0) {
       return {
         hasError: true,
-        message: '站点地址不可用，未清理数据。'
+        message: resolveAppResourceText($r('app.string.site_data_origin_unavailable'))
       };
     }
     const plan = this.buildSiteDataClearOnClosePlan(
@@ -536,8 +565,8 @@ export class SiteDataControlService {
       return {
         hasError: false,
         message: plan.dataScope === 'session_ephemeral'
-          ? '私密数据未按站点清除；Cookie 和站点存储将在私密会话结束时统一清理。'
-          : '当前站点没有可按站点清除的本地存储。'
+          ? resolveAppResourceText($r('app.string.site_data_private_not_per_site'))
+          : resolveAppResourceText($r('app.string.settings_site_info_no_clearable_storage'))
       };
     }
     try {
@@ -545,12 +574,12 @@ export class SiteDataControlService {
     } catch (error) {
       return {
         hasError: true,
-        message: `清除站点存储失败：${JSON.stringify(error)}`
+        message: resolveAppResourceText($r('app.string.site_data_storage_clear_failed', JSON.stringify(error)))
       };
     }
     return {
       hasError: false,
-      message: '站点存储已清除，Cookie 和网页缓存已保留。'
+      message: resolveAppResourceText($r('app.string.site_data_storage_cleared_kept'))
     };
   }
 
@@ -565,7 +594,7 @@ export class SiteDataControlService {
     if (context === undefined) {
       return {
         hasError: true,
-        message: '浏览数据范围不一致，未执行清理。'
+        message: resolveAppResourceText($r('app.string.settings_site_info_erasure_scope_mismatch'))
       };
     }
     const plan = this.buildClearAllSiteDataPlan(profileId, privacyMode, dataScope);
@@ -576,7 +605,7 @@ export class SiteDataControlService {
       try {
         webview.WebStorage.deleteAllData(isSessionEphemeral);
       } catch (error) {
-        failureMessages.push(`站点存储：${JSON.stringify(error)}`);
+        failureMessages.push(resolveAppResourceText($r('app.string.site_data_failure_storage', JSON.stringify(error))));
       }
     }
 
@@ -584,7 +613,7 @@ export class SiteDataControlService {
       try {
         this.clearAllCookiesForContext(isSessionEphemeral);
       } catch (error) {
-        failureMessages.push(`Cookie：${JSON.stringify(error)}`);
+        failureMessages.push(resolveAppResourceText($r('app.string.site_data_failure_cookies', JSON.stringify(error))));
       }
     }
 
@@ -592,7 +621,7 @@ export class SiteDataControlService {
       try {
         this.clearCache(controllerAttached, controller);
       } catch (error) {
-        failureMessages.push(`网页缓存：${JSON.stringify(error)}`);
+        failureMessages.push(resolveAppResourceText($r('app.string.site_data_failure_cache', JSON.stringify(error))));
       }
     }
 
@@ -602,22 +631,22 @@ export class SiteDataControlService {
         webview.GeolocationPermissions.deleteAllGeolocation(false);
         sharedBrowserSslDecisionCacheRuntime.requestClear();
       } catch (error) {
-        failureMessages.push(`站点权限：${JSON.stringify(error)}`);
+        failureMessages.push(resolveAppResourceText($r('app.string.site_data_failure_permissions', JSON.stringify(error))));
       }
     }
 
     if (failureMessages.length > 0) {
       return {
         hasError: true,
-        message: `部分浏览数据清除失败：${failureMessages.join('；')}`,
+        message: resolveAppResourceText($r('app.string.site_data_partial_clear_failed', failureMessages.join(resolveAppResourceText($r('app.string.site_data_detail_separator'))))),
         failureMessages: failureMessages.slice()
       };
     }
     return {
       hasError: false,
       message: isSessionEphemeral
-        ? '本次私密会话的 Cookie 和站点存储已清除，常规浏览资料未受影响。'
-        : '浏览数据、Cookie、缓存和当前浏览资料中的站点权限已全部清除。'
+        ? resolveAppResourceText($r('app.string.site_data_private_all_cleared'))
+        : resolveAppResourceText($r('app.string.site_data_all_cleared'))
     };
   }
 
@@ -633,7 +662,7 @@ export class SiteDataControlService {
     if (context === undefined) {
       return {
         hasError: true,
-        message: '浏览数据范围不一致，未执行清理。'
+        message: resolveAppResourceText($r('app.string.settings_site_info_erasure_scope_mismatch'))
       };
     }
     const failureMessages: string[] = [];
@@ -645,7 +674,7 @@ export class SiteDataControlService {
       try {
         webview.WebStorage.deleteAllData(isSessionEphemeral);
       } catch (error) {
-        failureMessages.push(`站点存储：${JSON.stringify(error)}`);
+        failureMessages.push(resolveAppResourceText($r('app.string.site_data_failure_storage', JSON.stringify(error))));
       }
     }
 
@@ -653,7 +682,7 @@ export class SiteDataControlService {
       try {
         this.clearAllCookiesForContext(isSessionEphemeral);
       } catch (error) {
-        failureMessages.push(`Cookie：${JSON.stringify(error)}`);
+        failureMessages.push(resolveAppResourceText($r('app.string.site_data_failure_cookies', JSON.stringify(error))));
       }
     }
 
@@ -661,7 +690,7 @@ export class SiteDataControlService {
       try {
         this.clearCache(controllerAttached, controller);
       } catch (error) {
-        failureMessages.push(`网页缓存：${JSON.stringify(error)}`);
+        failureMessages.push(resolveAppResourceText($r('app.string.site_data_failure_cache', JSON.stringify(error))));
       }
     }
 
@@ -671,20 +700,20 @@ export class SiteDataControlService {
         webview.GeolocationPermissions.deleteAllGeolocation(false);
         sharedBrowserSslDecisionCacheRuntime.requestClear();
       } catch (error) {
-        failureMessages.push(`站点权限：${JSON.stringify(error)}`);
+        failureMessages.push(resolveAppResourceText($r('app.string.site_data_failure_permissions', JSON.stringify(error))));
       }
     }
 
     if (failureMessages.length > 0) {
       return {
         hasError: true,
-        message: `部分浏览数据清除失败：${failureMessages.join('；')}`,
+        message: resolveAppResourceText($r('app.string.site_data_partial_clear_failed', failureMessages.join(resolveAppResourceText($r('app.string.site_data_detail_separator'))))),
         failureMessages: failureMessages.slice()
       };
     }
     return {
       hasError: false,
-      message: '所选浏览数据已清除。'
+      message: resolveAppResourceText($r('app.string.site_data_selected_cleared'))
     };
   }
 

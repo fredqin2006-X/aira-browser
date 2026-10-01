@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   BrowserTransientPromptBlockingFacts,
   BrowserTransientSurfaceId,
@@ -331,17 +332,59 @@ export class BottomToolbarGuideCoordinator {
     this.publishState({
       visible: true,
       clipId: step.clipId,
-      title: step.title,
-      message: step.message,
+      title: this.localizeStepTitle(step),
+      message: this.localizeStepMessage(step),
       progressLabel: `${index + 1}/${BOTTOM_TOOLBAR_GUIDE_STEPS.length}`,
       primaryAction: last ? 'acknowledge' : 'next',
-      primaryActionTitle: last ? BOTTOM_TOOLBAR_GUIDE_DONE_TITLE : BOTTOM_TOOLBAR_GUIDE_NEXT_TITLE,
-      secondaryActionTitle: BOTTOM_TOOLBAR_GUIDE_SECONDARY_ACTION_TITLE
+      primaryActionTitle: this.resolvePrimaryActionTitle(last),
+      secondaryActionTitle: toolbarGuideText($r('app.string.settings_link_guide_skip'), BOTTOM_TOOLBAR_GUIDE_SECONDARY_ACTION_TITLE)
     });
+  }
+
+  private resolvePrimaryActionTitle(last: boolean): string {
+    if (last) {
+      return toolbarGuideText($r('app.string.toolbar_guide_got_it'), BOTTOM_TOOLBAR_GUIDE_DONE_TITLE);
+    }
+    return toolbarGuideText($r('app.string.settings_link_guide_next'), BOTTOM_TOOLBAR_GUIDE_NEXT_TITLE);
+  }
+
+  private localizeStepTitle(step: BottomToolbarGuideStep): string {
+    switch (step.clipId) {
+      case 'hide':
+        return toolbarGuideText($r('app.string.toolbar_guide_hide_title'), step.title);
+      case 'return_home':
+        return toolbarGuideText($r('app.string.toolbar_guide_home_title'), step.title);
+      case 'tools_panel':
+        return toolbarGuideText($r('app.string.toolbar_guide_tools_title'), step.title);
+      case 'tab_switch':
+        return toolbarGuideText($r('app.string.toolbar_guide_tabs_title'), step.title);
+      default:
+        return step.title;
+    }
+  }
+
+  private localizeStepMessage(step: BottomToolbarGuideStep): string {
+    switch (step.clipId) {
+      case 'hide':
+        return toolbarGuideText($r('app.string.toolbar_guide_hide_message'), step.message);
+      case 'return_home':
+        return toolbarGuideText($r('app.string.toolbar_guide_home_message'), step.message);
+      case 'tools_panel':
+        return toolbarGuideText($r('app.string.toolbar_guide_tools_message'), step.message);
+      case 'tab_switch':
+        return toolbarGuideText($r('app.string.toolbar_guide_tabs_message'), step.message);
+      default:
+        return step.message;
+    }
   }
 
   private publishState(snapshot: BottomToolbarGuideSnapshot): void {
     this.snapshot = snapshot;
     this.shell.publishState(snapshot);
   }
+}
+
+function toolbarGuideText(resource: Resource, fallback: string): string {
+  const resolved = resolveAppResourceText(resource);
+  return resolved.length > 0 ? resolved : fallback;
 }

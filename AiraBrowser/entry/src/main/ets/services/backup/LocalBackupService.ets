@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   AIRA_SYNC_SCHEMA_VERSION,
   AiraBookmarkSyncApplyResult,
@@ -229,7 +230,7 @@ export class LocalBackupService {
     try {
       document = JSON.parse(payload) as LocalBackupDocument;
     } catch (_error) {
-      throw new Error('备份文件不是有效的 Aira 备份。');
+      throw new Error(resolveAppResourceText($r('app.string.local_backup_invalid')));
     }
     this.validateDocument(document);
     return {
@@ -294,7 +295,7 @@ export class LocalBackupService {
     this.validateDocument(document);
     const bookmarks = document.sections.bookmarks;
     if (bookmarks === undefined) {
-      throw new Error('备份中没有可恢复的书签。');
+      throw new Error(resolveAppResourceText($r('app.string.local_backup_no_bookmarks')));
     }
     return this.syncService.replaceLocalBookmarksFromRecoverySnapshot(
       this.buildBookmarkSnapshot(bookmarks.data)
@@ -498,7 +499,7 @@ export class LocalBackupService {
   private validateBookmarksPayload(payload: LocalBackupBookmarksPayload): void {
     if (!this.isRecord(payload) || !this.isValidBackupBookmarkDataSetShape(payload.regular) ||
       (payload.private !== undefined && !this.isValidBackupBookmarkDataSetShape(payload.private))) {
-      throw new Error('备份中的书签格式无效。');
+      throw new Error(resolveAppResourceText($r('app.string.local_backup_bookmarks_invalid')));
     }
     this.syncService.validateLocalBackupBookmarkSnapshot(this.buildBookmarkSnapshot(payload));
   }
@@ -742,7 +743,7 @@ export class LocalBackupService {
   private validatePersonalizationPayload(payload: LocalBackupPersonalizationPayload): void {
     if (!this.isRecord(payload) || !Array.isArray(payload.sections) ||
       payload.sections.length !== PERSONALIZATION_SYNC_ITEM_IDS.length) {
-      throw new Error('备份中的常用设置格式无效。');
+      throw new Error(resolveAppResourceText($r('app.string.local_backup_settings_invalid')));
     }
     const ids = new Set<string>();
     for (let index = 0; index < payload.sections.length; index += 1) {
@@ -754,7 +755,7 @@ export class LocalBackupService {
           section.id as PersonalizationSyncItemId,
           section.payload
         )) {
-        throw new Error('备份中的常用设置分区无效。');
+        throw new Error(resolveAppResourceText($r('app.string.local_backup_settings_section_invalid')));
       }
       ids.add(section.id);
     }
@@ -790,29 +791,29 @@ export class LocalBackupService {
 
   private validateDocument(document: LocalBackupDocument): void {
     if (!this.isRecord(document) || document.format !== LOCAL_BACKUP_FORMAT) {
-      throw new Error('备份文件不是有效的 Aira 本地备份。');
+      throw new Error(resolveAppResourceText($r('app.string.local_backup_not_local')));
     }
     if (document.formatVersion > LOCAL_BACKUP_FORMAT_VERSION) {
-      throw new Error('这份备份由更高版本的 Aira 创建，请先升级应用。');
+      throw new Error(resolveAppResourceText($r('app.string.local_backup_newer')));
     }
     if (document.formatVersion !== LOCAL_BACKUP_FORMAT_VERSION ||
       !this.isNonNegativeInteger(document.exportedAt) || !this.isRecord(document.exportedBy) ||
       typeof document.exportedBy.versionName !== 'string' ||
       !this.isNonNegativeInteger(document.exportedBy.versionCode) || !this.isRecord(document.sections)) {
-      throw new Error('Aira 备份文件格式或版本不受支持。');
+      throw new Error(resolveAppResourceText($r('app.string.local_backup_unsupported')));
     }
     const sectionKeys = Object.keys(document.sections);
     const allowedSectionIds: string[] = [
       'bookmarks', 'history', 'personalization', 'userScripts', 'userScriptValues'
     ];
     if (sectionKeys.length <= 0 || sectionKeys.some((key: string): boolean => !allowedSectionIds.includes(key))) {
-      throw new Error('Aira 备份文件包含不受支持的数据分区。');
+      throw new Error(resolveAppResourceText($r('app.string.local_backup_unknown_section')));
     }
     if (document.sections.bookmarks !== undefined) {
       this.requireSectionVersion(
         document.sections.bookmarks,
         LOCAL_BACKUP_BOOKMARKS_SCHEMA_VERSION,
-        '书签'
+        resolveAppResourceText($r('app.string.settings_advanced_backup_export_bookmarks'))
       );
       this.validateBookmarksPayload(document.sections.bookmarks.data);
     }
@@ -820,13 +821,13 @@ export class LocalBackupService {
       this.requireSectionVersion(
         document.sections.history,
         LOCAL_BACKUP_HISTORY_SCHEMA_VERSION,
-        '历史记录'
+        resolveAppResourceText($r('app.string.settings_advanced_backup_export_history'))
       );
       const historyVisits = this.historyTransferCodec.decodeVisits(
         JSON.stringify(document.sections.history.data)
       );
       if (historyVisits.some((visit: HistoryTransferVisit): boolean => visit.dataScope === 'session_ephemeral')) {
-        throw new Error('备份中的历史记录包含临时隐私会话数据，无法导入。');
+        throw new Error(resolveAppResourceText($r('app.string.local_backup_history_private')));
       }
       document.sections.history.data = historyVisits;
     }
@@ -834,7 +835,7 @@ export class LocalBackupService {
       this.requireSectionVersion(
         document.sections.personalization,
         LOCAL_BACKUP_PERSONALIZATION_SCHEMA_VERSION,
-        '常用设置'
+        resolveAppResourceText($r('app.string.settings_advanced_backup_export_personalization'))
       );
       this.validatePersonalizationPayload(document.sections.personalization.data);
     }
@@ -842,7 +843,7 @@ export class LocalBackupService {
       this.requireSectionVersion(
         document.sections.userScripts,
         LOCAL_BACKUP_USER_SCRIPTS_SCHEMA_VERSION,
-        '用户脚本'
+        resolveAppResourceText($r('app.string.settings_advanced_backup_export_user_scripts'))
       );
       this.validateUserScriptsPayload(document.sections.userScripts.data);
     }
@@ -850,7 +851,7 @@ export class LocalBackupService {
       this.requireSectionVersion(
         document.sections.userScriptValues,
         LOCAL_BACKUP_USER_SCRIPT_VALUES_SCHEMA_VERSION,
-        '脚本数据'
+        resolveAppResourceText($r('app.string.settings_advanced_backup_export_user_script_values'))
       );
       this.validateUserScriptValuesPayload(
         document.sections.userScriptValues.data,
@@ -861,7 +862,7 @@ export class LocalBackupService {
 
   private validateUserScriptsPayload(payload: LocalBackupUserScriptsPayload): void {
     if (!this.isRecord(payload) || !Array.isArray(payload.scripts)) {
-      throw new Error('备份中的用户脚本格式无效。');
+      throw new Error(resolveAppResourceText($r('app.string.local_backup_scripts_invalid')));
     }
     const ids = new Set<string>();
     for (let index = 0; index < payload.scripts.length; index += 1) {
@@ -880,7 +881,7 @@ export class LocalBackupService {
         typeof script.noframes !== 'boolean' || typeof script.runAt !== 'string' ||
         typeof script.installSource !== 'string' || !this.isNonNegativeInteger(script.createdAt) ||
         !this.isNonNegativeInteger(script.updatedAt)) {
-        throw new Error('备份中的用户脚本记录无效。');
+        throw new Error(resolveAppResourceText($r('app.string.local_backup_script_record_invalid')));
       }
       const preview = this.userScriptPackageLifecycle.previewSource({
         source: script.source,
@@ -890,7 +891,7 @@ export class LocalBackupService {
       });
       if (preview.status === 'failed') {
         const scriptLabel = script.name.trim().length > 0 ? script.name : script.id;
-        throw new Error(`备份中的脚本“${scriptLabel}”格式无效。`);
+        throw new Error(resolveAppResourceText($r('app.string.local_backup_script_named_invalid', scriptLabel)));
       }
       ids.add(script.id);
     }
@@ -901,7 +902,7 @@ export class LocalBackupService {
     scriptsPayload?: LocalBackupUserScriptsPayload
   ): void {
     if (!this.isRecord(payload) || !Array.isArray(payload.values) || scriptsPayload === undefined) {
-      throw new Error('备份中的脚本数据格式无效。');
+      throw new Error(resolveAppResourceText($r('app.string.local_backup_script_data_invalid')));
     }
     const scriptIds = new Set<string>(
       scriptsPayload.scripts.map((script: LocalBackupUserScriptRecord): string => script.id)
@@ -914,12 +915,12 @@ export class LocalBackupService {
         typeof record.key !== 'string' || record.key.trim().length <= 0 ||
         typeof record.valueJson !== 'string' || keys.has(identity) ||
         !this.isNonNegativeInteger(record.updatedAt)) {
-        throw new Error('备份中的脚本数据记录无效。');
+        throw new Error(resolveAppResourceText($r('app.string.local_backup_script_data_record_invalid')));
       }
       try {
         JSON.parse(record.valueJson);
       } catch (_error) {
-        throw new Error('备份中的脚本数据包含无效值。');
+        throw new Error(resolveAppResourceText($r('app.string.local_backup_script_data_value_invalid')));
       }
       keys.add(identity);
     }
@@ -1059,17 +1060,17 @@ export class LocalBackupService {
 
   private requireSectionVersion<T>(section: LocalBackupSection<T>, expected: number, label: string): void {
     if (!this.isRecord(section) || section.schemaVersion !== expected || section.data === undefined) {
-      throw new Error(`${label}备份版本不受支持。`);
+      throw new Error(resolveAppResourceText($r('app.string.local_backup_section_version', label)));
     }
   }
 
   private requireValidSelection(selection: LocalBackupSelection): void {
     if (selection.userScriptValues && !selection.userScripts) {
-      throw new Error('导出或恢复脚本数据时必须同时选择用户脚本。');
+      throw new Error(resolveAppResourceText($r('app.string.local_backup_scripts_required')));
     }
     if (!selection.bookmarks && !selection.history && !selection.personalization &&
       !selection.userScripts && !selection.userScriptValues) {
-      throw new Error('请至少选择一项备份内容。');
+      throw new Error(resolveAppResourceText($r('app.string.local_backup_selection_empty')));
     }
   }
 

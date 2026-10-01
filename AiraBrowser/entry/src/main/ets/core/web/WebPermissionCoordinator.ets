@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   SitePermissionKind,
   SitePermissionRule,
@@ -217,7 +218,7 @@ export class WebPermissionCoordinator {
       try {
         await this.persistPermissionRulesForTab(request.tabId, request.origin, [item.kind], 'block');
       } catch (error) {
-        this.emitMessage('error', `权限保存失败：${JSON.stringify(error)}`);
+        this.emitMessage('error', resolveAppResourceText($r('app.string.settings_site_info_permission_save_error', JSON.stringify(error))));
       } finally {
         this.backgroundSessionSyncCoordinator.release(request.tabId);
         this.setPermissionFlowInFlight(request.tabId, false);
@@ -230,7 +231,7 @@ export class WebPermissionCoordinator {
       try {
         await this.persistPermissionRulesForTab(request.tabId, request.origin, ['location'], 'block');
       } catch (error) {
-        this.emitMessage('error', `权限保存失败：${JSON.stringify(error)}`);
+        this.emitMessage('error', resolveAppResourceText($r('app.string.settings_site_info_permission_save_error', JSON.stringify(error))));
       } finally {
         this.backgroundSessionSyncCoordinator.release(request.tabId);
         this.setPermissionFlowInFlight(request.tabId, false);
@@ -266,15 +267,15 @@ export class WebPermissionCoordinator {
     this.requestAppPermissionSettingsForKinds(kinds)
       .then((granted: boolean) => {
         if (granted) {
-          this.emitMessage('toast', '系统权限已开启，请重新发起网页请求。');
+          this.emitMessage('toast', resolveAppResourceText($r('app.string.web_permission_system_on')));
           return;
         }
-        this.emitMessage('toast', '系统权限仍未完全开启，请在系统设置中检查。');
+        this.emitMessage('toast', resolveAppResourceText($r('app.string.web_permission_system_incomplete')));
         void this.openSystemSettingsFallback();
       })
       .catch((error: Error) => {
-        this.emitMessage('error', `打开系统权限设置失败：${JSON.stringify(error)}`);
-        this.emitMessage('toast', '无法直接打开权限设置，请在系统设置中手动开启。');
+        this.emitMessage('error', resolveAppResourceText($r('app.string.web_permission_settings_open_failed', JSON.stringify(error))));
+        this.emitMessage('toast', resolveAppResourceText($r('app.string.web_permission_settings_manual')));
         void this.openSystemSettingsFallback();
       });
   }
@@ -354,17 +355,19 @@ export class WebPermissionCoordinator {
     this.presentPrompt({
       type: 'protected_resource',
       protectedResourceRequest: pendingRequest
-    }, '站点权限请求',
-      `${this.siteInteractionLogicService.getDisplayOrigin(pendingRequest.origin)} 想使用` +
-        `${this.getKindsLabel([item.kind])}。`);
+    }, resolveAppResourceText($r('app.string.browser_ui_browser_site_permission_prompt_host_004')),
+      resolveAppResourceText($r('app.string.web_permission_wants_use',
+        this.siteInteractionLogicService.getDisplayOrigin(pendingRequest.origin),
+        this.getKindsLabel([item.kind]))));
   }
 
   private showGeolocationPermissionDialog(pendingRequest: PendingGeolocationPermissionRequest): void {
     this.presentPrompt({
       type: 'geolocation',
       geolocationRequest: pendingRequest
-    }, '位置权限请求',
-      `${this.siteInteractionLogicService.getDisplayOrigin(pendingRequest.origin)} 想获取你的位置信息。`);
+    }, resolveAppResourceText($r('app.string.web_permission_location_title')),
+      resolveAppResourceText($r('app.string.web_permission_wants_location',
+        this.siteInteractionLogicService.getDisplayOrigin(pendingRequest.origin))));
   }
 
   private presentPrompt(
@@ -449,13 +452,13 @@ export class WebPermissionCoordinator {
         this.backgroundSessionSyncCoordinator.release(pendingRequest.tabId);
         pendingRequest.request.deny();
         const fault = this.browserFaultClassifier.classifyPermissionDenied(
-          `权限授权失败：${JSON.stringify(error)}`
+          resolveAppResourceText($r('app.string.web_permission_grant_failed', JSON.stringify(error)))
         );
         this.emitMessage('error', fault.userMessage);
         this.presentPermissionFaultDescriptor(
           this.getKindsLabel(pendingRequest.kinds),
           fault,
-          '权限授权失败，已拒绝网页请求。'
+          resolveAppResourceText($r('app.string.web_permission_grant_denied'))
         );
         this.setPermissionFlowInFlight(pendingRequest.tabId, false);
       });
@@ -470,12 +473,13 @@ export class WebPermissionCoordinator {
           const fault = this.browserFaultClassifier.classifyPermissionDenied(
             result.message
           );
-          this.presentPermissionFaultDescriptor('位置信息', fault);
+          const locationLabel = this.getKindsLabel(['location']);
+          this.presentPermissionFaultDescriptor(locationLabel, fault);
           if (result.settingsRequired) {
             this.presentSystemPermissionSettingPrompt(
               pendingRequest.tabId,
               ['location'],
-              '位置信息',
+              locationLabel,
               result.locationServiceEnabled
             );
           }
@@ -490,13 +494,13 @@ export class WebPermissionCoordinator {
         this.backgroundSessionSyncCoordinator.release(pendingRequest.tabId);
         pendingRequest.geolocation.invoke(pendingRequest.origin, false, false);
         const fault = this.browserFaultClassifier.classifyPermissionDenied(
-          `定位授权失败：${JSON.stringify(error)}`
+          resolveAppResourceText($r('app.string.web_permission_location_failed', JSON.stringify(error)))
         );
         this.emitMessage('error', fault.userMessage);
         this.presentPermissionFaultDescriptor(
-          '位置信息',
+          this.getKindsLabel(['location']),
           fault,
-          '定位授权失败，已拒绝网页请求。'
+          resolveAppResourceText($r('app.string.web_permission_location_denied'))
         );
         this.setPermissionFlowInFlight(pendingRequest.tabId, false);
       });
@@ -521,10 +525,12 @@ export class WebPermissionCoordinator {
     this.sink.applyEffect({
       type: 'open_system_permission_setting_prompt',
       tabId: tabId,
-      title: locationServiceEnabled ? '需要开启系统权限' : '需要开启位置信息',
+      title: locationServiceEnabled
+        ? resolveAppResourceText($r('app.string.web_permission_need_system'))
+        : resolveAppResourceText($r('app.string.web_permission_need_location')),
       message: locationServiceEnabled
-        ? `Aira 需要系统${label}权限，才能允许网站使用。`
-        : '系统位置信息开关未开启，网站暂时无法获取位置。'
+        ? resolveAppResourceText($r('app.string.web_permission_need_system_label', label))
+        : resolveAppResourceText($r('app.string.web_permission_location_service_off'))
     });
   }
 
@@ -547,7 +553,7 @@ export class WebPermissionCoordinator {
       this.backgroundSessionSyncCoordinator.release(pendingRequest.tabId);
       this.setPermissionFlowInFlight(pendingRequest.tabId, false);
       pendingRequest.request.deny();
-      this.emitMessage('error', `权限保存失败：${JSON.stringify(error)}`);
+      this.emitMessage('error', resolveAppResourceText($r('app.string.settings_site_info_permission_save_error', JSON.stringify(error))));
       return false;
     }
   }
@@ -562,7 +568,7 @@ export class WebPermissionCoordinator {
       this.backgroundSessionSyncCoordinator.release(pendingRequest.tabId);
       this.setPermissionFlowInFlight(pendingRequest.tabId, false);
       pendingRequest.geolocation.invoke(pendingRequest.origin, false, false);
-      this.emitMessage('error', `权限保存失败：${JSON.stringify(error)}`);
+      this.emitMessage('error', resolveAppResourceText($r('app.string.settings_site_info_permission_save_error', JSON.stringify(error))));
     }
   }
 

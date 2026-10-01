@@ -64,7 +64,7 @@ export struct AdBlockRiskConsentSheet {
     BrowserImmersiveSheetLayout({
       footerVisible: true,
             closeVisible: true,
-      closeAccessibilityLabel: '关闭广告拦截风险提示',
+      closeAccessibilityLabel: $r('app.string.adblock_ui_ad_block_risk_consent_sheet_001'),
       onClose: (): void => {
         this.onDecline();
       },

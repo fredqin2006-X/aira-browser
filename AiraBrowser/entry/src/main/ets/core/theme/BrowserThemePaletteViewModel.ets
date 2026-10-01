@@ -1,6 +1,7 @@
 import { BrowserResolvedThemeMode, BrowserThemePaletteId } from '../../common/models/BrowserModels';
 import { BrowserThemePalette } from '../../features/theme/BrowserThemePaletteModels';
 import { BrowserThemePaletteService } from '../../services/theme/BrowserThemePaletteService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface ThemePaletteOptionState {
   id: BrowserThemePaletteId;
@@ -54,7 +55,7 @@ export class BrowserThemePaletteViewModel {
       };
     });
     return {
-      title: '主题色',
+      title: themeScreenText($r('app.string.settings_appearance_theme_color'), '主题色'),
       isPrivateContext,
       pageBackground: resolvedTokens.pageBackground,
       surfaceBackground: resolvedTokens.surfaceBackground,
@@ -65,7 +66,7 @@ export class BrowserThemePaletteViewModel {
       groups: [
         {
           id: 'all',
-          title: '全部主题色',
+          title: themeScreenText($r('app.string.theme_palette_all'), '全部主题色'),
           options: options
         }
       ]
@@ -76,4 +77,9 @@ export class BrowserThemePaletteViewModel {
     return this.paletteService.resolvePaletteLabel(id);
   }
 
+}
+
+function themeScreenText(resource: Resource, fallback: string): string {
+  const resolved = resolveAppResourceText(resource);
+  return resolved.length > 0 ? resolved : fallback;
 }

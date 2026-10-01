@@ -154,7 +154,7 @@ const ACCOUNT_TARGETS: SettingsDestinationCatalogTarget[] = [
     'aira_pro',
     'aira_pro',
     'aira_pro',
-    'Aira Pro',
+    '捐赠Pro',
     '账号与同步',
     'root',
     '',

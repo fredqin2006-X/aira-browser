@@ -1,4 +1,5 @@
 import { UIContext } from '@kit.ArkUI';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export class BrowserSafeBrowsingThreatPresentationService {
   private presentingByTabId: Record<string, boolean | undefined> = {};
@@ -9,10 +10,10 @@ export class BrowserSafeBrowsingThreatPresentationService {
     }
     this.presentingByTabId[tabId] = true;
     void uiContext.getPromptAction().showDialog({
-      title: '此网站可能存在安全风险',
-      message: '请谨慎输入密码、验证码或付款信息。确认网站可信后再继续访问。',
+      title: resolveAppResourceText($r('app.string.web_threat_site_risk_title')),
+      message: resolveAppResourceText($r('app.string.web_threat_site_risk_message')),
       buttons: [{
-        text: '知道了',
+        text: resolveAppResourceText($r('app.string.settings_advanced_backup_confirm')),
         color: $r('sys.color.ohos_id_color_text_primary')
       }]
     }).then((): void => {

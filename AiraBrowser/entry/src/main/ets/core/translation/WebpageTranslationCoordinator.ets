@@ -39,6 +39,7 @@ import {
   WebpageTranslationSettingsViewModel
 } from './WebpageTranslationSettingsViewModel';
 import { resolveAppResourceText } from '../resources/AppResourceText';
+import { resolveDisplayedTranslationProviderName } from '../../services/translation/TranslationProviderTemplateService';
 import { BrowserTransientSurfaceCoordinator } from '../browser/BrowserTransientSurfaceCoordinator';
 import { BrowserRuntimeLifecyclePort } from '../../services/web/BrowserRuntimeLifecyclePort';
 import {
@@ -1445,7 +1446,10 @@ export class WebpageTranslationCoordinator {
     if (provider === undefined || provider.status !== 'configured') {
       return this.buildProviderUnavailableMessage(provider);
     }
-    return resolveAppResourceText($r('app.string.webpage_translation_will_send', provider.displayName));
+    return resolveAppResourceText($r(
+      'app.string.webpage_translation_will_send',
+      resolveDisplayedTranslationProviderName(provider.templateId, provider.displayName)
+    ));
   }
 
   private buildTranslatingMessage(
@@ -1456,7 +1460,12 @@ export class WebpageTranslationCoordinator {
     if (provider === undefined || provider.status !== 'configured') {
       return resolveAppResourceText($r('app.string.webpage_translation_read_checking', itemCount, charCount));
     }
-    return resolveAppResourceText($r('app.string.webpage_translation_read_requesting', itemCount, charCount, provider.displayName));
+    return resolveAppResourceText($r(
+      'app.string.webpage_translation_read_requesting',
+      itemCount,
+      charCount,
+      resolveDisplayedTranslationProviderName(provider.templateId, provider.displayName)
+    ));
   }
 
   private isProviderReadyForTranslation(provider: TranslationProviderConfig | undefined): boolean {
@@ -2426,7 +2435,10 @@ export class WebpageTranslationCoordinator {
   }
 
   private resolveProviderDisplayName(provider: TranslationProviderConfig | undefined): string {
-    return provider?.displayName ?? resolveAppResourceText($r('app.string.webpage_translation_provider_unconfigured'));
+    if (provider === undefined) {
+      return resolveAppResourceText($r('app.string.webpage_translation_provider_unconfigured'));
+    }
+    return resolveDisplayedTranslationProviderName(provider.templateId, provider.displayName);
   }
 
   private buildErrorMessage(error: Error | Object): string {

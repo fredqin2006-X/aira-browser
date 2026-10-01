@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { TabRecord } from '../../common/models/BrowserModels';
 import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../common/config/AiraDistributionCapabilityOwner';
 import { AiraLapsedProView, AiraMembershipState, buildEmptyLapsedProView } from '../../common/models/MembershipModels';
@@ -116,7 +117,7 @@ export class CrossDeviceTabPresenceCoordinator {
             false,
             localDevice.deviceName,
             [],
-            '请先连接私有化部署',
+            resolveAppResourceText($r('app.string.device_tabs_connect_server_title')),
             buildCrossDeviceTabsEmptyPresentation('connect_personal_server', 'credentials')
           );
         }
@@ -130,7 +131,9 @@ export class CrossDeviceTabPresenceCoordinator {
           false,
           localDevice.deviceName,
           [],
-          unavailable ? '与电脑互联不可用' : '请先连接私有化部署',
+          unavailable
+            ? resolveAppResourceText($r('app.string.device_tabs_link_unavailable'))
+            : resolveAppResourceText($r('app.string.device_tabs_connect_server_title')),
           buildCrossDeviceTabsEmptyPresentation('connect_personal_server', unavailable ? 'unavailable' : 'community')
         );
       }
@@ -141,7 +144,7 @@ export class CrossDeviceTabPresenceCoordinator {
           false,
           localDevice.deviceName,
           [],
-          '请先使用华为账号登录。',
+          resolveAppResourceText($r('app.string.device_tabs_sign_in_huawei')),
           buildCrossDeviceTabsEmptyPresentation('sign_in')
         );
       }
@@ -179,7 +182,7 @@ export class CrossDeviceTabPresenceCoordinator {
         const localDevice = await this.preferencesRepository.readLocalDevice();
         const context = await this.resolveProviderContext(settings, localDevice);
         if (context === undefined) {
-          throw new Error('私有化部署尚未连接。');
+          throw new Error(resolveAppResourceText($r('app.string.device_tabs_server_not_connected')));
         }
         await this.enableProviderByDefault(context);
       } catch (_error) {
@@ -568,7 +571,7 @@ export class CrossDeviceTabPresenceCoordinator {
   private resolveErrorMessage(error: Object): string {
     const detail = error as Error;
     const message = detail.message?.trim() ?? '';
-    return message.length > 0 ? message : '跨设备标签页暂时不可用。';
+    return message.length > 0 ? message : resolveAppResourceText($r('app.string.device_tabs_unavailable'));
   }
 
   private isProRequired(error: Object): boolean {
@@ -590,7 +593,7 @@ export class CrossDeviceTabPresenceCoordinator {
 
   private requireSyncConfigStore(): AiraSyncConfigStore {
     if (this.syncConfigStore === undefined) {
-      throw new Error('同步配置尚未初始化。');
+      throw new Error(resolveAppResourceText($r('app.string.device_tabs_sync_not_ready')));
     }
     return this.syncConfigStore;
   }
@@ -614,7 +617,7 @@ export class CrossDeviceTabPresenceCoordinator {
       const config = AIRA_PERSONAL_SERVER_INSTANCE_SERVICE.requireConfigured(settings);
       const pairedDeviceId = settings.sourceId.trim();
       if (pairedDeviceId.length === 0) {
-        throw new Error('私有化部署设备标识不可用，请重新连接。');
+        throw new Error(resolveAppResourceText($r('app.string.device_tabs_server_device_missing')));
       }
       return {
         kind: 'self_hosted',

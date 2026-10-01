@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import bundleManager from '@ohos.bundle.bundleManager';
 import { APP_PREVIEW_VERSION_NAME } from '../../common/constants/AppVersionInfo';
 import {
@@ -119,12 +120,12 @@ export class AppReviewPromptCoordinator {
     try {
       const result = await this.systemSettingsLaunchService.showAppReviewPrompt(context);
       if (!result.success) {
-        this.shell.showToast(result.message.length > 0 ? result.message : '暂时无法打开评分弹窗。');
+        this.shell.showToast(result.message.length > 0 ? result.message : resolveAppResourceText($r('app.string.settings_launch_rating_failed')));
         return;
       }
       await this.repository.markPromptShown().catch((_error: Error) => {});
     } catch (_error) {
-      this.shell.showToast('暂时无法打开评分弹窗。');
+      this.shell.showToast(resolveAppResourceText($r('app.string.settings_launch_rating_failed')));
     } finally {
       this.systemPromptInFlight = false;
     }

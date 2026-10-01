@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>捐赠版 Pro · 首次进入的底部 Sheet 草稿</title>
+<title>捐赠Pro · 首次进入的底部 Sheet 草稿</title>
 <style>
   /* ------------------------------------------------------------------
      设计规则（对齐 iOS 系统语言，不是「卡片落地页」）：
@@ -14,6 +14,7 @@
      5. 留白用 4pt 网格，横向 24px，纵向节奏 20 / 24 / 32。
      ------------------------------------------------------------------ */
   :root{
+    --foot-h:146px;                  /* 悬浮页脚高度：16+50+2+44+34，滚动内容据此留白 */
     /* iOS system colors */
     --page:#F2F2F7;
     --sheet:#FFFFFF;
@@ -91,7 +92,7 @@
   }
   .statusbar .right{display:flex;align-items:center;gap:5px}
 
-  /* ---------- 背景：捐赠版 Pro 页面 ---------- */
+  /* ---------- 背景：捐赠Pro 页面 ---------- */
   .navbar{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:8px 16px 4px;gap:12px}
   .icon-btn{
     width:40px;height:40px;border-radius:50%;background:var(--fill-2);border:0;
@@ -126,17 +127,19 @@
     height:92%;                       /* ← 最高高度：贴近 SheetSize.LARGE */
     background:var(--sheet);
     border-radius:28px 28px 0 0;
-    display:flex;flex-direction:column;
+    overflow:hidden;                  /* 圆角裁切只作用于背景与滚动内容 */
     transform:translateY(0);
     transition:transform .3s cubic-bezier(.32,.72,0,1);
   }
   html[data-sheet="off"] .sheet{transform:translateY(101%)}
-  .grabber{flex:0 0 auto;padding:9px 0 0;display:flex;justify-content:center}
+  .grabber{position:absolute;left:0;right:0;top:0;z-index:3;padding:9px 0 0;display:flex;justify-content:center}
   .grabber i{display:block;width:36px;height:5px;border-radius:3px;background:var(--label-3)}
 
   .sheet-body{
-    flex:1 1 auto;overflow-y:auto;overflow-x:hidden;
-    padding:20px 24px 8px;display:flex;flex-direction:column;
+    position:absolute;left:0;right:0;top:0;bottom:0;   /* 铺满整张 sheet */
+    overflow-y:auto;overflow-x:hidden;
+    padding:26px 24px calc(var(--foot-h) + 16px + env(safe-area-inset-bottom));
+    display:flex;flex-direction:column;
     scrollbar-width:none;
   }
   .sheet-body::-webkit-scrollbar{display:none}
@@ -144,9 +147,11 @@
   /* 字号只有三档：32 / 17 / 13。正文一律 17，不再出现 15、16 这类中间档 */
   .sheet-title{
     margin:0;font-size:32px;line-height:1.14;font-weight:700;letter-spacing:-.034em;color:var(--label);
+    text-align:center;
   }
   .sheet-lead{
     margin:10px 0 0;font-size:17px;line-height:1.45;color:var(--label-2);letter-spacing:-.01em;
+    text-align:center;
   }
 
   /* 列表：hairline 分隔，无勾选、无缩进、无容器 */
@@ -165,11 +170,28 @@
     margin:24px 0 0;font-size:13px;line-height:1.5;color:var(--label-3);letter-spacing:-.003em;
   }
 
-  /* 页脚：实心主按钮 + 纯文字次动作 */
+  /* 开源仓库入口：纯文字链接，不占按钮位 */
+  .repo{
+    display:flex;align-items:center;gap:9px;margin-top:22px;
+    color:var(--accent);text-decoration:none;font-size:17px;letter-spacing:-.01em;
+  }
+  .repo svg{width:19px;height:19px;flex:0 0 auto}
+
+  /* 页脚：悬浮层。脱离文档流浮在滚动内容之上，不做裁剪、不随内容滚走 */
   .sheet-foot{
-    flex:0 0 auto;padding:16px 24px calc(18px + env(safe-area-inset-bottom));
+    position:absolute;left:0;right:0;bottom:0;z-index:2;
+    padding:16px 24px calc(34px + env(safe-area-inset-bottom));
     display:flex;flex-direction:column;align-items:stretch;gap:2px;
+    background:var(--sheet);
     border-top:var(--hairline) solid var(--separator);
+  }
+  /* 毛玻璃只在支持的浏览器生效；不支持时就是纯色底，不会读不出字 */
+  @supports (backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px)){
+    .sheet-foot{
+      background:color-mix(in srgb,var(--sheet) 82%,transparent);
+      -webkit-backdrop-filter:blur(20px) saturate(180%);
+      backdrop-filter:blur(20px) saturate(180%);
+    }
   }
   .cta{
     width:100%;height:50px;border:0;border-radius:980px;background:var(--accent);color:var(--on-accent);
@@ -195,8 +217,8 @@
 
 <div class="head">
   <div class="eyebrow">Aira Browser · 布局草稿（H5）</div>
-  <h1>捐赠版 Pro · 首次进入的底部 Sheet</h1>
-  <p>只在第一次进入「捐赠版 Pro」页时弹出一次，关掉或点过按钮后不再出现。排版按 iOS 系统语言重做：单一强调色、hairline 分隔、大字号负字距、不做容器堆叠。</p>
+  <h1>捐赠Pro · 首次进入的底部 Sheet</h1>
+  <p>只在第一次进入「捐赠Pro」页时弹出一次，关掉或点过按钮后不再出现。排版按 iOS 系统语言重做：单一强调色、hairline 分隔、大字号负字距、不做容器堆叠。</p>
 </div>
 
 <div class="toolbar">
@@ -227,7 +249,7 @@
           </span>
         </div>
 
-        <!-- 背景页：捐赠版 Pro -->
+        <!-- 背景页：捐赠Pro -->
         <div class="navbar">
           <button class="icon-btn" aria-label="关闭">
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M3.4 3.4l9.2 9.2M12.6 3.4 3.4 12.6"/></svg>
@@ -237,7 +259,7 @@
 
         <div class="page-scroll">
           <div class="page-hero">
-            <h2 id="page-title">捐赠版 Pro</h2>
+            <h2 id="page-title">捐赠Pro</h2>
             <p id="page-sub">本地功能永久免费，Pro 只用于官方托管云服务。</p>
           </div>
 
@@ -259,7 +281,7 @@
           <div class="grabber"><i></i></div>
 
           <div class="sheet-body">
-            <h2 class="sheet-title">开源免费，捐赠自愿</h2>
+            <h2 class="sheet-title">捐赠Pro</h2>
             <p class="sheet-lead">捐赠用于维护 Aira 自己的服务器。</p>
 
             <div class="list">
@@ -268,7 +290,7 @@
               <div class="row">华为云空间 / WebDAV 同步</div>
             </div>
 
-            <h3 class="section-title">那捐赠版 Pro 是什么</h3>
+            <h3 class="section-title">那捐赠Pro是什么</h3>
             <div class="list" style="margin-top:12px">
               <div class="row">用 Aira 的服务器同步，不用自己搭</div>
               <div class="row">跨设备互联开箱可用</div>
@@ -276,10 +298,15 @@
             </div>
 
             <p class="tail" id="tail">不想捐也没关系，页面下面可以一直免费领会员。</p>
+
+            <a class="repo" href="https://github.com/mason173/aira-browser">
+              <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+              <span>在 GitHub 上查看源码</span>
+            </a>
           </div>
 
           <div class="sheet-foot">
-            <button class="cta" id="cta">支持一下，开通捐赠版 Pro</button>
+            <button class="cta" id="cta">查看Pro权益</button>
             <button class="cta ghost" id="dismiss">以后再说</button>
           </div>
         </div>
@@ -294,6 +321,8 @@
   <div class="panel">
     <h3>这版排掉了哪些「AI 味」</h3>
     <ul>
+      <li><b>标题改成「捐赠Pro」。</b>原来那版是个句子（「开源免费，捐赠自愿」），读起来像在解释自己。现在标题只给名字，把「开源、免费、自愿」交给下面两段事实去说。</li>
+      <li><b>仓库入口是纯文字链接，不是按钮。</b>页脚已经有一个主按钮和一个次动作，再放一个按钮会变成三选一。它也不加「开源」两个字重复标题，只写去哪。</li>
       <li><b>勾选图标 → 删。</b>两段清单本来就是在陈述事实，不是「功能对比表」，打勾会把它们读成待办事项。同时删掉那 22px 图标列，两段清单的文字左边界现在完全对齐。</li>
       <li><b>字号从 5 档收到 3 档：32 / 17 / 13。</b>标题 32，正文一律 17（含组标题、导语、清单），页尾备注 13。原来 16 和 17 混用是左边界错位之外另一个「看着不齐」的原因。</li>
       <li><b>① ② ③ 带色编号圆点 → 删。</b>换成 hairline 分隔的普通行，编号本身就是模板感最强的元素。</li>
@@ -307,8 +336,9 @@
   <div class="panel">
     <h3>行为与待定</h3>
     <ul>
-      <li><b>只弹一次。</b>第一次进入「捐赠版 Pro」页时弹出；点主按钮、点「以后再说」、或下滑关掉，都记为已看过，之后不再出现。</li>
-      <li><b>名字范围待定。</b>建议只把会员页与购买流程改叫「捐赠版 Pro」；《Aira Pro 会员服务协议》《自动续费服务协议》这类法定名称保持不动。</li>
+      <li><b>只弹一次。</b>第一次进入「捐赠Pro」页时弹出；点主按钮、点「以后再说」、或下滑关掉，都记为已看过，之后不再出现。</li>
+      <li><b>仓库地址不写死。</b>用现成的 `AIRA_COMMUNITY_REPOSITORY_URL`（`common/constants/AiraCommunityProjectLinks.ets`），跳转走应用已有的外部导航，不在 Sheet 里另开一套。</li>
+      <li><b>名字范围待定。</b>建议只把会员页与购买流程改叫「捐赠Pro」；《Aira Pro 会员服务协议》《自动续费服务协议》这类法定名称保持不动。</li>
       <li><b>「不限次数」待确认。</b>现在客户端策略是「会员期内不能再领，到期可再领」，页尾那句是准的；如果服务端以后加冷却期要跟着改。</li>
       <li><b>免费领取的落点。</b>页尾那句指的是页面上已有的领取入口，Sheet 里不重复实现流程。</li>
     </ul>
@@ -318,16 +348,16 @@
 <script>
   const state = {mode:'first', sheet:'on'};
 
-  const PAGE_TITLE = {first:'捐赠版 Pro', claimed:'捐赠版 Pro', pro:'捐赠版 Pro 已开通'};
+  const PAGE_TITLE = {first:'捐赠Pro', claimed:'捐赠Pro', pro:'捐赠Pro 已开通'};
   const PAGE_SUB = {
     first:   '本地功能永久免费，Pro 只用于官方托管云服务。',
-    claimed: '已通过免费领取开通，权益和捐赠版一样。',
+    claimed: '已通过免费领取开通，权益和捐赠一样。',
     pro:     '云同步、网页接力与跨设备标签页均已生效。'
   };
   const CTA = {
-    first:   '支持一下，开通捐赠版 Pro',
-    claimed: '支持一下，升级为捐赠版 Pro',
-    pro:     '已开通捐赠版 Pro'
+    first:   '查看Pro权益',
+    claimed: '查看Pro权益',
+    pro:     '查看Pro权益'
   };
   const TAIL = {
     first:   '不想捐也没关系，页面下面可以一直免费领会员。',
@@ -345,7 +375,7 @@
 
     const cta = document.getElementById('cta');
     cta.textContent = CTA[state.mode];
-    cta.disabled = state.mode === 'pro';
+    cta.disabled = false;
 
     document.documentElement.dataset.sheet = state.sheet;
   }

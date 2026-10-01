@@ -6,6 +6,7 @@ import {
   BrowserUserAgentSettings
 } from '../../common/models/BrowserModels';
 import { SiteSettingTarget } from '../../common/models/SiteSettingModels';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { SiteIdentityService } from './SiteIdentityService';
 
 export interface BrowserUserAgentPreset {
@@ -151,6 +152,11 @@ export const DEFAULT_BROWSER_USER_AGENT_SETTINGS: BrowserUserAgentSettings = {
 
 const MAX_CUSTOM_USER_AGENT_RECORDS: number = 24;
 
+interface BrowserUserAgentPresetCopy {
+  title: string;
+  subtitle: string;
+}
+
 export const BROWSER_USER_AGENT_PRESETS: BrowserUserAgentPreset[] = [
   {
     id: SYSTEM_DEFAULT_USER_AGENT_PRESET_ID,
@@ -243,24 +249,15 @@ export class BrowserUserAgentService {
   }
 
   getPresets(): BrowserUserAgentPreset[] {
-    return BROWSER_USER_AGENT_PRESETS.map((preset: BrowserUserAgentPreset) => {
-      const nextPreset: BrowserUserAgentPreset = {
-        id: preset.id,
-        title: preset.title,
-        subtitle: preset.subtitle,
-        mode: preset.mode,
-        userAgent: preset.userAgent
-      };
-      return nextPreset;
-    });
+    return BROWSER_USER_AGENT_PRESETS.map((preset: BrowserUserAgentPreset) => this.localizePreset(preset));
   }
 
   getIdentityCatalog(settings: BrowserUserAgentSettings): BrowserUserAgentIdentity[] {
     const normalized = this.normalizeSettings(settings);
     const identities: BrowserUserAgentIdentity[] = [{
       id: FOLLOW_GLOBAL_BROWSER_IDENTITY_ID,
-      title: '跟随全局',
-      subtitle: '使用全局网页标识设置',
+      title: resolveAppResourceText($r('app.string.settings_site_customization_follow_global')),
+      subtitle: resolveAppResourceText($r('app.string.web_ua_follow_global_desc')),
       mode: normalized.defaultMode,
       userAgent: '',
       source: 'global'
@@ -279,7 +276,7 @@ export class BrowserUserAgentService {
       identities.push({
         id: record.id,
         title: record.name,
-        subtitle: '自定义网页标识',
+        subtitle: resolveAppResourceText($r('app.string.web_ua_custom_identity')),
         mode: 'custom',
         userAgent: record.userAgent,
         source: 'custom'
@@ -293,8 +290,70 @@ export class BrowserUserAgentService {
   }
 
   findPreset(id: BrowserUserAgentPresetId): BrowserUserAgentPreset {
-    return BROWSER_USER_AGENT_PRESETS.find((preset: BrowserUserAgentPreset) => preset.id === id) ??
+    const preset = BROWSER_USER_AGENT_PRESETS.find((item: BrowserUserAgentPreset) => item.id === id) ??
       BROWSER_USER_AGENT_PRESETS[0];
+    return this.localizePreset(preset);
+  }
+
+  private localizePreset(preset: BrowserUserAgentPreset): BrowserUserAgentPreset {
+    const copy = this.resolvePresetCopy(preset.id);
+    return {
+      id: preset.id,
+      title: copy.title,
+      subtitle: copy.subtitle,
+      mode: preset.mode,
+      userAgent: preset.userAgent
+    };
+  }
+
+  private resolvePresetCopy(id: string): BrowserUserAgentPresetCopy {
+    switch (id) {
+      case ARKWEB_ORIGINAL_USER_AGENT_PRESET_ID:
+        return {
+          title: resolveAppResourceText($r('app.string.web_ua_preset_arkweb_original')),
+          subtitle: resolveAppResourceText($r('app.string.web_ua_preset_arkweb_original_desc'))
+        };
+      case 'mobile_huawei_browser':
+        return {
+          title: resolveAppResourceText($r('app.string.web_ua_preset_huawei_browser')),
+          subtitle: resolveAppResourceText($r('app.string.web_ua_preset_huawei_browser_desc'))
+        };
+      case 'mobile_chrome_android':
+        return {
+          title: resolveAppResourceText($r('app.string.web_ua_preset_chrome_android')),
+          subtitle: resolveAppResourceText($r('app.string.web_ua_preset_chrome_android_desc'))
+        };
+      case 'mobile_safari_iphone':
+        return {
+          title: resolveAppResourceText($r('app.string.web_ua_preset_safari_iphone')),
+          subtitle: resolveAppResourceText($r('app.string.web_ua_preset_safari_iphone_desc'))
+        };
+      case DESKTOP_CHROME_USER_AGENT_PRESET_ID:
+        return {
+          title: resolveAppResourceText($r('app.string.web_ua_preset_chrome_windows')),
+          subtitle: resolveAppResourceText($r('app.string.web_ua_preset_chrome_windows_desc'))
+        };
+      case 'desktop_edge_windows':
+        return {
+          title: resolveAppResourceText($r('app.string.web_ua_preset_edge_windows')),
+          subtitle: resolveAppResourceText($r('app.string.web_ua_preset_edge_windows_desc'))
+        };
+      case 'desktop_safari_mac':
+        return {
+          title: resolveAppResourceText($r('app.string.web_ua_preset_safari_mac')),
+          subtitle: resolveAppResourceText($r('app.string.web_ua_preset_safari_mac_desc'))
+        };
+      case 'desktop_firefox_windows':
+        return {
+          title: resolveAppResourceText($r('app.string.web_ua_preset_firefox_windows')),
+          subtitle: resolveAppResourceText($r('app.string.web_ua_preset_firefox_windows_desc'))
+        };
+      default:
+        return {
+          title: resolveAppResourceText($r('app.string.web_ua_preset_aira_default')),
+          subtitle: resolveAppResourceText($r('app.string.web_ua_preset_aira_default_desc'))
+        };
+    }
   }
 
   buildPresetSettings(
@@ -632,7 +691,9 @@ export class BrowserUserAgentService {
   }
 
   resolveMenuTitle(mode: BrowserUserAgentMode): string {
-    return this.normalizeMode(mode) === 'desktop' ? '请求移动端网页' : '请求桌面版网页';
+    return this.normalizeMode(mode) === 'desktop'
+      ? resolveAppResourceText($r('app.string.web_ua_request_mobile'))
+      : resolveAppResourceText($r('app.string.web_ua_request_desktop'));
   }
 
   resolveSettingsSummary(settings: BrowserUserAgentSettings): string {
@@ -645,7 +706,9 @@ export class BrowserUserAgentService {
       if (selectedCustomUserAgent !== undefined) {
         return selectedCustomUserAgent.name;
       }
-      return normalized.customUserAgent.length > 0 ? '自定义 UA' : '自定义 UA 未填写';
+      return normalized.customUserAgent.length > 0
+        ? resolveAppResourceText($r('app.string.settings_custom_ua'))
+        : resolveAppResourceText($r('app.string.web_ua_custom_ua_empty'));
     }
     return this.findPreset(normalized.selectedPresetId).title;
   }
@@ -783,18 +846,18 @@ export class BrowserUserAgentService {
   private resolveFallbackCustomUserAgentName(userAgent: string): string {
     const normalizedUserAgent = this.normalizeCustomUserAgent(userAgent);
     if (normalizedUserAgent.includes('iPhone')) {
-      return '自定义 iPhone';
+      return resolveAppResourceText($r('app.string.web_ua_custom_iphone'));
     }
     if (normalizedUserAgent.includes('Windows')) {
-      return '自定义 Windows';
+      return resolveAppResourceText($r('app.string.web_ua_custom_windows'));
     }
     if (normalizedUserAgent.includes('Macintosh')) {
-      return '自定义 macOS';
+      return resolveAppResourceText($r('app.string.web_ua_custom_macos'));
     }
     if (normalizedUserAgent.includes('Android')) {
-      return '自定义 Android';
+      return resolveAppResourceText($r('app.string.web_ua_custom_android'));
     }
-    return '自定义 UA';
+    return resolveAppResourceText($r('app.string.settings_custom_ua'));
   }
 
   private buildCustomUserAgentId(createdAt: number, name: string, userAgent: string): string {
@@ -863,7 +926,7 @@ export class BrowserUserAgentService {
       presentationMode: mode === 'desktop' ? 'desktop-request' : 'mobile',
       scopeCapability: source === 'mandatory_compatibility' ? 'host' : 'runtime',
       compatibilityNotice: source === 'custom'
-        ? '自定义 UA 只保证字符串兼容，不承诺完整浏览器指纹一致。'
+        ? resolveAppResourceText($r('app.string.web_ua_custom_notice'))
         : reason
     };
   }
@@ -939,8 +1002,8 @@ export class BrowserUserAgentService {
     if (normalizedId === AIRA_DEFAULT_BROWSER_IDENTITY_ID) {
       return {
         id: normalizedId,
-        title: 'Aira默认',
-        subtitle: '使用 Android 兼容移动网页标识',
+        title: resolveAppResourceText($r('app.string.web_ua_preset_aira_default')),
+        subtitle: resolveAppResourceText($r('app.string.web_ua_android_compat')),
         mode: 'mobile',
         userAgent: AIRA_COMPAT_MOBILE_USER_AGENT,
         source: 'preset'

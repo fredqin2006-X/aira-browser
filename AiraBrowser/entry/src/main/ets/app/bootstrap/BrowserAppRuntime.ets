@@ -171,6 +171,7 @@ import { MembershipRepository } from '../../data/membership/MembershipRepository
 import { NewUserGiftRepository } from '../../data/membership/NewUserGiftRepository';
 import { BottomToolbarGuideRepository } from '../../data/onboarding/BottomToolbarGuideRepository';
 import { CrossDeviceLinkGuideRepository } from '../../data/onboarding/CrossDeviceLinkGuideRepository';
+import { TabsOverviewSegmentGuideRepository } from '../../data/onboarding/TabsOverviewSegmentGuideRepository';
 import { AiraLapsedProView, AiraMembershipState } from '../../common/models/MembershipModels';
 import { MembershipFeature } from '../../features/membership/MembershipFeature';
 import { HistoryFeature } from '../../features/history/HistoryFeature';
@@ -464,6 +465,8 @@ BookmarkMutationService.configureDefaultSyncPendingMarker((changedAt: number) =>
 export const sharedMembershipRepository: MembershipRepository = new MembershipRepository();
 export const sharedNewUserGiftRepository: NewUserGiftRepository = new NewUserGiftRepository();
 export const sharedBottomToolbarGuideRepository: BottomToolbarGuideRepository = new BottomToolbarGuideRepository();
+export const sharedTabsOverviewSegmentGuideRepository: TabsOverviewSegmentGuideRepository =
+  new TabsOverviewSegmentGuideRepository();
 export const sharedCrossDeviceLinkGuideRepository: CrossDeviceLinkGuideRepository =
   new CrossDeviceLinkGuideRepository();
 export const sharedMembershipFeature: MembershipFeature =
@@ -993,6 +996,9 @@ function buildBrowserRuntimeIdleWarmupTasks(): BrowserRuntimeIdleWarmupTask[] {
   }, {
     id: 'bottom_toolbar_guide_runtime',
     run: () => sharedBottomToolbarGuideRepository.initialize()
+  }, {
+    id: 'tabs_overview_segment_guide_runtime',
+    run: () => sharedTabsOverviewSegmentGuideRepository.initialize()
   }, {
     id: 'cross_device_link_guide_runtime',
     run: () => sharedCrossDeviceLinkGuideRepository.initialize()

@@ -1,3 +1,5 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
+
 export type CrossDeviceTabsEmptyKind =
   'none' |
   'sign_in' |
@@ -49,10 +51,10 @@ export function buildCrossDeviceTabsEmptyPresentation(
   if (kind === 'sign_in') {
     return {
       kind: kind,
-      title: '登录后查看跨设备标签页',
-      message: '使用华为账号登录，即可看到电脑上打开的网页。',
+      title: resolveAppResourceText($r('app.string.device_tabs_sign_in_title')),
+      message: resolveAppResourceText($r('app.string.device_tabs_sign_in_message')),
       primaryAction: 'sign_in',
-      primaryLabel: '登录华为账号',
+      primaryLabel: resolveAppResourceText($r('app.string.settings_pro_sign_in_title')),
       secondaryAction: 'none',
       secondaryLabel: ''
     };
@@ -60,32 +62,32 @@ export function buildCrossDeviceTabsEmptyPresentation(
   if (kind === 'pro_required') {
     return {
       kind: kind,
-      title: '跨设备标签页需要 Aira Pro',
-      message: '开通后可以查看并打开其他在线设备的标签页。连接自己的私有化部署则不必开通。',
+      title: resolveAppResourceText($r('app.string.device_tabs_pro_required_title')),
+      message: resolveAppResourceText($r('app.string.device_tabs_pro_required_message')),
       primaryAction: 'open_pro',
-      primaryLabel: '了解 Aira Pro',
+      primaryLabel: resolveAppResourceText($r('app.string.device_tabs_learn_pro')),
       secondaryAction: 'open_guide',
-      secondaryLabel: '使用私有化部署'
+      secondaryLabel: resolveAppResourceText($r('app.string.device_tabs_use_personal_server'))
     };
   }
   if (kind === 'pro_expired') {
     return {
       kind: kind,
-      title: 'Aira Pro 已过期',
-      message: '续费后即可恢复跨设备标签页。连接自己的私有化部署则不必开通。',
+      title: resolveAppResourceText($r('app.string.membership_gate_expired_title')),
+      message: resolveAppResourceText($r('app.string.device_tabs_pro_expired_message')),
       primaryAction: 'open_pro',
-      primaryLabel: '了解 Aira Pro',
+      primaryLabel: resolveAppResourceText($r('app.string.device_tabs_learn_pro')),
       secondaryAction: 'open_guide',
-      secondaryLabel: '使用私有化部署'
+      secondaryLabel: resolveAppResourceText($r('app.string.device_tabs_use_personal_server'))
     };
   }
   if (kind === 'link_disabled') {
     return {
       kind: kind,
-      title: '与电脑互联未开启',
-      message: '开启后即可看到电脑上的标签页，和数据同步无关。',
+      title: resolveAppResourceText($r('app.string.device_tabs_link_disabled_title')),
+      message: resolveAppResourceText($r('app.string.device_tabs_link_disabled_message')),
       primaryAction: 'enable_link',
-      primaryLabel: '开启与电脑互联',
+      primaryLabel: resolveAppResourceText($r('app.string.device_tabs_enable_link')),
       secondaryAction: 'none',
       secondaryLabel: ''
     };
@@ -93,36 +95,38 @@ export function buildCrossDeviceTabsEmptyPresentation(
   if (kind === 'no_devices') {
     return {
       kind: kind,
-      title: '当前没有在线电脑',
-      message: '在电脑上打开 Aira 并登录同一账号，这台电脑就会出现在这里。',
+      title: resolveAppResourceText($r('app.string.device_tabs_no_computer_title')),
+      message: resolveAppResourceText($r('app.string.device_tabs_no_computer_message')),
       primaryAction: 'open_setup',
-      primaryLabel: '查看连接方法',
+      primaryLabel: resolveAppResourceText($r('app.string.device_tabs_view_setup')),
       secondaryAction: 'refresh',
-      secondaryLabel: '刷新'
+      secondaryLabel: resolveAppResourceText($r('app.string.offline_action_refresh'))
     };
   }
   if (kind === 'connect_personal_server') {
     const credentials = detail === 'credentials';
     return {
       kind: kind,
-      title: '请先连接私有化部署',
+      title: resolveAppResourceText($r('app.string.device_tabs_connect_server_title')),
       message: credentials
-        ? '跨设备标签页需要有效的私有化部署设备凭据。'
-        : '跨设备标签页支持通过你自己部署的私有化部署使用，请先在同步设置中完成连接。',
+        ? resolveAppResourceText($r('app.string.device_tabs_server_credentials'))
+        : resolveAppResourceText($r('app.string.device_tabs_server_setup')),
       primaryAction: 'open_sync_settings',
-      primaryLabel: '去同步设置',
+      primaryLabel: resolveAppResourceText($r('app.string.device_tabs_open_sync_settings')),
       secondaryAction: 'none',
       secondaryLabel: ''
     };
   }
   if (kind === 'error') {
-    const message = detail.trim().length > 0 ? detail.trim() : '跨设备标签页暂时不可用。';
+    const message = detail.trim().length > 0
+      ? detail.trim()
+      : resolveAppResourceText($r('app.string.device_tabs_unavailable'));
     return {
       kind: kind,
-      title: '跨设备标签页暂时不可用',
+      title: resolveAppResourceText($r('app.string.device_tabs_unavailable_title')),
       message: message,
       primaryAction: 'refresh',
-      primaryLabel: '刷新',
+      primaryLabel: resolveAppResourceText($r('app.string.offline_action_refresh')),
       secondaryAction: 'none',
       secondaryLabel: ''
     };

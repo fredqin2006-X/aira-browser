@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BROWSER_THEME_STORAGE_ACCENT_KEY,
   BROWSER_THEME_STORAGE_CONTROL_BACKGROUND_KEY,
@@ -38,7 +39,7 @@ export struct DocumentViewerFileInfoDialog {
 
   build() {
     Column({ space: 16 }) {
-      Text('文件信息')
+      Text($r('app.string.bottom_panel_action_viewer_info'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -54,7 +55,7 @@ export struct DocumentViewerFileInfoDialog {
 
       BrowserSheetActionButton({
         stacked: true,
-        label: '知道了',
+        label: $r('app.string.settings_advanced_backup_confirm'),
         emphasis: 'primary',
         accentColor: this.storedAccentColor,
         fillAvailableWidth: false,
@@ -107,14 +108,14 @@ export struct HomeShortcutEditDialog {
     Column({ space: 16 }) {
       this.buildIcon()
 
-      Text('编辑快捷方式')
+      Text($r('app.string.browser_ui_browser_shell_dialogs_003'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.storedPrimaryTextColor)
         .textAlign(TextAlign.Center)
 
-      TextInput({ text: this.draft.title, placeholder: '名称' })
+      TextInput({ text: this.draft.title, placeholder: $r('app.string.ui_name') })
         .width('100%')
         .height(44)
         .fontSize(15)
@@ -134,7 +135,7 @@ export struct HomeShortcutEditDialog {
           this.draft = nextDraft;
         })
 
-      TextInput({ text: this.draft.url, placeholder: '网址' })
+      TextInput({ text: this.draft.url, placeholder: $r('app.string.ui_url') })
         .width('100%')
         .height(44)
         .fontSize(15)
@@ -156,7 +157,7 @@ export struct HomeShortcutEditDialog {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '保存',
+          label: $r('app.string.ui_save'),
           emphasis: 'primary',
           stacked: true,
           buttonHeight: 44,
@@ -168,7 +169,7 @@ export struct HomeShortcutEditDialog {
         })
 
         BrowserSheetActionButton({
-          label: '取消',
+          label: $r('app.string.settings_custom_home_cancel'),
           emphasis: 'ghost',
           stacked: true,
           buttonHeight: 44,
@@ -234,7 +235,7 @@ export struct SiteReportDialog {
       .backgroundColor(this.storedControlBackgroundColor)
       .borderRadius(18)
 
-      Text('举报网站')
+      Text($r('app.string.bottom_panel_action_report_site'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -251,7 +252,7 @@ export struct SiteReportDialog {
       .borderRadius(16)
       .clip(true)
 
-      TextArea({ text: this.remark, placeholder: '备注（选填）' })
+      TextArea({ text: this.remark, placeholder: $r('app.string.browser_ui_browser_shell_dialogs_001') })
         .width('100%')
         .height(88)
         .fontSize(15)
@@ -267,7 +268,7 @@ export struct SiteReportDialog {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '确定',
+          label: $r('app.string.ui_ok'),
           emphasis: 'primary',
           stacked: true,
           buttonHeight: 44,
@@ -279,7 +280,7 @@ export struct SiteReportDialog {
         })
 
         BrowserSheetActionButton({
-          label: '取消',
+          label: $r('app.string.settings_custom_home_cancel'),
           emphasis: 'ghost',
           stacked: true,
           buttonHeight: 44,
@@ -488,7 +489,7 @@ export struct BrowserShellWebPromptDialog {
 
   build() {
     Column({ space: 16 }) {
-      Text(this.presentation.title.length > 0 ? this.presentation.title : '网页提示')
+      Text(this.presentation.title.length > 0 ? this.presentation.title : resolveAppResourceText($r('app.string.browser_ui_browser_shell_dialogs_004')))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -525,7 +526,7 @@ export struct BrowserShellWebPromptDialog {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '确定',
+          label: $r('app.string.ui_ok'),
           emphasis: 'primary',
           stacked: true,
           buttonHeight: 44,
@@ -537,7 +538,7 @@ export struct BrowserShellWebPromptDialog {
         })
 
         BrowserSheetActionButton({
-          label: '取消',
+          label: $r('app.string.settings_custom_home_cancel'),
           emphasis: 'ghost',
           stacked: true,
           buttonHeight: 44,
@@ -567,7 +568,7 @@ export struct BrowserShellHttpAuthDialog {
 
   build() {
     Column({ space: 16 }) {
-      Text(this.presentation.host.length > 0 ? this.presentation.host : '网页身份验证')
+      Text(this.presentation.host.length > 0 ? this.presentation.host : resolveAppResourceText($r('app.string.browser_ui_browser_shell_dialogs_005')))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -583,7 +584,7 @@ export struct BrowserShellHttpAuthDialog {
           .textAlign(TextAlign.Center)
       }
 
-      TextInput({ text: this.presentation.username, placeholder: '用户名' })
+      TextInput({ text: this.presentation.username, placeholder: $r('app.string.settings_app_proxy_field_username') })
         .width('100%')
         .height(44)
         .fontSize(15)
@@ -604,7 +605,7 @@ export struct BrowserShellHttpAuthDialog {
           };
         })
 
-      TextInput({ text: this.presentation.password, placeholder: '密码' })
+      TextInput({ text: this.presentation.password, placeholder: $r('app.string.settings_app_proxy_field_password') })
         .width('100%')
         .height(44)
         .fontSize(15)
@@ -627,7 +628,7 @@ export struct BrowserShellHttpAuthDialog {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '登录',
+          label: $r('app.string.browser_ui_browser_shell_dialogs_002'),
           emphasis: 'primary',
           stacked: true,
           buttonHeight: 44,
@@ -639,7 +640,7 @@ export struct BrowserShellHttpAuthDialog {
         })
 
         BrowserSheetActionButton({
-          label: '取消',
+          label: $r('app.string.settings_custom_home_cancel'),
           emphasis: 'ghost',
           stacked: true,
           buttonHeight: 44,

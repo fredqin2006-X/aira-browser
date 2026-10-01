@@ -1,3 +1,5 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
+
 export type StartupWelcomeIntroActionId = 'personal_server' | 'webdav';
 
 export interface StartupWelcomeIntroActionState {
@@ -50,8 +52,8 @@ export class StartupWelcomeIntroViewModel {
       hero: this.resolveHero(facts),
       showHuaweiLogin: facts.optionalServiceAvailable && facts.huaweiAccountAvailable,
       actions: this.buildActions(facts),
-      previousActionLabel: STARTUP_WELCOME_INTRO_PREVIOUS_ACTION_LABEL,
-      skipActionLabel: STARTUP_WELCOME_INTRO_SKIP_ACTION_LABEL
+      previousActionLabel: welcomeText($r('app.string.feature_intro_previous'), STARTUP_WELCOME_INTRO_PREVIOUS_ACTION_LABEL),
+      skipActionLabel: welcomeText($r('app.string.onboarding_ui_feature_intro_skip_control_001'), STARTUP_WELCOME_INTRO_SKIP_ACTION_LABEL)
     };
   }
 
@@ -62,21 +64,45 @@ export class StartupWelcomeIntroViewModel {
     return [
       {
         id: 'personal_server',
-        label: '使用私有化部署同步'
+        label: welcomeText($r('app.string.startup_welcome_personal_server'), '使用私有化部署同步')
       },
       {
         id: 'webdav',
-        label: 'WebDAV 同步'
+        label: welcomeText($r('app.string.settings_sync_goal_webdav'), 'WebDAV 同步')
       }
     ];
   }
 
   private resolveHero(facts: StartupWelcomeIntroFacts): StartupWelcomeIntroHeroState {
     if (!facts.optionalServiceAvailable) {
-      return STARTUP_WELCOME_INTRO_HERO_BASIC_MODE;
+      return this.localizeHero(STARTUP_WELCOME_INTRO_HERO_BASIC_MODE, 'basic');
     }
     return facts.huaweiAccountAvailable
-      ? STARTUP_WELCOME_INTRO_HERO_SIGN_IN
-      : STARTUP_WELCOME_INTRO_HERO_SELF_HOSTED;
+      ? this.localizeHero(STARTUP_WELCOME_INTRO_HERO_SIGN_IN, 'sign_in')
+      : this.localizeHero(STARTUP_WELCOME_INTRO_HERO_SELF_HOSTED, 'server');
   }
+
+  private localizeHero(hero: StartupWelcomeIntroHeroState, kind: string): StartupWelcomeIntroHeroState {
+    if (kind === 'basic') {
+      return {
+        title: welcomeText($r('app.string.startup_welcome_basic_title'), hero.title),
+        subtitle: welcomeText($r('app.string.startup_welcome_basic_subtitle'), hero.subtitle)
+      };
+    }
+    if (kind === 'server') {
+      return {
+        title: welcomeText($r('app.string.startup_welcome_server_title'), hero.title),
+        subtitle: welcomeText($r('app.string.startup_welcome_server_subtitle'), hero.subtitle)
+      };
+    }
+    return {
+      title: welcomeText($r('app.string.startup_welcome_sign_in_title'), hero.title),
+      subtitle: welcomeText($r('app.string.startup_welcome_sign_in_subtitle'), hero.subtitle)
+    };
+  }
+}
+
+function welcomeText(resource: Resource, fallback: string): string {
+  const resolved = resolveAppResourceText(resource);
+  return resolved.length > 0 ? resolved : fallback;
 }

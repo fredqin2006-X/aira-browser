@@ -1,3 +1,5 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
+
 export type ElementInspectionRuntimeMode = 'selecting' | 'inspected';
 
 export type ElementInspectionNavigationRelation =
@@ -242,6 +244,7 @@ export class ElementInspectionRuntimeScriptService {
     const normalizedGeneration = Math.max(0, Math.floor(sessionGeneration));
     const encodedDocumentToken = this.encodeScriptString(documentToken);
     const encodedHighlightColor = this.encodeScriptString(highlightColor);
+    const inspectionCopy = this.buildInjectedInspectionCopy();
     return `
 ;(function airaElementInspectionInstall() {
   var protocolVersion = ${ELEMENT_INSPECTION_PROTOCOL_VERSION};
@@ -252,6 +255,7 @@ export class ElementInspectionRuntimeScriptService {
   var highlightId = 'aira-element-inspection-highlight';
   var htmlTransferChunkSize = ${ELEMENT_INSPECTION_HTML_TRANSFER_CHUNK_SIZE};
   var highlightColor = ${encodedHighlightColor} || 'Highlight';
+  var airaInspectionCopy = ${inspectionCopy};
   if (!document.documentElement) {
     return JSON.stringify({
       ok: false,
@@ -284,7 +288,7 @@ export class ElementInspectionRuntimeScriptService {
   }
   function sanitizeAttributeValue(name, value) {
     if (isSensitiveAttribute(name)) {
-      return { value: '[已隐藏]', redacted: true };
+      return { value: '[' + airaInspectionCopy.hidden + ']', redacted: true };
     }
     return { value: String(value === undefined || value === null ? '' : value), redacted: false };
   }
@@ -315,7 +319,7 @@ export class ElementInspectionRuntimeScriptService {
     for (var index = 0; index < node.attributes.length; index++) {
       var attribute = node.attributes[index];
       if (attribute && isSensitiveAttribute(attribute.name)) {
-        attribute.value = '[已隐藏]';
+        attribute.value = '[' + airaInspectionCopy.hidden + ']';
       }
     }
   }
@@ -668,28 +672,28 @@ export class ElementInspectionRuntimeScriptService {
   var tooltipColorText = tooltipValueNode();
   tooltipColorValue.appendChild(tooltipSwatch);
   tooltipColorValue.appendChild(tooltipColorText);
-  tooltipColorRow.appendChild(tooltipLabel('颜色'));
+  tooltipColorRow.appendChild(tooltipLabel(airaInspectionCopy.color));
   tooltipColorRow.appendChild(tooltipColorValue);
   var tooltipFontRow = tooltipRow();
   var tooltipFont = tooltipValueNode();
-  tooltipFontRow.appendChild(tooltipLabel('字体'));
+  tooltipFontRow.appendChild(tooltipLabel(airaInspectionCopy.font));
   tooltipFontRow.appendChild(tooltipFont);
   var tooltipPaddingRow = tooltipRow();
   var tooltipPadding = tooltipValueNode();
-  tooltipPaddingRow.appendChild(tooltipLabel('内边距'));
+  tooltipPaddingRow.appendChild(tooltipLabel(airaInspectionCopy.padding));
   tooltipPaddingRow.appendChild(tooltipPadding);
   var tooltipA11y = tooltipNode('display:flex!important;align-items:center!important;gap:8px!important;margin:8px 0 2px!important;');
   var tooltipA11yText = tooltipNode('flex:0 0 auto!important;color:#80868b!important;font:11px/16px sans-serif!important;letter-spacing:0.4px!important;');
-  tooltipA11yText.textContent = '无障碍';
+  tooltipA11yText.textContent = airaInspectionCopy.accessibility;
   tooltipA11y.appendChild(tooltipA11yText);
   tooltipA11y.appendChild(tooltipNode('flex:1 1 auto!important;height:1px!important;background:#e0e0e0!important;'));
   var tooltipNameRow = tooltipRow();
   var tooltipName = tooltipValueNode();
-  tooltipNameRow.appendChild(tooltipLabel('名称'));
+  tooltipNameRow.appendChild(tooltipLabel(airaInspectionCopy.name));
   tooltipNameRow.appendChild(tooltipName);
   var tooltipRoleRow = tooltipRow();
   var tooltipRole = tooltipValueNode();
-  tooltipRoleRow.appendChild(tooltipLabel('角色'));
+  tooltipRoleRow.appendChild(tooltipLabel(airaInspectionCopy.role));
   tooltipRoleRow.appendChild(tooltipRole);
   var tooltipFocusRow = tooltipRow();
   var tooltipFocusValue = tooltipNode('display:flex!important;justify-content:flex-end!important;');
@@ -729,7 +733,7 @@ export class ElementInspectionRuntimeScriptService {
   var tooltipFocusNo = createFocusIcon(false);
   tooltipFocusValue.appendChild(tooltipFocusYes);
   tooltipFocusValue.appendChild(tooltipFocusNo);
-  tooltipFocusRow.appendChild(tooltipLabel('可键盘聚焦'));
+  tooltipFocusRow.appendChild(tooltipLabel(airaInspectionCopy.focusable));
   tooltipFocusRow.appendChild(tooltipFocusValue);
   tooltip.appendChild(tooltipCaret);
   tooltip.appendChild(tooltipHeader);
@@ -3867,5 +3871,18 @@ export class ElementInspectionRuntimeScriptService {
 
   private encodeScriptString(value: string): string {
     return JSON.stringify(String(value ?? ''));
+  }
+
+  private buildInjectedInspectionCopy(): string {
+    return JSON.stringify({
+      hidden: resolveAppResourceText($r('app.string.browser_ui_element_inspection_dock_025')),
+      color: resolveAppResourceText($r('app.string.element_inspection_tooltip_color')),
+      font: resolveAppResourceText($r('app.string.element_inspection_tooltip_font')),
+      padding: resolveAppResourceText($r('app.string.element_inspection_tooltip_padding')),
+      accessibility: resolveAppResourceText($r('app.string.element_inspection_tooltip_accessibility')),
+      name: resolveAppResourceText($r('app.string.ui_name')),
+      role: resolveAppResourceText($r('app.string.element_inspection_tooltip_role')),
+      focusable: resolveAppResourceText($r('app.string.element_inspection_tooltip_focusable'))
+    });
   }
 }

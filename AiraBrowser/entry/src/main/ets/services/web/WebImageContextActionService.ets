@@ -8,6 +8,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { systemShare } from '@kit.ShareKit';
 import { webview } from '@kit.ArkWeb';
 import { AppRuntimeContext } from '../../app/runtime/AppRuntimeContext';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 const WEB_IMAGE_CONTEXT_CACHE_DIR_NAME: string = 'web-image-context-actions';
 const WEB_IMAGE_CONTEXT_REQUEST_TIMEOUT_MS: number = 10000;
@@ -15,7 +16,7 @@ const WEB_IMAGE_CONTEXT_MAX_BYTES: number = 30 * 1024 * 1024;
 const WEB_IMAGE_CONTEXT_COPY_CHUNK_BYTES: number = 512 * 1024;
 const WEB_IMAGE_CONTEXT_LOG_DOMAIN: number = 0xA17A;
 const WEB_IMAGE_CONTEXT_LOG_TAG: string = 'AiraWebImageContext';
-const WEB_IMAGE_CONTEXT_DEFAULT_TITLE: string = '网页图片';
+
 
 export interface WebImageContextActionInput {
   imageUrl: string;
@@ -49,7 +50,7 @@ export class WebImageContextActionService {
       if (savedUris.length <= 0) {
         return {
           ok: false,
-          message: '未保存图片。'
+          message: resolveAppResourceText($r('app.string.context_menu_image_not_saved'))
         };
       }
       const destinationUri = savedUris[0].trim();
@@ -62,13 +63,13 @@ export class WebImageContextActionService {
         destinationUri, file.data.byteLength, file.extension);
       return {
         ok: true,
-        message: '已保存至图库。'
+        message: resolveAppResourceText($r('app.string.context_menu_image_saved'))
       };
     } catch (error) {
       this.logActionFailure('save_to_gallery', error);
       return {
         ok: false,
-        message: '保存图片失败，请稍后重试。'
+        message: resolveAppResourceText($r('app.string.context_menu_image_save_failed'))
       };
     }
   }
@@ -86,13 +87,13 @@ export class WebImageContextActionService {
       await pasteboard.getSystemPasteboard().setData(data);
       return {
         ok: true,
-        message: '图片已复制。'
+        message: resolveAppResourceText($r('app.string.context_menu_image_copied'))
       };
     } catch (error) {
       this.logActionFailure('copy_image', error);
       return {
         ok: false,
-        message: '复制图片失败，请稍后重试。'
+        message: resolveAppResourceText($r('app.string.context_menu_image_copy_failed'))
       };
     } finally {
       if (pixelMap !== undefined) {
@@ -121,13 +122,13 @@ export class WebImageContextActionService {
       });
       return {
         ok: true,
-        message: '已打开分享面板。'
+        message: resolveAppResourceText($r('app.string.context_menu_share_opened'))
       };
     } catch (error) {
       this.logActionFailure('share_image', error);
       return {
         ok: false,
-        message: '分享图片失败，请稍后重试。'
+        message: resolveAppResourceText($r('app.string.context_menu_image_share_failed'))
       };
     }
   }
@@ -393,7 +394,7 @@ export class WebImageContextActionService {
     if (normalizedTitle.length > 0) {
       return normalizedTitle;
     }
-    return `${WEB_IMAGE_CONTEXT_DEFAULT_TITLE}-${Date.now().toString()}`;
+    return `${resolveAppResourceText($r('app.string.context_menu_web_image'))}-${Date.now().toString()}`;
   }
 
   private resolveFileNameFromUrl(imageUrl: string): string {

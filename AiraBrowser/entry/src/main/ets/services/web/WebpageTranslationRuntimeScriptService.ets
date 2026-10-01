@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   TRANSLATION_RUNTIME_NAME,
   TRANSLATION_RUNTIME_VERSION,
@@ -10,8 +11,12 @@ export class WebpageTranslationRuntimeScriptService {
     new WebpageTranslationRuntimeProtocolScriptService();
 
   buildInstallScript(): string {
+    const failedLabel = JSON.stringify(
+      resolveAppResourceText($r('app.string.translation_ui_webpage_translation_panel_012'))
+    );
     return `
 (function () {
+  var airaTranslationFailedLabel = ${failedLabel};
   if (window.${TRANSLATION_RUNTIME_NAME} &&
     window.${TRANSLATION_RUNTIME_NAME}.installed === true &&
     window.${TRANSLATION_RUNTIME_NAME}.runtimeVersion === '${TRANSLATION_RUNTIME_VERSION}' &&
@@ -760,7 +765,7 @@ export class WebpageTranslationRuntimeScriptService {
     result.classList.add('aira-translation-failed');
     result.setAttribute('data-aira-translation-failed', 'true');
     result.setAttribute('data-aira-loading-run-id', String(runId || ''));
-    result.textContent = normalizeText(message).length > 0 ? normalizeText(message) : '翻译失败';
+    result.textContent = normalizeText(message).length > 0 ? normalizeText(message) : airaTranslationFailedLabel;
     return result;
   }
   function insertOrUpdateTransientResult(element, result) {
@@ -1977,7 +1982,7 @@ export class WebpageTranslationRuntimeScriptService {
       return 'invalid_payload';
     }
     var runId = payload.runId === undefined || payload.runId === null ? '' : String(payload.runId);
-    var message = normalizeText(payload.message || '翻译失败');
+    var message = normalizeText(payload.message || airaTranslationFailedLabel);
     var failed = 0;
     var missingNodeCount = 0;
     var skippedCount = 0;

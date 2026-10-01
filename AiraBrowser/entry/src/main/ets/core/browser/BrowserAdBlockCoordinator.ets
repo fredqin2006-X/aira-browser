@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   BrowserDataScope,
   BrowserProfileId,
@@ -409,7 +410,7 @@ export class BrowserAdBlockCoordinator {
           capabilitySupported: context.capabilitySupported,
           availabilityState: this.resolveProtectionAvailabilityState(snapshot, policy, siteState.siteEnabled, undefined, context.tabId),
           summary: policy.enabledForPage && controller !== undefined && !nativeAuthorityReady
-            ? '网页内容过滤引擎暂不可用'
+            ? resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_018'))
             : this.buildSummary(policy.summary, context.tabId),
           siteToggleEnabled: siteState.siteToggleEnabled,
           siteEnabled: siteState.siteEnabled
@@ -776,30 +777,32 @@ export class BrowserAdBlockCoordinator {
     const snapshot = this.resolveSnapshot();
     const policy = this.resolveEffectivePagePolicy(snapshot, context);
     if (!context.capabilitySupported) {
-      return { state: 'unavailable', summary: '当前设备暂不支持隐私规则保护' };
+      return { state: 'unavailable', summary: resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_013')) };
     }
     if (!snapshot.settings.preferences.enabled) {
-      return { state: 'disabled', summary: '请先开启网页内容过滤' };
+      return { state: 'disabled', summary: resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_019')) };
     }
     if (policy.allowlisted) {
       return {
         state: 'site_disabled',
-        summary: context.dataScope === 'session_ephemeral' ? '本次私密会话已关闭本站保护' : '本站网页保护已关闭'
+        summary: context.dataScope === 'session_ephemeral'
+          ? resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_015'))
+          : resolveAppResourceText($r('app.string.settings_site_info_metric_label_site_off'))
       };
     }
     const source = snapshot.settings.customRuleSources.find((item: AdBlockCustomRuleSource): boolean => {
       return item.id === (findAdBlockThirdPartyRuleSource('third-party-easyprivacy')?.id ?? 'third-party-easyprivacy');
     });
     if (source === undefined || !source.enabled) {
-      return { state: 'disabled', summary: 'EasyPrivacy 隐私规则未开启' };
+      return { state: 'disabled', summary: resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_002')) };
     }
     if (source.lastError.trim().length > 0) {
-      return { state: 'failed', summary: 'EasyPrivacy 隐私规则加载失败' };
+      return { state: 'failed', summary: resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_001')) };
     }
     if (source.ruleCount <= 0 || !this.hasLoadedRules(source)) {
-      return { state: 'preparing', summary: 'EasyPrivacy 隐私规则正在准备' };
+      return { state: 'preparing', summary: resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_003')) };
     }
-    return { state: 'enabled', summary: 'EasyPrivacy 隐私规则正在生效' };
+    return { state: 'enabled', summary: resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_004')) };
   }
 
   async toggleSiteProtection(
@@ -813,11 +816,13 @@ export class BrowserAdBlockCoordinator {
       context.profileId
     );
     if (siteState.host.length === 0) {
-      return this.buildSiteProtectionToggleFailure('当前页面暂不支持本站网页内容过滤');
+      return this.buildSiteProtectionToggleFailure(resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_014')));
     }
     if (!siteState.canToggle) {
       return this.buildSiteProtectionToggleFailure(
-        settings.preferences.enabled ? '当前设备暂不支持网页内容过滤' : '请先开启网页内容过滤'
+        settings.preferences.enabled
+          ? resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_012'))
+          : resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_019'))
       );
     }
     const effectiveState = this.resolveSiteProtectionState(context);
@@ -830,8 +835,12 @@ export class BrowserAdBlockCoordinator {
       return {
         success: true,
         siteEnabled: nextEnabled,
-        summary: nextEnabled ? '已开启，仅本次私密会话生效' : '已关闭，仅本次私密会话生效',
-        toast: nextEnabled ? '已开启本站网页保护，仅本次私密会话生效' : '已关闭本站网页保护，仅本次私密会话生效'
+        summary: nextEnabled
+          ? resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_010'))
+          : resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_007')),
+        toast: nextEnabled
+          ? resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_008'))
+          : resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_005'))
       };
     }
     if (effectiveState.siteEnabled) {
@@ -839,16 +848,16 @@ export class BrowserAdBlockCoordinator {
       return {
         success: true,
         siteEnabled: false,
-        summary: '此站点已关闭网页内容过滤',
-        toast: '已关闭本站网页内容过滤'
+        summary: resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_017')),
+        toast: resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_006'))
       };
     }
     await this.runtimeGeneration.removeSiteException(siteState.host, context.profileId);
     return {
       success: true,
       siteEnabled: true,
-      summary: '已开启，暂无拦截',
-      toast: '已开启本站网页内容过滤'
+      summary: resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_011')),
+      toast: resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_009'))
     };
   }
 
@@ -981,7 +990,7 @@ export class BrowserAdBlockCoordinator {
         available: policyWithoutPersistentSiteExceptions.available,
         enabledForPage: false,
         allowlisted: true,
-        summary: '本次私密会话已关闭本站网页保护'
+        summary: resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_016'))
       };
     }
     if (!policyWithoutPersistentSiteExceptions.enabledForPage) {
@@ -991,7 +1000,7 @@ export class BrowserAdBlockCoordinator {
       available: true,
       enabledForPage: true,
       allowlisted: false,
-      summary: '已开启，仅本次私密会话生效'
+      summary: resolveAppResourceText($r('app.string.browser_browser_ad_block_coordinator_010'))
     };
   }
 

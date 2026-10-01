@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   BrowserWebSecuritySettingsRepository,
   sharedBrowserWebSecuritySettingsRepository
@@ -159,8 +160,8 @@ export class BrowserUrlThreatProtectionCoordinator {
         key: key,
         tabId: tabId,
         generation: generation,
-        title: '检测到网站安全风险',
-        subtitle: '请谨慎下载或安装内容'
+        title: resolveAppResourceText($r('app.string.browser_browser_url_threat_protection_coordinator_001')),
+        subtitle: resolveAppResourceText($r('app.string.browser_browser_url_threat_protection_coordinator_003'))
       };
     }
     if (verdict === 'phishing') {
@@ -169,8 +170,8 @@ export class BrowserUrlThreatProtectionCoordinator {
         key: key,
         tabId: tabId,
         generation: generation,
-        title: '检测到网站安全风险',
-        subtitle: '请谨慎输入账号或付款信息'
+        title: resolveAppResourceText($r('app.string.browser_browser_url_threat_protection_coordinator_001')),
+        subtitle: resolveAppResourceText($r('app.string.browser_browser_url_threat_protection_coordinator_004'))
       };
     }
     return {
@@ -178,8 +179,8 @@ export class BrowserUrlThreatProtectionCoordinator {
       key: key,
       tabId: tabId,
       generation: generation,
-      title: '检测到网站安全风险',
-      subtitle: '请留意页面内容和信息输入'
+      title: resolveAppResourceText($r('app.string.browser_browser_url_threat_protection_coordinator_001')),
+      subtitle: resolveAppResourceText($r('app.string.browser_browser_url_threat_protection_coordinator_002'))
     };
   }
 

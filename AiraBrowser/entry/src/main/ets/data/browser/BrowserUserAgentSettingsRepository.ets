@@ -1,4 +1,5 @@
 import { preferences } from '@kit.ArkData';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { AppRuntimeContext } from '../../app/runtime/AppRuntimeContext';
 import {
   BrowserCustomUserAgentRecord,
@@ -180,7 +181,7 @@ export class BrowserUserAgentSettingsRepository implements BrowserUserAgentSetti
       return [];
     }
     const record = this.service.buildCustomUserAgentRecord({
-      name: '自定义 UA',
+      name: resolveAppResourceText($r('app.string.settings_custom_ua')),
       userAgent: legacyCustomUserAgent
     });
     return record === undefined ? [] : [record];

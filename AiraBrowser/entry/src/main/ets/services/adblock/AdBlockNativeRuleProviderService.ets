@@ -1,4 +1,5 @@
 import { taskpool, util } from '@kit.ArkTS';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { fileIo } from '@kit.CoreFileKit';
 import { AppRuntimeContext } from '../../app/runtime/AppRuntimeContext';
 import {
@@ -157,12 +158,12 @@ export class AdBlockNativeRuleProviderService {
       for (let index = 0; index < names.length; index += 1) {
         const name = names[index];
         if (name.indexOf('/') >= 0 || name.indexOf('\\') >= 0) {
-          throw new Error('原生规则目录包含无效文件名');
+          throw new Error(resolveAppResourceText($r('app.string.adblock_native_dir_invalid_name')));
         }
         const path = `${root}/${name}`;
         const stat = await fileIo.stat(path);
         if (stat.isDirectory()) {
-          throw new Error('原生规则目录包含未知子目录');
+          throw new Error(resolveAppResourceText($r('app.string.adblock_native_dir_unknown')));
         }
         await fileIo.unlink(path);
       }
@@ -173,13 +174,13 @@ export class AdBlockNativeRuleProviderService {
 
   stageSourcePayload(sourceId: string, payload: string): Promise<string> {
     if (!this.isSupportedSourceId(sourceId)) {
-      return Promise.reject(new Error('原生规则源 ID 不受支持'));
+      return Promise.reject(new Error(resolveAppResourceText($r('app.string.adblock_native_source_unsupported'))));
     }
     let identity: string = '';
     return this.enqueue(async (): Promise<void> => {
       const bytes: Uint8Array = this.encoder.encodeInto(payload);
       if (bytes.byteLength <= 0 || bytes.byteLength > MAX_NATIVE_SOURCE_BYTES) {
-        throw new Error('原生规则源文件大小无效');
+        throw new Error(resolveAppResourceText($r('app.string.adblock_native_source_size_invalid')));
       }
       await this.ensureRootDir();
       await this.writeBytes(this.getSourceNextPath(sourceId), bytes, MAX_NATIVE_SOURCE_BYTES);
@@ -195,13 +196,13 @@ export class AdBlockNativeRuleProviderService {
 
   validateStagedSourcePayload(sourceId: string): Promise<AdBlockNativeSourcePayloadInfo> {
     if (!this.isSupportedSourceId(sourceId)) {
-      return Promise.reject(new Error('原生规则源 ID 不受支持'));
+      return Promise.reject(new Error(resolveAppResourceText($r('app.string.adblock_native_source_unsupported'))));
     }
     let info: AdBlockNativeSourcePayloadInfo | undefined = undefined;
     return this.enqueue(async (): Promise<void> => {
       const path: string = this.getSourceNextPath(sourceId);
       if (!await this.pathExists(path)) {
-        throw new Error('原生规则源候选文件不存在');
+        throw new Error(resolveAppResourceText($r('app.string.adblock_native_source_missing')));
       }
       const buildResult: AdBlockNativeAuthorityBuildResult = await this.nativeAuthorityEngine.buildEngine(path);
       try {
@@ -214,7 +215,7 @@ export class AdBlockNativeRuleProviderService {
       }
     }).then((): AdBlockNativeSourcePayloadInfo => {
       if (info === undefined) {
-        throw new Error('原生规则源校验失败');
+        throw new Error(resolveAppResourceText($r('app.string.adblock_native_source_validate_failed')));
       }
       return info;
     });
@@ -252,7 +253,7 @@ export class AdBlockNativeRuleProviderService {
       const identityNextPath: string = this.getSourceIdentityNextPath(sourceId);
       const identityPreviousPath: string = this.getSourceIdentityPreviousPath(sourceId);
       if (!await this.pathExists(nextPath) || !await this.pathExists(identityNextPath)) {
-        throw new Error('原生规则源候选文件不存在');
+        throw new Error(resolveAppResourceText($r('app.string.adblock_native_source_missing')));
       }
       let payloadFinalMoved: boolean = false;
       let identityFinalMoved: boolean = false;
@@ -286,7 +287,7 @@ export class AdBlockNativeRuleProviderService {
         if (identityFinalMoved) {
           await fileIo.rename(identityPreviousPath, identityPath);
         }
-        throw new Error('原生规则源提交失败');
+        throw new Error(resolveAppResourceText($r('app.string.adblock_native_source_commit_failed')));
       }
     });
   }
@@ -588,7 +589,7 @@ export class AdBlockNativeRuleProviderService {
     const previousPath: string = this.getRulesetPreviousPath();
     const candidateStat = await fileIo.stat(nextPath);
     if (candidateStat.isDirectory() || candidateStat.size <= 0 || candidateStat.size > MAX_NATIVE_RULESET_BYTES) {
-      throw new Error('原生规则集大小无效');
+      throw new Error(resolveAppResourceText($r('app.string.adblock_native_ruleset_size_invalid')));
     }
     let finalMoved: boolean = false;
     try {
@@ -602,7 +603,7 @@ export class AdBlockNativeRuleProviderService {
       if (finalMoved) {
         await fileIo.rename(previousPath, finalPath);
       }
-      throw new Error('原生规则集提交失败');
+      throw new Error(resolveAppResourceText($r('app.string.adblock_native_ruleset_commit_failed')));
     }
   }
 
@@ -641,7 +642,7 @@ export class AdBlockNativeRuleProviderService {
   private async writeManifest(manifest: AdBlockNativeRuleProviderManifest): Promise<void> {
     const bytes: Uint8Array = this.encoder.encodeInto(JSON.stringify(manifest));
     if (bytes.byteLength <= 0 || bytes.byteLength > MAX_NATIVE_MANIFEST_BYTES) {
-      throw new Error('原生规则清单大小无效');
+      throw new Error(resolveAppResourceText($r('app.string.adblock_native_manifest_size_invalid')));
     }
     const finalPath: string = this.getManifestPath();
     const nextPath: string = `${finalPath}.next`;
@@ -661,7 +662,7 @@ export class AdBlockNativeRuleProviderService {
       const bytes: ArrayBuffer = new ArrayBuffer(size);
       const readLength: number = await fileIo.read(file.fd, bytes);
       if (readLength !== size) {
-        throw new Error('原生规则文件读取不完整');
+        throw new Error(resolveAppResourceText($r('app.string.adblock_native_file_read_incomplete')));
       }
       return new Uint8Array(bytes);
     } finally {
@@ -673,7 +674,7 @@ export class AdBlockNativeRuleProviderService {
 
   private async writeBytes(path: string, bytes: Uint8Array, limit: number): Promise<void> {
     if (bytes.byteLength <= 0 || bytes.byteLength > limit) {
-      throw new Error('原生规则文件大小无效');
+      throw new Error(resolveAppResourceText($r('app.string.adblock_native_file_size_invalid')));
     }
     let file: fileIo.File | undefined = undefined;
     try {
@@ -687,7 +688,7 @@ export class AdBlockNativeRuleProviderService {
       const written: number = await fileIo.write(file.fd, payload);
       await fileIo.fsync(file.fd);
       if (written !== bytes.byteLength) {
-        throw new Error('原生规则文件写入不完整');
+        throw new Error(resolveAppResourceText($r('app.string.adblock_native_file_write_incomplete')));
       }
     } finally {
       if (file !== undefined) {

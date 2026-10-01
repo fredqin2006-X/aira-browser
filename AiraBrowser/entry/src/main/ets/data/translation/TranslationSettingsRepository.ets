@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { preferences } from '@kit.ArkData';
 import { AppRuntimeContext } from '../../app/runtime/AppRuntimeContext';
 import {
@@ -103,7 +104,7 @@ export class TranslationSettingsRepository {
     await this.ensureInitialized();
     const normalizedProvider = this.normalizeProvider(provider);
     if (normalizedProvider.id.length === 0) {
-      throw new Error('翻译服务配置无效。');
+      throw new Error(resolveAppResourceText($r('app.string.translation_settings_invalid')));
     }
     const nextProviders = this.settings.providers
       .filter((item: TranslationProviderConfig) => item.id !== normalizedProvider.id)

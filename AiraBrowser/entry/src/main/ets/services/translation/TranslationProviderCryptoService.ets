@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { cryptoFramework } from '@kit.CryptoArchitectureKit';
 import { util } from '@kit.ArkTS';
 
@@ -40,7 +41,7 @@ export class TranslationProviderCryptoService {
   private digestHex(algorithm: string, value: string): string {
     const md = cryptoFramework.createMd(algorithm);
     md.updateSync({ data: this.encoder.encodeInto(value) });
-    return this.toHex(this.readBlobData(md.digestSync(), `生成 ${algorithm} 摘要`));
+    return this.toHex(this.readBlobData(md.digestSync(), resolveAppResourceText($r('app.string.translation_crypto_digest_label', algorithm))));
   }
 
   private hmac(algorithmName: string, key: string, value: string): Uint8Array {
@@ -69,9 +70,13 @@ export class TranslationProviderCryptoService {
     try {
       const md = cryptoFramework.createMd(algorithm);
       md.updateSync({ data: value });
-      return this.readBlobData(md.digestSync(), `生成 ${algorithm} 摘要`);
+      return this.readBlobData(md.digestSync(), resolveAppResourceText($r('app.string.translation_crypto_digest_label', algorithm)));
     } catch (error) {
-      throw new Error(`生成 ${algorithm} 摘要失败：系统加密组件不可用，请更新系统后重试。${this.stringifyErrorDetail(error)}`);
+      throw new Error(resolveAppResourceText($r(
+        'app.string.translation_crypto_digest_unavailable',
+        algorithm,
+        this.stringifyErrorDetail(error)
+      )));
     }
   }
 
@@ -84,11 +89,11 @@ export class TranslationProviderCryptoService {
 
   private readBlobData(blob: Object | null, label: string): Uint8Array {
     if (blob === null || blob === undefined) {
-      throw new Error(`${label}失败：底层加密组件返回空结果。`);
+      throw new Error(resolveAppResourceText($r('app.string.translation_crypto_empty_result', label)));
     }
     const data = (blob as cryptoFramework.DataBlob).data;
     if (data === null || data === undefined) {
-      throw new Error(`${label}失败：底层加密组件未返回数据。`);
+      throw new Error(resolveAppResourceText($r('app.string.translation_crypto_no_data', label)));
     }
     return data;
   }

@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   HomeShortcutSelectionAction,
   HomeShortcutSelectionState
@@ -43,7 +44,7 @@ export struct HomeShortcutSelectionDialog {
   build() {
     Column() {
       BrowserLargeScreenModalHeader({
-        title: '添加至首页',
+        title: resolveAppResourceText($r('app.string.browser_ui_home_shortcut_selection_sheet_003')),
         dialogMode: true,
         onClose: this.onClose
       })

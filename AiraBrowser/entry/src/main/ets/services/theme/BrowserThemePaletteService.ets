@@ -2,6 +2,7 @@ import {
   BrowserResolvedThemeMode,
   BrowserThemePaletteId
 } from '../../common/models/BrowserModels';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   BrowserActivityHeatmapTokenSet,
   BrowserSettingsIconBackgroundTokenSet,
@@ -71,10 +72,11 @@ export class BrowserThemePaletteService {
   }
 
   private clonePalette(palette: BrowserThemePalette): BrowserThemePalette {
+    const copy = localizedThemePaletteCopy(palette.id);
     return {
       id: palette.id,
-      title: palette.title,
-      subtitle: palette.subtitle,
+      title: copy === undefined ? palette.title : copy.title,
+      subtitle: copy === undefined ? palette.subtitle : copy.subtitle,
       previewColor: palette.previewColor,
       light: this.cloneTokenSet(palette.light),
       dark: this.cloneTokenSet(palette.dark)
@@ -169,5 +171,112 @@ export class BrowserThemePaletteService {
       siteClipboard: resolvedTokens.siteClipboard,
       siteExternalActions: resolvedTokens.siteExternalActions
     };
+  }
+}
+
+interface LocalizedThemePaletteCopy {
+  title: string;
+  subtitle: string;
+}
+
+function themePaletteText(resource: Resource, fallback: string): string {
+  const resolved = resolveAppResourceText(resource);
+  return resolved.length > 0 ? resolved : fallback;
+}
+
+function localizedThemePaletteCopy(id: string): LocalizedThemePaletteCopy | undefined {
+  switch (id) {
+    case 'default':
+      return {
+        title: themePaletteText($r('app.string.web_text_zoom_default'), '默认'),
+        subtitle: themePaletteText($r('app.string.theme_palette_default_subtitle'), '蓝色主调，中性灰阶')
+      };
+    case 'aira_classic':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_dawn_title'), '晨光'),
+        subtitle: themePaletteText($r('app.string.theme_palette_dawn_subtitle'), '蓝紫晨光')
+      };
+    case 'aira_origin':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_lead_title'), '铅云'),
+        subtitle: themePaletteText($r('app.string.theme_palette_lead_subtitle'), '中性灰阶')
+      };
+    case 'aurora':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_aurora_title'), '晨屿'),
+        subtitle: themePaletteText($r('app.string.theme_palette_aurora_subtitle'), '海雾青光')
+      };
+    case 'sage':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_sage_title'), '竹影'),
+        subtitle: themePaletteText($r('app.string.theme_palette_sage_subtitle'), '静绿灰调')
+      };
+    case 'cedar':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_cedar_title'), '森息'),
+        subtitle: themePaletteText($r('app.string.theme_palette_cedar_subtitle'), '深林呼吸')
+      };
+    case 'lagoon':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_lagoon_title'), '潮镜'),
+        subtitle: themePaletteText($r('app.string.theme_palette_lagoon_subtitle'), '温蓝水面')
+      };
+    case 'glacier':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_glacier_title'), '薄霁'),
+        subtitle: themePaletteText($r('app.string.theme_palette_glacier_subtitle'), '浅蓝晴空')
+      };
+    case 'indigo':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_indigo_title'), '夜航'),
+        subtitle: themePaletteText($r('app.string.theme_palette_indigo_subtitle'), '蓝紫航线')
+      };
+    case 'wisteria':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_wisteria_title'), '云藤'),
+        subtitle: themePaletteText($r('app.string.theme_palette_wisteria_subtitle'), '柔紫云隙')
+      };
+    case 'rosewood':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_rosewood_title'), '绯页'),
+        subtitle: themePaletteText($r('app.string.theme_palette_rosewood_subtitle'), '低饱和红')
+      };
+    case 'terracotta':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_terracotta_title'), '暖砖'),
+        subtitle: themePaletteText($r('app.string.theme_palette_terracotta_subtitle'), '红棕余温')
+      };
+    case 'amber':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_amber_title'), '灯穗'),
+        subtitle: themePaletteText($r('app.string.theme_palette_amber_subtitle'), '金色暖影')
+      };
+    case 'moss':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_moss_title'), '苔径'),
+        subtitle: themePaletteText($r('app.string.theme_palette_moss_subtitle'), '橄榄小路')
+      };
+    case 'cyan':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_cyan_title'), '晴瓷'),
+        subtitle: themePaletteText($r('app.string.theme_palette_cyan_subtitle'), '清透青蓝')
+      };
+    case 'steel':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_steel_title'), '雾钢'),
+        subtitle: themePaletteText($r('app.string.theme_palette_steel_subtitle'), '理性灰蓝')
+      };
+    case 'plum':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_plum_title'), '暮梅'),
+        subtitle: themePaletteText($r('app.string.theme_palette_plum_subtitle'), '深紫红晕')
+      };
+    case 'coral':
+      return {
+        title: themePaletteText($r('app.string.theme_palette_coral_title'), '橙潮'),
+        subtitle: themePaletteText($r('app.string.theme_palette_coral_subtitle'), '柔亮橙粉')
+      };
+    default:
+      return undefined;
   }
 }

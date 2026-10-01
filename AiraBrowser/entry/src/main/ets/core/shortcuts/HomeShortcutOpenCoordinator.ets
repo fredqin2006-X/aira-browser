@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { ShortcutRecord } from '../../common/models/BrowserModels';
 import { BrowserAppUrlOpenCoordinator } from '../browser/BrowserAppUrlOpenCoordinator';
 import { BrowserShellRouteCoordinator } from '../browser/BrowserShellRouteCoordinator';
@@ -41,7 +42,7 @@ export class HomeShortcutOpenCoordinator {
   private applyOpenPlan(plan: HomeShortcutOpenPlan): HomeShortcutOpenOutcome {
     if (plan.kind === 'system') {
       if (!this.routeCoordinator.openHomeSystemEntry(plan.target)) {
-        return { failureMessage: '这个系统快捷方式暂不可用。' };
+        return { failureMessage: resolveAppResourceText($r('app.string.home_shortcut_open_unavailable')) };
       }
       return { failureMessage: '' };
     }

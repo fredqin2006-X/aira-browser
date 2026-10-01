@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   AdBlockCustomRuleSource,
   AdBlockSettings
@@ -83,7 +84,7 @@ export class AdBlockRuleSourceCoordinator {
     if (!this.isValidSubscriptionUrl(normalizedUrl)) {
       return {
         settings: this.repository.getSettings(),
-        message: '请输入 HTTPS 规则订阅地址',
+        message: resolveAppResourceText($r('app.string.adblock_subscription_https_required')),
         success: false
       };
     }
@@ -102,10 +103,10 @@ export class AdBlockRuleSourceCoordinator {
     return {
       sourceId: definition.id,
       sourceTitle: definition.title,
-      title: '启用第三方过滤规则？',
-      message: `“${definition.title}”由第三方独立提供和维护。启用后，Aira 将从互联网下载并更新该规则，规则提供方可能记录本次网络请求。\n\nAira 不参与规则内容编写，也无法保证其准确性、适用性或持续可用性。请在遵守你所在地法律法规及相关网站服务条款的前提下使用。\n\n规则来源：${definition.sourceHost}`,
-      acceptLabel: '同意并下载',
-      cancelLabel: '取消'
+      title: resolveAppResourceText($r('app.string.adblock_third_party_title')),
+      message: resolveAppResourceText($r('app.string.adblock_third_party_message', definition.title, definition.sourceHost)),
+      acceptLabel: resolveAppResourceText($r('app.string.adblock_third_party_accept')),
+      cancelLabel: resolveAppResourceText($r('app.string.settings_custom_home_cancel'))
     };
   }
 
@@ -135,14 +136,14 @@ export class AdBlockRuleSourceCoordinator {
     if (source === undefined) {
       return {
         settings: this.repository.getSettings(),
-        message: '未找到这条规则订阅',
+        message: resolveAppResourceText($r('app.string.adblock_source_missing')),
         success: false
       };
     }
     if (source.sourceType === 'system') {
       return {
         settings: this.repository.getSettings(),
-        message: '系统预置规则无需刷新',
+        message: resolveAppResourceText($r('app.string.adblock_preset_no_refresh')),
         success: true
       };
     }
@@ -243,7 +244,9 @@ export class AdBlockRuleSourceCoordinator {
       }
       return {
         settings: settings,
-        message: enabled ? '自定义规则已启用' : '自定义规则已关闭',
+        message: enabled
+          ? resolveAppResourceText($r('app.string.adblock_custom_enabled'))
+          : resolveAppResourceText($r('app.string.adblock_custom_disabled')),
         success: true
       };
     });
@@ -265,7 +268,7 @@ export class AdBlockRuleSourceCoordinator {
         await this.nativeRuleProvider.stageSourcePayload(source.id, payload);
         payloadInfo = await this.nativeRuleProvider.validateStagedSourcePayload(source.id);
         if (payloadInfo.ruleCount <= 0) {
-          throw new Error('没有解析到可用规则');
+          throw new Error(resolveAppResourceText($r('app.string.adblock_no_rules_parsed')));
         }
         await this.nativeRuleProvider.commitStagedSourcePayload(source.id);
         payloadCommitted = true;
@@ -289,14 +292,14 @@ export class AdBlockRuleSourceCoordinator {
       if (!nativeResult.success ||
         (settings.preferences.enabled && nativeResult.sourceIds.indexOf(source.id) < 0) ||
         !await this.acceptNativeAuthority(settings, nativeResult)) {
-        throw new Error('原生过滤规则加载失败，请重试');
+        throw new Error(resolveAppResourceText($r('app.string.adblock_native_load_failed')));
       }
       if (payloadCommitted) {
         await this.nativeRuleProvider.completeStagedSourcePayload(source.id);
       }
       return {
         settings: settings,
-        message: '自定义规则已启用',
+        message: resolveAppResourceText($r('app.string.adblock_custom_enabled')),
         success: true
       };
     } catch (error) {
@@ -323,7 +326,7 @@ export class AdBlockRuleSourceCoordinator {
     if (this.isRemovedBuiltInRuleSourceId(sourceId) || isAdBlockThirdPartyRuleSourceId(sourceId)) {
       return {
         settings: this.repository.getSettings(),
-        message: '预置规则不能删除',
+        message: resolveAppResourceText($r('app.string.adblock_preset_cannot_delete')),
         success: false
       };
     }
@@ -340,7 +343,7 @@ export class AdBlockRuleSourceCoordinator {
       await this.nativeRuleProvider.removeSourcePayload(sourceId);
       return {
         settings: settings,
-        message: '自定义规则已删除',
+        message: resolveAppResourceText($r('app.string.adblock_custom_deleted')),
         success: true
       };
     });
@@ -361,11 +364,10 @@ export class AdBlockRuleSourceCoordinator {
         source.title = preset.title;
         source.enabled = true;
       }
-      const messagePrefix = existing === undefined ? '已导入' : '已更新';
       const settings = await this.storeRemoteSource(source, payload, preset !== undefined);
       return {
         settings: settings,
-        message: this.buildSuccessMessage(messagePrefix, source),
+        message: this.buildSuccessMessage(existing === undefined, source),
         success: true
       };
     } catch (error) {
@@ -382,11 +384,10 @@ export class AdBlockRuleSourceCoordinator {
       await this.repository.initializeMetadata();
       const payload = await this.localFileService.readRuleFile(uri);
       const source = this.metadataService.buildLocalSource(uri, title, existing);
-      const messagePrefix = existing === undefined ? '已导入' : '已更新';
       const settings = await this.storeSource(source, payload, false);
       return {
         settings: settings,
-        message: this.buildSuccessMessage(messagePrefix, source),
+        message: this.buildSuccessMessage(existing === undefined, source),
         success: true
       };
     } catch (error) {
@@ -421,7 +422,7 @@ export class AdBlockRuleSourceCoordinator {
         source.nativeCosmeticRuleCount = payloadInfo.cosmeticRuleCount;
         source.ruleCount = payloadInfo.ruleCount;
         if (source.ruleCount <= 0) {
-          throw new Error('没有解析到可用规则');
+          throw new Error(resolveAppResourceText($r('app.string.adblock_no_rules_parsed')));
         }
         await this.nativeRuleProvider.commitStagedSourcePayload(source.id);
         payloadCommitted = true;
@@ -429,7 +430,7 @@ export class AdBlockRuleSourceCoordinator {
         sourceCommitted = true;
         const nativeResult = await this.nativeRuleProvider.reconcile(settings);
         if (!await this.acceptNativeAuthority(settings, nativeResult)) {
-          throw new Error('原生过滤规则加载失败，请重试');
+          throw new Error(resolveAppResourceText($r('app.string.adblock_native_load_failed')));
         }
         await this.nativeRuleProvider.completeStagedSourcePayload(source.id);
         return settings;
@@ -543,18 +544,18 @@ export class AdBlockRuleSourceCoordinator {
   private buildMissingSourceResult(): AdBlockRuleSourceResult {
     return {
       settings: this.repository.getSettings(),
-      message: '未找到这条规则订阅',
+      message: resolveAppResourceText($r('app.string.adblock_source_missing')),
       success: false
     };
   }
 
   private buildNativeActivationFailureResult(
     settings: AdBlockSettings,
-    message: string = '原生过滤规则加载失败，请重试'
+    message?: string
   ): AdBlockRuleSourceResult {
     return {
       settings: settings,
-      message: message,
+      message: message ?? resolveAppResourceText($r('app.string.adblock_native_load_failed')),
       success: false
     };
   }
@@ -576,7 +577,7 @@ export class AdBlockRuleSourceCoordinator {
   private buildPolicyDeniedResult(): AdBlockRuleSourceResult {
     return {
       settings: this.repository.getSettings(),
-      message: '当前会话不可修改网页内容过滤设置',
+      message: resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_host_003')),
       success: false
     };
   }
@@ -585,8 +586,11 @@ export class AdBlockRuleSourceCoordinator {
     return url.startsWith('https://') && url.indexOf('.') > 0;
   }
 
-  private buildSuccessMessage(prefix: string, source: AdBlockCustomRuleSource): string {
-    return `${prefix} ${source.ruleCount} 条规则`;
+  private buildSuccessMessage(imported: boolean, source: AdBlockCustomRuleSource): string {
+    if (imported) {
+      return resolveAppResourceText($r('app.string.adblock_rules_imported', source.ruleCount));
+    }
+    return resolveAppResourceText($r('app.string.adblock_rules_updated', source.ruleCount));
   }
 
   private async buildFailureResult(
@@ -658,6 +662,6 @@ export class AdBlockRuleSourceCoordinator {
     if (maybeError.message !== undefined && maybeError.message.length > 0) {
       return maybeError.message;
     }
-    return '规则订阅更新失败';
+    return resolveAppResourceText($r('app.string.adblock_subscription_update_failed'));
   }
 }

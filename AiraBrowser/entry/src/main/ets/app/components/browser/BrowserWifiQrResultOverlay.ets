@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
 import { BrowserWifiQrCredentials } from '../../../services/browser/BrowserWifiQrCodeService';
 import { BrowserWifiQrResultAction } from '../../../core/browser/BrowserQrScanCoordinator';
@@ -64,7 +65,7 @@ export struct BrowserWifiQrResultOverlay {
     BrowserAdaptiveModalOverlay({
       visible: this.externallyControlled ? this.presentationVisible : this.visible,
       layoutMode: this.layoutMode,
-      title: 'Wi-Fi 信息',
+      title: $r('app.string.browser_ui_browser_wifi_qr_result_overlay_001'),
       tier: 'm',
       onDismiss: () => {
         this.requestClose();
@@ -80,13 +81,13 @@ export struct BrowserWifiQrResultOverlay {
           if (this.layoutMode === 'phone') {
             Row() {
               Column({ space: 4 }) {
-                Text('Wi-Fi 信息')
+                Text($r('app.string.browser_ui_browser_wifi_qr_result_overlay_001'))
                   .fontSize(19)
                   .fontWeight(FontWeight.Bold)
                   .fontColor(this.storedPrimaryTextColor)
                   .width('100%')
 
-                Text('可将密码复制到电脑或其他设备使用')
+                Text($r('app.string.browser_ui_browser_wifi_qr_result_overlay_002'))
                   .fontSize(13)
                   .fontColor(this.storedSecondaryTextColor)
                   .width('100%')
@@ -97,7 +98,7 @@ export struct BrowserWifiQrResultOverlay {
               BrowserSheetIconButton({
                 icon: $r('sys.symbol.xmark'),
                 iconSize: 16,
-                accessibilityLabel: '关闭',
+                accessibilityLabel: $r('app.string.ui_close'),
                 onAction: () => {
                   this.requestClose();
                 }
@@ -106,25 +107,27 @@ export struct BrowserWifiQrResultOverlay {
             .width('100%')
             .alignItems(VerticalAlign.Center)
           } else {
-            Text('可将密码复制到电脑或其他设备使用')
+            Text($r('app.string.browser_ui_browser_wifi_qr_result_overlay_002'))
               .fontSize(13)
               .fontColor(this.storedSecondaryTextColor)
               .width('100%')
           }
 
           SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
-            this.buildCredentialRow('网络名称', this.credentials.networkName, false)
+            this.buildCredentialRow(resolveAppResourceText($r('app.string.browser_ui_browser_wifi_qr_result_overlay_005')), this.credentials.networkName, false)
             SettingsGroupDivider({ dividerColor: this.storedDividerColor })
             this.buildCredentialRow(
-              '密码',
-              this.credentials.password.length > 0 ? this.credentials.password : '未包含密码',
+              resolveAppResourceText($r('app.string.settings_app_proxy_field_password')),
+              this.credentials.password.length > 0
+                ? this.credentials.password
+                : resolveAppResourceText($r('app.string.browser_ui_browser_wifi_qr_result_overlay_004')),
               this.credentials.password.length <= 0
             )
           }
 
           Column({ space: 8 }) {
             BrowserSheetActionButton({
-              label: '复制密码',
+              label: $r('app.string.browser_ui_browser_wifi_qr_result_overlay_003'),
               emphasis: 'primary',
               stacked: true,
               actionEnabled: this.credentials.password.length > 0,
@@ -135,7 +138,7 @@ export struct BrowserWifiQrResultOverlay {
             })
 
             BrowserSheetActionButton({
-              label: '关闭',
+              label: $r('app.string.ui_close'),
               emphasis: 'ghost',
               stacked: true,
               onAction: () => {

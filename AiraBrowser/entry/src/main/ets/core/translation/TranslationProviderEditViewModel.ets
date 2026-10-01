@@ -145,27 +145,32 @@ export class TranslationProviderEditViewModel {
       case 'baidu':
       case 'youdao':
         return [
-          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', '百度翻译')), secure: false },
+          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r(
+            'app.string.settings_web_translation_field_name_provider',
+            templateId === 'youdao'
+              ? resolveAppResourceText($r('app.string.translation_template_youdao_short'))
+              : resolveAppResourceText($r('app.string.translation_template_baidu_name'))
+          )), secure: false },
           { key: 'appId', label: 'App ID', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_app_id_placeholder')), secure: false },
           { key: 'secretKey', label: resolveAppResourceText($r('app.string.settings_web_translation_field_secret')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_secret_placeholder')), secure: true }
         ];
       case 'tencent_cloud':
         return [
-          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', '腾讯云翻译')), secure: false },
+          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', resolveAppResourceText($r('app.string.translation_template_tencent_cloud_short')))), secure: false },
           { key: 'appId', label: 'SecretId', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', 'SecretId')), secure: false },
           { key: 'secretKey', label: 'SecretKey', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', 'SecretKey')), secure: true },
           { key: 'region', label: resolveAppResourceText($r('app.string.settings_web_translation_field_region')), placeholder: 'ap-shanghai', secure: false }
         ];
       case 'alibaba_cloud':
         return [
-          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', '阿里云翻译')), secure: false },
+          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', resolveAppResourceText($r('app.string.translation_template_alibaba_short')))), secure: false },
           { key: 'appId', label: 'AccessKey ID', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', 'AccessKey ID')), secure: false },
           { key: 'secretKey', label: 'AccessKey Secret', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_access_secret_placeholder')), secure: true },
           { key: 'region', label: resolveAppResourceText($r('app.string.settings_web_translation_field_region')), placeholder: 'cn-hangzhou', secure: false }
         ];
       case 'volcano':
         return [
-          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', '火山翻译')), secure: false },
+          { key: 'displayName', label: resolveAppResourceText($r('app.string.settings_web_translation_field_name')), placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_name_provider', resolveAppResourceText($r('app.string.translation_template_volcano_short')))), secure: false },
           { key: 'appId', label: 'Access Key', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_access_placeholder')), secure: false },
           { key: 'secretKey', label: 'Secret Key', placeholder: resolveAppResourceText($r('app.string.settings_web_translation_field_secret_key_placeholder')), secure: true },
           { key: 'region', label: resolveAppResourceText($r('app.string.settings_web_translation_field_area')), placeholder: 'cn-north-1', secure: false }

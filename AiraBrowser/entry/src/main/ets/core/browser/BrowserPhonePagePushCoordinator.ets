@@ -1,4 +1,5 @@
 import { webview } from '@kit.ArkWeb';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../common/config/AiraDistributionCapabilityOwner';
 import { AIRA_FEATURE_PHONE_PAGE_PUSH } from '../../common/constants/MembershipFeatureKeys';
 import {
@@ -74,7 +75,7 @@ export class BrowserPhonePagePushCoordinator {
           title: this.resolveTitle(snapshot.title, url)
         }, host, config);
       } catch (error) {
-        host.showToast(this.resolveErrorMessage(error as Error, '请先连接私有化部署。'));
+        host.showToast(this.resolveErrorMessage(error as Error, resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_010'))));
       }
       return;
     }
@@ -85,7 +86,7 @@ export class BrowserPhonePagePushCoordinator {
     const accessSnapshot = host.resolveSnapshot();
     const uid = await this.resolveAccountUid(settings, accessSnapshot.uid);
     if (uid.length === 0) {
-      host.showToast('请先使用华为账号登录后再推送网页。不必先开启数据同步。');
+      host.showToast(resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_009')));
       return;
     }
     if (!await this.featureGateCoordinator.ensureAccess(
@@ -133,10 +134,10 @@ export class BrowserPhonePagePushCoordinator {
   ): Promise<void> {
     const url = request.url.trim();
     if (url.length <= 0) {
-      host.showToast('当前没有可推送的网址。');
+      host.showToast(resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_002')));
       return;
     }
-    host.showToast('正在推送到电脑...');
+    host.showToast(resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_007')));
     try {
       const result = personalServerConfig === undefined
         ? await this.service.enqueue(
@@ -158,7 +159,7 @@ export class BrowserPhonePagePushCoordinator {
       }
       host.showToast(this.resolveFailureMessage(result, personalServerConfig !== undefined));
     } catch (_error) {
-      host.showToast('推送失败，请稍后重试。');
+      host.showToast(resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_006')));
     }
   }
 
@@ -288,42 +289,44 @@ export class BrowserPhonePagePushCoordinator {
   private resolveSuccessMessage(result: AiraPhonePagePushResponseBody): string {
     switch (result.code) {
       case 'phone_page_push_duplicate_pending':
-        return '这页已经在电脑待打开队列里。';
+        return resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_014'));
       case 'phone_page_push_duplicate_recent':
-        return '这页刚刚已经在电脑打开过。';
+        return resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_013'));
       default:
-        return '已推送到电脑。';
+        return resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_001'));
     }
   }
 
   private resolveFailureMessage(result: AiraPhonePagePushResponseBody, personalServer: boolean): string {
     switch (result.code) {
       case 'pro_required':
-        return '通过 Aira 云推送网页需要 Pro；连接私有化部署后可免费使用。';
+        return resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_015'));
       case 'phone_page_push_rate_limited':
       case 'page_push_rate_limited':
-        return '推送太频繁了，请稍后再试。';
+        return resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_005'));
       case 'phone_page_push_queue_full':
       case 'page_push_queue_full':
-        return '电脑待打开的网页太多了，请先处理一部分。';
+        return resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_008'));
       case 'no_online_desktop_device':
-        return '当前没有在线的已配对电脑。';
+        return resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_003'));
       case 'page_push_phone_required':
       case 'personal_server_auth_required':
       case 'invalid_device_credential':
       case 'device_revoked':
-        return '请重新连接私有化部署后再推送网页。';
+        return resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_012'));
       case 'missing_uid':
       case 'auth_token_required':
       case 'auth_token_expired':
-        return personalServer ? '请重新连接私有化部署后再推送网页。' : '请重新登录华为账号后再推送。';
+        return personalServer
+          ? resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_012'))
+          : resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_011'));
       case 'invalid_url':
       case 'invalid_page_url':
-        return '当前页面不能推送到电脑。';
+        return resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_004'));
       case 'distribution_unavailable':
         return result.message?.trim() || AIRA_DISTRIBUTION_CAPABILITY_OWNER.resolveUnavailableReason('aira_cloud');
       default:
-        return result.message?.trim() || '推送失败，请稍后重试。';
+        return result.message?.trim() || resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_006'));
     }
   }
 

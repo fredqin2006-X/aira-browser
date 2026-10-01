@@ -228,6 +228,15 @@
       ]
     },
     {
+      "owner": "donate-pro-intro-artwork",
+      "reason": "User-provided multi-color Donate Pro intro artwork preserves its original geometry and colors.",
+      "resourcePaths": [
+        "base/media/donate_pro_intro_cloud_sync.svg",
+        "base/media/donate_pro_intro_cross_device.svg",
+        "base/media/donate_pro_intro_support_dev.svg"
+      ]
+    },
+    {
       "owner": "legacy-unused-artwork",
       "reason": "Preserved zero-change legacy artwork with no current app caller; cleanup is outside Candidate 1.",
       "resourcePaths": [

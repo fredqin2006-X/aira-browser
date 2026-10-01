@@ -1,3 +1,5 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
+
 export function localizeAboutSettingsCopy(value: ResourceStr): ResourceStr {
   if (typeof value !== 'string') {
     return value;
@@ -88,11 +90,18 @@ export function localizeCommunityUpdateMessage(outcome: string, versionName: str
   return fallback;
 }
 
-export function localizeAboutReviewFailure(message: string): ResourceStr {
-  if (message.length === 0 ||
-    message === '应用市场暂时无法打开。' ||
+function isAboutReviewFailureMessage(message: string): boolean {
+  const linkFailedPrefix = resolveAppResourceText($r('app.string.settings_launch_link_failed_prefix'));
+  return message === '应用市场暂时无法打开。' ||
+    message === resolveAppResourceText($r('app.string.settings_launch_market_unavailable')) ||
     message === '暂时无法打开评分弹窗。' ||
-    message.indexOf('打开链接失败：') === 0) {
+    message === resolveAppResourceText($r('app.string.settings_launch_rating_failed')) ||
+    message.indexOf('打开链接失败：') === 0 ||
+    (linkFailedPrefix.length > 0 && message.indexOf(linkFailedPrefix) === 0);
+}
+
+export function localizeAboutReviewFailure(message: string): ResourceStr {
+  if (message.length === 0 || isAboutReviewFailureMessage(message)) {
     return $r('app.string.settings_about_review_failed');
   }
   return message;

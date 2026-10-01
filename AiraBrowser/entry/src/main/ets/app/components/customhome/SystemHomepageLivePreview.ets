@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   BrowserHomePageStyle,
   usesCenteredHomeFrame
@@ -179,7 +180,7 @@ export struct SystemHomepageLivePreview {
         Column({ space: this.desktopUnit(this.desktopLayout().sectionVerticalGap) }) {
           Column() {
             if (this.storedShowFavoritesTitle) {
-              this.buildDesktopSectionTitle('收藏')
+              this.buildDesktopSectionTitle(previewText($r('app.string.homepage_preview_favorites'), '收藏'))
             }
             this.buildDesktopShortcutGrid(this.buildClassicTiles(), false)
           }
@@ -189,7 +190,7 @@ export struct SystemHomepageLivePreview {
           if (this.showRecentlyClosed) {
             Column() {
               if (this.storedShowRecentlyClosedTitle) {
-                this.buildDesktopSectionTitle('最近关闭')
+                this.buildDesktopSectionTitle(previewText($r('app.string.settings_home_recently_closed'), '最近关闭'))
               }
               this.buildDesktopClosedGrid()
             }
@@ -349,7 +350,7 @@ export struct SystemHomepageLivePreview {
   @Builder
   private buildDesktopClosedGrid() {
     if (this.desktopClosedItems().length <= 0) {
-      Text('暂无最近关闭')
+      Text(previewText($r('app.string.custom_home_ui_system_homepage_live_preview_001'), '暂无最近关闭'))
         .width('100%')
         .fontSize(this.desktopUnit(RECORD_LIST_ROW_TITLE_SIZE))
         .fontColor(this.resolveSecondaryText())
@@ -415,7 +416,7 @@ export struct SystemHomepageLivePreview {
   @Builder
   private buildDesktopSettingsPill() {
     Row() {
-      Text('设置')
+      Text(previewText($r('app.string.bottom_panel_action_settings'), '设置'))
         .fontSize(this.desktopUnit(CLASSIC_SETTINGS_FONT))
         .fontWeight(FontWeight.Medium)
         .fontColor(this.storedPrimaryTextColor)
@@ -432,7 +433,7 @@ export struct SystemHomepageLivePreview {
   @Builder
   private buildDesktopSearch() {
     Row() {
-      Text('搜索或输入网址')
+      Text(previewText($r('app.string.aira_search_card_placeholder'), '搜索或输入网址'))
         .fontSize(this.desktopUnit(16))
         .fontColor(this.resolveSecondaryText())
         .maxLines(1)
@@ -466,7 +467,7 @@ export struct SystemHomepageLivePreview {
         Column({ space: this.unit(CLASSIC_SECTION_GAP) }) {
           Column() {
             if (this.storedShowFavoritesTitle) {
-              this.buildSectionTitle('收藏')
+              this.buildSectionTitle(previewText($r('app.string.homepage_preview_favorites'), '收藏'))
             }
             this.buildClassicShortcutGrid(this.buildClassicTiles())
           }
@@ -476,7 +477,7 @@ export struct SystemHomepageLivePreview {
           if (this.showRecentlyClosed) {
             Column() {
               if (this.storedShowRecentlyClosedTitle) {
-                this.buildSectionTitle('最近关闭')
+                this.buildSectionTitle(previewText($r('app.string.settings_home_recently_closed'), '最近关闭'))
               }
               this.buildRecentlyClosedRows()
             }
@@ -523,7 +524,7 @@ export struct SystemHomepageLivePreview {
           maxWidthVp: Math.max(1, this.cardWidth - this.unit(24)),
           tintColor: this.resolvePrimaryText()
         })
-        this.buildOutlinedSearch('搜索或输入网址')
+        this.buildOutlinedSearch(previewText($r('app.string.aira_search_card_placeholder'), '搜索或输入网址'))
         if (this.style === 'centered') {
           Column() {
             this.buildShortcutGrid(this.buildCenteredTiles(), CENTERED_COLUMNS, 0.5, true)
@@ -567,7 +568,7 @@ export struct SystemHomepageLivePreview {
           iconSize: this.unit(22),
           iconColor: this.resolvePrimaryText()
         })
-        Text('主页')
+        Text(previewText($r('app.string.bottom_panel_action_home'), '主页'))
           .fontSize(this.unit(18))
           .fontColor(this.resolvePrimaryText())
           .maxLines(1)
@@ -788,7 +789,7 @@ export struct SystemHomepageLivePreview {
   @Builder
   private buildRecentlyClosedRows() {
     if (this.resolveVisibleClosedItems().length <= 0) {
-      Text('暂无最近关闭')
+      Text(previewText($r('app.string.custom_home_ui_system_homepage_live_preview_001'), '暂无最近关闭'))
         .width('100%')
         .fontSize(this.unit(RECORD_LIST_ROW_TITLE_SIZE))
         .fontColor(this.resolveSecondaryText())
@@ -848,7 +849,7 @@ export struct SystemHomepageLivePreview {
   @Builder
   private buildSettingsPill() {
     Row() {
-      Text('设置')
+      Text(previewText($r('app.string.bottom_panel_action_settings'), '设置'))
         .fontSize(this.unit(CLASSIC_SETTINGS_FONT))
         .fontWeight(FontWeight.Medium)
         .fontColor(this.storedPrimaryTextColor)
@@ -868,7 +869,7 @@ export struct SystemHomepageLivePreview {
       this.buildRoundChromeButton('browser.toolbar.back')
       Row() {
         this.buildFloatingSlotIcon('browser.toolbar.menu')
-        Text('搜索或输入网址')
+        Text(previewText($r('app.string.aira_search_card_placeholder'), '搜索或输入网址'))
           .fontSize(this.unit(15))
           .fontColor(this.storedSecondaryTextColor)
           .maxLines(1)
@@ -993,14 +994,14 @@ export struct SystemHomepageLivePreview {
   private buildClassicTiles(): HomepagePreviewTile[] {
     const tiles = this.buildShortcutTiles();
     if (this.showShortcuts) {
-      tiles.push(this.buildChromeTile('add', '添加', 'browser.tabs.add'));
+      tiles.push(this.buildChromeTile('add', previewText($r('app.string.settings_custom_home_add'), '添加'), 'browser.tabs.add'));
     }
     return tiles;
   }
 
   private buildCenteredTiles(): HomepagePreviewTile[] {
     const tiles: HomepagePreviewTile[] = this.buildShortcutTiles();
-    tiles.push(this.buildChromeTile('add', '添加', 'browser.tabs.add'));
+    tiles.push(this.buildChromeTile('add', previewText($r('app.string.settings_custom_home_add'), '添加'), 'browser.tabs.add'));
     return tiles;
   }
 
@@ -1014,7 +1015,7 @@ export struct SystemHomepageLivePreview {
         resolveHomeSystemShortcutDefinitionByUrl(shortcut.url)?.iconId : undefined;
       tiles.push({
         key: `${shortcut.id}:${index}:${shortcut.position}:${shortcut.icon ?? ''}:${systemIcon ?? ''}`,
-        title: shortcut.title.length > 0 ? shortcut.title : '收藏',
+        title: shortcut.title.length > 0 ? shortcut.title : previewText($r('app.string.homepage_preview_favorites'), '收藏'),
         iconUri: systemIcon === undefined ? (shortcut.icon ?? '') : '',
         fallbackLabel: this.resolveFallback(shortcut.title),
         chromeIcon: systemIcon ?? 'browser.shortcut.home',
@@ -1274,4 +1275,9 @@ export struct SystemHomepageLivePreview {
     }
     return rows;
   }
+}
+
+function previewText(resource: Resource, fallback: string): string {
+  const resolved = resolveAppResourceText(resource);
+  return resolved.length > 0 ? resolved : fallback;
 }

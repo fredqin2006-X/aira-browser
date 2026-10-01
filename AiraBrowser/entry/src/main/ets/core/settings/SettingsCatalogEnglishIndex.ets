@@ -18,6 +18,7 @@ import { settingsCatalogEnglishText } from '../../core/settings/SettingsCatalogE
  */
 const SETTINGS_CATALOG_ENGLISH_INDEX: Map<string, string> = new Map<string, string>([
   ['360 搜索', '360 Search'],
+  ['捐赠Pro', 'Donate Pro'],
   ['Aira Pro会员服务协议', 'Aira Pro Membership Service Agreement'],
   ['Aira Pro自动续费服务协议', 'Aira Pro Auto-Renewal Service Agreement'],
   ['Aira 默认', 'Aira default'],

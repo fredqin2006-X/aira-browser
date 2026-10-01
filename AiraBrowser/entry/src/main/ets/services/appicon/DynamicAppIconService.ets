@@ -1,4 +1,5 @@
 import { appInfoManager } from '@kit.AppGalleryKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { BusinessError } from '@kit.BasicServicesKit';
 
 export interface DynamicAppIconOption {
@@ -51,7 +52,7 @@ export class DynamicAppIconService {
         availability: mappedIcons.length > 0 ? 'available' : 'empty',
         icons: mappedIcons,
         code: 0,
-        message: mappedIcons.length > 0 ? '' : '暂无可用的应用图标。'
+        message: mappedIcons.length > 0 ? '' : resolveAppResourceText($r('app.string.settings_app_icon_12'))
       };
     } catch (error) {
       return this.buildQueryFailure(error as BusinessError);
@@ -65,7 +66,7 @@ export class DynamicAppIconService {
         ok: false,
         kind: 'select',
         code: 401,
-        message: '图标信息无效。'
+        message: resolveAppResourceText($r('app.string.app_icon_invalid'))
       };
     }
     try {
@@ -74,7 +75,7 @@ export class DynamicAppIconService {
         ok: true,
         kind: 'select',
         code: 0,
-        message: '应用图标已更新。'
+        message: resolveAppResourceText($r('app.string.app_icon_updated'))
       };
     } catch (error) {
       return this.buildMutationFailure('select', error as BusinessError);
@@ -88,7 +89,7 @@ export class DynamicAppIconService {
         ok: true,
         kind: 'restore_default',
         code: 0,
-        message: '已恢复默认应用图标。'
+        message: resolveAppResourceText($r('app.string.app_icon_restored'))
       };
     } catch (error) {
       return this.buildMutationFailure('restore_default', error as BusinessError);
@@ -102,7 +103,7 @@ export class DynamicAppIconService {
         availability: 'empty',
         icons: [],
         code: code,
-        message: '暂无可用的应用图标。'
+        message: resolveAppResourceText($r('app.string.settings_app_icon_12'))
       };
     }
     if (code === DYNAMIC_ICON_SERVICE_CONNECT_FAILED_CODE) {
@@ -110,7 +111,7 @@ export class DynamicAppIconService {
         availability: 'service_unavailable',
         icons: [],
         code: code,
-        message: '图标管理服务暂不可用。'
+        message: resolveAppResourceText($r('app.string.settings_app_icon_01'))
       };
     }
     if (code === DYNAMIC_ICON_INTERNAL_ERROR_CODE) {
@@ -118,14 +119,14 @@ export class DynamicAppIconService {
         availability: 'internal_error',
         icons: [],
         code: code,
-        message: '读取应用图标失败，请稍后重试。'
+        message: resolveAppResourceText($r('app.string.app_icon_read_failed'))
       };
     }
     return {
       availability: 'service_unavailable',
       icons: [],
       code: code,
-      message: '暂时无法读取应用图标。'
+      message: resolveAppResourceText($r('app.string.app_icon_read_unavailable'))
     };
   }
 
@@ -144,17 +145,19 @@ export class DynamicAppIconService {
 
   private resolveMutationFailureMessage(kind: DynamicAppIconMutationKind, code: number): string {
     if (code === DYNAMIC_ICON_CUSTOM_THEME_CONFLICT_CODE) {
-      return '当前系统主题正在使用自定义图标，无法切换应用图标。';
+      return resolveAppResourceText($r('app.string.app_icon_theme_conflict'));
     }
     if (kind === 'select' && code === DYNAMIC_ICON_SELECT_FAILED_CODE) {
-      return '切换应用图标失败，请稍后重试。';
+      return resolveAppResourceText($r('app.string.app_icon_select_retry'));
     }
     if (kind === 'restore_default' && code === DYNAMIC_ICON_DISABLE_FAILED_CODE) {
-      return '恢复默认图标失败，请稍后重试。';
+      return resolveAppResourceText($r('app.string.app_icon_restore_retry'));
     }
     if (code === DYNAMIC_ICON_INTERNAL_ERROR_CODE) {
-      return '图标管理服务异常，请稍后重试。';
+      return resolveAppResourceText($r('app.string.app_icon_service_error'));
     }
-    return kind === 'select' ? '切换应用图标失败。' : '恢复默认图标失败。';
+    return kind === 'select'
+      ? resolveAppResourceText($r('app.string.app_icon_select_failed'))
+      : resolveAppResourceText($r('app.string.app_icon_restore_failed'));
   }
 }

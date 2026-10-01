@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import {
   BrowserDataScope,
@@ -442,7 +443,7 @@ export class HomeShortcutStateCoordinator {
         );
         this.executeEffect({
           type: 'set_helper_message',
-          message: `快捷方式加载失败：${this.stringifyError(error)}`
+          message: resolveAppResourceText($r('app.string.home_shortcut_load_failed', this.stringifyError(error)))
         });
         this.applyLoadedState(DEFAULT_HOME_SHORTCUT_SCENARIO_ID, [], true, true);
         this.iconHydrationCoordinator.clear(this.iconHydrationCallbacks);
@@ -539,7 +540,7 @@ export class HomeShortcutStateCoordinator {
   ): HomeShortcutActionDispatchResult {
     const shortcut = this.findShortcut(shortcutId);
     if (shortcut === undefined) {
-      this.showToast('未找到这个快捷方式。');
+      this.showToast(resolveAppResourceText($r('app.string.home_shortcut_not_found')));
       return 'not_found';
     }
     const facts = this.shell.resolveFacts();
@@ -558,14 +559,14 @@ export class HomeShortcutStateCoordinator {
   private copyShortcutUrl(shortcutId: string): HomeShortcutActionDispatchResult {
     const shortcut = this.findShortcut(shortcutId);
     if (shortcut === undefined) {
-      this.showToast('未找到这个快捷方式。');
+      this.showToast(resolveAppResourceText($r('app.string.home_shortcut_not_found')));
       return 'not_found';
     }
     this.executeEffect({ type: 'dismiss_context_menu' });
     void this.dependencies.clipboardService.copyText({
       value: shortcut.url.trim(),
-      emptyMessage: '当前没有可复制的链接。',
-      successMessage: '链接已复制。'
+      emptyMessage: resolveAppResourceText($r('app.string.bookshelf_copy_empty')),
+      successMessage: resolveAppResourceText($r('app.string.reader_copy_link_done'))
     }).then((result): void => {
       this.showToast(result.message);
     }).catch((error: Error): void => {
@@ -577,7 +578,7 @@ export class HomeShortcutStateCoordinator {
   private requestEdit(shortcutId: string): HomeShortcutActionDispatchResult {
     const shortcut = this.findShortcut(shortcutId);
     if (shortcut === undefined) {
-      this.showToast('未找到这个快捷方式。');
+      this.showToast(resolveAppResourceText($r('app.string.home_shortcut_not_found')));
       return 'not_found';
     }
     const resolvedIcon = this.icons.find((icon: HomeShortcutIconState) => icon.id === shortcut.id);
@@ -600,17 +601,17 @@ export class HomeShortcutStateCoordinator {
     }
     const shortcut = this.findShortcut(draft.shortcutId);
     if (shortcut === undefined) {
-      this.showDialog('保存失败', '未找到要编辑的快捷方式。');
+      this.showDialog(resolveAppResourceText($r('app.string.offline_save_status_failed')), resolveAppResourceText($r('app.string.home_shortcut_edit_missing')));
       return 'not_found';
     }
     const normalizedTitle = draft.title.trim();
     const normalizedUrl = draft.url.trim();
     if (normalizedTitle.length === 0) {
-      this.showDialog('保存失败', '请输入名称。');
+      this.showDialog(resolveAppResourceText($r('app.string.offline_save_status_failed')), resolveAppResourceText($r('app.string.bookmark_name_required')));
       return 'invalid_request';
     }
     if (normalizedUrl.length === 0) {
-      this.showDialog('保存失败', '请输入网址。');
+      this.showDialog(resolveAppResourceText($r('app.string.offline_save_status_failed')), resolveAppResourceText($r('app.string.bookmark_url_required')));
       return 'invalid_request';
     }
     const result = this.replaceShortcutById(shortcut.id, (current: ShortcutRecord): ShortcutRecord => {
@@ -622,13 +623,16 @@ export class HomeShortcutStateCoordinator {
     void this.commitMutation(result, STRUCTURAL_MUTATION_POLICY)
       .then((updated: boolean): void => {
         if (!updated) {
-          this.showDialog('保存失败', '未找到要编辑的快捷方式。');
+          this.showDialog(resolveAppResourceText($r('app.string.offline_save_status_failed')), resolveAppResourceText($r('app.string.home_shortcut_edit_missing')));
           return;
         }
-        this.showToast('快捷方式已保存。');
+        this.showToast(resolveAppResourceText($r('app.string.home_shortcut_saved')));
       })
       .catch((error: Error): void => {
-        this.showDialog('保存失败', `保存失败：${this.stringifyError(error)}`);
+        this.showDialog(
+          resolveAppResourceText($r('app.string.offline_save_status_failed')),
+          resolveAppResourceText($r('app.string.home_shortcut_save_failed_detail', this.stringifyError(error)))
+        );
       });
     return 'accepted';
   }
@@ -636,7 +640,7 @@ export class HomeShortcutStateCoordinator {
   private requestDelete(shortcutId: string): HomeShortcutActionDispatchResult {
     const shortcut = this.findShortcut(shortcutId);
     if (shortcut === undefined) {
-      this.showToast('未找到这个快捷方式。');
+      this.showToast(resolveAppResourceText($r('app.string.home_shortcut_not_found')));
       return 'not_found';
     }
     this.executeEffect({ type: 'dismiss_context_menu' });
@@ -664,19 +668,22 @@ export class HomeShortcutStateCoordinator {
     };
     if (!result.changed) {
       if (showSuccessFeedback) {
-        this.showDialog('删除失败', '未找到要删除的快捷方式。');
+        this.showDialog(resolveAppResourceText($r('app.string.history_delete_failed')), resolveAppResourceText($r('app.string.home_shortcut_delete_missing')));
       }
       return 'not_found';
     }
     void this.commitMutation(result, STRUCTURAL_MUTATION_POLICY)
       .then((deleted: boolean): void => {
         if (showSuccessFeedback && deleted) {
-          this.showToast('快捷方式已删除。');
+          this.showToast(resolveAppResourceText($r('app.string.home_shortcut_deleted')));
         }
       })
       .catch((error: Error): void => {
         if (showSuccessFeedback) {
-          this.showDialog('删除失败', `删除失败：${this.stringifyError(error)}`);
+          this.showDialog(
+            resolveAppResourceText($r('app.string.history_delete_failed')),
+            resolveAppResourceText($r('app.string.home_shortcut_delete_failed_detail', this.stringifyError(error)))
+          );
         }
       });
     return 'accepted';
@@ -691,22 +698,25 @@ export class HomeShortcutStateCoordinator {
     }
     const shortcut = this.findShortcut(shortcutId);
     if (shortcut === undefined) {
-      this.showToast('未找到要移动的快捷方式。');
+      this.showToast(resolveAppResourceText($r('app.string.home_shortcut_move_missing')));
       return 'not_found';
     }
     const result = this.logicService.moveById(this.shortcuts, shortcutId, boundary);
     if (!result.changed) {
-      this.showToast(boundary === 'top' ? '已经在最前面了。' : '已经在最后面了。');
+      this.showToast(boundary === 'top' ? resolveAppResourceText($r('app.string.home_shortcut_already_first')) : resolveAppResourceText($r('app.string.home_shortcut_already_last')));
       return 'unchanged';
     }
     void this.commitMutation(result, ORDER_MUTATION_POLICY)
       .then((): void => {
         this.showToast(boundary === 'top'
-          ? `已将“${shortcut.title}”置顶。`
-          : `已将“${shortcut.title}”置底。`);
+          ? resolveAppResourceText($r('app.string.home_shortcut_moved_top', shortcut.title))
+          : resolveAppResourceText($r('app.string.home_shortcut_moved_bottom', shortcut.title)));
       })
       .catch((error: Error): void => {
-        this.showDialog('移动失败', `移动失败：${this.stringifyError(error)}`);
+        this.showDialog(
+          resolveAppResourceText($r('app.string.bookmark_move_failed')),
+          resolveAppResourceText($r('app.string.home_shortcut_move_failed_detail', this.stringifyError(error)))
+        );
       });
     return 'accepted';
   }
@@ -720,22 +730,25 @@ export class HomeShortcutStateCoordinator {
     }
     const shortcut = this.findShortcut(shortcutId);
     if (shortcut === undefined) {
-      this.showToast('未找到要移动的快捷方式。');
+      this.showToast(resolveAppResourceText($r('app.string.home_shortcut_move_missing')));
       return 'not_found';
     }
     const result = this.logicService.moveByIdStep(this.shortcuts, shortcutId, step);
     if (!result.changed) {
-      this.showToast(step === 'up' ? '已经在最前面了。' : '已经在最后面了。');
+      this.showToast(step === 'up' ? resolveAppResourceText($r('app.string.home_shortcut_already_first')) : resolveAppResourceText($r('app.string.home_shortcut_already_last')));
       return 'unchanged';
     }
     void this.commitMutation(result, ORDER_MUTATION_POLICY)
       .then((): void => {
         this.showToast(step === 'up'
-          ? `已上移“${shortcut.title}”。`
-          : `已下移“${shortcut.title}”。`);
+          ? resolveAppResourceText($r('app.string.home_shortcut_moved_up', shortcut.title))
+          : resolveAppResourceText($r('app.string.home_shortcut_moved_down', shortcut.title)));
       })
       .catch((error: Error): void => {
-        this.showDialog('移动失败', `移动失败：${this.stringifyError(error)}`);
+        this.showDialog(
+          resolveAppResourceText($r('app.string.bookmark_move_failed')),
+          resolveAppResourceText($r('app.string.home_shortcut_move_failed_detail', this.stringifyError(error)))
+        );
       });
     return 'accepted';
   }
@@ -915,7 +928,7 @@ export class HomeShortcutStateCoordinator {
     });
     this.refresh();
     if (notifyMoveFailure) {
-      this.showToast('排序保存失败，已恢复已保存的顺序。');
+      this.showToast(resolveAppResourceText($r('app.string.home_shortcut_order_restore')));
     }
   }
 
@@ -989,7 +1002,7 @@ export class HomeShortcutStateCoordinator {
     this.executeEffect({
       type: 'present_boundary_block',
       summaryLine: `${policy.summaryLine} action=${action}`,
-      helperText: '当前私密会话不可修改常规首页快捷方式。'
+      helperText: resolveAppResourceText($r('app.string.browser_browser_recently_closed_application_coordinator_003'))
     });
     return false;
   }

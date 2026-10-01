@@ -1,4 +1,5 @@
 import { webview } from '@kit.ArkWeb';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { BrowserDataScope, BrowserSessionPrivacyMode } from '../../common/models/BrowserModels';
 import { BrowserAppUrlOpenCoordinator } from '../browser/BrowserAppUrlOpenCoordinator';
 import { BrowserWebLayerGeometrySnapshot } from '../browser/BrowserWebLayerGeometryCache';
@@ -164,15 +165,15 @@ interface WebContextMenuMediaParam {
 const WEB_CONTEXT_MENU_MEDIA_TYPE_IMAGE: number = 1;
 
 const WEB_LINK_CONTEXT_MENU_ACTIONS: WebLinkContextMenuItem[] = [
-  { action: 'open', label: '打开', group: 'open' },
-  { action: 'open_new_tab', label: '新标签页打开', group: 'open' },
-  { action: 'open_background_tab', label: '后台打开', group: 'open' },
-  { action: 'open_private_tab', label: '隐私标签页打开', group: 'open' },
-  { action: 'copy_link', label: '复制链接', group: 'transfer' },
-  { action: 'share_link', label: '分享链接', group: 'transfer' },
-  { action: 'add_bookmark', label: '添加书签', group: 'save' },
-  { action: 'save_offline', label: '保存离线', group: 'save' },
-  { action: 'download_link', label: '下载链接', group: 'save' }
+  { action: 'open', label: '', group: 'open' },
+  { action: 'open_new_tab', label: '', group: 'open' },
+  { action: 'open_background_tab', label: '', group: 'open' },
+  { action: 'open_private_tab', label: '', group: 'open' },
+  { action: 'copy_link', label: '', group: 'transfer' },
+  { action: 'share_link', label: '', group: 'transfer' },
+  { action: 'add_bookmark', label: '', group: 'save' },
+  { action: 'save_offline', label: '', group: 'save' },
+  { action: 'download_link', label: '', group: 'save' }
 ];
 
 export class WebLinkContextMenuCoordinator {
@@ -309,7 +310,9 @@ export class WebLinkContextMenuCoordinator {
     if (state.url.length === 0) {
       this.applyResult(this.buildResult([{
         type: 'toast',
-        message: state.kind === 'image' ? '当前没有可处理的图片。' : '当前没有可处理的链接。'
+        message: state.kind === 'image'
+          ? resolveAppResourceText($r('app.string.context_menu_no_image'))
+          : resolveAppResourceText($r('app.string.context_menu_no_link'))
       }]));
       return;
     }
@@ -389,7 +392,9 @@ export class WebLinkContextMenuCoordinator {
     if (url.length === 0 || !this.isWebImageContext(request.event.param, request.hitTest, url)) {
       return undefined;
     }
-    const title = request.pageTitle.trim().length > 0 ? request.pageTitle.trim() : '网页图片';
+    const title = request.pageTitle.trim().length > 0
+      ? request.pageTitle.trim()
+      : resolveAppResourceText($r('app.string.context_menu_web_image'));
     return {
       visible: true,
       kind: 'image',
@@ -399,9 +404,9 @@ export class WebLinkContextMenuCoordinator {
       x: this.safeNumber(() => request.event.param.x()),
       y: this.safeNumber(() => request.event.param.y()),
       items: [
-        { action: 'save_image', label: '保存至图库', group: 'image' },
-        { action: 'copy_image', label: '复制图片', group: 'image' },
-        { action: 'share_image', label: '分享图片', group: 'image' }
+        { action: 'save_image', label: resolveAppResourceText($r('app.string.context_menu_save_to_gallery')), group: 'image' },
+        { action: 'copy_image', label: resolveAppResourceText($r('app.string.context_menu_copy_image')), group: 'image' },
+        { action: 'share_image', label: resolveAppResourceText($r('app.string.context_menu_share_image')), group: 'image' }
       ]
     };
   }
@@ -503,9 +508,9 @@ export class WebLinkContextMenuCoordinator {
   ): WebContextMenuEffect[] {
     if (state.tabId !== facts.activeTabId) {
       if (!this.webLoadRuntimeCoordinator.loadWebContextMenuLinkForTab(state.tabId, state.url)) {
-        return [{ type: 'toast', message: '链接打开失败。' }];
+        return [{ type: 'toast', message: resolveAppResourceText($r('app.string.context_menu_open_failed')) }];
       }
-      return [{ type: 'helper_message', message: '正在打开链接' }];
+      return [{ type: 'helper_message', message: resolveAppResourceText($r('app.string.context_menu_opening')) }];
     }
     return [{ type: 'open_current_link', tabId: state.tabId, url: state.url }];
   }
@@ -541,7 +546,7 @@ export class WebLinkContextMenuCoordinator {
     return task.then((result: WebImageContextActionResult): WebContextMenuEffect[] => {
       return [{ type: 'toast', message: result.message }];
     }).catch((_error: Error): WebContextMenuEffect[] => {
-      return [{ type: 'toast', message: '图片处理失败，请稍后重试。' }];
+      return [{ type: 'toast', message: resolveAppResourceText($r('app.string.context_menu_image_failed')) }];
     });
   }
 
@@ -553,7 +558,7 @@ export class WebLinkContextMenuCoordinator {
     const scriptId = String(item.scriptId ?? '').trim();
     const commandId = String(item.commandId ?? '').trim();
     if (scriptId.length === 0 || commandId.length === 0) {
-      return this.buildResult([{ type: 'toast', message: '脚本命令不可用。' }]);
+      return this.buildResult([{ type: 'toast', message: resolveAppResourceText($r('app.string.context_menu_script_unavailable')) }]);
     }
     const completion = this.userScriptRuntimeCoordinator.executePageCommandForPage(
       state.tabId,
@@ -562,9 +567,17 @@ export class WebLinkContextMenuCoordinator {
       facts.pageUrl,
       this.isPrivateBoundary(facts.privacyMode, facts.dataScope)
     ).then((success: boolean): WebContextMenuEffect[] => {
-      return [{ type: 'toast', message: success ? '脚本已执行。' : '脚本执行失败。' }];
+      return [{
+        type: 'toast',
+        message: success
+          ? resolveAppResourceText($r('app.string.context_menu_script_done'))
+          : resolveAppResourceText($r('app.string.context_menu_script_failed'))
+      }];
     }).catch((error: Error): WebContextMenuEffect[] => {
-      return [{ type: 'error_message', message: `执行脚本菜单失败：${this.stringifyError(error)}` }];
+      return [{
+        type: 'error_message',
+        message: resolveAppResourceText($r('app.string.context_menu_script_error', this.stringifyError(error)))
+      }];
     });
     return this.buildResult([], completion);
   }
@@ -765,7 +778,7 @@ export class WebLinkContextMenuCoordinator {
           action: item.action,
           label: item.action === 'open_private_tab'
             ? this.resolvePrivateOpenLabel(privateOpenTarget)
-            : item.label,
+            : this.resolveLinkActionLabel(item.action),
           group: item.group,
           scriptId: item.scriptId,
           commandId: item.commandId
@@ -773,8 +786,33 @@ export class WebLinkContextMenuCoordinator {
       });
   }
 
+  private resolveLinkActionLabel(action: string): string {
+    switch (action) {
+      case 'open':
+        return resolveAppResourceText($r('app.string.ui_open'));
+      case 'open_new_tab':
+        return resolveAppResourceText($r('app.string.history_open_new_tab_short'));
+      case 'open_background_tab':
+        return resolveAppResourceText($r('app.string.history_open_background'));
+      case 'copy_link':
+        return resolveAppResourceText($r('app.string.offline_action_copy_link'));
+      case 'share_link':
+        return resolveAppResourceText($r('app.string.context_menu_share_link'));
+      case 'add_bookmark':
+        return resolveAppResourceText($r('app.string.bottom_panel_action_bookmark'));
+      case 'save_offline':
+        return resolveAppResourceText($r('app.string.context_menu_save_offline'));
+      case 'download_link':
+        return resolveAppResourceText($r('app.string.context_menu_download_link'));
+      default:
+        return resolveAppResourceText($r('app.string.ui_open'));
+    }
+  }
+
   private resolvePrivateOpenLabel(target: BrowserPrivateOpenTarget): string {
-    return target === 'new_window' ? '在隐私窗口中打开' : '在隐私标签页中打开';
+    return target === 'new_window'
+      ? resolveAppResourceText($r('app.string.bookmark_bar_open_private'))
+      : resolveAppResourceText($r('app.string.context_menu_open_private_tab_long'));
   }
 
   private resolvePrivateOpenEffectType(): WebContextMenuEffectType {
@@ -832,7 +870,7 @@ export class WebLinkContextMenuCoordinator {
     try {
       return JSON.stringify(error);
     } catch (_stringifyError) {
-      return '未知错误';
+      return resolveAppResourceText($r('app.string.settings_custom_home_unknown_error'));
     }
   }
 }

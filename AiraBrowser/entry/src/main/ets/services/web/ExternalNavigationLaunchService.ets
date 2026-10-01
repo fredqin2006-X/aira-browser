@@ -1,5 +1,6 @@
 import { Want, bundleManager, common } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 export type ExternalNavigationLaunchClassification =
   'http_app_link' |
@@ -169,8 +170,8 @@ export class ExternalNavigationLaunchService {
         fallbackUrl: fallbackUrl,
         errorCode: '',
         errorMessage: '',
-        message: '外部应用链接无效。',
-        userMessage: '链接无效，无法打开外部应用。',
+        message: resolveAppResourceText($r('app.string.external_nav_link_invalid')),
+        userMessage: resolveAppResourceText($r('app.string.external_nav_invalid_link')),
         request: request,
         launchApi: '',
         resolution: launchTarget.resolution,
@@ -191,8 +192,8 @@ export class ExternalNavigationLaunchService {
         fallbackUrl: fallbackUrl,
         errorCode: '',
         errorMessage: '',
-        message: '外部应用目标无效。',
-        userMessage: '目标应用信息无效，无法打开。',
+        message: resolveAppResourceText($r('app.string.external_nav_target_invalid')),
+        userMessage: resolveAppResourceText($r('app.string.external_nav_target_invalid_user')),
         request: request,
         launchApi: '',
         resolution: launchTarget.resolution,
@@ -711,13 +712,13 @@ export class ExternalNavigationLaunchService {
 
   private buildSuccessMessage(mode: ExternalNavigationLaunchMode): string {
     if (mode === 'deeplink_view_data') {
-      return '已通过系统外部应用能力打开。';
+      return resolveAppResourceText($r('app.string.external_nav_opened_capability'));
     }
-    return '已交给系统打开。';
+    return resolveAppResourceText($r('app.string.external_nav_handed_to_system'));
   }
 
   private buildSuccessUserMessage(): string {
-    return '已交给系统打开。';
+    return resolveAppResourceText($r('app.string.external_nav_handed_to_system'));
   }
 
   private buildResult(input: ExternalNavigationLaunchResultInput): ExternalNavigationLaunchResult {
@@ -770,17 +771,17 @@ export class ExternalNavigationLaunchService {
   ): string {
     if (status === 'no_matching_ability') {
       if (mode === 'app_linking_only') {
-        return `没有已安装应用声明可打开此 AppLinking 链接。${this.buildErrorSuffix(errorCode, errorMessage)}`;
+        return `${resolveAppResourceText($r('app.string.external_nav_no_applinking'))}${this.buildErrorSuffix(errorCode, errorMessage)}`;
       }
-      return `没有已安装应用声明可打开此外部链接。${this.buildErrorSuffix(errorCode, errorMessage)}`;
+      return `${resolveAppResourceText($r('app.string.external_nav_no_declared'))}${this.buildErrorSuffix(errorCode, errorMessage)}`;
     }
     if (status === 'platform_blocked') {
-      return `系统暂时阻止打开外部应用。${this.buildErrorSuffix(errorCode, errorMessage)}`;
+      return `${resolveAppResourceText($r('app.string.external_nav_platform_blocked'))}${this.buildErrorSuffix(errorCode, errorMessage)}`;
     }
     if (status === 'invalid_url') {
-      return `外部应用链接无效。${this.buildErrorSuffix(errorCode, errorMessage)}`;
+      return `${resolveAppResourceText($r('app.string.external_nav_link_invalid'))}${this.buildErrorSuffix(errorCode, errorMessage)}`;
     }
-    return `打开外部应用失败。${this.buildErrorSuffix(errorCode, errorMessage)}`;
+    return `${resolveAppResourceText($r('app.string.external_nav_open_failed'))}${this.buildErrorSuffix(errorCode, errorMessage)}`;
   }
 
   private buildFailureUserMessage(
@@ -789,17 +790,17 @@ export class ExternalNavigationLaunchService {
   ): string {
     if (status === 'no_matching_ability') {
       if (mode === 'app_linking_only') {
-        return '当前链接无法由已安装应用处理。';
+        return resolveAppResourceText($r('app.string.external_nav_applinking_unhandled'));
       }
-      return '没有找到可打开此链接的应用。';
+      return resolveAppResourceText($r('app.string.external_nav_no_app'));
     }
     if (status === 'platform_blocked') {
-      return '系统暂时阻止打开外部应用，请回到前台后重试。';
+      return resolveAppResourceText($r('app.string.external_nav_foreground_retry'));
     }
     if (status === 'invalid_url') {
-      return '链接无效，无法打开外部应用。';
+      return resolveAppResourceText($r('app.string.external_nav_invalid_link'));
     }
-    return '打开外部应用失败。';
+    return resolveAppResourceText($r('app.string.external_nav_open_failed'));
   }
 
   private buildErrorSuffix(errorCode: string, errorMessage: string): string {

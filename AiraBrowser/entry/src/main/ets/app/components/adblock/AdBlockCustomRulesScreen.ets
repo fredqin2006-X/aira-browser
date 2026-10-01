@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
 import { AdBlockCustomRuleSourceRowView } from '../../../core/adblock/AdBlockSettingsViewModel';
 import { isPrivateBoundaryRoute } from '../../../common/utils/RouteParamUtils';
@@ -53,7 +54,7 @@ export struct AdBlockGithubRuleDialog {
 
   build() {
     Column({ space: 16 }) {
-      Text('URL 订阅导入')
+      Text($r('app.string.adblock_ui_ad_block_custom_rules_screen_001'))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
@@ -62,7 +63,7 @@ export struct AdBlockGithubRuleDialog {
 
       SettingsTextField({
         text: this.ruleUrl,
-        placeholder: '粘贴 HTTPS 规则订阅地址',
+        placeholder: $r('app.string.adblock_ui_ad_block_custom_rules_screen_005'),
         underlineStyle: true,
         controlBackgroundColor: this.storedControlBackgroundColor,
         primaryTextColor: this.storedPrimaryTextColor,
@@ -74,7 +75,7 @@ export struct AdBlockGithubRuleDialog {
 
       Column({ space: 8 }) {
         BrowserSheetActionButton({
-          label: '确定',
+          label: $r('app.string.ui_ok'),
           emphasis: 'primary',
           stacked: true,
           accentColor: this.storedAccentColor,
@@ -88,7 +89,7 @@ export struct AdBlockGithubRuleDialog {
         })
 
         BrowserSheetActionButton({
-          label: '取消',
+          label: $r('app.string.settings_custom_home_cancel'),
           emphasis: 'ghost',
           stacked: true,
           buttonHeight: 44,
@@ -142,7 +143,7 @@ export struct AdBlockCustomRulesScreen {
 
   build() {
     SettingsHdsScaffold({
-      title: '过滤规则',
+      title: $r('app.string.settings_privacy_protection_adblock_rules'),
       backIconKind: 'back',
       pageBackground: this.storedPageBackgroundColor,
       headerButtonBackground: this.storedPressedBackgroundColor,
@@ -156,14 +157,14 @@ export struct AdBlockCustomRulesScreen {
       scrollers: [this.settingsScroller],
       menuActions: [
         {
-          label: '本地导入',
+          label: $r('app.string.adblock_ui_ad_block_custom_rules_screen_003'),
           icon: $r('sys.symbol.folder_badge_plus'),
           action: () => {
             this.onImportLocal();
           }
         },
         {
-          label: 'URL 订阅导入',
+          label: $r('app.string.adblock_ui_ad_block_custom_rules_screen_001'),
           icon: $r('sys.symbol.link'),
           action: () => {
             this.onOpenGithubDialog();
@@ -181,7 +182,7 @@ export struct AdBlockCustomRulesScreen {
       Column() {
         if (this.desktopPresentation) {
           SettingsDesktopWorkspaceHeader({
-            title: '过滤规则',
+            title: $r('app.string.settings_privacy_protection_adblock_rules'),
             showBackButton: true,
             primaryTextColor: this.storedPrimaryTextColor,
             iconColor: this.storedSecondaryTextColor,
@@ -210,10 +211,10 @@ export struct AdBlockCustomRulesScreen {
             })
           }
           if (this.hasThirdPartyPresetSources()) {
-            this.buildRuleSourceSection('第三方规则', true)
+            this.buildRuleSourceSection($r('app.string.adblock_ui_ad_block_custom_rules_screen_004'), true)
           }
           if (this.hasUserRuleSources()) {
-            this.buildRuleSourceSection('自定义规则', false)
+            this.buildRuleSourceSection($r('app.string.adblock_ui_ad_block_custom_rules_screen_006'), false)
           }
         }
       }
@@ -226,13 +227,13 @@ export struct AdBlockCustomRulesScreen {
   private buildDesktopHeaderActions(): SettingsDesktopWorkspaceHeaderAction[] {
     return [
       {
-        label: '本地导入',
+        label: resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_screen_003')),
         action: (): void => {
           this.onImportLocal();
         }
       },
       {
-        label: 'URL 订阅导入',
+        label: resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_screen_001')),
         action: (): void => {
           this.onOpenGithubDialog();
         }
@@ -241,7 +242,7 @@ export struct AdBlockCustomRulesScreen {
   }
 
   @Builder
-  private buildRuleSourceSection(title: string, isThirdPartyPreset: boolean) {
+  private buildRuleSourceSection(title: ResourceStr, isThirdPartyPreset: boolean) {
     SettingsSection({ title: title }) {
       Column({ space: 10 }) {
         ForEach(this.filterSources(isThirdPartyPreset), (item: AdBlockCustomRuleSourceRowView) => {
@@ -259,7 +260,7 @@ export struct AdBlockCustomRulesScreen {
   @Builder
   private buildUpdatePolicySection() {
     SettingsSection({
-      title: '更新策略',
+      title: $r('app.string.user_script_update_policy'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       Column({ space: 8 }) {
@@ -268,7 +269,7 @@ export struct AdBlockCustomRulesScreen {
           desktopPresentation: this.desktopPresentation
         }) {
           SettingsSwitchRow({
-            title: '订阅规则自动更新',
+            title: $r('app.string.adblock_ui_ad_block_custom_rules_screen_007'),
             desktopPresentation: this.desktopPresentation,
             checked: this.updateOnForeground,
             rowPosition: 'single',
@@ -310,7 +311,7 @@ export struct AdBlockCustomRulesScreen {
     .alignItems(HorizontalAlign.Start)
 
     if (item.hasError) {
-      Text('更新失败')
+      Text($r('app.string.adblock_ui_ad_block_custom_rules_screen_002'))
         .fontSize(12)
         .fontColor(this.storedSecondaryTextColor)
         .maxLines(1)
@@ -440,13 +441,13 @@ export struct AdBlockCustomRulesScreen {
   private buildSourceContextMenu(item: AdBlockCustomRuleSourceRowView) {
     Menu() {
       if (item.canRefresh) {
-        MenuItem({ content: '刷新' })
+        MenuItem({ content: $r('app.string.offline_action_refresh') })
           .onClick(() => {
             this.onRefreshSource(item.id);
           })
       }
       if (item.canRemove) {
-        MenuItem({ content: '删除' })
+        MenuItem({ content: $r('app.string.settings_delete') })
           .onClick(() => {
             this.onRemoveSource(item.id);
           })

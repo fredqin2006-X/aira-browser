@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   BrowserDataScope,
   BrowserSessionPrivacyMode,
@@ -10,6 +11,7 @@ import { TranslationSecretStore } from '../../data/translation/TranslationSecret
 import { BrowserPrivacyEffectPolicyService } from '../../services/privacy/BrowserPrivacyEffectPolicyService';
 import { TranslationProviderError } from '../../services/translation/TranslationProviderFailureClassifierService';
 import { TranslationProviderRequestService } from '../../services/translation/TranslationProviderRequestService';
+import { resolveDisplayedTranslationProviderName } from '../../services/translation/TranslationProviderTemplateService';
 import { TranslationProviderSecretService } from '../../services/translation/TranslationProviderSecretService';
 import { WebpageTranslationTextItem } from '../../services/web/WebpageTranslationRuntimeModels';
 import { BrowserProfileBoundaryService } from '../browser/BrowserProfileBoundaryService';
@@ -100,9 +102,16 @@ export class TranslationSettingsCoordinator {
 
   buildSaveConfirmationMessage(provider: TranslationProviderConfig): string {
     if (provider.templateId === 'custom_http') {
-      return `保存后将使用 ${provider.displayName} 翻译网页，页面文字会发送到：\n${provider.endpoint}`;
+      return resolveAppResourceText($r(
+        'app.string.translation_settings_save_disclosure_endpoint',
+        resolveDisplayedTranslationProviderName(provider.templateId, provider.displayName),
+        provider.endpoint
+      ));
     }
-    return `保存后将使用 ${provider.displayName} 翻译网页。翻译时，页面文字会发送到该服务商处理。`;
+    return resolveAppResourceText($r(
+      'app.string.translation_settings_save_disclosure',
+      resolveDisplayedTranslationProviderName(provider.templateId, provider.displayName)
+    ));
   }
 
   async buildEditableProvider(
@@ -110,7 +119,7 @@ export class TranslationSettingsCoordinator {
     boundary: TranslationSettingsBoundary
   ): Promise<TranslationProviderConfig> {
     if (!this.canReadDevicePreference(boundary)) {
-      throw new Error('当前会话不可读取翻译服务配置。');
+      throw new Error(resolveAppResourceText($r('app.string.translation_settings_read_denied')));
     }
     return this.requireSecretService().buildEditableProvider(provider);
   }
@@ -123,11 +132,11 @@ export class TranslationSettingsCoordinator {
     try {
       await this.testProviderConnection(provider);
       if (!this.canWriteDevicePreference(boundary)) {
-        return { ok: false, message: '当前会话不可保存翻译设置。' };
+        return { ok: false, message: resolveAppResourceText($r('app.string.translation_settings_save_denied')) };
       }
       const securedProvider = await this.requireSecretService().secureProviderForSave(provider, this.repository);
       if (!this.canWriteDevicePreference(boundary)) {
-        return { ok: false, message: '当前会话不可保存翻译设置。' };
+        return { ok: false, message: resolveAppResourceText($r('app.string.translation_settings_save_denied')) };
       }
       const settings = await this.repository.saveUserProvider(securedProvider);
       await this.syncTargetLanguageForProvider(settings, boundary);
@@ -180,7 +189,7 @@ export class TranslationSettingsCoordinator {
     const result = await this.requestService.translateBatch(provider, [testItem], 'en', 'zh-CN');
     const translatedText = result[0]?.translatedText?.trim() ?? '';
     if (translatedText.length === 0) {
-      throw new Error('翻译服务返回了空结果，请检查服务配置。');
+      throw new Error(resolveAppResourceText($r('app.string.translation_settings_empty_result')));
     }
   }
 
@@ -249,6 +258,6 @@ export class TranslationSettingsCoordinator {
     if (error instanceof Error && error.message.length > 0) {
       return error.message;
     }
-    return '无法连接翻译服务，请检查网络和 API 配置。';
+    return resolveAppResourceText($r('app.string.translation_settings_connect_failed'));
   }
 }

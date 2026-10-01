@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { image } from '@kit.ImageKit';
 import { ShortcutRecord } from '../../../common/models/BrowserModels';
 import {
@@ -252,7 +253,7 @@ export struct HomeShortcutSurface {
       } else {
         AppEmptyState({
           showIcon: false,
-          title: '暂无收藏',
+          title: resolveAppResourceText($r('app.string.bookshelf_empty')),
           message: '',
           topPadding: 18,
           bottomPadding: 34,
@@ -374,7 +375,7 @@ export struct HomeShortcutSurface {
       )
 
       if (this.storedShowShortcutNames) {
-        Text('添加')
+        Text(resolveAppResourceText($r('app.string.settings_custom_home_add')))
           .width('100%')
           .height(this.metrics.titleBlockHeight)
           .fontSize(this.viewModel.getShortcutTitleFontSize(this.gridWidth, this.metrics))
@@ -424,7 +425,7 @@ export struct HomeShortcutSurface {
       )
 
       if (this.storedShowShortcutNames) {
-        Text('主页设置')
+        Text(resolveAppResourceText($r('app.string.settings_custom_home_title')))
           .width('100%')
           .height(this.metrics.titleBlockHeight)
           .fontSize(this.viewModel.getShortcutTitleFontSize(this.gridWidth, this.metrics))
@@ -518,32 +519,32 @@ export struct HomeShortcutSurface {
     BrowserDesktopContextMenu() {
       if (isHomeSystemShortcut(shortcut)) {
         MenuItemGroup() {
-          this.buildDesktopShortcutContextMenuItem(shortcut, 'open', '打开')
+          this.buildDesktopShortcutContextMenuItem(shortcut, 'open', resolveAppResourceText($r('app.string.ui_open')))
         }
 
         MenuItemGroup() {
-          this.buildDesktopShortcutContextMenuItem(shortcut, 'delete', '从首页移除')
+          this.buildDesktopShortcutContextMenuItem(shortcut, 'delete', resolveAppResourceText($r('app.string.browser_ui_home_shortcut_surface_001')))
         }
       } else {
         MenuItemGroup() {
-          this.buildDesktopShortcutContextMenuItem(shortcut, 'open', '打开')
-          this.buildDesktopShortcutContextMenuItem(shortcut, 'open_new_tab', '新标签页打开')
-          this.buildDesktopShortcutContextMenuItem(shortcut, 'open_background_tab', '后台打开')
+          this.buildDesktopShortcutContextMenuItem(shortcut, 'open', resolveAppResourceText($r('app.string.ui_open')))
+          this.buildDesktopShortcutContextMenuItem(shortcut, 'open_new_tab', resolveAppResourceText($r('app.string.history_open_new_tab_short')))
+          this.buildDesktopShortcutContextMenuItem(shortcut, 'open_background_tab', resolveAppResourceText($r('app.string.history_open_background')))
         }
 
         MenuItemGroup() {
-          this.buildDesktopShortcutContextMenuItem(shortcut, 'copy_link', '复制链接')
-          this.buildDesktopShortcutContextMenuItem(shortcut, 'edit', '编辑')
+          this.buildDesktopShortcutContextMenuItem(shortcut, 'copy_link', resolveAppResourceText($r('app.string.offline_action_copy_link')))
+          this.buildDesktopShortcutContextMenuItem(shortcut, 'edit', resolveAppResourceText($r('app.string.ui_edit')))
         }
 
         MenuItemGroup() {
-          this.buildDesktopShortcutContextMenuItem(shortcut, 'delete', '删除')
+          this.buildDesktopShortcutContextMenuItem(shortcut, 'delete', resolveAppResourceText($r('app.string.settings_delete')))
         }
       }
 
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
-          label: '主页设置',
+          label: resolveAppResourceText($r('app.string.settings_custom_home_title')),
           onAction: (): void => {
             this.runAfterContextMenuDismiss(() => {
               this.onOpenHomeSettings();
@@ -590,7 +591,7 @@ export struct HomeShortcutSurface {
           })
       }, (item: HomeShortcutContextAction) => item.id)
 
-      MenuItem({ content: '主页设置' })
+      MenuItem({ content: resolveAppResourceText($r('app.string.settings_custom_home_title')) })
         .onClick(() => {
           this.runAfterContextMenuDismiss(() => {
             this.onOpenHomeSettings();
@@ -1001,17 +1002,17 @@ export struct HomeShortcutSurface {
   private resolveContextActions(shortcut: ShortcutRecord): HomeShortcutContextAction[] {
     if (isHomeSystemShortcut(shortcut)) {
       return [
-        { id: 'open', title: '打开', role: 'normal' },
-        { id: 'delete', title: '从首页移除', role: 'destructive' }
+        { id: 'open', title: resolveAppResourceText($r('app.string.ui_open')), role: 'normal' },
+        { id: 'delete', title: resolveAppResourceText($r('app.string.browser_ui_home_shortcut_surface_001')), role: 'destructive' }
       ];
     }
     return [
-      { id: 'open', title: '打开', role: 'normal' },
-      { id: 'open_new_tab', title: '新标签页打开', role: 'normal' },
-      { id: 'open_background_tab', title: '后台打开', role: 'normal' },
-      { id: 'copy_link', title: '复制链接', role: 'normal' },
-      { id: 'edit', title: '编辑', role: 'normal' },
-      { id: 'delete', title: '删除', role: 'destructive' }
+      { id: 'open', title: resolveAppResourceText($r('app.string.ui_open')), role: 'normal' },
+      { id: 'open_new_tab', title: resolveAppResourceText($r('app.string.history_open_new_tab_short')), role: 'normal' },
+      { id: 'open_background_tab', title: resolveAppResourceText($r('app.string.history_open_background')), role: 'normal' },
+      { id: 'copy_link', title: resolveAppResourceText($r('app.string.offline_action_copy_link')), role: 'normal' },
+      { id: 'edit', title: resolveAppResourceText($r('app.string.ui_edit')), role: 'normal' },
+      { id: 'delete', title: resolveAppResourceText($r('app.string.settings_delete')), role: 'destructive' }
     ];
   }
 

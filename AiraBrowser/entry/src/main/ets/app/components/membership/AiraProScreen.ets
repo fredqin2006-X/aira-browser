@@ -15,6 +15,10 @@ import {
   resolveAiraProMembershipRedeemResult
 } from '../../../core/membership/AiraProMembershipRedeemResult';
 import { AiraProOverviewScreen } from './AiraProOverviewScreen';
+import { AiraDonateProIntroSheet } from './AiraDonateProIntroSheet';
+import { AiraDonateProIntroRepository } from '../../../data/onboarding/AiraDonateProIntroRepository';
+import { AIRA_COMMUNITY_REPOSITORY_URL } from '../../../common/constants/AiraCommunityProjectLinks';
+import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../../common/config/AiraDistributionCapabilityOwner';
 import { resolveCenteredDialogControllerWidth,  CENTERED_DIALOG_CORNER_RADIUS_VP } from '../common/CenteredDialogSurface';
 import {
   BrowserThemeViewState,
@@ -44,7 +48,6 @@ import {
   AiraProPurchaseCoordinator,
   AiraProPurchaseFlowHostAdapter
 } from '../../../core/membership/AiraProPurchaseCoordinator';
-import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../../common/config/AiraDistributionCapabilityOwner';
 import { HuaweiIapProductView } from '../../../services/membership/HuaweiIapPurchaseService';
 import {
   readCachedAiraProLifetimeStorePrice,
@@ -65,7 +68,7 @@ import { AppServiceModeGateService } from '../../../services/settings/AppService
 import { MEMBERSHIP_REFRESH_ACCOUNT_VISIBLE_FRESH_MS } from '../../../services/membership/MembershipRefreshPolicyService';
 import { applyDesktopDialogSheetChrome } from '../common/DesktopDialogSheetChrome';
 
-type AiraProSheetKind = 'none' | 'login' | 'legalDocument' | 'selfHostingGuide';
+type AiraProSheetKind = 'none' | 'login' | 'legalDocument' | 'selfHostingGuide' | 'donateIntro';
 export type AiraProPresentationMode = 'page' | 'workspace';
 export type AiraProPageLayoutMode = 'phone' | 'large_screen';
 
@@ -107,6 +110,8 @@ export struct AiraProScreen {
         this.handleHuaweiLoginPanelResult(error, response);
       });
   private contentScroller: Scroller = new Scroller();
+  private donateIntroRepository: AiraDonateProIntroRepository = new AiraDonateProIntroRepository();
+  private donateIntroRequest: number = 0;
   private themePreferencesListenerKey: string = '';
   @State private dataScope: string = '';
   @State private privacyMode: string = '';
@@ -177,6 +182,7 @@ export struct AiraProScreen {
   aboutToAppear(): void {
     this.bindThemePreferencesUpdates();
     this.refreshState();
+    this.presentDonateIntro();
     if (this.isDesktopPresentation()) {
       this.purchaseCoordinator.handlePageShow(this.purchaseFlowHost, this.buildAiraProDataBoundaryInput());
     }
@@ -200,6 +206,7 @@ export struct AiraProScreen {
 
   onPageShow(): void {
     this.refreshState();
+    this.presentDonateIntro();
     this.purchaseCoordinator.handlePageShow(this.purchaseFlowHost, this.buildAiraProDataBoundaryInput());
   }
 
@@ -240,7 +247,7 @@ export struct AiraProScreen {
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     .bindSheet($$this.activeSheetVisible, this.buildActiveSheet(), applyDesktopDialogSheetChrome({
       preferType: this.pageLayoutMode === 'large_screen' ? SheetType.CENTER : SheetType.BOTTOM,
-      height: this.resolveActiveSheetHeight(),
+      height: this.activeSheetKind === 'donateIntro' ? SheetSize.LARGE : this.resolveActiveSheetHeight(),
       dragBar: this.pageLayoutMode !== 'large_screen',
       showClose: this.activeSheetKind === 'login',
       backgroundColor: this.resolveActiveSheetBackgroundColor(),
@@ -357,6 +364,26 @@ export struct AiraProScreen {
         .height('100%')
     } else if (this.activeSheetKind === 'selfHostingGuide') {
       SyncDesktopBookmarkGuideContent()
+        .width('100%')
+        .height('100%')
+    } else if (this.activeSheetKind === 'donateIntro') {
+      AiraDonateProIntroSheet({
+        primaryTextColor: this.theme.textPrimary,
+        secondaryTextColor: this.theme.textSecondary,
+        accentColor: this.theme.accent,
+        onAccentColor: this.theme.onAccent,
+        surfaceColor: this.storedFloatingSurfaceColor,
+        onEnter: (): void => {
+          this.closeActiveSheet();
+        },
+        onOpenRepository: (): void => {
+          this.closeActiveSheet();
+          this.navigationCoordinator.openBrowserUrlFromGuide(
+            AIRA_COMMUNITY_REPOSITORY_URL,
+            this.buildAiraProBoundaryState()
+          );
+        }
+      })
         .width('100%')
         .height('100%')
     } else {
@@ -725,6 +752,31 @@ export struct AiraProScreen {
     }
     this.closeActiveSheet();
     this.signInHuaweiAccount();
+  }
+
+  /**
+   * Official only, and only the first time this device opens the page. Community
+   * has no hosted membership to explain. Marking shown before the sheet opens
+   * means a swipe-away still counts.
+   */
+  private presentDonateIntro(): void {
+    if (AIRA_DISTRIBUTION_CAPABILITY_OWNER.isCommunity() || this.activeSheetVisible) {
+      return;
+    }
+    const request = this.donateIntroRequest + 1;
+    this.donateIntroRequest = request;
+    this.donateIntroRepository.initialize()
+      .then((): void => {
+        if (request !== this.donateIntroRequest || this.donateIntroRepository.hasShown() ||
+          this.activeSheetVisible) {
+          return;
+        }
+        this.donateIntroRepository.markShown().catch((_error: Error): void => {
+        });
+        this.openActiveSheet('donateIntro');
+      })
+      .catch((_error: Error): void => {
+      });
   }
 
   private openActiveSheet(kind: AiraProSheetKind): void {

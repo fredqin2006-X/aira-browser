@@ -244,7 +244,7 @@ export class AiraProOverviewViewModel {
 
   private resolveHeroTitle(state: AiraMembershipState): ResourceStr {
     if (state.plan !== 'pro') {
-      return 'Aira Pro';
+      return $r('app.string.settings_pro_donate_title');
     }
     if (this.membershipPresentationService.isLongTermMember(state) &&
       !this.membershipPresentationService.hasInsiderRecognition(state)) {

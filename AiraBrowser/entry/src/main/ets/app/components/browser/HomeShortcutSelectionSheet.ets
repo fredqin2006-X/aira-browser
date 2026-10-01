@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { display } from '@kit.ArkUI';
 import { image } from '@kit.ImageKit';
 import { desktopDialogTierSpec } from '../../../core/browser/BrowserDialogPresentationTokens';
@@ -52,8 +53,8 @@ import { FloatingGlassMaterialSurface } from '../common/FloatingGlassMaterialSur
 import { resolveFloatingGlassMaterialTintForMode } from '../common/FloatingGlassMaterialTokens';
 
 const HOME_SHORTCUT_SELECTION_TABS: SegmentedTabOption[] = [
-  { id: 'system', title: '系统入口' },
-  { id: 'bookmarks', title: '书签' }
+  { id: 'system', title: $r('app.string.browser_ui_home_shortcut_selection_sheet_004') },
+  { id: 'bookmarks', title: $r('app.string.app_shortcut_bookmarks') }
 ];
 const HOME_SHORTCUT_SELECTION_ROW_HEIGHT: number = 62;
 const HOME_SHORTCUT_SELECTION_ICON_SIZE: number = 42;
@@ -74,7 +75,7 @@ const EMPTY_HOME_SHORTCUT_SELECTION_STATE: HomeShortcutSelectionState = {
   scenarioId: 'aira_default_scenario',
   activeTab: 'system',
   currentFolderId: '',
-  currentFolderTitle: '书签',
+  currentFolderTitle: $r('app.string.app_shortcut_bookmarks'),
   systemRows: [],
   bookmarkRows: [],
   busyKeys: [],
@@ -225,7 +226,7 @@ export struct HomeShortcutSelectionContent {
         icon: $r('sys.symbol.xmark'),
         iconSize: BROWSER_FEATURE_SHEET_HEADER_ICON_SIZE,
         buttonSize: BROWSER_FEATURE_SHEET_HEADER_BUTTON_SIZE,
-        accessibilityLabel: '关闭添加至首页',
+        accessibilityLabel: resolveAppResourceText($r('app.string.browser_ui_home_shortcut_selection_sheet_001')),
         immersiveMaterialEnabled: true,
         onAction: (): void => {
           this.onClose();
@@ -241,7 +242,7 @@ export struct HomeShortcutSelectionContent {
   private buildPhoneHeader() {
     Column({ space: 14 }) {
       BrowserFeatureSheetHeader({
-        title: '添加至首页'
+        title: resolveAppResourceText($r('app.string.browser_ui_home_shortcut_selection_sheet_003'))
       })
 
       this.buildSelectionTabs()
@@ -338,7 +339,9 @@ export struct HomeShortcutSelectionContent {
       trailing: () => {
         this.buildToggleButton(row.added, this.isBusy(row.busyKey), () => {
           this.onAction({ type: 'toggle_system', target: row.target });
-        }, row.added ? `从首页移除${row.title}` : `添加${row.title}至首页`)
+        }, row.added
+          ? resolveAppResourceText($r('app.string.home_shortcut_remove_named', row.title))
+          : resolveAppResourceText($r('app.string.home_shortcut_add_named', row.title)))
       }
     })
   }
@@ -381,7 +384,7 @@ export struct HomeShortcutSelectionContent {
             .width(28)
             .height(28)
             .color(this.storedAccentColor)
-          Text('正在加载书签…')
+          Text(resolveAppResourceText($r('app.string.browser_ui_home_shortcut_selection_sheet_002')))
             .fontSize(13)
             .fontColor(this.storedSecondaryTextColor)
         }
@@ -393,7 +396,7 @@ export struct HomeShortcutSelectionContent {
       } else {
         AppEmptyState({
           airaIconId: 'browser.shortcut.bookmarks',
-          title: '这里还没有书签',
+          title: resolveAppResourceText($r('app.string.bookmark_empty')),
           message: '',
           topPadding: 32,
           bottomPadding: 32,
@@ -446,7 +449,7 @@ export struct HomeShortcutSelectionContent {
     Row({ space: 10 }) {
       BrowserSheetIconButton({
         icon: $r('sys.symbol.chevron_left'),
-        accessibilityLabel: '返回上一级',
+        accessibilityLabel: resolveAppResourceText($r('app.string.browser_ui_home_shortcut_selection_sheet_005')),
         onAction: () => {
           this.navigateBackBookmarkFolder();
         }
@@ -513,7 +516,9 @@ export struct HomeShortcutSelectionContent {
         trailing: () => {
           this.buildToggleButton(row.added, this.isBusy(row.busyKey), () => {
             this.onAction({ type: 'toggle_bookmark', bookmarkId: row.id });
-          }, row.added ? `从首页移除${row.title}` : `添加${row.title}至首页`)
+          }, row.added
+            ? resolveAppResourceText($r('app.string.home_shortcut_remove_named', row.title))
+            : resolveAppResourceText($r('app.string.home_shortcut_add_named', row.title)))
         }
       })
     }
@@ -618,7 +623,7 @@ export struct HomeShortcutSelectionContent {
   }
 
   private resolveBookmarkFolderTitle(folderId: string): ResourceStr {
-    return this.bookmarkTitleByFolderId.get(folderId) ?? '书签';
+    return this.bookmarkTitleByFolderId.get(folderId) ?? resolveAppResourceText($r('app.string.app_shortcut_bookmarks'));
   }
 
   private openBookmarkFolder(folderId: string): void {

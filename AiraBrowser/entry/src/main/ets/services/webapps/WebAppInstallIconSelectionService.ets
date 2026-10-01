@@ -2,6 +2,7 @@ import { common } from '@kit.AbilityKit';
 import { fileIo, fileUri } from '@kit.CoreFileKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { DesktopShortcutIconPreparationService } from '../shortcuts/DesktopShortcutIconPreparationService';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
 const WEB_APP_INSTALL_ICON_DRAFT_DIR: string = 'webapp-install-icon-drafts';
 
@@ -44,7 +45,7 @@ export class WebAppInstallIconSelectionService {
   ): Promise<WebAppInstallIconSelection> {
     const normalizedSourceUri = sourceUri.trim();
     if (normalizedSourceUri.length === 0) {
-      throw new Error('未选择应用图标。');
+      throw new Error(resolveAppResourceText($r('app.string.desktop_shortcut_icon_not_selected')));
     }
     const directory = `${context.cacheDir}/${WEB_APP_INSTALL_ICON_DRAFT_DIR}`;
     await this.ensureDirectory(directory);

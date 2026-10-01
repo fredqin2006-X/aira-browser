@@ -1,4 +1,5 @@
 import { Want, common, defaultAppManager } from '@kit.AbilityKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { commentManager } from '@kit.AppGalleryKit';
 import { APP_BUNDLE_NAME } from '../../common/constants/AppVersionInfo';
 
@@ -33,7 +34,7 @@ export class SystemSettingsLaunchService {
         await context.startAbility(candidates[index]);
         return {
           success: true,
-          message: '已打开系统设置，请选择默认浏览器。'
+          message: launchText($r('app.string.settings_general_default_browser_opened'), '已打开系统设置，请选择默认浏览器。')
         };
       } catch (_error) {
       }
@@ -41,7 +42,7 @@ export class SystemSettingsLaunchService {
 
     return {
       success: false,
-      message: '无法打开默认浏览器设置，请手动进入系统设置更改。'
+      message: launchText($r('app.string.settings_general_default_browser_failed'), '无法打开默认浏览器设置，请手动进入系统设置更改。')
     };
   }
 
@@ -65,7 +66,7 @@ export class SystemSettingsLaunchService {
         await context.startAbility(candidates[index]);
         return {
           success: true,
-          message: '已打开系统设置，请进入 Wi-Fi 页面连接网络。'
+          message: resolveAppResourceText($r('app.string.settings_launch_wifi_opened'))
         };
       } catch (_error) {
       }
@@ -73,7 +74,7 @@ export class SystemSettingsLaunchService {
 
     return {
       success: false,
-      message: '无法打开系统设置，请手动进入设置并连接 Wi-Fi。'
+      message: resolveAppResourceText($r('app.string.settings_launch_wifi_failed'))
     };
   }
 
@@ -91,7 +92,7 @@ export class SystemSettingsLaunchService {
         await context.startAbility(candidates[index]);
         return {
           success: true,
-          message: '已打开系统设置，请进入 Aira 的应用权限。'
+          message: resolveAppResourceText($r('app.string.settings_launch_permission_opened'))
         };
       } catch (_error) {
       }
@@ -99,7 +100,7 @@ export class SystemSettingsLaunchService {
 
     return {
       success: false,
-      message: '无法打开系统设置，请手动进入设置并开启 Aira 权限。'
+      message: resolveAppResourceText($r('app.string.settings_launch_permission_failed'))
     };
   }
 
@@ -116,25 +117,25 @@ export class SystemSettingsLaunchService {
       await context.openLink(url);
       return {
         success: true,
-        message: '已交给系统打开。'
+        message: resolveAppResourceText($r('app.string.external_nav_handed_to_system'))
       };
     } catch (error) {
       return {
         success: false,
-        message: `打开链接失败：${JSON.stringify(error)}`
+        message: resolveAppResourceText($r('app.string.settings_launch_link_failed', JSON.stringify(error)))
       };
     }
   }
 
   async openAppReviewPage(context: common.UIAbilityContext): Promise<SystemSettingsLaunchResult> {
     const reviewPageResult = await this.openAppGalleryDeepLink(context, AIRA_APPGALLERY_REVIEW_URI,
-      '已打开应用市场评论页。');
+      resolveAppResourceText($r('app.string.settings_launch_review_opened')));
     if (reviewPageResult.success) {
       return reviewPageResult;
     }
 
     const detailPageResult = await this.openAppGalleryDeepLink(context, AIRA_APPGALLERY_DETAIL_URI,
-      '已打开应用市场详情页。');
+      resolveAppResourceText($r('app.string.settings_launch_detail_opened')));
     if (detailPageResult.success) {
       return detailPageResult;
     }
@@ -151,7 +152,7 @@ export class SystemSettingsLaunchService {
     const detailPageResult = await this.openAppGalleryDeepLink(
       context,
       AIRA_APPGALLERY_DETAIL_URI,
-      '已打开应用市场，请升级 Aira。'
+      resolveAppResourceText($r('app.string.settings_launch_upgrade_opened'))
     );
     if (detailPageResult.success) {
       return detailPageResult;
@@ -167,12 +168,12 @@ export class SystemSettingsLaunchService {
       await commentManager.showCommentDialog(context);
       return {
         success: true,
-        message: '已打开评分弹窗。'
+        message: resolveAppResourceText($r('app.string.settings_launch_rating_opened'))
       };
     } catch (_error) {
       return {
         success: false,
-        message: '暂时无法打开评分弹窗。'
+        message: resolveAppResourceText($r('app.string.settings_launch_rating_failed'))
       };
     }
   }
@@ -195,8 +196,13 @@ export class SystemSettingsLaunchService {
     } catch (_error) {
       return {
         success: false,
-        message: '应用市场暂时无法打开。'
+        message: resolveAppResourceText($r('app.string.settings_launch_market_unavailable'))
       };
     }
   }
+}
+
+function launchText(resource: Resource, fallback: string): string {
+  const resolved = resolveAppResourceText(resource);
+  return resolved.length > 0 ? resolved : fallback;
 }

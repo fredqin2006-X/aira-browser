@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   BrowserDataScope,
   BrowserProfileId,
@@ -113,7 +114,7 @@ export class ExternalNavigationPolicyService {
         isUserTriggered: isUserTriggered,
         appName: appName,
         key: key,
-        message: `已阻止打开${appName}。`
+        message: resolveAppResourceText($r('app.string.external_nav_blocked', appName))
       };
     }
     if (effectivePolicy === 'allow') {
@@ -127,7 +128,7 @@ export class ExternalNavigationPolicyService {
           isUserTriggered: isUserTriggered,
           appName: appName,
           key: key,
-          message: `已阻止网页自动打开${appName}。`
+          message: resolveAppResourceText($r('app.string.external_nav_blocked_auto', appName))
         };
       }
       return {
@@ -139,7 +140,7 @@ export class ExternalNavigationPolicyService {
         isUserTriggered: isUserTriggered,
         appName: appName,
         key: key,
-        message: `允许直接打开${appName}。`
+        message: resolveAppResourceText($r('app.string.external_nav_allowed', appName))
       };
     }
     const shouldSuppressPrompt = normalizedUrl === duplicateUrl && now - duplicateAt < dedupeIntervalMs;
@@ -154,8 +155,10 @@ export class ExternalNavigationPolicyService {
       appName: appName,
       key: key,
       message: userSuppressed
-        ? `已根据上次取消静默拦截${appName}。`
-        : (isUserTriggered ? `请求打开${appName}。` : `已阻止网页自动打开${appName}。`)
+        ? resolveAppResourceText($r('app.string.external_nav_suppressed', appName))
+        : (isUserTriggered
+          ? resolveAppResourceText($r('app.string.external_nav_request', appName))
+          : resolveAppResourceText($r('app.string.external_nav_blocked_auto', appName)))
     };
   }
 
@@ -217,10 +220,10 @@ export class ExternalNavigationPolicyService {
     const redactedOrigin = dataScope === 'session_ephemeral';
     const scheme = this.getUrlScheme(url) || 'unknown';
     return {
-      title: '打开其他应用',
-      message: `${displayOrigin} 想打开${appName}。`,
-      confirmLabel: '允许',
-      cancelLabel: '取消',
+      title: resolveAppResourceText($r('app.string.external_nav_open_title')),
+      message: resolveAppResourceText($r('app.string.external_nav_open_message', displayOrigin, appName)),
+      confirmLabel: resolveAppResourceText($r('app.string.settings_site_capability_rule_allow')),
+      cancelLabel: resolveAppResourceText($r('app.string.settings_custom_home_cancel')),
       appName: appName,
       displayOrigin: displayOrigin,
       redactedOrigin: redactedOrigin,
@@ -242,6 +245,23 @@ export class ExternalNavigationPolicyService {
   }
 
   getAppName(url: string): string {
+    const scheme = this.externalNavigationLaunchService.resolveExternalAppScheme(url);
+    if (scheme === 'baiduboxapp') {
+      return resolveAppResourceText($r('app.string.external_nav_baidu'));
+    }
+    if (scheme === 'bilibili') {
+      return resolveAppResourceText($r('app.string.external_nav_bilibili'));
+    }
+    if (scheme === 'qklink') {
+      return resolveAppResourceText($r('app.string.external_nav_quark'));
+    }
+    if (scheme.length > 0) {
+      return resolveAppResourceText($r('app.string.external_nav_scheme_app', scheme));
+    }
+    return resolveAppResourceText($r('app.string.browser_external_navigation_prompt_view_model_001'));
+  }
+
+  private getStableAppKeyName(url: string): string {
     const scheme = this.externalNavigationLaunchService.resolveExternalAppScheme(url);
     if (scheme === 'baiduboxapp') {
       return '百度 App';
@@ -276,7 +296,7 @@ export class ExternalNavigationPolicyService {
         action: 'show_unavailable_message',
         appName: appName,
         fallbackUrl: fallbackUrl,
-        message: '链接无效，无法打开外部应用。',
+        message: resolveAppResourceText($r('app.string.external_nav_invalid_link')),
         faultCode: 'external_navigation_invalid_url',
         targetInfo: targetInfo
       };
@@ -286,7 +306,7 @@ export class ExternalNavigationPolicyService {
         action: 'show_unavailable_message',
         appName: appName,
         fallbackUrl: fallbackUrl,
-        message: '没有找到可打开此链接的应用。',
+        message: resolveAppResourceText($r('app.string.external_nav_no_app')),
         faultCode: 'external_navigation_no_ability',
         targetInfo: targetInfo
       };
@@ -295,7 +315,9 @@ export class ExternalNavigationPolicyService {
       action: 'show_prompt',
       appName: appName,
       fallbackUrl: fallbackUrl,
-      message: targetInfo.multipleCandidates ? '可由多个应用打开。' : '可打开外部应用。',
+      message: targetInfo.multipleCandidates
+        ? resolveAppResourceText($r('app.string.external_nav_multiple'))
+        : resolveAppResourceText($r('app.string.external_nav_can_open')),
       faultCode: '',
       targetInfo: targetInfo
     };
@@ -371,12 +393,12 @@ export class ExternalNavigationPolicyService {
   private buildSuppressionKey(origin: string, url: string): string {
     const originKey = origin.trim().toLowerCase();
     const scheme = this.getUrlScheme(url);
-    return `${originKey}|${scheme}|${this.getAppName(url).toLowerCase()}`;
+    return `${originKey}|${scheme}|${this.getStableAppKeyName(url).toLowerCase()}`;
   }
 
   private resolvePromptAppName(url: string, targetInfo: ExternalNavigationTargetLaunchInfo): string {
     if (targetInfo.multipleCandidates) {
-      return '可用应用';
+      return resolveAppResourceText($r('app.string.external_nav_available_apps'));
     }
     const appName = targetInfo.appName.trim();
     if (appName.length > 0) {
@@ -405,7 +427,7 @@ export class ExternalNavigationPolicyService {
 
   private getDisplayOriginForScope(origin: string, dataScope: BrowserDataScope): string {
     if (dataScope === 'session_ephemeral') {
-      return '当前私密页面';
+      return resolveAppResourceText($r('app.string.external_nav_private_page'));
     }
     return this.getDisplayOrigin(origin);
   }

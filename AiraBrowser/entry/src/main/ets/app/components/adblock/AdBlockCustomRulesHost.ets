@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   resolveCenteredDialogControllerWidth,
   CENTERED_DIALOG_CORNER_RADIUS_VP,
@@ -55,14 +56,14 @@ struct AdBlockRuleImportProgressDialog {
         .height(40)
         .color(this.storedAccentColor)
 
-      Text(this.title.length > 0 ? this.title : '正在处理')
+      Text(this.title.length > 0 ? this.title : resolveAppResourceText($r('app.string.settings_advanced_backup_exporting')))
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.storedPrimaryTextColor)
         .textAlign(TextAlign.Center)
 
-      Text(this.subtitle.length > 0 ? this.subtitle : '请稍候')
+      Text(this.subtitle.length > 0 ? this.subtitle : resolveAppResourceText($r('app.string.settings_sync_please_wait')))
         .fontSize(14)
         .lineHeight(20)
         .textAlign(TextAlign.Center)
@@ -200,14 +201,14 @@ export struct AdBlockCustomRulesHost {
       .then((result: AdBlockSettingsMutationResult) => {
         if (!result.allowed) {
           this.state = previousState;
-          this.showToast('当前会话不可修改网页内容过滤设置');
+          this.showToast(resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_host_003')));
           return;
         }
         this.state = this.viewModel.buildState(result.settings);
       })
       .catch((_error: Error) => {
         this.state = previousState;
-        this.showToast('更新策略保存失败');
+        this.showToast(resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_host_004')));
       });
   }
 
@@ -223,7 +224,10 @@ export struct AdBlockCustomRulesHost {
         if (uri === undefined || uri.length === 0) {
           return undefined;
         }
-        this.beginRuleImportOperation('正在导入规则', '正在解析并保存本地规则，请稍候。');
+        this.beginRuleImportOperation(
+          resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_host_007')),
+          resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_host_010'))
+        );
         return this.coordinator.importLocalSource(uri, this.buildSettingsBoundary());
       })
       .then((result: AdBlockRuleSourceResult | undefined) => {
@@ -253,14 +257,17 @@ export struct AdBlockCustomRulesHost {
     }
     const url = this.githubRuleUrl.trim();
     if (url.length === 0) {
-      this.showToast('请输入规则链接');
+      this.showToast(resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_host_014')));
       return;
     }
     this.importGithubRuleSource(url);
   }
 
   private importGithubRuleSource(url: string): void {
-    this.beginRuleImportOperation('正在导入订阅', '正在下载并解析远程规则，请稍候。');
+    this.beginRuleImportOperation(
+      resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_host_008')),
+      resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_host_005'))
+    );
     this.coordinator.addSource(url, this.buildSettingsBoundary())
       .then((result: AdBlockRuleSourceResult) => {
         this.githubRuleUrl = '';
@@ -280,7 +287,10 @@ export struct AdBlockCustomRulesHost {
     if (this.ruleImportInProgress) {
       return;
     }
-    this.beginRuleImportOperation('正在更新规则', '正在重新拉取并解析规则，请稍候。');
+    this.beginRuleImportOperation(
+      resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_host_009')),
+      resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_host_011'))
+    );
     this.coordinator.refreshSource(sourceId, this.buildSettingsBoundary())
       .then((result: AdBlockRuleSourceResult) => {
         this.completeRuleImportOperation();
@@ -336,7 +346,10 @@ export struct AdBlockCustomRulesHost {
       this.refreshState();
       return;
     }
-    this.beginRuleImportOperation('正在下载规则', `正在下载并解析“${consent.sourceTitle}”，请稍候。`);
+    this.beginRuleImportOperation(
+      resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_host_006')),
+      resolveAppResourceText($r('app.string.adblock_downloading_named', consent.sourceTitle))
+    );
     this.coordinator.downloadAndEnableThirdPartyPreset(consent.sourceId, this.buildSettingsBoundary())
       .then((result: AdBlockRuleSourceResult) => {
         this.completeRuleImportOperation();
@@ -366,15 +379,15 @@ export struct AdBlockCustomRulesHost {
 
   private confirmRemoveRuleSource(sourceId: string): void {
     showCenteredAlertDialog({
-      title: '删除自定义规则',
-      message: '删除后需要重新导入才能恢复。',
+      title: $r('app.string.adblock_ui_ad_block_custom_rules_host_002'),
+      message: $r('app.string.adblock_ui_ad_block_custom_rules_host_001'),
       autoCancel: true,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.settings_custom_home_cancel'),
         action: () => {}
       },
       secondaryButton: {
-        value: '删除',
+        value: $r('app.string.settings_delete'),
         fontColor: $r('app.color.permission_blocked'),
         action: () => {
           this.removeRuleSource(sourceId);
@@ -425,7 +438,7 @@ export struct AdBlockCustomRulesHost {
       message: message,
       autoCancel: true,
       confirm: {
-        value: '知道了',
+        value: $r('app.string.settings_advanced_backup_confirm'),
         action: () => {
         }
       }
@@ -435,8 +448,8 @@ export struct AdBlockCustomRulesHost {
   private showRuleDownloadFailure(sourceTitle: string, detail: string): void {
     const detailText = detail.trim().length > 0 ? `\n\n${detail.trim()}` : '';
     this.showDialog(
-      '规则下载失败',
-      `无法下载“${sourceTitle}”。请检查网络连接和规则服务器后重试。${detailText}`
+      resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_host_013')),
+      resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_host_015', sourceTitle, detailText))
     );
   }
 
@@ -472,7 +485,7 @@ export struct AdBlockCustomRulesHost {
     if (error.message !== undefined && error.message.length > 0) {
       return error.message;
     }
-    return '自定义规则更新失败';
+    return resolveAppResourceText($r('app.string.adblock_ui_ad_block_custom_rules_host_012'));
   }
 
   private ensureOptionalServiceRoute(): boolean {

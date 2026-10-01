@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   BrowserWebNavigationCommandReason,
   BrowserWebNavigationCommandResult
@@ -73,7 +74,12 @@ export class BrowserWebHistoryCommandRuntimeCoordinator {
 
   handleShortcutNavigateBack(): void {
     const result = this.navigate('back');
-    this.presentCommandFeedback('back', 'keyboard_back', result, '已后退。');
+    this.presentCommandFeedback(
+      'back',
+      'keyboard_back',
+      result,
+      resolveAppResourceText($r('app.string.browser_browser_web_history_command_runtime_coordinator_001'))
+    );
   }
 
   handleShortcutNavigateForward(message: string): void {
@@ -132,9 +138,13 @@ export class BrowserWebHistoryCommandRuntimeCoordinator {
   ): void {
     let message = '';
     if (result.status === 'unavailable') {
-      message = direction === 'back' ? '没有可后退的页面。' : '没有可前进的页面。';
+      message = direction === 'back'
+        ? resolveAppResourceText($r('app.string.keyboard_shortcut_no_back'))
+        : resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_028'));
     } else if (result.status === 'failed') {
-      message = direction === 'back' ? '后退失败，请重试。' : '前进失败，请重试。';
+      message = direction === 'back'
+        ? resolveAppResourceText($r('app.string.keyboard_shortcut_back_failed'))
+        : resolveAppResourceText($r('app.string.keyboard_shortcut_forward_failed'));
     } else if (result.status === 'native_issued') {
       message = successMessage;
     }

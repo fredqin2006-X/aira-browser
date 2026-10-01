@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   WallpaperColorChoiceViewState,
   WallpaperImageOptionViewState,
@@ -74,7 +75,7 @@ export struct WallpaperSettingsContent {
   @Builder
   private buildColorSection() {
     SettingsSection({
-      title: '壁纸颜色',
+      title: $r('app.string.wallpaper_ui_wallpaper_settings_screen_003'),
       secondaryTextColor: this.storedSecondaryTextColor
     }) {
       SettingsGroupCard({ surfaceColor: this.storedSurfaceBackgroundColor }) {
@@ -117,7 +118,9 @@ export struct WallpaperSettingsContent {
       color: choice.isSelected ? this.storedAccentColor : Color.Transparent
     })
     .enabled(choice.isEnabled)
-    .accessibilityText(choice.isSelected ? `${choice.label}，已选中` : choice.label)
+    .accessibilityText(choice.isSelected
+      ? resolveAppResourceText($r('app.string.wallpaper_selected', choice.label))
+      : choice.label)
     .onClick(() => {
       if (choice.isEnabled) {
         this.onColorSelect(choice.id);
@@ -215,7 +218,7 @@ export struct WallpaperSettingsContent {
     Row() {
       Column() {
         SettingsSection({
-          title: '图片与视频',
+          title: $r('app.string.wallpaper_ui_wallpaper_settings_screen_002'),
           secondaryTextColor: this.storedSecondaryTextColor
         }) {
           Row({ space: this.layoutState.cardGap }) {
@@ -300,7 +303,7 @@ export struct WallpaperSettingsContent {
           .height(30)
           .color(this.storedAccentColor)
       } else if (option.id === 'bing' && this.state.bingPreviewStatus === 'error') {
-        Text('加载失败')
+        Text($r('app.string.history_load_failed'))
           .fontSize(15)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.storedSecondaryTextColor)
@@ -327,7 +330,7 @@ export struct WallpaperSettingsContent {
   @Builder
   private buildCustomReplaceCapsule() {
     Row() {
-      Text('更换')
+      Text($r('app.string.wallpaper_ui_wallpaper_settings_screen_005'))
         .fontSize(13)
         .fontWeight(FontWeight.Medium)
         .fontColor(this.storedOnAccentColor)
@@ -421,7 +424,7 @@ export struct WallpaperSettingsContent {
         .layoutWeight(1)
 
       if (this.state.bingRetryVisible) {
-        Button('重试')
+        Button($r('app.string.settings_sync_retry'))
           .buttonStyle(ButtonStyleMode.TEXTUAL)
           .fontSize(13)
           .fontWeight(FontWeight.Medium)
@@ -451,18 +454,22 @@ export struct WallpaperSettingsContent {
 
   private resolvePreviewAccessibilityText(option: WallpaperImageOptionViewState): string {
     if (option.id === 'custom') {
-      return option.isEmpty ? '添加自定义壁纸' : '更换自定义壁纸';
+      return option.isEmpty
+        ? resolveAppResourceText($r('app.string.wallpaper_ui_wallpaper_settings_screen_009'))
+        : resolveAppResourceText($r('app.string.wallpaper_ui_wallpaper_settings_screen_006'));
     }
     if (option.id === 'video') {
-      return option.isEmpty ? '添加视频壁纸' : '更换视频壁纸';
+      return option.isEmpty
+        ? resolveAppResourceText($r('app.string.wallpaper_ui_wallpaper_settings_screen_010'))
+        : resolveAppResourceText($r('app.string.wallpaper_ui_wallpaper_settings_screen_007'));
     }
     if (this.state.bingPreviewStatus === 'loading') {
-      return '正在加载必应壁纸';
+      return resolveAppResourceText($r('app.string.wallpaper_ui_wallpaper_settings_screen_008'));
     }
     if (this.state.bingPreviewStatus === 'error' && option.isEmpty) {
-      return '必应壁纸加载失败';
+      return resolveAppResourceText($r('app.string.wallpaper_ui_wallpaper_settings_screen_004'));
     }
-    return '使用必应壁纸';
+    return resolveAppResourceText($r('app.string.wallpaper_ui_wallpaper_settings_screen_001'));
   }
 
   private updateResponsiveLayout(containerWidth: number, containerHeight: number): void {

@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { common } from '@kit.AbilityKit';
 import { OfflinePageSaveCoordinator } from '../offline/OfflinePageSaveCoordinator';
 import { PreferencesRepository } from '../../data/preferences/PreferencesRepository';
@@ -124,34 +125,34 @@ export class BrowserKeyboardShortcutCoordinator {
     switch (action) {
       case 'focusAddressBar':
         this.shell.focusAddressBar();
-        this.shell.showMessage('已聚焦地址栏。');
+        this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_016')));
         return;
       case 'openNewTab':
         this.openNewTab();
-        this.shell.showMessage('已打开新标签页。');
+        this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_011')));
         return;
       case 'openHistory':
         this.dependencies.routeCoordinator.openHistoryManagerPage();
-        this.shell.showMessage('已打开历史记录。');
+        this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_010')));
         return;
       case 'openDownloads':
         this.dependencies.routeCoordinator.openDownloadManagementPage();
-        this.shell.showMessage('已打开下载管理。');
+        this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_008')));
         return;
       case 'toggleTabsOverview':
         this.shell.setTabsOverviewVisible(!facts.showTabsSheet);
-        this.shell.showMessage(facts.showTabsSheet ? '已关闭标签页列表。' : '已打开标签页列表。');
+        this.shell.showMessage(facts.showTabsSheet ? resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_004')) : resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_012')));
         return;
       case 'openPageFind':
         if (this.isWebSurfaceUnavailable(facts) || !facts.controllerAttached || !this.canOpenPageFind(facts)) {
-          this.shell.showMessage('当前页面暂不可查找。');
+          this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_024')));
           return;
         }
         this.dependencies.pageFindCoordinator.open(facts.activeTabId);
         return;
       case 'toggleFullScreen':
         if (!facts.fullScreenModeEnabled && this.isWebSurfaceUnavailable(facts)) {
-          this.shell.showMessage('打开网页后可进入全屏模式。');
+          this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_026')));
           return;
         }
         if (facts.fullScreenModeEnabled) {
@@ -167,35 +168,35 @@ export class BrowserKeyboardShortcutCoordinator {
           return;
         }
         if (facts.showHomePage) {
-          this.shell.showMessage('已经在首页。');
+          this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_015')));
           return;
         }
         this.dependencies.webHistoryCommandRuntimeCoordinator.handleShortcutNavigateBack();
         return;
       case 'navigateForward':
         if (this.isWebSurfaceUnavailable(facts)) {
-          this.shell.showMessage('没有可前进的页面。');
+          this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_028')));
           return;
         }
-        this.dependencies.webHistoryCommandRuntimeCoordinator.handleShortcutNavigateForward('已前进。');
+        this.dependencies.webHistoryCommandRuntimeCoordinator.handleShortcutNavigateForward(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_007')));
         return;
       case 'reloadPage':
         if (this.isWebSurfaceUnavailable(facts)) {
-          this.shell.showMessage('当前没有可刷新的网页。');
+          this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_021')));
           return;
         }
         this.dependencies.activeTabRuntimeRestoreCoordinator.reloadActive('user_manual_reload');
-        this.shell.showMessage('已刷新页面。');
+        this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_006')));
         return;
       case 'closeActiveTab':
         if (facts.showTabsSheet) {
           return;
         }
-        void this.closeActiveTab(facts.activeTabId, facts.tabs, '已关闭当前标签页。');
+        void this.closeActiveTab(facts.activeTabId, facts.tabs, resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_003')));
         return;
       case 'restoreRecentlyClosedTab':
         if (facts.recentlyClosedCount <= 0) {
-          this.shell.showMessage('没有最近关闭的标签页。');
+          this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_030')));
           return;
         }
         this.dependencies.tabCloseCoordinator.restoreLatestRecentlyClosedShortcut();
@@ -203,37 +204,37 @@ export class BrowserKeyboardShortcutCoordinator {
       case 'switchToNextTab':
       case 'switchToPreviousTab':
         if (facts.tabs.length <= 1) {
-          this.shell.showMessage('没有其他可切换的标签页。');
+          this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_027')));
           return;
         }
         void this.switchActiveTabByOffset(
           facts.tabs,
           facts.activeTabId,
           action === 'switchToNextTab' ? 1 : -1,
-          action === 'switchToNextTab' ? '已切到下一个标签页。' : '已切到上一个标签页。'
+          action === 'switchToNextTab' ? resolveAppResourceText($r('app.string.keyboard_shortcut_switched_next')) : resolveAppResourceText($r('app.string.keyboard_shortcut_switched_previous'))
         );
         return;
       case 'saveOfflinePage':
         if (this.isWebSurfaceUnavailable(facts)) {
-          this.shell.showMessage('当前页面无法保存离线。');
+          this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_022')));
           return;
         }
         this.dependencies.offlinePageSaveCoordinator.startActiveSave();
         return;
       case 'bookmarkCurrentPage':
         if (this.isWebSurfaceUnavailable(facts)) {
-          this.shell.showMessage('当前页面无法收藏。');
+          this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_023')));
           return;
         }
         this.shell.bookmarkCurrentPage();
         return;
       case 'openBookmarks':
         void this.dependencies.routeCoordinator.openBookmarkManagerPage();
-        this.shell.showMessage('已打开书签管理。');
+        this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_009')));
         return;
       case 'openSettings':
         this.dependencies.routeCoordinator.openSettingsCenterPage();
-        this.shell.showMessage('已打开设置。');
+        this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_013')));
         return;
       case 'toggleBookmarkBar':
         void this.toggleBookmarkBar();
@@ -266,7 +267,7 @@ export class BrowserKeyboardShortcutCoordinator {
       return;
     }
     if (facts.tabs.length <= 0) {
-      this.shell.showMessage('当前没有可切换的标签页。');
+      this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_020')));
       return;
     }
     const targetTabId = this.dependencies.tabsOverviewSessionCoordinator.handle({
@@ -278,7 +279,7 @@ export class BrowserKeyboardShortcutCoordinator {
       }
     })?.tabId ?? '';
     if (targetTabId.length <= 0) {
-      this.shell.showMessage('没有对应的标签页。');
+      this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_029')));
       return;
     }
     void this.switchToNumberedTab(targetTabId, digit);
@@ -291,8 +292,10 @@ export class BrowserKeyboardShortcutCoordinator {
 
   private async switchToNumberedTab(tabId: string, digit: number): Promise<void> {
     await this.dependencies.tabSwitchCoordinator.switchToTab(tabId);
-    const label = digit === 9 ? '最后一个标签页' : `第 ${digit} 个标签页`;
-    this.shell.showMessage(`已切到${label}。`);
+    const message = digit === 9
+      ? resolveAppResourceText($r('app.string.keyboard_shortcut_switched_last'))
+      : resolveAppResourceText($r('app.string.keyboard_shortcut_switched_numbered', digit));
+    this.shell.showMessage(message);
   }
 
   private async switchActiveTabByOffset(
@@ -303,7 +306,7 @@ export class BrowserKeyboardShortcutCoordinator {
   ): Promise<void> {
     const targetTabId = this.resolveAdjacentTabId(tabs, activeTabId, offset);
     if (targetTabId.length <= 0) {
-      this.shell.showMessage('没有其他可切换的标签页。');
+      this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_027')));
       return;
     }
     await this.dependencies.tabSwitchCoordinator.switchToTab(targetTabId);
@@ -316,7 +319,7 @@ export class BrowserKeyboardShortcutCoordinator {
     message: string
   ): Promise<void> {
     if (activeTabId.length <= 0 || this.findTabById(tabs, activeTabId) === undefined) {
-      this.shell.showMessage('当前没有可关闭的标签页。');
+      this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_019')));
       return;
     }
     const closesApplication = tabs.length <= 1 &&
@@ -334,7 +337,7 @@ export class BrowserKeyboardShortcutCoordinator {
   private handleEscapeShortcut(facts: BrowserKeyboardShortcutFacts): void {
     if (this.dependencies.pageFindCoordinator.isVisibleForTab(facts.activeTabId)) {
       this.dependencies.pageFindCoordinator.close(facts.activeTabId);
-      this.shell.showMessage('已关闭页内查找。');
+      this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_005')));
       return;
     }
     if (facts.fullScreenModeEnabled) {
@@ -343,17 +346,17 @@ export class BrowserKeyboardShortcutCoordinator {
     }
     if (facts.showTabsSheet) {
       this.shell.setTabsOverviewVisible(false);
-      this.shell.showMessage('已关闭标签页列表。');
+      this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_004')));
       return;
     }
     if (facts.webBottomAddressFocused || facts.homeSearchFocused || facts.searchInvocationVisible) {
       this.releaseAddressFocus();
-      this.shell.showMessage('已退出地址栏。');
+      this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_017')));
       return;
     }
     if (facts.loading) {
       this.dependencies.webTabsController.stopLoading(facts.activeTabId);
-      this.shell.showMessage('已停止加载。');
+      this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_002')));
     }
   }
 
@@ -378,9 +381,9 @@ export class BrowserKeyboardShortcutCoordinator {
   private async toggleBookmarkBar(): Promise<void> {
     try {
       const visible = await toggleDesktopBookmarkBarVisibility(this.dependencies.preferencesRepository);
-      this.shell.showMessage(visible ? '已显示书签栏。' : '已隐藏书签栏。');
+      this.shell.showMessage(visible ? resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_014')) : resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_018')));
     } catch (_error) {
-      this.shell.showMessage('书签栏切换失败，请稍后重试。');
+      this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_001')));
     }
   }
 
@@ -392,7 +395,7 @@ export class BrowserKeyboardShortcutCoordinator {
       webPageVisible: !facts.showHomePage && !facts.showTabsSheet && facts.controllerAttached
     });
     if (!canPrint) {
-      this.shell.showMessage('当前页面暂时无法打印。');
+      this.shell.showMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_025')));
       return;
     }
     const activeTab = this.findTabById(facts.tabs, facts.activeTabId);

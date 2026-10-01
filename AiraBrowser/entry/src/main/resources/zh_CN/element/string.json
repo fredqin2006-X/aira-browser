@@ -1665,6 +1665,54 @@
       "value": "管理我的订阅"
     },
     {
+      "name": "settings_pro_donate_title",
+      "value": "捐赠Pro"
+    },
+    {
+      "name": "settings_pro_donate_intro_title",
+      "value": "捐赠Pro"
+    },
+    {
+      "name": "settings_pro_donate_intro_lead",
+      "value": "浏览器全部功能免费，捐赠用于维护 Aira 自己的服务器。"
+    },
+    {
+      "name": "settings_pro_donate_intro_row_sync_title",
+      "value": "云端同步"
+    },
+    {
+      "name": "settings_pro_donate_intro_row_sync_desc",
+      "value": "不用自己搭服务器，直接用 Aira 的服务器同步书签和数据"
+    },
+    {
+      "name": "settings_pro_donate_intro_row_link_title",
+      "value": "跨设备互联"
+    },
+    {
+      "name": "settings_pro_donate_intro_row_link_desc",
+      "value": "登录同一账号，跨设备互联开箱可用"
+    },
+    {
+      "name": "settings_pro_donate_intro_row_support_title",
+      "value": "支持开发"
+    },
+    {
+      "name": "settings_pro_donate_intro_row_support_desc",
+      "value": "你的捐赠支持我继续把 Aira 做下去"
+    },
+    {
+      "name": "settings_pro_donate_intro_tail",
+      "value": "不想捐也没关系：可以自己搭服务器，或用华为云空间 / WebDAV 同步，页面下面还能一直免费领会员。"
+    },
+    {
+      "name": "settings_pro_donate_intro_repo",
+      "value": "在 GitHub 上查看源码"
+    },
+    {
+      "name": "settings_pro_donate_intro_enter",
+      "value": "查看Pro权益"
+    },
+    {
       "name": "settings_pro_subscription_check_failed",
       "value": "订阅状态检查失败，请稍后重试"
     },
@@ -15442,7 +15490,7 @@
     },
     {
       "name": "settings_catalog_aira_pro",
-      "value": "Aira Pro"
+      "value": "捐赠Pro"
     },
     {
       "name": "settings_catalog_baidu",
@@ -20551,6 +20599,2338 @@
     {
       "name": "element_inspection_stored_global_named",
       "value": "已存为 %1$s，可在控制台使用。"
+    },
+    {
+      "name": "element_inspection_tooltip_color",
+      "value": "颜色"
+    },
+    {
+      "name": "element_inspection_tooltip_font",
+      "value": "字体"
+    },
+    {
+      "name": "element_inspection_tooltip_padding",
+      "value": "内边距"
+    },
+    {
+      "name": "element_inspection_tooltip_accessibility",
+      "value": "无障碍"
+    },
+    {
+      "name": "element_inspection_tooltip_role",
+      "value": "角色"
+    },
+    {
+      "name": "element_inspection_tooltip_focusable",
+      "value": "可键盘聚焦"
+    },
+    {
+      "name": "keyboard_shortcut_switched_next",
+      "value": "已切到下一个标签页。"
+    },
+    {
+      "name": "keyboard_shortcut_switched_previous",
+      "value": "已切到上一个标签页。"
+    },
+    {
+      "name": "keyboard_shortcut_switched_last",
+      "value": "已切到最后一个标签页。"
+    },
+    {
+      "name": "keyboard_shortcut_switched_numbered",
+      "value": "已切到第 %1$d 个标签页。"
+    },
+    {
+      "name": "keyboard_shortcut_no_back",
+      "value": "没有可后退的页面。"
+    },
+    {
+      "name": "keyboard_shortcut_back_failed",
+      "value": "后退失败，请重试。"
+    },
+    {
+      "name": "keyboard_shortcut_forward_failed",
+      "value": "前进失败，请重试。"
+    },
+    {
+      "name": "home_shortcut_load_failed",
+      "value": "快捷方式加载失败：%1$s"
+    },
+    {
+      "name": "home_shortcut_not_found",
+      "value": "未找到这个快捷方式。"
+    },
+    {
+      "name": "home_shortcut_saved",
+      "value": "快捷方式已保存。"
+    },
+    {
+      "name": "home_shortcut_deleted",
+      "value": "快捷方式已删除。"
+    },
+    {
+      "name": "home_shortcut_edit_missing",
+      "value": "未找到要编辑的快捷方式。"
+    },
+    {
+      "name": "home_shortcut_delete_missing",
+      "value": "未找到要删除的快捷方式。"
+    },
+    {
+      "name": "home_shortcut_delete_failed_detail",
+      "value": "删除失败：%1$s"
+    },
+    {
+      "name": "home_shortcut_save_failed_detail",
+      "value": "保存失败：%1$s"
+    },
+    {
+      "name": "home_shortcut_move_missing",
+      "value": "未找到要移动的快捷方式。"
+    },
+    {
+      "name": "home_shortcut_already_first",
+      "value": "已经在最前面了。"
+    },
+    {
+      "name": "home_shortcut_already_last",
+      "value": "已经在最后面了。"
+    },
+    {
+      "name": "home_shortcut_moved_top",
+      "value": "已将“%1$s”置顶。"
+    },
+    {
+      "name": "home_shortcut_moved_bottom",
+      "value": "已将“%1$s”置底。"
+    },
+    {
+      "name": "home_shortcut_moved_up",
+      "value": "已上移“%1$s”。"
+    },
+    {
+      "name": "home_shortcut_moved_down",
+      "value": "已下移“%1$s”。"
+    },
+    {
+      "name": "home_shortcut_move_failed_detail",
+      "value": "移动失败：%1$s"
+    },
+    {
+      "name": "home_shortcut_order_restore",
+      "value": "排序保存失败，已恢复已保存的顺序。"
+    },
+    {
+      "name": "home_shortcut_system_unavailable",
+      "value": "这个系统入口暂不可添加到主页。"
+    },
+    {
+      "name": "home_shortcut_bookmark_no_url",
+      "value": "这个书签没有可添加到主页的网址。"
+    },
+    {
+      "name": "home_shortcut_list_load_failed",
+      "value": "加载添加列表失败：%1$s"
+    },
+    {
+      "name": "home_shortcut_update_failed",
+      "value": "更新首页快捷方式失败：%1$s"
+    },
+    {
+      "name": "home_shortcut_added",
+      "value": "已将“%1$s”添加至首页。"
+    },
+    {
+      "name": "home_shortcut_removed",
+      "value": "已从首页移除“%1$s”。"
+    },
+    {
+      "name": "home_shortcut_delete_title",
+      "value": "删除快捷方式"
+    },
+    {
+      "name": "home_shortcut_delete_confirm",
+      "value": "确定删除“%1$s”吗？"
+    },
+    {
+      "name": "home_shortcut_no_link",
+      "value": "当前没有可添加到主页的链接。"
+    },
+    {
+      "name": "home_shortcut_open_unavailable",
+      "value": "这个系统快捷方式暂不可用。"
+    },
+    {
+      "name": "home_shortcut_ad_block",
+      "value": "广告拦截"
+    },
+    {
+      "name": "home_shortcut_remove_named",
+      "value": "从首页移除%1$s"
+    },
+    {
+      "name": "home_shortcut_add_named",
+      "value": "添加%1$s至首页"
+    },
+    {
+      "name": "desktop_shortcut_icon_missing",
+      "value": "未提供可用的桌面图标。"
+    },
+    {
+      "name": "desktop_shortcut_icon_same_path",
+      "value": "桌面图标来源与输出路径不能相同。"
+    },
+    {
+      "name": "desktop_shortcut_icon_bad_size",
+      "value": "这张图片的尺寸不可用。"
+    },
+    {
+      "name": "desktop_shortcut_icon_too_large",
+      "value": "这张图片无法压缩到鸿蒙桌面图标要求，请换一张再试。"
+    },
+    {
+      "name": "desktop_shortcut_icon_not_selected",
+      "value": "未选择应用图标。"
+    },
+    {
+      "name": "desktop_shortcut_entry_invalid",
+      "value": "这个桌面入口已失效，请重新添加。"
+    },
+    {
+      "name": "desktop_shortcut_returned",
+      "value": "已切回桌面网页。"
+    },
+    {
+      "name": "desktop_shortcut_opening",
+      "value": "正在打开桌面网页"
+    },
+    {
+      "name": "translation_provider_invalid_format",
+      "value": "翻译服务返回格式无效。"
+    },
+    {
+      "name": "translation_provider_template_unimplemented",
+      "value": "当前翻译服务模板尚未实现。"
+    },
+    {
+      "name": "translation_provider_custom_https",
+      "value": "自定义翻译服务必须使用 HTTPS endpoint。"
+    },
+    {
+      "name": "translation_provider_secret_in_url",
+      "value": "翻译服务密钥不能放在 URL 查询参数中。"
+    },
+    {
+      "name": "translation_provider_aira_owned_only",
+      "value": "Aira 系统翻译必须通过 Aira 自有服务接口调用。"
+    },
+    {
+      "name": "translation_provider_deepl_https",
+      "value": "DeepL endpoint 必须使用 HTTPS。"
+    },
+    {
+      "name": "translation_provider_google_https",
+      "value": "Google Cloud Translation endpoint 必须使用 HTTPS。"
+    },
+    {
+      "name": "translation_provider_microsoft_https",
+      "value": "Microsoft Translator endpoint 必须使用 HTTPS。"
+    },
+    {
+      "name": "translation_provider_baidu_https",
+      "value": "百度翻译 endpoint 必须使用 HTTPS。"
+    },
+    {
+      "name": "translation_provider_youdao_https",
+      "value": "有道智云 endpoint 必须使用 HTTPS。"
+    },
+    {
+      "name": "translation_provider_tencent_https",
+      "value": "腾讯云机器翻译 endpoint 必须使用 HTTPS。"
+    },
+    {
+      "name": "translation_provider_aliyun_https",
+      "value": "阿里云机器翻译 endpoint 必须使用 HTTPS。"
+    },
+    {
+      "name": "translation_provider_volc_https",
+      "value": "火山引擎机器翻译 endpoint 必须使用 HTTPS。"
+    },
+    {
+      "name": "translation_provider_no_translation",
+      "value": "翻译服务没有返回可用译文。"
+    },
+    {
+      "name": "translation_provider_tencent_empty",
+      "value": "Tencent 没有返回可用译文。"
+    },
+    {
+      "name": "translation_provider_json_invalid",
+      "value": "翻译服务返回的 JSON 无法解析。"
+    },
+    {
+      "name": "translation_provider_empty_translation",
+      "value": "翻译服务返回的译文为空。"
+    },
+    {
+      "name": "translation_provider_count_mismatch",
+      "value": "翻译服务返回的译文数量与原文不一致。"
+    },
+    {
+      "name": "translation_provider_error_named",
+      "value": "%1$s 返回错误：%2$s"
+    },
+    {
+      "name": "translation_provider_error_status",
+      "value": "翻译服务返回错误 %1$d：%2$s"
+    },
+    {
+      "name": "translation_provider_no_translation_named",
+      "value": "%1$s 没有返回可用译文。"
+    },
+    {
+      "name": "translation_provider_auth_failed",
+      "value": "翻译服务认证失败，请检查服务配置。"
+    },
+    {
+      "name": "translation_provider_unavailable",
+      "value": "翻译服务暂时不可用。"
+    },
+    {
+      "name": "translation_provider_bad_status",
+      "value": "翻译服务返回异常状态：%1$d"
+    },
+    {
+      "name": "translation_provider_canceled",
+      "value": "已取消翻译请求。"
+    },
+    {
+      "name": "translation_provider_network",
+      "value": "网络连接异常，无法完成翻译。"
+    },
+    {
+      "name": "translation_provider_quota",
+      "value": "翻译服务额度或频率受限，稍后再试。"
+    },
+    {
+      "name": "translation_provider_none",
+      "value": "当前没有可用的翻译服务。"
+    },
+    {
+      "name": "translation_provider_not_connected",
+      "value": "当前服务商接口尚未接入。"
+    },
+    {
+      "name": "translation_aira_request_failed",
+      "value": "Aira 系统翻译服务请求失败（%1$d）。"
+    },
+    {
+      "name": "translation_aira_no_translation_shape",
+      "value": "Aira 系统翻译没有返回可用译文。返回结构：%1$s"
+    },
+    {
+      "name": "translation_aira_empty_response",
+      "value": "Aira 系统翻译服务返回为空。"
+    },
+    {
+      "name": "translation_aira_json_invalid",
+      "value": "Aira 系统翻译返回的 JSON 无法解析。"
+    },
+    {
+      "name": "translation_aira_failed_detail",
+      "value": "Aira 系统翻译失败：%1$s"
+    },
+    {
+      "name": "translation_aira_empty_text",
+      "value": "Aira 系统翻译返回的译文为空。"
+    },
+    {
+      "name": "translation_aira_quota",
+      "value": "Aira 系统翻译额度或频率受限，稍后再试。"
+    },
+    {
+      "name": "translation_aira_auth_failed",
+      "value": "Aira 系统翻译鉴权失败，请检查自有服务配置。"
+    },
+    {
+      "name": "translation_aira_network",
+      "value": "网络连接异常，无法完成 Aira 系统翻译。"
+    },
+    {
+      "name": "translation_aira_unavailable",
+      "value": "Aira 系统翻译暂时不可用。"
+    },
+    {
+      "name": "translation_aira_execution",
+      "value": "Aira 系统翻译服务执行异常，请检查服务入参读取和返回结构。"
+    },
+    {
+      "name": "translation_aira_failed",
+      "value": "Aira 系统翻译失败。"
+    },
+    {
+      "name": "translation_crypto_digest_label",
+      "value": "生成 %1$s 摘要"
+    },
+    {
+      "name": "translation_crypto_digest_unavailable",
+      "value": "生成 %1$s 摘要失败：系统加密组件不可用，请更新系统后重试。%2$s"
+    },
+    {
+      "name": "translation_crypto_empty_result",
+      "value": "%1$s失败：底层加密组件返回空结果。"
+    },
+    {
+      "name": "translation_crypto_no_data",
+      "value": "%1$s失败：底层加密组件未返回数据。"
+    },
+    {
+      "name": "translation_settings_save_disclosure_endpoint",
+      "value": "保存后将使用 %1$s 翻译网页，页面文字会发送到：\n%2$s"
+    },
+    {
+      "name": "translation_settings_save_disclosure",
+      "value": "保存后将使用 %1$s 翻译网页。翻译时，页面文字会发送到该服务商处理。"
+    },
+    {
+      "name": "translation_settings_read_denied",
+      "value": "当前会话不可读取翻译服务配置。"
+    },
+    {
+      "name": "translation_settings_save_denied",
+      "value": "当前会话不可保存翻译设置。"
+    },
+    {
+      "name": "translation_settings_empty_result",
+      "value": "翻译服务返回了空结果，请检查服务配置。"
+    },
+    {
+      "name": "translation_settings_connect_failed",
+      "value": "无法连接翻译服务，请检查网络和 API 配置。"
+    },
+    {
+      "name": "translation_settings_invalid",
+      "value": "翻译服务配置无效。"
+    },
+    {
+      "name": "translation_secret_read_failed",
+      "value": "读取翻译密钥失败"
+    },
+    {
+      "name": "translation_secret_delete_failed",
+      "value": "删除翻译密钥失败"
+    },
+    {
+      "name": "translation_provider_baidu_error",
+      "value": "百度翻译返回错误：%1$s"
+    },
+    {
+      "name": "translation_provider_youdao_error",
+      "value": "有道智云返回错误：%1$s"
+    },
+    {
+      "name": "translation_template_aira_name",
+      "value": "Aira 系统翻译"
+    },
+    {
+      "name": "translation_template_edge_name",
+      "value": "Microsoft Edge 网页翻译"
+    },
+    {
+      "name": "translation_template_google_web_name",
+      "value": "Google 网页翻译"
+    },
+    {
+      "name": "translation_template_tencent_web_name",
+      "value": "腾讯交互翻译"
+    },
+    {
+      "name": "translation_template_yandex_name",
+      "value": "Yandex 网页翻译"
+    },
+    {
+      "name": "translation_template_custom_name",
+      "value": "自定义接口"
+    },
+    {
+      "name": "translation_template_tencent_cloud_name",
+      "value": "腾讯云机器翻译"
+    },
+    {
+      "name": "translation_template_baidu_name",
+      "value": "百度翻译"
+    },
+    {
+      "name": "translation_template_alibaba_name",
+      "value": "阿里云机器翻译"
+    },
+    {
+      "name": "translation_template_volcano_name",
+      "value": "火山引擎机器翻译"
+    },
+    {
+      "name": "translation_template_youdao_name",
+      "value": "有道智云翻译"
+    },
+    {
+      "name": "translation_template_tencent_cloud_short",
+      "value": "腾讯云翻译"
+    },
+    {
+      "name": "translation_template_alibaba_short",
+      "value": "阿里云翻译"
+    },
+    {
+      "name": "translation_template_volcano_short",
+      "value": "火山翻译"
+    },
+    {
+      "name": "translation_template_youdao_short",
+      "value": "有道智云"
+    },
+    {
+      "name": "translation_template_aira_desc",
+      "value": "由 Aira 提供的网页翻译服务，可能使用 Aira 云服务和必要第三方机器翻译服务处理页面文字。"
+    },
+    {
+      "name": "translation_template_edge_desc",
+      "value": "免密钥。清风直接请求 Edge 公开翻译接口，适合一次翻译多个段落。"
+    },
+    {
+      "name": "translation_template_google_web_desc",
+      "value": "免密钥。清风直接请求 Google 公开翻译接口，每次发送一段文字。"
+    },
+    {
+      "name": "translation_template_tencent_web_desc",
+      "value": "免密钥。清风直接请求腾讯交互翻译公开接口。"
+    },
+    {
+      "name": "translation_template_yandex_desc",
+      "value": "免密钥。清风直接请求 Yandex 公开翻译接口，每次发送一段文字。"
+    },
+    {
+      "name": "translation_template_custom_desc",
+      "value": "使用你自己的 HTTPS 翻译接口，适合把官方服务商鉴权放在自有服务端代理里。"
+    },
+    {
+      "name": "translation_template_deepl_desc",
+      "value": "填写自己的 API Key，清风会请求 DeepL 官方翻译接口。"
+    },
+    {
+      "name": "translation_template_google_cloud_desc",
+      "value": "填写自己的 API Key，清风会请求 Google Cloud Translation 官方接口。"
+    },
+    {
+      "name": "translation_template_tencent_cloud_desc",
+      "value": "填写 SecretId、SecretKey 和地域，清风会使用腾讯云 API3 签名请求。"
+    },
+    {
+      "name": "translation_template_baidu_desc",
+      "value": "填写 App ID 与密钥，清风会请求百度翻译开放平台接口。"
+    },
+    {
+      "name": "translation_template_microsoft_desc",
+      "value": "填写订阅 Key 和区域，清风会请求 Microsoft Translator 官方接口。"
+    },
+    {
+      "name": "translation_template_alibaba_desc",
+      "value": "填写 AccessKey ID、AccessKey Secret 和地域，清风会使用阿里云签名请求。"
+    },
+    {
+      "name": "translation_template_volcano_desc",
+      "value": "填写 Access Key、Secret Key 和区域，清风会使用火山引擎签名请求。"
+    },
+    {
+      "name": "translation_template_youdao_desc",
+      "value": "填写应用 ID 与应用密钥，清风会请求有道智云官方接口。"
+    },
+    {
+      "name": "custom_home_html_unavailable",
+      "value": "HTML 文件不可用。"
+    },
+    {
+      "name": "custom_home_html_control_chars",
+      "value": "HTML 文件包含不可见控制字符。"
+    },
+    {
+      "name": "custom_home_html_structure",
+      "value": "HTML 文件必须包含完整的 html/head/body 结构。"
+    },
+    {
+      "name": "custom_home_html_doctype",
+      "value": "HTML 文件必须声明 <!doctype html>。"
+    },
+    {
+      "name": "custom_home_html_no_iframe",
+      "value": "HTML 中不能包含 iframe。"
+    },
+    {
+      "name": "custom_home_html_no_object",
+      "value": "HTML 中不能包含 object。"
+    },
+    {
+      "name": "custom_home_html_no_embed",
+      "value": "HTML 中不能包含 embed。"
+    },
+    {
+      "name": "custom_home_html_no_base",
+      "value": "HTML 中不能包含 base 标签。"
+    },
+    {
+      "name": "custom_home_html_no_refresh",
+      "value": "HTML 中不能包含自动刷新跳转。"
+    },
+    {
+      "name": "custom_home_html_no_inline_event",
+      "value": "HTML 中不能包含内联事件处理属性，请使用 addEventListener。"
+    },
+    {
+      "name": "custom_home_html_no_javascript_url",
+      "value": "HTML 中不能包含 javascript: 链接。"
+    },
+    {
+      "name": "custom_home_html_no_data_html",
+      "value": "HTML 中不能引用 data:text/html。"
+    },
+    {
+      "name": "custom_home_html_no_service_worker",
+      "value": "HTML 中不能注册 Service Worker。"
+    },
+    {
+      "name": "custom_home_html_no_file_url",
+      "value": "HTML 中不能引用 file:// 绝对路径。"
+    },
+    {
+      "name": "custom_home_html_no_remote_script",
+      "value": "HTML 中不能引用远程脚本。"
+    },
+    {
+      "name": "custom_home_html_no_location",
+      "value": "HTML 中不能自动改写页面地址。"
+    },
+    {
+      "name": "custom_home_html_no_window_open",
+      "value": "HTML 中不能直接打开新窗口，请使用 AiraHome.openUrl。"
+    },
+    {
+      "name": "custom_home_html_no_network",
+      "value": "HTML 中不能直接发起网络请求。"
+    },
+    {
+      "name": "custom_home_script_no_service_worker",
+      "value": "主页包脚本不能注册 Service Worker。"
+    },
+    {
+      "name": "custom_home_script_no_file_url",
+      "value": "主页包脚本不能引用 file:// 绝对路径。"
+    },
+    {
+      "name": "custom_home_script_no_location",
+      "value": "主页包脚本不能自动改写页面地址。"
+    },
+    {
+      "name": "custom_home_script_no_window_open",
+      "value": "主页包脚本不能直接打开新窗口，请使用 AiraHome.openUrl。"
+    },
+    {
+      "name": "custom_home_script_no_network",
+      "value": "主页包脚本不能直接发起网络请求。"
+    },
+    {
+      "name": "custom_home_html_not_selected",
+      "value": "未选择 HTML 文件。"
+    },
+    {
+      "name": "custom_home_package_not_selected",
+      "value": "未选择主页包。"
+    },
+    {
+      "name": "custom_home_package_missing_entry",
+      "value": "主页包缺少入口文件。"
+    },
+    {
+      "name": "custom_home_entry_must_html",
+      "value": "入口文件必须是 HTML。"
+    },
+    {
+      "name": "custom_home_package_dir_conflict",
+      "value": "主页包安装目录冲突，请重试。"
+    },
+    {
+      "name": "custom_home_package_install_incomplete",
+      "value": "主页包安装未完成。"
+    },
+    {
+      "name": "custom_home_picker_package",
+      "value": "Aira 主页包|.zip"
+    },
+    {
+      "name": "custom_home_picker_html",
+      "value": "HTML 主页|.html"
+    },
+    {
+      "name": "custom_home_file_missing",
+      "value": "自定义主页文件不存在。"
+    },
+    {
+      "name": "custom_home_package_missing",
+      "value": "自定义主页包不存在。"
+    },
+    {
+      "name": "custom_home_url_missing",
+      "value": "网址主页地址不存在。"
+    },
+    {
+      "name": "custom_home_export_saved_url",
+      "value": "此文件保存了 Aira 网址主页的地址。"
+    },
+    {
+      "name": "custom_home_export_open",
+      "value": "打开主页"
+    },
+    {
+      "name": "custom_home_package_unavailable",
+      "value": "主页包不可用。"
+    },
+    {
+      "name": "custom_home_package_too_big",
+      "value": "主页包超过 20 MB。"
+    },
+    {
+      "name": "custom_home_package_invalid_zip",
+      "value": "请选择有效的 ZIP 主页包。"
+    },
+    {
+      "name": "custom_home_package_extracted_too_big",
+      "value": "主页包解压后超过 50 MB。"
+    },
+    {
+      "name": "custom_home_html_too_big",
+      "value": "HTML 文件超过 5 MB。"
+    },
+    {
+      "name": "custom_home_html_invalid",
+      "value": "请选择有效的 HTML 文件。"
+    },
+    {
+      "name": "custom_home_source_html",
+      "value": "HTML 文件"
+    },
+    {
+      "name": "custom_home_package_empty",
+      "value": "主页包为空。"
+    },
+    {
+      "name": "custom_home_package_too_many_files",
+      "value": "主页包文件数量超过 300 个。"
+    },
+    {
+      "name": "custom_home_package_file_too_big",
+      "value": "主页包内文件过大：%1$s"
+    },
+    {
+      "name": "custom_home_package_script_unsafe",
+      "value": "主页包脚本不安全：%1$s"
+    },
+    {
+      "name": "custom_home_package_missing_manifest",
+      "value": "主页包缺少 aira-homepage.json。"
+    },
+    {
+      "name": "custom_home_schema_version",
+      "value": "schemaVersion 必须为 1。"
+    },
+    {
+      "name": "custom_home_manifest_invalid",
+      "value": "主页包清单无效：%1$s"
+    },
+    {
+      "name": "custom_home_preview_required",
+      "value": "主页包缺少预览图。请配置 preview、previewLight 或 previewDark 中至少一个字段。"
+    },
+    {
+      "name": "custom_home_manifest_path_invalid",
+      "value": "主页包清单字段 %1$s 的路径无效。"
+    },
+    {
+      "name": "custom_home_entry_html_missing",
+      "value": "入口 HTML 文件不存在。"
+    },
+    {
+      "name": "custom_home_entry_html_too_big",
+      "value": "入口 HTML 文件超过 5 MB。"
+    },
+    {
+      "name": "custom_home_entry_html_invalid",
+      "value": "入口文件不是有效的 HTML。"
+    },
+    {
+      "name": "custom_home_source_entry_html",
+      "value": "入口 HTML"
+    },
+    {
+      "name": "custom_home_preview_missing",
+      "value": "主页包预览图不存在。"
+    },
+    {
+      "name": "custom_home_preview_too_big",
+      "value": "主页包预览图超过 8 MB。"
+    },
+    {
+      "name": "custom_home_preview_type",
+      "value": "主页包预览图必须是 PNG、JPEG 或 WebP 图片。"
+    },
+    {
+      "name": "custom_home_file_too_big",
+      "value": "文件过大。"
+    },
+    {
+      "name": "custom_home_file_read_failed",
+      "value": "文件读取失败。"
+    },
+    {
+      "name": "custom_home_dir_cleanup_failed",
+      "value": "目录清理失败：%1$s"
+    },
+    {
+      "name": "custom_home_version_type",
+      "value": "主页包 version 必须是字符串。"
+    },
+    {
+      "name": "custom_home_version_length",
+      "value": "主页包 version 不能超过 %1$d 个字符。"
+    },
+    {
+      "name": "custom_home_version_semver",
+      "value": "主页包 version 必须使用 SemVer 格式，例如 1.0.0 或 1.2.0-beta.1。"
+    },
+    {
+      "name": "custom_home_description_type",
+      "value": "主页包 description 必须是字符串。"
+    },
+    {
+      "name": "custom_home_description_length",
+      "value": "主页包 description 不能超过 %1$d 个字符。"
+    },
+    {
+      "name": "custom_home_id_type",
+      "value": "主页包 id 必须是字符串。"
+    },
+    {
+      "name": "custom_home_id_length",
+      "value": "主页包 id 不能超过 128 个字符。"
+    },
+    {
+      "name": "custom_home_precheck_invalid",
+      "value": "主页包预检状态无效。"
+    },
+    {
+      "name": "custom_home_path_invalid",
+      "value": "主页包路径无效。"
+    },
+    {
+      "name": "custom_home_illegal_path",
+      "value": "主页包包含非法路径。"
+    },
+    {
+      "name": "custom_home_hidden_entry",
+      "value": "主页包不能包含隐藏文件或隐藏目录。"
+    },
+    {
+      "name": "custom_home_contains_dir",
+      "value": "主页包不能包含目录：%1$s"
+    },
+    {
+      "name": "custom_home_unsupported_path",
+      "value": "主页包包含不支持的路径。"
+    },
+    {
+      "name": "custom_home_unsupported_type",
+      "value": "主页包包含不支持的文件类型。"
+    },
+    {
+      "name": "custom_home_unsupported_file",
+      "value": "主页包包含不支持的文件：%1$s"
+    },
+    {
+      "name": "custom_home_isolated_dir",
+      "value": "隔离目录"
+    },
+    {
+      "name": "custom_home_install_dir",
+      "value": "安装目录"
+    },
+    {
+      "name": "custom_home_cleanup_failed",
+      "value": "%1$s %2$s清理失败：%3$s"
+    },
+    {
+      "name": "context_menu_open_private_tab",
+      "value": "隐私标签页打开"
+    },
+    {
+      "name": "context_menu_share_link",
+      "value": "分享链接"
+    },
+    {
+      "name": "context_menu_save_offline",
+      "value": "保存离线"
+    },
+    {
+      "name": "context_menu_download_link",
+      "value": "下载链接"
+    },
+    {
+      "name": "context_menu_no_image",
+      "value": "当前没有可处理的图片。"
+    },
+    {
+      "name": "context_menu_no_link",
+      "value": "当前没有可处理的链接。"
+    },
+    {
+      "name": "context_menu_web_image",
+      "value": "网页图片"
+    },
+    {
+      "name": "context_menu_save_to_gallery",
+      "value": "保存至图库"
+    },
+    {
+      "name": "context_menu_copy_image",
+      "value": "复制图片"
+    },
+    {
+      "name": "context_menu_share_image",
+      "value": "分享图片"
+    },
+    {
+      "name": "context_menu_open_failed",
+      "value": "链接打开失败。"
+    },
+    {
+      "name": "context_menu_opening",
+      "value": "正在打开链接"
+    },
+    {
+      "name": "context_menu_image_failed",
+      "value": "图片处理失败，请稍后重试。"
+    },
+    {
+      "name": "context_menu_script_unavailable",
+      "value": "脚本命令不可用。"
+    },
+    {
+      "name": "context_menu_script_done",
+      "value": "脚本已执行。"
+    },
+    {
+      "name": "context_menu_script_failed",
+      "value": "脚本执行失败。"
+    },
+    {
+      "name": "context_menu_script_error",
+      "value": "执行脚本菜单失败：%1$s"
+    },
+    {
+      "name": "context_menu_open_private_tab_long",
+      "value": "在隐私标签页中打开"
+    },
+    {
+      "name": "context_menu_image_not_saved",
+      "value": "未保存图片。"
+    },
+    {
+      "name": "context_menu_image_saved",
+      "value": "已保存至图库。"
+    },
+    {
+      "name": "context_menu_image_save_failed",
+      "value": "保存图片失败，请稍后重试。"
+    },
+    {
+      "name": "context_menu_image_copied",
+      "value": "图片已复制。"
+    },
+    {
+      "name": "context_menu_image_copy_failed",
+      "value": "复制图片失败，请稍后重试。"
+    },
+    {
+      "name": "context_menu_share_opened",
+      "value": "已打开分享面板。"
+    },
+    {
+      "name": "context_menu_image_share_failed",
+      "value": "分享图片失败，请稍后重试。"
+    },
+    {
+      "name": "tab_runtime_active",
+      "value": "当前活动中"
+    },
+    {
+      "name": "tab_runtime_ready",
+      "value": "已就绪"
+    },
+    {
+      "name": "tab_runtime_load_failed_detail",
+      "value": "加载失败：%1$s"
+    },
+    {
+      "name": "device_tabs_sign_in_title",
+      "value": "登录后查看跨设备标签页"
+    },
+    {
+      "name": "device_tabs_sign_in_message",
+      "value": "使用华为账号登录，即可看到电脑上打开的网页。"
+    },
+    {
+      "name": "device_tabs_pro_required_title",
+      "value": "跨设备标签页需要 Aira Pro"
+    },
+    {
+      "name": "device_tabs_pro_required_message",
+      "value": "开通后可以查看并打开其他在线设备的标签页。连接自己的私有化部署则不必开通。"
+    },
+    {
+      "name": "device_tabs_learn_pro",
+      "value": "了解 Aira Pro"
+    },
+    {
+      "name": "device_tabs_use_personal_server",
+      "value": "使用私有化部署"
+    },
+    {
+      "name": "device_tabs_pro_expired_message",
+      "value": "续费后即可恢复跨设备标签页。连接自己的私有化部署则不必开通。"
+    },
+    {
+      "name": "device_tabs_link_disabled_title",
+      "value": "与电脑互联未开启"
+    },
+    {
+      "name": "device_tabs_link_disabled_message",
+      "value": "开启后即可看到电脑上的标签页，和数据同步无关。"
+    },
+    {
+      "name": "device_tabs_enable_link",
+      "value": "开启与电脑互联"
+    },
+    {
+      "name": "device_tabs_no_computer_title",
+      "value": "当前没有在线电脑"
+    },
+    {
+      "name": "device_tabs_no_computer_message",
+      "value": "在电脑上打开 Aira 并登录同一账号，这台电脑就会出现在这里。"
+    },
+    {
+      "name": "device_tabs_view_setup",
+      "value": "查看连接方法"
+    },
+    {
+      "name": "device_tabs_connect_server_title",
+      "value": "请先连接私有化部署"
+    },
+    {
+      "name": "device_tabs_server_credentials",
+      "value": "跨设备标签页需要有效的私有化部署设备凭据。"
+    },
+    {
+      "name": "device_tabs_server_setup",
+      "value": "跨设备标签页支持通过你自己部署的私有化部署使用，请先在同步设置中完成连接。"
+    },
+    {
+      "name": "device_tabs_open_sync_settings",
+      "value": "去同步设置"
+    },
+    {
+      "name": "device_tabs_unavailable",
+      "value": "跨设备标签页暂时不可用。"
+    },
+    {
+      "name": "device_tabs_unavailable_title",
+      "value": "跨设备标签页暂时不可用"
+    },
+    {
+      "name": "device_tabs_link_unavailable",
+      "value": "与电脑互联不可用"
+    },
+    {
+      "name": "device_tabs_sign_in_huawei",
+      "value": "请先使用华为账号登录。"
+    },
+    {
+      "name": "device_tabs_server_not_connected",
+      "value": "私有化部署尚未连接。"
+    },
+    {
+      "name": "device_tabs_sync_not_ready",
+      "value": "同步配置尚未初始化。"
+    },
+    {
+      "name": "device_tabs_server_device_missing",
+      "value": "私有化部署设备标识不可用，请重新连接。"
+    },
+    {
+      "name": "device_tabs_request_failed",
+      "value": "跨设备标签页服务请求失败（%1$d）。"
+    },
+    {
+      "name": "device_tabs_publish_failed",
+      "value": "暂时无法发布这台手机的标签页。"
+    },
+    {
+      "name": "device_tabs_read_failed",
+      "value": "暂时无法读取跨设备标签页。"
+    },
+    {
+      "name": "device_tabs_clear_failed",
+      "value": "暂时无法清除这台手机的标签页状态。"
+    },
+    {
+      "name": "device_tabs_server_publish_failed",
+      "value": "暂时无法向私有化部署发布这台手机的标签页。"
+    },
+    {
+      "name": "device_tabs_server_read_failed",
+      "value": "暂时无法从私有化部署读取跨设备标签页。"
+    },
+    {
+      "name": "device_tabs_server_clear_failed",
+      "value": "暂时无法清除私有化部署上的手机标签页状态。"
+    },
+    {
+      "name": "device_tabs_sign_in_again",
+      "value": "请重新登录华为账号后再继续。"
+    },
+    {
+      "name": "device_tabs_server_reconnect",
+      "value": "请重新连接私有化部署后再继续。"
+    },
+    {
+      "name": "device_tabs_empty_response",
+      "value": "跨设备标签页服务没有返回结果。"
+    },
+    {
+      "name": "device_tabs_bad_response",
+      "value": "跨设备标签页服务返回的数据无法解析。"
+    },
+    {
+      "name": "site_data_cookies_allowed",
+      "value": "当前允许站点 Cookie"
+    },
+    {
+      "name": "site_data_cookies_blocked",
+      "value": "当前已禁用站点 Cookie"
+    },
+    {
+      "name": "site_data_third_party_allowed",
+      "value": "当前允许第三方 Cookie"
+    },
+    {
+      "name": "site_data_third_party_blocked",
+      "value": "当前已拦截第三方 Cookie"
+    },
+    {
+      "name": "site_data_profile_regular",
+      "value": "当前资料：常规浏览资料"
+    },
+    {
+      "name": "site_data_profile_named",
+      "value": "当前资料：%1$s"
+    },
+    {
+      "name": "site_data_session_private",
+      "value": "当前会话边界：私密会话"
+    },
+    {
+      "name": "site_data_session_regular",
+      "value": "当前会话边界：常规会话"
+    },
+    {
+      "name": "site_data_summary_private",
+      "value": "%1$s；%2$s；%3$s；%4$s；数据范围：仅本次私密会话。平台不支持按当前站点清除私密 Cookie 或站点存储，请使用“清除本次私密数据”统一清理。"
+    },
+    {
+      "name": "site_data_permissions_private",
+      "value": "当前仅显示本次私密会话的站点权限；会话权限规则 %1$d 条；不会读取或列出常规浏览资料中的站点权限规则。"
+    },
+    {
+      "name": "site_data_summary_regular",
+      "value": "%1$s；%2$s；%3$s；%4$s；数据范围：常规浏览资料。当前站点清理只处理按来源隔离的站点存储；Cookie、缓存和全部站点存储在“隐私防护”中统一清理。"
+    },
+    {
+      "name": "site_data_permissions_saved",
+      "value": "已保存 %1$d 条站点权限。当前站点清理不会删除 Cookie 或共享网页缓存。"
+    },
+    {
+      "name": "site_data_permission_counts",
+      "value": "%1$s 其中允许 %2$d 项，阻止 %3$d 项。"
+    },
+    {
+      "name": "site_data_cookie_snapshot_off",
+      "value": "未启用隐私 Cookie 快照。"
+    },
+    {
+      "name": "site_data_cookie_nothing_to_restore",
+      "value": "没有可恢复的隐私 Cookie。"
+    },
+    {
+      "name": "site_data_cookie_restored",
+      "value": "隐私 Cookie 已恢复 %1$d 条，失败 %2$d 条。"
+    },
+    {
+      "name": "site_data_cookie_restore_failed",
+      "value": "恢复隐私 Cookie 失败：%1$s"
+    },
+    {
+      "name": "site_data_cookie_saved",
+      "value": "隐私 Cookie 已保存 %1$d 条。"
+    },
+    {
+      "name": "site_data_cookie_save_failed",
+      "value": "保存隐私 Cookie 失败：%1$s"
+    },
+    {
+      "name": "site_data_private_cleared_kept",
+      "value": "私密会话数据已清除，已保留 %1$d 条 Cookie 快照。"
+    },
+    {
+      "name": "site_data_private_cleared",
+      "value": "私密会话数据已清除。"
+    },
+    {
+      "name": "site_data_private_clear_failed",
+      "value": "清除私密会话数据失败：%1$s"
+    },
+    {
+      "name": "site_data_origin_unavailable",
+      "value": "站点地址不可用，未清理数据。"
+    },
+    {
+      "name": "site_data_private_not_per_site",
+      "value": "私密数据未按站点清除；Cookie 和站点存储将在私密会话结束时统一清理。"
+    },
+    {
+      "name": "site_data_storage_clear_failed",
+      "value": "清除站点存储失败：%1$s"
+    },
+    {
+      "name": "site_data_storage_cleared_kept",
+      "value": "站点存储已清除，Cookie 和网页缓存已保留。"
+    },
+    {
+      "name": "site_data_failure_storage",
+      "value": "站点存储：%1$s"
+    },
+    {
+      "name": "site_data_failure_cookies",
+      "value": "Cookie：%1$s"
+    },
+    {
+      "name": "site_data_failure_cache",
+      "value": "网页缓存：%1$s"
+    },
+    {
+      "name": "site_data_failure_permissions",
+      "value": "站点权限：%1$s"
+    },
+    {
+      "name": "site_data_detail_separator",
+      "value": "；"
+    },
+    {
+      "name": "site_data_partial_clear_failed",
+      "value": "部分浏览数据清除失败：%1$s"
+    },
+    {
+      "name": "site_data_private_all_cleared",
+      "value": "本次私密会话的 Cookie 和站点存储已清除，常规浏览资料未受影响。"
+    },
+    {
+      "name": "site_data_all_cleared",
+      "value": "浏览数据、Cookie、缓存和当前浏览资料中的站点权限已全部清除。"
+    },
+    {
+      "name": "site_data_selected_cleared",
+      "value": "所选浏览数据已清除。"
+    },
+    {
+      "name": "theme_palette_default_subtitle",
+      "value": "蓝色主调，中性灰阶"
+    },
+    {
+      "name": "theme_palette_dawn_title",
+      "value": "晨光"
+    },
+    {
+      "name": "theme_palette_dawn_subtitle",
+      "value": "蓝紫晨光"
+    },
+    {
+      "name": "theme_palette_lead_title",
+      "value": "铅云"
+    },
+    {
+      "name": "theme_palette_lead_subtitle",
+      "value": "中性灰阶"
+    },
+    {
+      "name": "theme_palette_aurora_title",
+      "value": "晨屿"
+    },
+    {
+      "name": "theme_palette_aurora_subtitle",
+      "value": "海雾青光"
+    },
+    {
+      "name": "theme_palette_sage_title",
+      "value": "竹影"
+    },
+    {
+      "name": "theme_palette_sage_subtitle",
+      "value": "静绿灰调"
+    },
+    {
+      "name": "theme_palette_cedar_title",
+      "value": "森息"
+    },
+    {
+      "name": "theme_palette_cedar_subtitle",
+      "value": "深林呼吸"
+    },
+    {
+      "name": "theme_palette_lagoon_title",
+      "value": "潮镜"
+    },
+    {
+      "name": "theme_palette_lagoon_subtitle",
+      "value": "温蓝水面"
+    },
+    {
+      "name": "theme_palette_glacier_title",
+      "value": "薄霁"
+    },
+    {
+      "name": "theme_palette_glacier_subtitle",
+      "value": "浅蓝晴空"
+    },
+    {
+      "name": "theme_palette_indigo_title",
+      "value": "夜航"
+    },
+    {
+      "name": "theme_palette_indigo_subtitle",
+      "value": "蓝紫航线"
+    },
+    {
+      "name": "theme_palette_wisteria_title",
+      "value": "云藤"
+    },
+    {
+      "name": "theme_palette_wisteria_subtitle",
+      "value": "柔紫云隙"
+    },
+    {
+      "name": "theme_palette_rosewood_title",
+      "value": "绯页"
+    },
+    {
+      "name": "theme_palette_rosewood_subtitle",
+      "value": "低饱和红"
+    },
+    {
+      "name": "theme_palette_terracotta_title",
+      "value": "暖砖"
+    },
+    {
+      "name": "theme_palette_terracotta_subtitle",
+      "value": "红棕余温"
+    },
+    {
+      "name": "theme_palette_amber_title",
+      "value": "灯穗"
+    },
+    {
+      "name": "theme_palette_amber_subtitle",
+      "value": "金色暖影"
+    },
+    {
+      "name": "theme_palette_moss_title",
+      "value": "苔径"
+    },
+    {
+      "name": "theme_palette_moss_subtitle",
+      "value": "橄榄小路"
+    },
+    {
+      "name": "theme_palette_cyan_title",
+      "value": "晴瓷"
+    },
+    {
+      "name": "theme_palette_cyan_subtitle",
+      "value": "清透青蓝"
+    },
+    {
+      "name": "theme_palette_steel_title",
+      "value": "雾钢"
+    },
+    {
+      "name": "theme_palette_steel_subtitle",
+      "value": "理性灰蓝"
+    },
+    {
+      "name": "theme_palette_plum_title",
+      "value": "暮梅"
+    },
+    {
+      "name": "theme_palette_plum_subtitle",
+      "value": "深紫红晕"
+    },
+    {
+      "name": "theme_palette_coral_title",
+      "value": "橙潮"
+    },
+    {
+      "name": "theme_palette_coral_subtitle",
+      "value": "柔亮橙粉"
+    },
+    {
+      "name": "theme_palette_all",
+      "value": "全部主题色"
+    },
+    {
+      "name": "feature_intro_appearance_title",
+      "value": "选择外观"
+    },
+    {
+      "name": "feature_intro_appearance_subtitle",
+      "value": "主题色和标签页样式之后也可以在设置里更改。"
+    },
+    {
+      "name": "feature_intro_previous",
+      "value": "上一步"
+    },
+    {
+      "name": "feature_intro_vertical_tabs",
+      "value": "竖向标签页"
+    },
+    {
+      "name": "web_ua_request_mobile",
+      "value": "请求移动端网页"
+    },
+    {
+      "name": "web_ua_request_desktop",
+      "value": "请求桌面版网页"
+    },
+    {
+      "name": "web_ua_custom_iphone",
+      "value": "自定义 iPhone"
+    },
+    {
+      "name": "web_ua_custom_windows",
+      "value": "自定义 Windows"
+    },
+    {
+      "name": "web_ua_custom_macos",
+      "value": "自定义 macOS"
+    },
+    {
+      "name": "web_ua_custom_android",
+      "value": "自定义 Android"
+    },
+    {
+      "name": "web_ua_custom_notice",
+      "value": "自定义 UA 只保证字符串兼容，不承诺完整浏览器指纹一致。"
+    },
+    {
+      "name": "web_ua_android_compat",
+      "value": "使用 Android 兼容移动网页标识"
+    },
+    {
+      "name": "web_ua_follow_global_desc",
+      "value": "使用全局网页标识设置"
+    },
+    {
+      "name": "web_ua_custom_identity",
+      "value": "自定义网页标识"
+    },
+    {
+      "name": "local_backup_invalid",
+      "value": "备份文件不是有效的 Aira 备份。"
+    },
+    {
+      "name": "local_backup_no_bookmarks",
+      "value": "备份中没有可恢复的书签。"
+    },
+    {
+      "name": "local_backup_bookmarks_invalid",
+      "value": "备份中的书签格式无效。"
+    },
+    {
+      "name": "local_backup_settings_invalid",
+      "value": "备份中的常用设置格式无效。"
+    },
+    {
+      "name": "local_backup_settings_section_invalid",
+      "value": "备份中的常用设置分区无效。"
+    },
+    {
+      "name": "local_backup_not_local",
+      "value": "备份文件不是有效的 Aira 本地备份。"
+    },
+    {
+      "name": "local_backup_newer",
+      "value": "这份备份由更高版本的 Aira 创建，请先升级应用。"
+    },
+    {
+      "name": "local_backup_unsupported",
+      "value": "Aira 备份文件格式或版本不受支持。"
+    },
+    {
+      "name": "local_backup_unknown_section",
+      "value": "Aira 备份文件包含不受支持的数据分区。"
+    },
+    {
+      "name": "local_backup_history_private",
+      "value": "备份中的历史记录包含临时隐私会话数据，无法导入。"
+    },
+    {
+      "name": "local_backup_scripts_invalid",
+      "value": "备份中的用户脚本格式无效。"
+    },
+    {
+      "name": "local_backup_script_record_invalid",
+      "value": "备份中的用户脚本记录无效。"
+    },
+    {
+      "name": "local_backup_script_named_invalid",
+      "value": "备份中的脚本“%1$s”格式无效。"
+    },
+    {
+      "name": "local_backup_script_data_invalid",
+      "value": "备份中的脚本数据格式无效。"
+    },
+    {
+      "name": "local_backup_script_data_record_invalid",
+      "value": "备份中的脚本数据记录无效。"
+    },
+    {
+      "name": "local_backup_script_data_value_invalid",
+      "value": "备份中的脚本数据包含无效值。"
+    },
+    {
+      "name": "local_backup_section_version",
+      "value": "%1$s备份版本不受支持。"
+    },
+    {
+      "name": "local_backup_scripts_required",
+      "value": "导出或恢复脚本数据时必须同时选择用户脚本。"
+    },
+    {
+      "name": "local_backup_selection_empty",
+      "value": "请至少选择一项备份内容。"
+    },
+    {
+      "name": "external_nav_blocked",
+      "value": "已阻止打开%1$s。"
+    },
+    {
+      "name": "external_nav_blocked_auto",
+      "value": "已阻止网页自动打开%1$s。"
+    },
+    {
+      "name": "external_nav_allowed",
+      "value": "允许直接打开%1$s。"
+    },
+    {
+      "name": "external_nav_suppressed",
+      "value": "已根据上次取消静默拦截%1$s。"
+    },
+    {
+      "name": "external_nav_request",
+      "value": "请求打开%1$s。"
+    },
+    {
+      "name": "external_nav_open_title",
+      "value": "打开其他应用"
+    },
+    {
+      "name": "external_nav_open_message",
+      "value": "%1$s 想打开%2$s。"
+    },
+    {
+      "name": "external_nav_baidu",
+      "value": "百度 App"
+    },
+    {
+      "name": "external_nav_bilibili",
+      "value": "哔哩哔哩 App"
+    },
+    {
+      "name": "external_nav_quark",
+      "value": "夸克 App"
+    },
+    {
+      "name": "external_nav_scheme_app",
+      "value": "%1$s 应用"
+    },
+    {
+      "name": "external_nav_invalid_link",
+      "value": "链接无效，无法打开外部应用。"
+    },
+    {
+      "name": "external_nav_no_app",
+      "value": "没有找到可打开此链接的应用。"
+    },
+    {
+      "name": "external_nav_multiple",
+      "value": "可由多个应用打开。"
+    },
+    {
+      "name": "external_nav_can_open",
+      "value": "可打开外部应用。"
+    },
+    {
+      "name": "external_nav_available_apps",
+      "value": "可用应用"
+    },
+    {
+      "name": "external_nav_private_page",
+      "value": "当前私密页面"
+    },
+    {
+      "name": "external_nav_link_invalid",
+      "value": "外部应用链接无效。"
+    },
+    {
+      "name": "external_nav_target_invalid",
+      "value": "外部应用目标无效。"
+    },
+    {
+      "name": "external_nav_target_invalid_user",
+      "value": "目标应用信息无效，无法打开。"
+    },
+    {
+      "name": "external_nav_opened_capability",
+      "value": "已通过系统外部应用能力打开。"
+    },
+    {
+      "name": "external_nav_handed_to_system",
+      "value": "已交给系统打开。"
+    },
+    {
+      "name": "external_nav_no_applinking",
+      "value": "没有已安装应用声明可打开此 AppLinking 链接。"
+    },
+    {
+      "name": "external_nav_no_declared",
+      "value": "没有已安装应用声明可打开此外部链接。"
+    },
+    {
+      "name": "external_nav_platform_blocked",
+      "value": "系统暂时阻止打开外部应用。"
+    },
+    {
+      "name": "external_nav_open_failed",
+      "value": "打开外部应用失败。"
+    },
+    {
+      "name": "external_nav_applinking_unhandled",
+      "value": "当前链接无法由已安装应用处理。"
+    },
+    {
+      "name": "external_nav_foreground_retry",
+      "value": "系统暂时阻止打开外部应用，请回到前台后重试。"
+    },
+    {
+      "name": "adblock_subscription_https_required",
+      "value": "请输入 HTTPS 规则订阅地址"
+    },
+    {
+      "name": "adblock_third_party_title",
+      "value": "启用第三方过滤规则？"
+    },
+    {
+      "name": "adblock_third_party_message",
+      "value": "“%1$s”由第三方独立提供和维护。启用后，Aira 将从互联网下载并更新该规则，规则提供方可能记录本次网络请求。\n\nAira 不参与规则内容编写，也无法保证其准确性、适用性或持续可用性。请在遵守你所在地法律法规及相关网站服务条款的前提下使用。\n\n规则来源：%2$s"
+    },
+    {
+      "name": "adblock_third_party_accept",
+      "value": "同意并下载"
+    },
+    {
+      "name": "adblock_source_missing",
+      "value": "未找到这条规则订阅"
+    },
+    {
+      "name": "adblock_preset_no_refresh",
+      "value": "系统预置规则无需刷新"
+    },
+    {
+      "name": "adblock_custom_enabled",
+      "value": "自定义规则已启用"
+    },
+    {
+      "name": "adblock_custom_disabled",
+      "value": "自定义规则已关闭"
+    },
+    {
+      "name": "adblock_no_rules_parsed",
+      "value": "没有解析到可用规则"
+    },
+    {
+      "name": "adblock_native_load_failed",
+      "value": "原生过滤规则加载失败，请重试"
+    },
+    {
+      "name": "adblock_preset_cannot_delete",
+      "value": "预置规则不能删除"
+    },
+    {
+      "name": "adblock_custom_deleted",
+      "value": "自定义规则已删除"
+    },
+    {
+      "name": "adblock_rules_imported",
+      "value": "已导入 %1$d 条规则"
+    },
+    {
+      "name": "adblock_rules_updated",
+      "value": "已更新 %1$d 条规则"
+    },
+    {
+      "name": "adblock_subscription_update_failed",
+      "value": "规则订阅更新失败"
+    },
+    {
+      "name": "web_runtime_switching_tab",
+      "value": "正在切换标签页内容"
+    },
+    {
+      "name": "web_runtime_page_loading",
+      "value": "页面正在加载"
+    },
+    {
+      "name": "web_runtime_page_loaded",
+      "value": "页面已加载完成"
+    },
+    {
+      "name": "web_runtime_history_failed",
+      "value": "历史记录切换失败：%1$s"
+    },
+    {
+      "name": "web_runtime_no_address",
+      "value": "网页没有提供可打开的地址"
+    },
+    {
+      "name": "web_runtime_external_resource",
+      "value": "尝试处理外部资源：%1$s"
+    },
+    {
+      "name": "web_runtime_popup_opened",
+      "value": "已在新标签页中打开弹出页面"
+    },
+    {
+      "name": "web_runtime_link_opened",
+      "value": "已在新标签页中打开链接"
+    },
+    {
+      "name": "web_runtime_new_window",
+      "value": "新窗口页面"
+    },
+    {
+      "name": "web_runtime_current_page",
+      "value": "当前网页"
+    },
+    {
+      "name": "web_runtime_cert_title",
+      "value": "证书安全警告"
+    },
+    {
+      "name": "web_runtime_cert_message",
+      "value": "%1$s 的证书校验失败。继续访问可能存在风险。"
+    },
+    {
+      "name": "web_runtime_back_safe",
+      "value": "返回安全页面"
+    },
+    {
+      "name": "web_runtime_continue",
+      "value": "继续访问"
+    },
+    {
+      "name": "web_runtime_https_title",
+      "value": "无法建立安全连接"
+    },
+    {
+      "name": "web_runtime_https_message",
+      "value": "%1$s 无法通过 HTTPS 安全访问。你可以返回，或继续使用不安全的 HTTP 连接 %2$s。"
+    },
+    {
+      "name": "web_runtime_use_http",
+      "value": "使用 HTTP 继续"
+    },
+    {
+      "name": "web_runtime_allowed_files",
+      "value": "网页允许的文件"
+    },
+    {
+      "name": "adblock_downloading_named",
+      "value": "正在下载并解析“%1$s”，请稍候。"
+    },
+    {
+      "name": "web_error_tab_unrecoverable",
+      "value": "标签页暂时无法恢复"
+    },
+    {
+      "name": "web_error_homepage_title",
+      "value": "主页无法打开"
+    },
+    {
+      "name": "web_error_certificate_title",
+      "value": "连接安全性需要确认"
+    },
+    {
+      "name": "web_error_site_not_found",
+      "value": "找不到这个网站"
+    },
+    {
+      "name": "web_error_site_unavailable",
+      "value": "网站暂时无法打开"
+    },
+    {
+      "name": "web_error_tab_crashed",
+      "value": "当前标签页运行时异常，可以重新加载页面或回到首页。"
+    },
+    {
+      "name": "web_error_homepage_unavailable",
+      "value": "当前自定义主页不可用"
+    },
+    {
+      "name": "web_error_edit_homepage",
+      "value": "编辑主页"
+    },
+    {
+      "name": "web_error_hint_reload",
+      "value": "重新加载页面"
+    },
+    {
+      "name": "web_error_hint_home_retry",
+      "value": "如果仍然失败，先回到首页再打开网站"
+    },
+    {
+      "name": "web_error_hint_copy",
+      "value": "复制错误详情用于诊断"
+    },
+    {
+      "name": "web_error_hint_time",
+      "value": "确认设备时间是否正确"
+    },
+    {
+      "name": "web_error_hint_cert",
+      "value": "谨慎处理证书异常的网站"
+    },
+    {
+      "name": "web_error_hint_network",
+      "value": "检查 Wi-Fi 或移动网络"
+    },
+    {
+      "name": "web_error_hint_url",
+      "value": "确认网址没有输入错误"
+    },
+    {
+      "name": "web_error_hint_proxy",
+      "value": "如果使用了 VPN 或代理，可以稍后再试"
+    },
+    {
+      "name": "web_permission_system_on",
+      "value": "系统权限已开启，请重新发起网页请求。"
+    },
+    {
+      "name": "web_permission_system_incomplete",
+      "value": "系统权限仍未完全开启，请在系统设置中检查。"
+    },
+    {
+      "name": "web_permission_settings_open_failed",
+      "value": "打开系统权限设置失败：%1$s"
+    },
+    {
+      "name": "web_permission_settings_manual",
+      "value": "无法直接打开权限设置，请在系统设置中手动开启。"
+    },
+    {
+      "name": "web_permission_wants_use",
+      "value": "%1$s 想使用%2$s。"
+    },
+    {
+      "name": "web_permission_location_title",
+      "value": "位置权限请求"
+    },
+    {
+      "name": "web_permission_wants_location",
+      "value": "%1$s 想获取你的位置信息。"
+    },
+    {
+      "name": "web_permission_grant_failed",
+      "value": "权限授权失败：%1$s"
+    },
+    {
+      "name": "web_permission_grant_denied",
+      "value": "权限授权失败，已拒绝网页请求。"
+    },
+    {
+      "name": "web_permission_location_failed",
+      "value": "定位授权失败：%1$s"
+    },
+    {
+      "name": "web_permission_location_denied",
+      "value": "定位授权失败，已拒绝网页请求。"
+    },
+    {
+      "name": "web_permission_need_system",
+      "value": "需要开启系统权限"
+    },
+    {
+      "name": "web_permission_need_location",
+      "value": "需要开启位置信息"
+    },
+    {
+      "name": "web_permission_need_system_label",
+      "value": "Aira 需要系统%1$s权限，才能允许网站使用。"
+    },
+    {
+      "name": "web_permission_location_service_off",
+      "value": "系统位置信息开关未开启，网站暂时无法获取位置。"
+    },
+    {
+      "name": "feature_intro_ad_block_title",
+      "value": "少一点广告打扰"
+    },
+    {
+      "name": "feature_intro_ad_block_body",
+      "value": "按你启用的规则过滤网页广告，也可以手动隐藏看不顺眼的元素。"
+    },
+    {
+      "name": "feature_intro_video_title",
+      "value": "接管网页视频"
+    },
+    {
+      "name": "feature_intro_video_body",
+      "value": "用 Aira 播放器控制网页里的真实视频，调倍速、切画面，也能下载。"
+    },
+    {
+      "name": "feature_intro_scripts_title",
+      "value": "支持用户脚本"
+    },
+    {
+      "name": "feature_intro_scripts_body",
+      "value": "导入脚本后，只在匹配的网站里改页面，也可以单独开关。"
+    },
+    {
+      "name": "feature_intro_sync_title",
+      "value": "换一台，接着用"
+    },
+    {
+      "name": "feature_intro_sync_body",
+      "value": "书签和常用设置可以同步。配对电脑后，也能看到那边的标签页，把当前网页推过去。"
+    },
+    {
+      "name": "feature_intro_gate_label",
+      "value": "向右滑动开始使用"
+    },
+    {
+      "name": "feature_intro_skip_title",
+      "value": "跳过介绍"
+    },
+    {
+      "name": "feature_intro_skip_message",
+      "value": "跳过后将直接进入主页，不再显示这些介绍。"
+    },
+    {
+      "name": "feature_intro_enter_home",
+      "value": "进入主页"
+    },
+    {
+      "name": "adblock_native_dir_invalid_name",
+      "value": "原生规则目录包含无效文件名"
+    },
+    {
+      "name": "adblock_native_dir_unknown",
+      "value": "原生规则目录包含未知子目录"
+    },
+    {
+      "name": "adblock_native_source_unsupported",
+      "value": "原生规则源 ID 不受支持"
+    },
+    {
+      "name": "adblock_native_source_size_invalid",
+      "value": "原生规则源文件大小无效"
+    },
+    {
+      "name": "adblock_native_source_missing",
+      "value": "原生规则源候选文件不存在"
+    },
+    {
+      "name": "adblock_native_source_validate_failed",
+      "value": "原生规则源校验失败"
+    },
+    {
+      "name": "adblock_native_source_commit_failed",
+      "value": "原生规则源提交失败"
+    },
+    {
+      "name": "adblock_native_ruleset_size_invalid",
+      "value": "原生规则集大小无效"
+    },
+    {
+      "name": "adblock_native_ruleset_commit_failed",
+      "value": "原生规则集提交失败"
+    },
+    {
+      "name": "adblock_native_manifest_size_invalid",
+      "value": "原生规则清单大小无效"
+    },
+    {
+      "name": "adblock_native_file_read_incomplete",
+      "value": "原生规则文件读取不完整"
+    },
+    {
+      "name": "adblock_native_file_size_invalid",
+      "value": "原生规则文件大小无效"
+    },
+    {
+      "name": "adblock_native_file_write_incomplete",
+      "value": "原生规则文件写入不完整"
+    },
+    {
+      "name": "homepage_preview_favorites",
+      "value": "收藏"
+    },
+    {
+      "name": "web_threat_site_risk_title",
+      "value": "此网站可能存在安全风险"
+    },
+    {
+      "name": "web_threat_site_risk_message",
+      "value": "请谨慎输入密码、验证码或付款信息。确认网站可信后再继续访问。"
+    },
+    {
+      "name": "page_push_http_failed",
+      "value": "网页推送服务请求失败（%1$d）。"
+    },
+    {
+      "name": "page_push_sign_in_first",
+      "value": "请先使用华为账号登录后再推送网页。"
+    },
+    {
+      "name": "page_push_sign_in_again",
+      "value": "请重新登录华为账号后再推送网页。"
+    },
+    {
+      "name": "page_push_empty",
+      "value": "网页推送服务没有返回结果。"
+    },
+    {
+      "name": "page_push_json_invalid",
+      "value": "网页推送服务返回的 JSON 无法解析。"
+    },
+    {
+      "name": "page_push_body_invalid",
+      "value": "网页推送服务返回的 body 无法解析。"
+    },
+    {
+      "name": "toolbar_guide_got_it",
+      "value": "我知道了"
+    },
+    {
+      "name": "toolbar_guide_hide_title",
+      "value": "向下滑动隐藏悬浮工具条"
+    },
+    {
+      "name": "toolbar_guide_hide_message",
+      "value": "工具条就会收起来，只看网页内容，浏览更清爽。"
+    },
+    {
+      "name": "toolbar_guide_home_title",
+      "value": "上滑两侧按钮回到主页"
+    },
+    {
+      "name": "toolbar_guide_home_message",
+      "value": "按住返回或标签按钮向上滑，松手就会关闭当前页并回到主页。"
+    },
+    {
+      "name": "toolbar_guide_tools_title",
+      "value": "上滑中间搜索区打开工具"
+    },
+    {
+      "name": "toolbar_guide_tools_message",
+      "value": "按住中间的搜索区向上滑，工具面板会从底部展开。"
+    },
+    {
+      "name": "toolbar_guide_tabs_title",
+      "value": "左右滑动切换标签页"
+    },
+    {
+      "name": "toolbar_guide_tabs_message",
+      "value": "在搜索区左右滑动，就能切到旁边的标签页。"
+    },
+    {
+      "name": "startup_welcome_sign_in_title",
+      "value": "登录账号"
+    },
+    {
+      "name": "startup_welcome_sign_in_subtitle",
+      "value": "登录华为账号，或连接你自己的服务器。也可以先跳过，之后在设置里再登录。"
+    },
+    {
+      "name": "startup_welcome_server_title",
+      "value": "连接服务器"
+    },
+    {
+      "name": "startup_welcome_server_subtitle",
+      "value": "连接私有化部署或 WebDAV。也可以先跳过，之后在设置里再连接。"
+    },
+    {
+      "name": "startup_welcome_basic_title",
+      "value": "欢迎使用 Aira"
+    },
+    {
+      "name": "startup_welcome_basic_subtitle",
+      "value": "当前处于精简模式，账号与同步功能需要切换到全量模式后使用。你可以先直接开始浏览。"
+    },
+    {
+      "name": "startup_welcome_personal_server",
+      "value": "使用私有化部署同步"
+    },
+    {
+      "name": "app_icon_invalid",
+      "value": "图标信息无效。"
+    },
+    {
+      "name": "app_icon_updated",
+      "value": "应用图标已更新。"
+    },
+    {
+      "name": "app_icon_restored",
+      "value": "已恢复默认应用图标。"
+    },
+    {
+      "name": "app_icon_read_failed",
+      "value": "读取应用图标失败，请稍后重试。"
+    },
+    {
+      "name": "app_icon_read_unavailable",
+      "value": "暂时无法读取应用图标。"
+    },
+    {
+      "name": "app_icon_theme_conflict",
+      "value": "当前系统主题正在使用自定义图标，无法切换应用图标。"
+    },
+    {
+      "name": "app_icon_select_retry",
+      "value": "切换应用图标失败，请稍后重试。"
+    },
+    {
+      "name": "app_icon_restore_retry",
+      "value": "恢复默认图标失败，请稍后重试。"
+    },
+    {
+      "name": "app_icon_service_error",
+      "value": "图标管理服务异常，请稍后重试。"
+    },
+    {
+      "name": "app_icon_select_failed",
+      "value": "切换应用图标失败。"
+    },
+    {
+      "name": "app_icon_restore_failed",
+      "value": "恢复默认图标失败。"
+    },
+    {
+      "name": "tabs_guide_private_title",
+      "value": "这里查看隐私标签页"
+    },
+    {
+      "name": "tabs_guide_close_all",
+      "value": "长按可以关闭全部"
+    },
+    {
+      "name": "tabs_guide_continue",
+      "value": "轻点继续"
+    },
+    {
+      "name": "tabs_guide_normal_title",
+      "value": "这里查看普通标签页"
+    },
+    {
+      "name": "tabs_guide_devices_title",
+      "value": "这里查看跨设备标签页"
+    },
+    {
+      "name": "tabs_guide_devices_message",
+      "value": "其他设备打开的页面会列在这里"
+    },
+    {
+      "name": "tabs_guide_done",
+      "value": "轻点完成"
+    },
+    {
+      "name": "settings_launch_wifi_opened",
+      "value": "已打开系统设置，请进入 Wi-Fi 页面连接网络。"
+    },
+    {
+      "name": "settings_launch_wifi_failed",
+      "value": "无法打开系统设置，请手动进入设置并连接 Wi-Fi。"
+    },
+    {
+      "name": "settings_launch_permission_opened",
+      "value": "已打开系统设置，请进入 Aira 的应用权限。"
+    },
+    {
+      "name": "settings_launch_permission_failed",
+      "value": "无法打开系统设置，请手动进入设置并开启 Aira 权限。"
+    },
+    {
+      "name": "settings_launch_link_failed",
+      "value": "打开链接失败：%1$s"
+    },
+    {
+      "name": "settings_launch_link_failed_prefix",
+      "value": "打开链接失败："
+    },
+    {
+      "name": "settings_launch_review_opened",
+      "value": "已打开应用市场评论页。"
+    },
+    {
+      "name": "settings_launch_detail_opened",
+      "value": "已打开应用市场详情页。"
+    },
+    {
+      "name": "settings_launch_upgrade_opened",
+      "value": "已打开应用市场，请升级 Aira。"
+    },
+    {
+      "name": "settings_launch_rating_opened",
+      "value": "已打开评分弹窗。"
+    },
+    {
+      "name": "settings_launch_rating_failed",
+      "value": "暂时无法打开评分弹窗。"
+    },
+    {
+      "name": "settings_launch_market_unavailable",
+      "value": "应用市场暂时无法打开。"
+    },
+    {
+      "name": "tab_close_count",
+      "value": "已关闭 %1$d 个标签页。"
+    },
+    {
+      "name": "wallpaper_download_failed",
+      "value": "壁纸图片下载失败。"
+    },
+    {
+      "name": "wallpaper_signature_invalid",
+      "value": "壁纸图片内容标识无效。"
+    },
+    {
+      "name": "wallpaper_bing_daily",
+      "value": "Bing 每日壁纸"
+    },
+    {
+      "name": "wallpaper_none_selected",
+      "value": "未选择壁纸图片。"
+    },
+    {
+      "name": "wallpaper_unavailable",
+      "value": "壁纸图片不可用。"
+    },
+    {
+      "name": "wallpaper_too_large",
+      "value": "壁纸图片超过 30 MB。"
+    },
+    {
+      "name": "wallpaper_custom_title",
+      "value": "自定义壁纸"
+    },
+    {
+      "name": "wallpaper_save_failed",
+      "value": "无法保存这张壁纸，请换一张再试。"
+    },
+    {
+      "name": "wallpaper_video_none",
+      "value": "未选择视频壁纸。"
+    },
+    {
+      "name": "wallpaper_video_signature_invalid",
+      "value": "视频壁纸内容标识无效。"
+    },
+    {
+      "name": "wallpaper_video_unavailable",
+      "value": "这个视频不可用。"
+    },
+    {
+      "name": "wallpaper_video_too_large",
+      "value": "视频超过 100 MB，请换一个短一些的再试。"
+    },
+    {
+      "name": "wallpaper_video_title",
+      "value": "视频壁纸"
+    },
+    {
+      "name": "wallpaper_video_save_failed",
+      "value": "无法保存这个视频，请换一个再试。"
+    },
+    {
+      "name": "wallpaper_footer",
+      "value": "必应壁纸每天自动检查更新。视频壁纸静音循环播放。两者仅用于 Aira 原生主页；自定义主页和隐私主页不会显示。"
+    },
+    {
+      "name": "wallpaper_auto_mono",
+      "value": "自动黑白"
+    },
+    {
+      "name": "wallpaper_solid",
+      "value": "纯色背景"
+    },
+    {
+      "name": "wallpaper_bing",
+      "value": "必应壁纸"
+    },
+    {
+      "name": "wallpaper_checking",
+      "value": "正在检查必应每日壁纸更新…"
+    },
+    {
+      "name": "wallpaper_fetching",
+      "value": "正在获取必应每日壁纸…"
+    },
+    {
+      "name": "wallpaper_update_failed_cache",
+      "value": "今日壁纸更新失败，正在继续使用缓存。"
+    },
+    {
+      "name": "wallpaper_load_failed_network",
+      "value": "必应壁纸加载失败，请检查网络后重试。"
+    },
+    {
+      "name": "wallpaper_selected",
+      "value": "%1$s，已选中"
+    },
+    {
+      "name": "wallpaper_refresh_failed_cache",
+      "value": "刷新失败，继续使用缓存或默认壁纸"
+    },
+    {
+      "name": "wallpaper_select_failed",
+      "value": "选择壁纸失败，请稍后重试。"
+    },
+    {
+      "name": "wallpaper_select_video_failed",
+      "value": "选择视频壁纸失败，请稍后重试。"
     }
   ]
 }

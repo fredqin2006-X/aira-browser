@@ -1,3 +1,5 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
+
 export interface FeatureIntroSlide {
   id: string;
   title: string;
@@ -38,38 +40,75 @@ const FEATURE_INTRO_SKIP_CONFIRM_ENTER_LABEL: string = '进入主页';
 
 export class FeatureIntroViewModel {
   slides(): FeatureIntroSlide[] {
-    return FEATURE_INTRO_SLIDES;
+    return FEATURE_INTRO_SLIDES.map((slide: FeatureIntroSlide): FeatureIntroSlide => this.localizeSlide(slide));
   }
 
   actionLabel(index: number): string {
-    return this.isLast(index) ? FEATURE_INTRO_DONE_LABEL : FEATURE_INTRO_NEXT_LABEL;
+    return featureIntroText($r('app.string.settings_sync_next'),
+      this.isLast(index) ? FEATURE_INTRO_DONE_LABEL : FEATURE_INTRO_NEXT_LABEL);
   }
 
   gateActionLabel(): string {
-    return FEATURE_INTRO_GATE_LABEL;
+    return featureIntroText($r('app.string.feature_intro_gate_label'), FEATURE_INTRO_GATE_LABEL);
   }
 
   gateSkipLabel(): string {
-    return FEATURE_INTRO_GATE_SKIP_LABEL;
+    return featureIntroText($r('app.string.onboarding_ui_feature_intro_skip_control_001'), FEATURE_INTRO_GATE_SKIP_LABEL);
   }
 
   skipConfirmTitle(): string {
-    return FEATURE_INTRO_SKIP_CONFIRM_TITLE;
+    return featureIntroText($r('app.string.feature_intro_skip_title'), FEATURE_INTRO_SKIP_CONFIRM_TITLE);
   }
 
   skipConfirmMessage(): string {
-    return FEATURE_INTRO_SKIP_CONFIRM_MESSAGE;
+    return featureIntroText($r('app.string.feature_intro_skip_message'), FEATURE_INTRO_SKIP_CONFIRM_MESSAGE);
   }
 
   skipConfirmCancelLabel(): string {
-    return FEATURE_INTRO_SKIP_CONFIRM_CANCEL_LABEL;
+    return featureIntroText($r('app.string.settings_custom_home_cancel'), FEATURE_INTRO_SKIP_CONFIRM_CANCEL_LABEL);
   }
 
   skipConfirmEnterLabel(): string {
-    return FEATURE_INTRO_SKIP_CONFIRM_ENTER_LABEL;
+    return featureIntroText($r('app.string.feature_intro_enter_home'), FEATURE_INTRO_SKIP_CONFIRM_ENTER_LABEL);
+  }
+
+  private localizeSlide(slide: FeatureIntroSlide): FeatureIntroSlide {
+    switch (slide.id) {
+      case 'ad_block':
+        return {
+          id: slide.id,
+          title: featureIntroText($r('app.string.feature_intro_ad_block_title'), slide.title),
+          body: featureIntroText($r('app.string.feature_intro_ad_block_body'), slide.body)
+        };
+      case 'video_takeover':
+        return {
+          id: slide.id,
+          title: featureIntroText($r('app.string.feature_intro_video_title'), slide.title),
+          body: featureIntroText($r('app.string.feature_intro_video_body'), slide.body)
+        };
+      case 'user_scripts':
+        return {
+          id: slide.id,
+          title: featureIntroText($r('app.string.feature_intro_scripts_title'), slide.title),
+          body: featureIntroText($r('app.string.feature_intro_scripts_body'), slide.body)
+        };
+      case 'sync':
+        return {
+          id: slide.id,
+          title: featureIntroText($r('app.string.feature_intro_sync_title'), slide.title),
+          body: featureIntroText($r('app.string.feature_intro_sync_body'), slide.body)
+        };
+      default:
+        return slide;
+    }
   }
 
   isLast(index: number): boolean {
     return index >= FEATURE_INTRO_SLIDES.length - 1;
   }
+}
+
+function featureIntroText(resource: Resource, fallback: string): string {
+  const resolved = resolveAppResourceText(resource);
+  return resolved.length > 0 ? resolved : fallback;
 }

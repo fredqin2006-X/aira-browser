@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   BrowserDataBoundaryInput,
   ShortcutKind,
@@ -204,11 +205,11 @@ export class HomeShortcutToggleService {
     const kind = resolveHomeShortcutKind(target.kind);
     const normalizedUrl = this.normalizeShortcutUrl(target.url);
     if (normalizedUrl.length <= 0 || normalizedUrl === 'about:blank') {
-      throw new Error('当前没有可添加到主页的链接。');
+      throw new Error(resolveAppResourceText($r('app.string.home_shortcut_no_link')));
     }
     const systemDefinition = kind === 'system' ? resolveHomeSystemShortcutDefinitionByUrl(normalizedUrl) : undefined;
     if (kind === 'system' && systemDefinition === undefined) {
-      throw new Error('这个系统入口暂不可添加到主页。');
+      throw new Error(resolveAppResourceText($r('app.string.home_shortcut_system_unavailable')));
     }
     await this.repository.createShortcut({
       title: systemDefinition?.title ?? this.resolveShortcutTitle(target.title, normalizedUrl),

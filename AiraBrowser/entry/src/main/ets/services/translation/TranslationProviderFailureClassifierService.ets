@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 export type TranslationProviderFailureType =
   'missing_provider' |
   'missing_disclosure' |
@@ -47,20 +48,20 @@ export class TranslationProviderFailureClassifierService {
     if (statusCode === 401 || statusCode === 403) {
       return this.buildFailure(
         'missing_provider',
-        normalizedMessage.length > 0 ? normalizedMessage : '翻译服务认证失败，请检查服务配置。',
+        normalizedMessage.length > 0 ? normalizedMessage : resolveAppResourceText($r('app.string.translation_provider_auth_failed')),
         statusCode
       );
     }
     if (statusCode >= 500) {
       return this.buildFailure(
         'server_error',
-        normalizedMessage.length > 0 ? normalizedMessage : '翻译服务暂时不可用。',
+        normalizedMessage.length > 0 ? normalizedMessage : resolveAppResourceText($r('app.string.translation_provider_unavailable')),
         statusCode
       );
     }
     return this.buildFailure(
       'server_error',
-      normalizedMessage.length > 0 ? normalizedMessage : `翻译服务返回异常状态：${statusCode}`,
+      normalizedMessage.length > 0 ? normalizedMessage : resolveAppResourceText($r('app.string.translation_provider_bad_status', statusCode)),
       statusCode
     );
   }
@@ -69,15 +70,15 @@ export class TranslationProviderFailureClassifierService {
     const message = this.stringifyError(error);
     const lowerMessage = message.toLowerCase();
     if (lowerMessage.indexOf('canceled') >= 0 || lowerMessage.indexOf('destroy') >= 0) {
-      return this.buildFailure('request_canceled', '已取消翻译请求。');
+      return this.buildFailure('request_canceled', resolveAppResourceText($r('app.string.translation_provider_canceled')));
     }
     if (lowerMessage.indexOf('timeout') >= 0 || lowerMessage.indexOf('network') >= 0) {
-      return this.buildFailure('network_unavailable', '网络连接异常，无法完成翻译。');
+      return this.buildFailure('network_unavailable', resolveAppResourceText($r('app.string.translation_provider_network')));
     }
     if (this.isQuotaOrRateLimit(0, lowerMessage)) {
       return this.buildFailure('quota_or_rate_limit', this.resolveQuotaMessage(message));
     }
-    return this.buildFailure('unknown', message.length > 0 ? message : '网页翻译失败。');
+    return this.buildFailure('unknown', message.length > 0 ? message : resolveAppResourceText($r('app.string.webpage_translation_failed')));
   }
 
   private isQuotaOrRateLimit(statusCode: number, lowerMessage: string): boolean {
@@ -98,7 +99,7 @@ export class TranslationProviderFailureClassifierService {
 
   private resolveQuotaMessage(message: string): string {
     const normalizedMessage = message.trim();
-    return normalizedMessage.length > 0 ? normalizedMessage : '翻译服务额度或频率受限，稍后再试。';
+    return normalizedMessage.length > 0 ? normalizedMessage : resolveAppResourceText($r('app.string.translation_provider_quota'));
   }
 
   private stringifyError(error: Error | Object): string {

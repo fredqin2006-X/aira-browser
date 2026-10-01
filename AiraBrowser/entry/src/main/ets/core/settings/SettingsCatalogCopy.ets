@@ -20,7 +20,7 @@ export function localizeSettingsCatalogCopy(value: ResourceStr): ResourceStr {
   switch (value) {
     case '360 搜索':
       return $r('app.string.settings_catalog_360_search');
-    case 'Aira Pro':
+    case '捐赠Pro':
       return $r('app.string.settings_catalog_aira_pro');
     case 'Aira Pro会员服务协议':
       return $r('app.string.settings_pro_legal_membership_full');

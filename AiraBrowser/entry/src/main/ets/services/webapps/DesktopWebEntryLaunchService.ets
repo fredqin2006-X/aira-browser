@@ -1,4 +1,5 @@
 import { BrowserLaunchPayload } from '../../app/runtime/BrowserWindowRuntime';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { BrowserCreateTabOptions, BrowserTabState } from '../../core/tabs/TabManager';
 import { DesktopWebEntryRecord } from '../../data/webapps/WebAppInstallModels';
 import {
@@ -32,7 +33,7 @@ export class DesktopWebEntryLaunchService {
     }
     const targetUrl = this.resolveLaunchUrl(record, payload.uri);
     if (targetUrl.length === 0) {
-      return this.buildInvalidPlan('这个桌面入口已失效，请重新添加。');
+      return this.buildInvalidPlan();
     }
     const launchContext = this.tabReusePolicyService.buildDesktopWebEntryLaunchContext(
       shortcut.shortcutId,
@@ -63,7 +64,7 @@ export class DesktopWebEntryLaunchService {
         tabId: reusable.tab.id,
         options: options,
         reuseReason: reusable.reason,
-        message: '已切回桌面网页。'
+        message: resolveAppResourceText($r('app.string.desktop_shortcut_returned'))
       };
     }
     const entryScopedFallback = this.findMostRecentDesktopEntryTab(entryScopedTabs);
@@ -74,7 +75,7 @@ export class DesktopWebEntryLaunchService {
         tabId: entryScopedFallback.id,
         options: options,
         reuseReason: 'launch_source_id',
-        message: '已切回桌面网页。'
+        message: resolveAppResourceText($r('app.string.desktop_shortcut_returned'))
       };
     }
     return {
@@ -83,7 +84,9 @@ export class DesktopWebEntryLaunchService {
       tabId: activeTabId,
       options: options,
       reuseReason: 'none',
-      message: payload.action.length > 0 ? '系统已交给Aira打开链接' : '正在打开桌面网页'
+      message: payload.action.length > 0
+        ? resolveAppResourceText($r('app.string.browser_browser_window_launch_application_008'))
+        : resolveAppResourceText($r('app.string.desktop_shortcut_opening'))
     };
   }
 
@@ -120,14 +123,14 @@ export class DesktopWebEntryLaunchService {
     return selected;
   }
 
-  private buildInvalidPlan(message: string = '这个桌面入口已失效，请重新添加。'): DesktopWebEntryLaunchPlan {
+  private buildInvalidPlan(): DesktopWebEntryLaunchPlan {
     return {
       action: 'invalid',
       targetUrl: '',
       tabId: '',
       options: {},
       reuseReason: 'none',
-      message: message
+      message: resolveAppResourceText($r('app.string.desktop_shortcut_entry_invalid'))
     };
   }
 }

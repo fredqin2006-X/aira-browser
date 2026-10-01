@@ -1665,6 +1665,54 @@
       "value": "Manage my subscription"
     },
     {
+      "name": "settings_pro_donate_title",
+      "value": "Donate Pro"
+    },
+    {
+      "name": "settings_pro_donate_intro_title",
+      "value": "Donate Pro"
+    },
+    {
+      "name": "settings_pro_donate_intro_lead",
+      "value": "Every browser feature is free. Donations maintain Aira's own servers."
+    },
+    {
+      "name": "settings_pro_donate_intro_row_sync_title",
+      "value": "Cloud Sync"
+    },
+    {
+      "name": "settings_pro_donate_intro_row_sync_desc",
+      "value": "Sync bookmarks and data on Aira's servers, no self-hosting needed"
+    },
+    {
+      "name": "settings_pro_donate_intro_row_link_title",
+      "value": "Cross-Device Link"
+    },
+    {
+      "name": "settings_pro_donate_intro_row_link_desc",
+      "value": "Sign in with the same account and cross-device linking works right away"
+    },
+    {
+      "name": "settings_pro_donate_intro_row_support_title",
+      "value": "Support Development"
+    },
+    {
+      "name": "settings_pro_donate_intro_row_support_desc",
+      "value": "Your donation keeps Aira going"
+    },
+    {
+      "name": "settings_pro_donate_intro_tail",
+      "value": "If you would rather not donate, you can host your own server, sync through Huawei Cloud or WebDAV, and keep claiming free membership below."
+    },
+    {
+      "name": "settings_pro_donate_intro_repo",
+      "value": "View the source on GitHub"
+    },
+    {
+      "name": "settings_pro_donate_intro_enter",
+      "value": "View Pro benefits"
+    },
+    {
       "name": "settings_pro_subscription_check_failed",
       "value": "Couldn't check the subscription. Try again later."
     },
@@ -15442,7 +15490,7 @@
     },
     {
       "name": "settings_catalog_aira_pro",
-      "value": "Aira Pro"
+      "value": "Donate Pro"
     },
     {
       "name": "settings_catalog_baidu",
@@ -20551,6 +20599,2338 @@
     {
       "name": "element_inspection_stored_global_named",
       "value": "Stored as %1$s. You can use it in the console."
+    },
+    {
+      "name": "element_inspection_tooltip_color",
+      "value": "Color"
+    },
+    {
+      "name": "element_inspection_tooltip_font",
+      "value": "Font"
+    },
+    {
+      "name": "element_inspection_tooltip_padding",
+      "value": "Padding"
+    },
+    {
+      "name": "element_inspection_tooltip_accessibility",
+      "value": "Accessibility"
+    },
+    {
+      "name": "element_inspection_tooltip_role",
+      "value": "Role"
+    },
+    {
+      "name": "element_inspection_tooltip_focusable",
+      "value": "Keyboard focusable"
+    },
+    {
+      "name": "keyboard_shortcut_switched_next",
+      "value": "Switched to the next tab."
+    },
+    {
+      "name": "keyboard_shortcut_switched_previous",
+      "value": "Switched to the previous tab."
+    },
+    {
+      "name": "keyboard_shortcut_switched_last",
+      "value": "Switched to the last tab."
+    },
+    {
+      "name": "keyboard_shortcut_switched_numbered",
+      "value": "Switched to tab %1$d."
+    },
+    {
+      "name": "keyboard_shortcut_no_back",
+      "value": "No page to go back to."
+    },
+    {
+      "name": "keyboard_shortcut_back_failed",
+      "value": "Couldn't go back. Try again."
+    },
+    {
+      "name": "keyboard_shortcut_forward_failed",
+      "value": "Couldn't go forward. Try again."
+    },
+    {
+      "name": "home_shortcut_load_failed",
+      "value": "Couldn't load shortcuts: %1$s"
+    },
+    {
+      "name": "home_shortcut_not_found",
+      "value": "Shortcut not found."
+    },
+    {
+      "name": "home_shortcut_saved",
+      "value": "Shortcut saved."
+    },
+    {
+      "name": "home_shortcut_deleted",
+      "value": "Shortcut deleted."
+    },
+    {
+      "name": "home_shortcut_edit_missing",
+      "value": "The shortcut to edit was not found."
+    },
+    {
+      "name": "home_shortcut_delete_missing",
+      "value": "The shortcut to delete was not found."
+    },
+    {
+      "name": "home_shortcut_delete_failed_detail",
+      "value": "Couldn't delete: %1$s"
+    },
+    {
+      "name": "home_shortcut_save_failed_detail",
+      "value": "Couldn't save: %1$s"
+    },
+    {
+      "name": "home_shortcut_move_missing",
+      "value": "The shortcut to move was not found."
+    },
+    {
+      "name": "home_shortcut_already_first",
+      "value": "Already at the front."
+    },
+    {
+      "name": "home_shortcut_already_last",
+      "value": "Already at the end."
+    },
+    {
+      "name": "home_shortcut_moved_top",
+      "value": "Moved “%1$s” to the front."
+    },
+    {
+      "name": "home_shortcut_moved_bottom",
+      "value": "Moved “%1$s” to the end."
+    },
+    {
+      "name": "home_shortcut_moved_up",
+      "value": "Moved “%1$s” up."
+    },
+    {
+      "name": "home_shortcut_moved_down",
+      "value": "Moved “%1$s” down."
+    },
+    {
+      "name": "home_shortcut_move_failed_detail",
+      "value": "Couldn't move: %1$s"
+    },
+    {
+      "name": "home_shortcut_order_restore",
+      "value": "Couldn't save the order. The saved order was restored."
+    },
+    {
+      "name": "home_shortcut_system_unavailable",
+      "value": "This system entry cannot be added to home right now."
+    },
+    {
+      "name": "home_shortcut_bookmark_no_url",
+      "value": "This bookmark has no address to add to home."
+    },
+    {
+      "name": "home_shortcut_list_load_failed",
+      "value": "Couldn't load the add list: %1$s"
+    },
+    {
+      "name": "home_shortcut_update_failed",
+      "value": "Couldn't update home shortcuts: %1$s"
+    },
+    {
+      "name": "home_shortcut_added",
+      "value": "Added “%1$s” to home."
+    },
+    {
+      "name": "home_shortcut_removed",
+      "value": "Removed “%1$s” from home."
+    },
+    {
+      "name": "home_shortcut_delete_title",
+      "value": "Delete shortcut"
+    },
+    {
+      "name": "home_shortcut_delete_confirm",
+      "value": "Delete “%1$s”?"
+    },
+    {
+      "name": "home_shortcut_no_link",
+      "value": "There is no link to add to home."
+    },
+    {
+      "name": "home_shortcut_open_unavailable",
+      "value": "This system shortcut is unavailable right now."
+    },
+    {
+      "name": "home_shortcut_ad_block",
+      "value": "Ad blocking"
+    },
+    {
+      "name": "home_shortcut_remove_named",
+      "value": "Remove %1$s from home"
+    },
+    {
+      "name": "home_shortcut_add_named",
+      "value": "Add %1$s to home"
+    },
+    {
+      "name": "desktop_shortcut_icon_missing",
+      "value": "No desktop icon was provided."
+    },
+    {
+      "name": "desktop_shortcut_icon_same_path",
+      "value": "The desktop icon source and output path cannot be the same."
+    },
+    {
+      "name": "desktop_shortcut_icon_bad_size",
+      "value": "This image size cannot be used."
+    },
+    {
+      "name": "desktop_shortcut_icon_too_large",
+      "value": "This image cannot be compressed to the HarmonyOS desktop icon limit. Try another one."
+    },
+    {
+      "name": "desktop_shortcut_icon_not_selected",
+      "value": "No app icon was selected."
+    },
+    {
+      "name": "desktop_shortcut_entry_invalid",
+      "value": "This desktop entry is no longer valid. Add it again."
+    },
+    {
+      "name": "desktop_shortcut_returned",
+      "value": "Switched back to the desktop page."
+    },
+    {
+      "name": "desktop_shortcut_opening",
+      "value": "Opening the desktop page"
+    },
+    {
+      "name": "translation_provider_invalid_format",
+      "value": "The translation service returned an invalid format."
+    },
+    {
+      "name": "translation_provider_template_unimplemented",
+      "value": "This translation service template is not available yet."
+    },
+    {
+      "name": "translation_provider_custom_https",
+      "value": "The custom translation service must use an HTTPS endpoint."
+    },
+    {
+      "name": "translation_provider_secret_in_url",
+      "value": "Don't put the translation service secret in the URL query."
+    },
+    {
+      "name": "translation_provider_aira_owned_only",
+      "value": "Aira system translation must be called through Aira's own service."
+    },
+    {
+      "name": "translation_provider_deepl_https",
+      "value": "The DeepL endpoint must use HTTPS."
+    },
+    {
+      "name": "translation_provider_google_https",
+      "value": "The Google Cloud Translation endpoint must use HTTPS."
+    },
+    {
+      "name": "translation_provider_microsoft_https",
+      "value": "The Microsoft Translator endpoint must use HTTPS."
+    },
+    {
+      "name": "translation_provider_baidu_https",
+      "value": "The Baidu Translate endpoint must use HTTPS."
+    },
+    {
+      "name": "translation_provider_youdao_https",
+      "value": "The Youdao endpoint must use HTTPS."
+    },
+    {
+      "name": "translation_provider_tencent_https",
+      "value": "The Tencent Cloud machine translation endpoint must use HTTPS."
+    },
+    {
+      "name": "translation_provider_aliyun_https",
+      "value": "The Alibaba Cloud machine translation endpoint must use HTTPS."
+    },
+    {
+      "name": "translation_provider_volc_https",
+      "value": "The Volcengine machine translation endpoint must use HTTPS."
+    },
+    {
+      "name": "translation_provider_no_translation",
+      "value": "The translation service did not return a usable translation."
+    },
+    {
+      "name": "translation_provider_tencent_empty",
+      "value": "Tencent did not return a usable translation."
+    },
+    {
+      "name": "translation_provider_json_invalid",
+      "value": "The translation service returned JSON that could not be parsed."
+    },
+    {
+      "name": "translation_provider_empty_translation",
+      "value": "The translation service returned an empty translation."
+    },
+    {
+      "name": "translation_provider_count_mismatch",
+      "value": "The translation service returned a different number of translations than the source text."
+    },
+    {
+      "name": "translation_provider_error_named",
+      "value": "%1$s returned an error: %2$s"
+    },
+    {
+      "name": "translation_provider_error_status",
+      "value": "The translation service returned error %1$d: %2$s"
+    },
+    {
+      "name": "translation_provider_no_translation_named",
+      "value": "%1$s did not return a usable translation."
+    },
+    {
+      "name": "translation_provider_auth_failed",
+      "value": "Translation service authentication failed. Check the service setup."
+    },
+    {
+      "name": "translation_provider_unavailable",
+      "value": "The translation service is temporarily unavailable."
+    },
+    {
+      "name": "translation_provider_bad_status",
+      "value": "The translation service returned an unexpected status: %1$d"
+    },
+    {
+      "name": "translation_provider_canceled",
+      "value": "The translation request was canceled."
+    },
+    {
+      "name": "translation_provider_network",
+      "value": "The network connection failed, so translation could not finish."
+    },
+    {
+      "name": "translation_provider_quota",
+      "value": "The translation service quota or rate limit was reached. Try again later."
+    },
+    {
+      "name": "translation_provider_none",
+      "value": "No translation service is available."
+    },
+    {
+      "name": "translation_provider_not_connected",
+      "value": "This provider is not connected yet."
+    },
+    {
+      "name": "translation_aira_request_failed",
+      "value": "The Aira system translation request failed (%1$d)."
+    },
+    {
+      "name": "translation_aira_no_translation_shape",
+      "value": "Aira system translation did not return a usable translation. Response shape: %1$s"
+    },
+    {
+      "name": "translation_aira_empty_response",
+      "value": "Aira system translation returned an empty response."
+    },
+    {
+      "name": "translation_aira_json_invalid",
+      "value": "Aira system translation returned JSON that could not be parsed."
+    },
+    {
+      "name": "translation_aira_failed_detail",
+      "value": "Aira system translation failed: %1$s"
+    },
+    {
+      "name": "translation_aira_empty_text",
+      "value": "Aira system translation returned an empty translation."
+    },
+    {
+      "name": "translation_aira_quota",
+      "value": "Aira system translation quota or rate limit was reached. Try again later."
+    },
+    {
+      "name": "translation_aira_auth_failed",
+      "value": "Aira system translation authentication failed. Check your service setup."
+    },
+    {
+      "name": "translation_aira_network",
+      "value": "The network connection failed, so Aira system translation could not finish."
+    },
+    {
+      "name": "translation_aira_unavailable",
+      "value": "Aira system translation is temporarily unavailable."
+    },
+    {
+      "name": "translation_aira_execution",
+      "value": "Aira system translation failed while reading the request or response."
+    },
+    {
+      "name": "translation_aira_failed",
+      "value": "Aira system translation failed."
+    },
+    {
+      "name": "translation_crypto_digest_label",
+      "value": "%1$s digest"
+    },
+    {
+      "name": "translation_crypto_digest_unavailable",
+      "value": "Couldn't generate a %1$s digest: the system crypto component is unavailable. Update the system and try again. %2$s"
+    },
+    {
+      "name": "translation_crypto_empty_result",
+      "value": "%1$s failed: the crypto component returned an empty result."
+    },
+    {
+      "name": "translation_crypto_no_data",
+      "value": "%1$s failed: the crypto component did not return data."
+    },
+    {
+      "name": "translation_settings_save_disclosure_endpoint",
+      "value": "After saving, %1$s will translate pages. Page text will be sent to:\n%2$s"
+    },
+    {
+      "name": "translation_settings_save_disclosure",
+      "value": "After saving, %1$s will translate pages. Page text will be sent to that provider."
+    },
+    {
+      "name": "translation_settings_read_denied",
+      "value": "This session cannot read translation service settings."
+    },
+    {
+      "name": "translation_settings_save_denied",
+      "value": "This session cannot save translation settings."
+    },
+    {
+      "name": "translation_settings_empty_result",
+      "value": "The translation service returned an empty result. Check the service setup."
+    },
+    {
+      "name": "translation_settings_connect_failed",
+      "value": "Couldn't connect to the translation service. Check the network and API setup."
+    },
+    {
+      "name": "translation_settings_invalid",
+      "value": "The translation service configuration is invalid."
+    },
+    {
+      "name": "translation_secret_read_failed",
+      "value": "Couldn't read the translation secret."
+    },
+    {
+      "name": "translation_secret_delete_failed",
+      "value": "Couldn't delete the translation secret."
+    },
+    {
+      "name": "translation_provider_baidu_error",
+      "value": "Baidu Translate returned an error: %1$s"
+    },
+    {
+      "name": "translation_provider_youdao_error",
+      "value": "Youdao returned an error: %1$s"
+    },
+    {
+      "name": "translation_template_aira_name",
+      "value": "Aira system translation"
+    },
+    {
+      "name": "translation_template_edge_name",
+      "value": "Microsoft Edge webpage translation"
+    },
+    {
+      "name": "translation_template_google_web_name",
+      "value": "Google webpage translation"
+    },
+    {
+      "name": "translation_template_tencent_web_name",
+      "value": "Tencent Interactive Translation"
+    },
+    {
+      "name": "translation_template_yandex_name",
+      "value": "Yandex webpage translation"
+    },
+    {
+      "name": "translation_template_custom_name",
+      "value": "Custom API"
+    },
+    {
+      "name": "translation_template_tencent_cloud_name",
+      "value": "Tencent Cloud machine translation"
+    },
+    {
+      "name": "translation_template_baidu_name",
+      "value": "Baidu Translate"
+    },
+    {
+      "name": "translation_template_alibaba_name",
+      "value": "Alibaba Cloud machine translation"
+    },
+    {
+      "name": "translation_template_volcano_name",
+      "value": "Volcengine machine translation"
+    },
+    {
+      "name": "translation_template_youdao_name",
+      "value": "Youdao translation"
+    },
+    {
+      "name": "translation_template_tencent_cloud_short",
+      "value": "Tencent Cloud Translate"
+    },
+    {
+      "name": "translation_template_alibaba_short",
+      "value": "Alibaba Cloud Translate"
+    },
+    {
+      "name": "translation_template_volcano_short",
+      "value": "Volcengine Translate"
+    },
+    {
+      "name": "translation_template_youdao_short",
+      "value": "Youdao"
+    },
+    {
+      "name": "translation_template_aira_desc",
+      "value": "Webpage translation from Aira. It may use Aira cloud and necessary third-party machine translation to process page text."
+    },
+    {
+      "name": "translation_template_edge_desc",
+      "value": "No key. Aira requests the public Edge translation API directly and can translate several sections at once."
+    },
+    {
+      "name": "translation_template_google_web_desc",
+      "value": "No key. Aira requests the public Google translation API directly, one section at a time."
+    },
+    {
+      "name": "translation_template_tencent_web_desc",
+      "value": "No key. Aira requests the public Tencent Interactive Translation API directly."
+    },
+    {
+      "name": "translation_template_yandex_desc",
+      "value": "No key. Aira requests the public Yandex translation API directly, one section at a time."
+    },
+    {
+      "name": "translation_template_custom_desc",
+      "value": "Use your own HTTPS translation API. Useful when provider credentials stay on your own server."
+    },
+    {
+      "name": "translation_template_deepl_desc",
+      "value": "Enter your API key. Aira requests the official DeepL translation API."
+    },
+    {
+      "name": "translation_template_google_cloud_desc",
+      "value": "Enter your API key. Aira requests the official Google Cloud Translation API."
+    },
+    {
+      "name": "translation_template_tencent_cloud_desc",
+      "value": "Enter SecretId, SecretKey, and region. Aira signs requests with the Tencent Cloud API3 signature."
+    },
+    {
+      "name": "translation_template_baidu_desc",
+      "value": "Enter the App ID and secret. Aira requests the Baidu Translate Open Platform API."
+    },
+    {
+      "name": "translation_template_microsoft_desc",
+      "value": "Enter the subscription key and region. Aira requests the official Microsoft Translator API."
+    },
+    {
+      "name": "translation_template_alibaba_desc",
+      "value": "Enter AccessKey ID, AccessKey Secret, and region. Aira signs requests for Alibaba Cloud."
+    },
+    {
+      "name": "translation_template_volcano_desc",
+      "value": "Enter Access Key, Secret Key, and region. Aira signs requests for Volcengine."
+    },
+    {
+      "name": "translation_template_youdao_desc",
+      "value": "Enter the app ID and secret. Aira requests the official Youdao API."
+    },
+    {
+      "name": "custom_home_html_unavailable",
+      "value": "The HTML file can't be used."
+    },
+    {
+      "name": "custom_home_html_control_chars",
+      "value": "The HTML file contains invisible control characters."
+    },
+    {
+      "name": "custom_home_html_structure",
+      "value": "The HTML file must include a complete html, head, and body structure."
+    },
+    {
+      "name": "custom_home_html_doctype",
+      "value": "The HTML file must declare <!doctype html>."
+    },
+    {
+      "name": "custom_home_html_no_iframe",
+      "value": "HTML can't include an iframe."
+    },
+    {
+      "name": "custom_home_html_no_object",
+      "value": "HTML can't include an object."
+    },
+    {
+      "name": "custom_home_html_no_embed",
+      "value": "HTML can't include an embed."
+    },
+    {
+      "name": "custom_home_html_no_base",
+      "value": "HTML can't include a base tag."
+    },
+    {
+      "name": "custom_home_html_no_refresh",
+      "value": "HTML can't include an automatic refresh redirect."
+    },
+    {
+      "name": "custom_home_html_no_inline_event",
+      "value": "HTML can't include inline event handlers. Use addEventListener."
+    },
+    {
+      "name": "custom_home_html_no_javascript_url",
+      "value": "HTML can't include javascript: links."
+    },
+    {
+      "name": "custom_home_html_no_data_html",
+      "value": "HTML can't reference data:text/html."
+    },
+    {
+      "name": "custom_home_html_no_service_worker",
+      "value": "HTML can't register a Service Worker."
+    },
+    {
+      "name": "custom_home_html_no_file_url",
+      "value": "HTML can't reference a file:// absolute path."
+    },
+    {
+      "name": "custom_home_html_no_remote_script",
+      "value": "HTML can't reference a remote script."
+    },
+    {
+      "name": "custom_home_html_no_location",
+      "value": "HTML can't automatically change the page address."
+    },
+    {
+      "name": "custom_home_html_no_window_open",
+      "value": "HTML can't open a new window directly. Use AiraHome.openUrl."
+    },
+    {
+      "name": "custom_home_html_no_network",
+      "value": "HTML can't start a network request directly."
+    },
+    {
+      "name": "custom_home_script_no_service_worker",
+      "value": "Package scripts can't register a Service Worker."
+    },
+    {
+      "name": "custom_home_script_no_file_url",
+      "value": "Package scripts can't reference a file:// absolute path."
+    },
+    {
+      "name": "custom_home_script_no_location",
+      "value": "Package scripts can't automatically change the page address."
+    },
+    {
+      "name": "custom_home_script_no_window_open",
+      "value": "Package scripts can't open a new window directly. Use AiraHome.openUrl."
+    },
+    {
+      "name": "custom_home_script_no_network",
+      "value": "Package scripts can't start a network request directly."
+    },
+    {
+      "name": "custom_home_html_not_selected",
+      "value": "No HTML file was selected."
+    },
+    {
+      "name": "custom_home_package_not_selected",
+      "value": "No homepage package was selected."
+    },
+    {
+      "name": "custom_home_package_missing_entry",
+      "value": "The homepage package is missing its entry file."
+    },
+    {
+      "name": "custom_home_entry_must_html",
+      "value": "The entry file must be HTML."
+    },
+    {
+      "name": "custom_home_package_dir_conflict",
+      "value": "The homepage package install directory conflicts. Try again."
+    },
+    {
+      "name": "custom_home_package_install_incomplete",
+      "value": "The homepage package wasn't installed."
+    },
+    {
+      "name": "custom_home_picker_package",
+      "value": "Aira homepage package|.zip"
+    },
+    {
+      "name": "custom_home_picker_html",
+      "value": "HTML homepage|.html"
+    },
+    {
+      "name": "custom_home_file_missing",
+      "value": "The custom homepage file doesn't exist."
+    },
+    {
+      "name": "custom_home_package_missing",
+      "value": "The custom homepage package doesn't exist."
+    },
+    {
+      "name": "custom_home_url_missing",
+      "value": "The web homepage address doesn't exist."
+    },
+    {
+      "name": "custom_home_export_saved_url",
+      "value": "This file stores the address of an Aira web homepage."
+    },
+    {
+      "name": "custom_home_export_open",
+      "value": "Open homepage"
+    },
+    {
+      "name": "custom_home_package_unavailable",
+      "value": "The homepage package can't be used."
+    },
+    {
+      "name": "custom_home_package_too_big",
+      "value": "The homepage package is larger than 20 MB."
+    },
+    {
+      "name": "custom_home_package_invalid_zip",
+      "value": "Choose a valid ZIP homepage package."
+    },
+    {
+      "name": "custom_home_package_extracted_too_big",
+      "value": "The unpacked homepage package is larger than 50 MB."
+    },
+    {
+      "name": "custom_home_html_too_big",
+      "value": "The HTML file is larger than 5 MB."
+    },
+    {
+      "name": "custom_home_html_invalid",
+      "value": "Choose a valid HTML file."
+    },
+    {
+      "name": "custom_home_source_html",
+      "value": "HTML file"
+    },
+    {
+      "name": "custom_home_package_empty",
+      "value": "The homepage package is empty."
+    },
+    {
+      "name": "custom_home_package_too_many_files",
+      "value": "The homepage package has more than 300 files."
+    },
+    {
+      "name": "custom_home_package_file_too_big",
+      "value": "A file in the homepage package is too large: %1$s"
+    },
+    {
+      "name": "custom_home_package_script_unsafe",
+      "value": "A package script isn't safe: %1$s"
+    },
+    {
+      "name": "custom_home_package_missing_manifest",
+      "value": "The homepage package is missing aira-homepage.json."
+    },
+    {
+      "name": "custom_home_schema_version",
+      "value": "schemaVersion must be 1."
+    },
+    {
+      "name": "custom_home_manifest_invalid",
+      "value": "The homepage package manifest is invalid: %1$s"
+    },
+    {
+      "name": "custom_home_preview_required",
+      "value": "The homepage package is missing a preview. Set at least one of preview, previewLight, or previewDark."
+    },
+    {
+      "name": "custom_home_manifest_path_invalid",
+      "value": "The path for manifest field %1$s is invalid."
+    },
+    {
+      "name": "custom_home_entry_html_missing",
+      "value": "The entry HTML file doesn't exist."
+    },
+    {
+      "name": "custom_home_entry_html_too_big",
+      "value": "The entry HTML file is larger than 5 MB."
+    },
+    {
+      "name": "custom_home_entry_html_invalid",
+      "value": "The entry file isn't valid HTML."
+    },
+    {
+      "name": "custom_home_source_entry_html",
+      "value": "Entry HTML"
+    },
+    {
+      "name": "custom_home_preview_missing",
+      "value": "The homepage package preview doesn't exist."
+    },
+    {
+      "name": "custom_home_preview_too_big",
+      "value": "The homepage package preview is larger than 8 MB."
+    },
+    {
+      "name": "custom_home_preview_type",
+      "value": "The homepage package preview must be a PNG, JPEG, or WebP image."
+    },
+    {
+      "name": "custom_home_file_too_big",
+      "value": "The file is too large."
+    },
+    {
+      "name": "custom_home_file_read_failed",
+      "value": "Couldn't read the file."
+    },
+    {
+      "name": "custom_home_dir_cleanup_failed",
+      "value": "Couldn't clean up the directory: %1$s"
+    },
+    {
+      "name": "custom_home_version_type",
+      "value": "The homepage package version must be a string."
+    },
+    {
+      "name": "custom_home_version_length",
+      "value": "The homepage package version can't be longer than %1$d characters."
+    },
+    {
+      "name": "custom_home_version_semver",
+      "value": "The homepage package version must use SemVer, for example 1.0.0 or 1.2.0-beta.1."
+    },
+    {
+      "name": "custom_home_description_type",
+      "value": "The homepage package description must be a string."
+    },
+    {
+      "name": "custom_home_description_length",
+      "value": "The homepage package description can't be longer than %1$d characters."
+    },
+    {
+      "name": "custom_home_id_type",
+      "value": "The homepage package id must be a string."
+    },
+    {
+      "name": "custom_home_id_length",
+      "value": "The homepage package id can't be longer than 128 characters."
+    },
+    {
+      "name": "custom_home_precheck_invalid",
+      "value": "The homepage package check state is invalid."
+    },
+    {
+      "name": "custom_home_path_invalid",
+      "value": "The homepage package path is invalid."
+    },
+    {
+      "name": "custom_home_illegal_path",
+      "value": "The homepage package contains an illegal path."
+    },
+    {
+      "name": "custom_home_hidden_entry",
+      "value": "The homepage package can't include hidden files or directories."
+    },
+    {
+      "name": "custom_home_contains_dir",
+      "value": "The homepage package can't include a directory: %1$s"
+    },
+    {
+      "name": "custom_home_unsupported_path",
+      "value": "The homepage package contains an unsupported path."
+    },
+    {
+      "name": "custom_home_unsupported_type",
+      "value": "The homepage package contains an unsupported file type."
+    },
+    {
+      "name": "custom_home_unsupported_file",
+      "value": "The homepage package contains an unsupported file: %1$s"
+    },
+    {
+      "name": "custom_home_isolated_dir",
+      "value": "the isolated directory"
+    },
+    {
+      "name": "custom_home_install_dir",
+      "value": "the install directory"
+    },
+    {
+      "name": "custom_home_cleanup_failed",
+      "value": "%1$s Couldn't clean up %2$s: %3$s"
+    },
+    {
+      "name": "context_menu_open_private_tab",
+      "value": "Open in private tab"
+    },
+    {
+      "name": "context_menu_share_link",
+      "value": "Share link"
+    },
+    {
+      "name": "context_menu_save_offline",
+      "value": "Save offline"
+    },
+    {
+      "name": "context_menu_download_link",
+      "value": "Download link"
+    },
+    {
+      "name": "context_menu_no_image",
+      "value": "No image to use."
+    },
+    {
+      "name": "context_menu_no_link",
+      "value": "No link to use."
+    },
+    {
+      "name": "context_menu_web_image",
+      "value": "Web image"
+    },
+    {
+      "name": "context_menu_save_to_gallery",
+      "value": "Save to gallery"
+    },
+    {
+      "name": "context_menu_copy_image",
+      "value": "Copy image"
+    },
+    {
+      "name": "context_menu_share_image",
+      "value": "Share image"
+    },
+    {
+      "name": "context_menu_open_failed",
+      "value": "Couldn't open the link."
+    },
+    {
+      "name": "context_menu_opening",
+      "value": "Opening the link"
+    },
+    {
+      "name": "context_menu_image_failed",
+      "value": "Couldn't process the image. Try again later."
+    },
+    {
+      "name": "context_menu_script_unavailable",
+      "value": "The script command isn't available."
+    },
+    {
+      "name": "context_menu_script_done",
+      "value": "Script ran."
+    },
+    {
+      "name": "context_menu_script_failed",
+      "value": "The script failed."
+    },
+    {
+      "name": "context_menu_script_error",
+      "value": "Couldn't run the script menu: %1$s"
+    },
+    {
+      "name": "context_menu_open_private_tab_long",
+      "value": "Open in a private tab"
+    },
+    {
+      "name": "context_menu_image_not_saved",
+      "value": "The image wasn't saved."
+    },
+    {
+      "name": "context_menu_image_saved",
+      "value": "Saved to gallery."
+    },
+    {
+      "name": "context_menu_image_save_failed",
+      "value": "Couldn't save the image. Try again later."
+    },
+    {
+      "name": "context_menu_image_copied",
+      "value": "Image copied."
+    },
+    {
+      "name": "context_menu_image_copy_failed",
+      "value": "Couldn't copy the image. Try again later."
+    },
+    {
+      "name": "context_menu_share_opened",
+      "value": "The share sheet is open."
+    },
+    {
+      "name": "context_menu_image_share_failed",
+      "value": "Couldn't share the image. Try again later."
+    },
+    {
+      "name": "tab_runtime_active",
+      "value": "Active now"
+    },
+    {
+      "name": "tab_runtime_ready",
+      "value": "Ready"
+    },
+    {
+      "name": "tab_runtime_load_failed_detail",
+      "value": "Couldn't load: %1$s"
+    },
+    {
+      "name": "device_tabs_sign_in_title",
+      "value": "Sign in to see tabs from other devices"
+    },
+    {
+      "name": "device_tabs_sign_in_message",
+      "value": "Sign in with your HUAWEI ID to see pages open on your computer."
+    },
+    {
+      "name": "device_tabs_pro_required_title",
+      "value": "Cross-device tabs need Aira Pro"
+    },
+    {
+      "name": "device_tabs_pro_required_message",
+      "value": "After you subscribe, you can view and open tabs from other online devices. Your own personal server does not need a subscription."
+    },
+    {
+      "name": "device_tabs_learn_pro",
+      "value": "Learn about Aira Pro"
+    },
+    {
+      "name": "device_tabs_use_personal_server",
+      "value": "Use a personal server"
+    },
+    {
+      "name": "device_tabs_pro_expired_message",
+      "value": "Renew to restore cross-device tabs. Your own personal server does not need a subscription."
+    },
+    {
+      "name": "device_tabs_link_disabled_title",
+      "value": "Link with computer is off"
+    },
+    {
+      "name": "device_tabs_link_disabled_message",
+      "value": "Turn it on to see tabs on your computer. This is separate from data sync."
+    },
+    {
+      "name": "device_tabs_enable_link",
+      "value": "Turn on link with computer"
+    },
+    {
+      "name": "device_tabs_no_computer_title",
+      "value": "No computer is online"
+    },
+    {
+      "name": "device_tabs_no_computer_message",
+      "value": "Open Aira on a computer and sign in with the same account. That computer will appear here."
+    },
+    {
+      "name": "device_tabs_view_setup",
+      "value": "See how to connect"
+    },
+    {
+      "name": "device_tabs_connect_server_title",
+      "value": "Connect a personal server first"
+    },
+    {
+      "name": "device_tabs_server_credentials",
+      "value": "Cross-device tabs need valid personal-server device credentials."
+    },
+    {
+      "name": "device_tabs_server_setup",
+      "value": "Cross-device tabs can use a personal server you run yourself. Connect it in sync settings first."
+    },
+    {
+      "name": "device_tabs_open_sync_settings",
+      "value": "Open sync settings"
+    },
+    {
+      "name": "device_tabs_unavailable",
+      "value": "Cross-device tabs are unavailable right now."
+    },
+    {
+      "name": "device_tabs_unavailable_title",
+      "value": "Cross-device tabs are unavailable"
+    },
+    {
+      "name": "device_tabs_link_unavailable",
+      "value": "Link with computer is unavailable"
+    },
+    {
+      "name": "device_tabs_sign_in_huawei",
+      "value": "Sign in with your HUAWEI ID first."
+    },
+    {
+      "name": "device_tabs_server_not_connected",
+      "value": "The personal server is not connected yet."
+    },
+    {
+      "name": "device_tabs_sync_not_ready",
+      "value": "Sync settings are not ready yet."
+    },
+    {
+      "name": "device_tabs_server_device_missing",
+      "value": "The personal-server device ID is unavailable. Connect again."
+    },
+    {
+      "name": "device_tabs_request_failed",
+      "value": "The cross-device tabs request failed (%1$d)."
+    },
+    {
+      "name": "device_tabs_publish_failed",
+      "value": "Couldn't publish this phone's tabs right now."
+    },
+    {
+      "name": "device_tabs_read_failed",
+      "value": "Couldn't read cross-device tabs right now."
+    },
+    {
+      "name": "device_tabs_clear_failed",
+      "value": "Couldn't clear this phone's tab status right now."
+    },
+    {
+      "name": "device_tabs_server_publish_failed",
+      "value": "Couldn't publish this phone's tabs to the personal server right now."
+    },
+    {
+      "name": "device_tabs_server_read_failed",
+      "value": "Couldn't read cross-device tabs from the personal server right now."
+    },
+    {
+      "name": "device_tabs_server_clear_failed",
+      "value": "Couldn't clear this phone's tab status on the personal server right now."
+    },
+    {
+      "name": "device_tabs_sign_in_again",
+      "value": "Sign in to your HUAWEI ID again to continue."
+    },
+    {
+      "name": "device_tabs_server_reconnect",
+      "value": "Connect the personal server again to continue."
+    },
+    {
+      "name": "device_tabs_empty_response",
+      "value": "The cross-device tabs service did not return a result."
+    },
+    {
+      "name": "device_tabs_bad_response",
+      "value": "The cross-device tabs service returned data that could not be parsed."
+    },
+    {
+      "name": "site_data_cookies_allowed",
+      "value": "Site cookies are allowed"
+    },
+    {
+      "name": "site_data_cookies_blocked",
+      "value": "Site cookies are blocked"
+    },
+    {
+      "name": "site_data_third_party_allowed",
+      "value": "Third-party cookies are allowed"
+    },
+    {
+      "name": "site_data_third_party_blocked",
+      "value": "Third-party cookies are blocked"
+    },
+    {
+      "name": "site_data_profile_regular",
+      "value": "Profile: regular browsing data"
+    },
+    {
+      "name": "site_data_profile_named",
+      "value": "Profile: %1$s"
+    },
+    {
+      "name": "site_data_session_private",
+      "value": "Session: private"
+    },
+    {
+      "name": "site_data_session_regular",
+      "value": "Session: regular"
+    },
+    {
+      "name": "site_data_summary_private",
+      "value": "%1$s; %2$s; %3$s; %4$s. Scope: this private session only. The system cannot clear private cookies or site storage for one site. Use \"Clear this private session\" instead."
+    },
+    {
+      "name": "site_data_permissions_private",
+      "value": "Only this private session's site permissions are shown. %1$d session permission rules. Regular browsing permissions are not listed."
+    },
+    {
+      "name": "site_data_summary_regular",
+      "value": "%1$s; %2$s; %3$s; %4$s. Scope: regular browsing data. Clearing this site only removes origin-scoped storage. Cookies, cache, and all site storage are cleared together in Privacy protection."
+    },
+    {
+      "name": "site_data_permissions_saved",
+      "value": "%1$d site permissions are saved. Clearing this site does not delete cookies or the shared web cache."
+    },
+    {
+      "name": "site_data_permission_counts",
+      "value": "%1$s Allowed: %2$d. Blocked: %3$d."
+    },
+    {
+      "name": "site_data_cookie_snapshot_off",
+      "value": "Private cookie snapshots are off."
+    },
+    {
+      "name": "site_data_cookie_nothing_to_restore",
+      "value": "There are no private cookies to restore."
+    },
+    {
+      "name": "site_data_cookie_restored",
+      "value": "Restored %1$d private cookies. %2$d failed."
+    },
+    {
+      "name": "site_data_cookie_restore_failed",
+      "value": "Couldn't restore private cookies: %1$s"
+    },
+    {
+      "name": "site_data_cookie_saved",
+      "value": "Saved %1$d private cookies."
+    },
+    {
+      "name": "site_data_cookie_save_failed",
+      "value": "Couldn't save private cookies: %1$s"
+    },
+    {
+      "name": "site_data_private_cleared_kept",
+      "value": "Private session data cleared. %1$d cookie snapshots were kept."
+    },
+    {
+      "name": "site_data_private_cleared",
+      "value": "Private session data cleared."
+    },
+    {
+      "name": "site_data_private_clear_failed",
+      "value": "Couldn't clear private session data: %1$s"
+    },
+    {
+      "name": "site_data_origin_unavailable",
+      "value": "The site address is unavailable, so nothing was cleared."
+    },
+    {
+      "name": "site_data_private_not_per_site",
+      "value": "Private data was not cleared per site. Cookies and site storage are cleared when the private session ends."
+    },
+    {
+      "name": "site_data_storage_clear_failed",
+      "value": "Couldn't clear site storage: %1$s"
+    },
+    {
+      "name": "site_data_storage_cleared_kept",
+      "value": "Site storage cleared. Cookies and the web cache were kept."
+    },
+    {
+      "name": "site_data_failure_storage",
+      "value": "Site storage: %1$s"
+    },
+    {
+      "name": "site_data_failure_cookies",
+      "value": "Cookies: %1$s"
+    },
+    {
+      "name": "site_data_failure_cache",
+      "value": "Web cache: %1$s"
+    },
+    {
+      "name": "site_data_failure_permissions",
+      "value": "Site permissions: %1$s"
+    },
+    {
+      "name": "site_data_detail_separator",
+      "value": "; "
+    },
+    {
+      "name": "site_data_partial_clear_failed",
+      "value": "Some browsing data could not be cleared: %1$s"
+    },
+    {
+      "name": "site_data_private_all_cleared",
+      "value": "Cookies and site storage for this private session were cleared. Regular browsing data was not changed."
+    },
+    {
+      "name": "site_data_all_cleared",
+      "value": "Browsing data, cookies, cache, and site permissions in the current profile were cleared."
+    },
+    {
+      "name": "site_data_selected_cleared",
+      "value": "The selected browsing data was cleared."
+    },
+    {
+      "name": "theme_palette_default_subtitle",
+      "value": "Blue accent, neutral gray"
+    },
+    {
+      "name": "theme_palette_dawn_title",
+      "value": "Dawn"
+    },
+    {
+      "name": "theme_palette_dawn_subtitle",
+      "value": "Blue-violet dawn"
+    },
+    {
+      "name": "theme_palette_lead_title",
+      "value": "Lead cloud"
+    },
+    {
+      "name": "theme_palette_lead_subtitle",
+      "value": "Neutral gray"
+    },
+    {
+      "name": "theme_palette_aurora_title",
+      "value": "Morning isle"
+    },
+    {
+      "name": "theme_palette_aurora_subtitle",
+      "value": "Sea-mist teal"
+    },
+    {
+      "name": "theme_palette_sage_title",
+      "value": "Bamboo shade"
+    },
+    {
+      "name": "theme_palette_sage_subtitle",
+      "value": "Quiet green-gray"
+    },
+    {
+      "name": "theme_palette_cedar_title",
+      "value": "Forest breath"
+    },
+    {
+      "name": "theme_palette_cedar_subtitle",
+      "value": "Deep forest"
+    },
+    {
+      "name": "theme_palette_lagoon_title",
+      "value": "Tide mirror"
+    },
+    {
+      "name": "theme_palette_lagoon_subtitle",
+      "value": "Warm blue water"
+    },
+    {
+      "name": "theme_palette_glacier_title",
+      "value": "Pale mist"
+    },
+    {
+      "name": "theme_palette_glacier_subtitle",
+      "value": "Light blue sky"
+    },
+    {
+      "name": "theme_palette_indigo_title",
+      "value": "Night voyage"
+    },
+    {
+      "name": "theme_palette_indigo_subtitle",
+      "value": "Blue-violet route"
+    },
+    {
+      "name": "theme_palette_wisteria_title",
+      "value": "Cloud wisteria"
+    },
+    {
+      "name": "theme_palette_wisteria_subtitle",
+      "value": "Soft purple clouds"
+    },
+    {
+      "name": "theme_palette_rosewood_title",
+      "value": "Rose page"
+    },
+    {
+      "name": "theme_palette_rosewood_subtitle",
+      "value": "Muted red"
+    },
+    {
+      "name": "theme_palette_terracotta_title",
+      "value": "Warm brick"
+    },
+    {
+      "name": "theme_palette_terracotta_subtitle",
+      "value": "Red-brown warmth"
+    },
+    {
+      "name": "theme_palette_amber_title",
+      "value": "Lamp tassel"
+    },
+    {
+      "name": "theme_palette_amber_subtitle",
+      "value": "Golden warmth"
+    },
+    {
+      "name": "theme_palette_moss_title",
+      "value": "Moss path"
+    },
+    {
+      "name": "theme_palette_moss_subtitle",
+      "value": "Olive path"
+    },
+    {
+      "name": "theme_palette_cyan_title",
+      "value": "Clear porcelain"
+    },
+    {
+      "name": "theme_palette_cyan_subtitle",
+      "value": "Clear cyan"
+    },
+    {
+      "name": "theme_palette_steel_title",
+      "value": "Mist steel"
+    },
+    {
+      "name": "theme_palette_steel_subtitle",
+      "value": "Cool gray-blue"
+    },
+    {
+      "name": "theme_palette_plum_title",
+      "value": "Dusk plum"
+    },
+    {
+      "name": "theme_palette_plum_subtitle",
+      "value": "Deep plum glow"
+    },
+    {
+      "name": "theme_palette_coral_title",
+      "value": "Coral tide"
+    },
+    {
+      "name": "theme_palette_coral_subtitle",
+      "value": "Soft coral"
+    },
+    {
+      "name": "theme_palette_all",
+      "value": "All theme colors"
+    },
+    {
+      "name": "feature_intro_appearance_title",
+      "value": "Choose appearance"
+    },
+    {
+      "name": "feature_intro_appearance_subtitle",
+      "value": "You can change the theme color and tab style later in Settings."
+    },
+    {
+      "name": "feature_intro_previous",
+      "value": "Back"
+    },
+    {
+      "name": "feature_intro_vertical_tabs",
+      "value": "Vertical tabs"
+    },
+    {
+      "name": "web_ua_request_mobile",
+      "value": "Request mobile pages"
+    },
+    {
+      "name": "web_ua_request_desktop",
+      "value": "Request desktop pages"
+    },
+    {
+      "name": "web_ua_custom_iphone",
+      "value": "Custom iPhone"
+    },
+    {
+      "name": "web_ua_custom_windows",
+      "value": "Custom Windows"
+    },
+    {
+      "name": "web_ua_custom_macos",
+      "value": "Custom macOS"
+    },
+    {
+      "name": "web_ua_custom_android",
+      "value": "Custom Android"
+    },
+    {
+      "name": "web_ua_custom_notice",
+      "value": "A custom UA only matches the string. It does not guarantee the same browser fingerprint."
+    },
+    {
+      "name": "web_ua_android_compat",
+      "value": "Uses an Android-compatible mobile page identity"
+    },
+    {
+      "name": "web_ua_follow_global_desc",
+      "value": "Uses the global page identity"
+    },
+    {
+      "name": "web_ua_custom_identity",
+      "value": "Custom page identity"
+    },
+    {
+      "name": "local_backup_invalid",
+      "value": "The file is not a valid Aira backup."
+    },
+    {
+      "name": "local_backup_no_bookmarks",
+      "value": "The backup has no bookmarks to restore."
+    },
+    {
+      "name": "local_backup_bookmarks_invalid",
+      "value": "The bookmarks in the backup are invalid."
+    },
+    {
+      "name": "local_backup_settings_invalid",
+      "value": "The settings in the backup are invalid."
+    },
+    {
+      "name": "local_backup_settings_section_invalid",
+      "value": "The settings section in the backup is invalid."
+    },
+    {
+      "name": "local_backup_not_local",
+      "value": "The file is not a valid Aira local backup."
+    },
+    {
+      "name": "local_backup_newer",
+      "value": "This backup was created by a newer version of Aira. Update the app first."
+    },
+    {
+      "name": "local_backup_unsupported",
+      "value": "This Aira backup format or version is not supported."
+    },
+    {
+      "name": "local_backup_unknown_section",
+      "value": "This Aira backup contains an unsupported data section."
+    },
+    {
+      "name": "local_backup_history_private",
+      "value": "The history in the backup includes temporary private-session data and cannot be imported."
+    },
+    {
+      "name": "local_backup_scripts_invalid",
+      "value": "The user scripts in the backup are invalid."
+    },
+    {
+      "name": "local_backup_script_record_invalid",
+      "value": "A user script record in the backup is invalid."
+    },
+    {
+      "name": "local_backup_script_named_invalid",
+      "value": "The script “%1$s” in the backup is invalid."
+    },
+    {
+      "name": "local_backup_script_data_invalid",
+      "value": "The script data in the backup is invalid."
+    },
+    {
+      "name": "local_backup_script_data_record_invalid",
+      "value": "A script data record in the backup is invalid."
+    },
+    {
+      "name": "local_backup_script_data_value_invalid",
+      "value": "The script data in the backup contains an invalid value."
+    },
+    {
+      "name": "local_backup_section_version",
+      "value": "The %1$s backup version is not supported."
+    },
+    {
+      "name": "local_backup_scripts_required",
+      "value": "Select user scripts when exporting or restoring script data."
+    },
+    {
+      "name": "local_backup_selection_empty",
+      "value": "Select at least one item to back up."
+    },
+    {
+      "name": "external_nav_blocked",
+      "value": "Blocked opening %1$s."
+    },
+    {
+      "name": "external_nav_blocked_auto",
+      "value": "Blocked the page from automatically opening %1$s."
+    },
+    {
+      "name": "external_nav_allowed",
+      "value": "Allowed opening %1$s directly."
+    },
+    {
+      "name": "external_nav_suppressed",
+      "value": "Quietly blocked %1$s after the last cancellation."
+    },
+    {
+      "name": "external_nav_request",
+      "value": "Requested to open %1$s."
+    },
+    {
+      "name": "external_nav_open_title",
+      "value": "Open another app"
+    },
+    {
+      "name": "external_nav_open_message",
+      "value": "%1$s wants to open %2$s."
+    },
+    {
+      "name": "external_nav_baidu",
+      "value": "Baidu App"
+    },
+    {
+      "name": "external_nav_bilibili",
+      "value": "Bilibili App"
+    },
+    {
+      "name": "external_nav_quark",
+      "value": "Quark App"
+    },
+    {
+      "name": "external_nav_scheme_app",
+      "value": "%1$s app"
+    },
+    {
+      "name": "external_nav_invalid_link",
+      "value": "The link is invalid and cannot open an external app."
+    },
+    {
+      "name": "external_nav_no_app",
+      "value": "No app was found that can open this link."
+    },
+    {
+      "name": "external_nav_multiple",
+      "value": "More than one app can open this."
+    },
+    {
+      "name": "external_nav_can_open",
+      "value": "An external app can open this."
+    },
+    {
+      "name": "external_nav_available_apps",
+      "value": "Available apps"
+    },
+    {
+      "name": "external_nav_private_page",
+      "value": "This private page"
+    },
+    {
+      "name": "external_nav_link_invalid",
+      "value": "The external app link is invalid."
+    },
+    {
+      "name": "external_nav_target_invalid",
+      "value": "The external app target is invalid."
+    },
+    {
+      "name": "external_nav_target_invalid_user",
+      "value": "The target app information is invalid and cannot be opened."
+    },
+    {
+      "name": "external_nav_opened_capability",
+      "value": "Opened through the system external app capability."
+    },
+    {
+      "name": "external_nav_handed_to_system",
+      "value": "Handed to the system to open."
+    },
+    {
+      "name": "external_nav_no_applinking",
+      "value": "No installed app claims this AppLinking link."
+    },
+    {
+      "name": "external_nav_no_declared",
+      "value": "No installed app claims this external link."
+    },
+    {
+      "name": "external_nav_platform_blocked",
+      "value": "The system temporarily blocked opening an external app."
+    },
+    {
+      "name": "external_nav_open_failed",
+      "value": "Could not open the external app."
+    },
+    {
+      "name": "external_nav_applinking_unhandled",
+      "value": "No installed app can handle this link."
+    },
+    {
+      "name": "external_nav_foreground_retry",
+      "value": "The system temporarily blocked opening an external app. Return to the foreground and try again."
+    },
+    {
+      "name": "adblock_subscription_https_required",
+      "value": "Enter an HTTPS rule subscription address"
+    },
+    {
+      "name": "adblock_third_party_title",
+      "value": "Enable third-party filter rules?"
+    },
+    {
+      "name": "adblock_third_party_message",
+      "value": "“%1$s” is provided and maintained independently. After you enable it, Aira downloads and updates the rules from the internet, and the provider may record that request.\n\nAira does not write the rules and cannot guarantee their accuracy, suitability, or continued availability. Use them in line with the laws where you are and the site's terms.\n\nRule source: %2$s"
+    },
+    {
+      "name": "adblock_third_party_accept",
+      "value": "Agree and download"
+    },
+    {
+      "name": "adblock_source_missing",
+      "value": "This rule subscription was not found"
+    },
+    {
+      "name": "adblock_preset_no_refresh",
+      "value": "Built-in rules do not need a refresh"
+    },
+    {
+      "name": "adblock_custom_enabled",
+      "value": "Custom rules are on"
+    },
+    {
+      "name": "adblock_custom_disabled",
+      "value": "Custom rules are off"
+    },
+    {
+      "name": "adblock_no_rules_parsed",
+      "value": "No usable rules were found"
+    },
+    {
+      "name": "adblock_native_load_failed",
+      "value": "Couldn't load the native filter rules. Try again"
+    },
+    {
+      "name": "adblock_preset_cannot_delete",
+      "value": "Built-in rules cannot be deleted"
+    },
+    {
+      "name": "adblock_custom_deleted",
+      "value": "Custom rules deleted"
+    },
+    {
+      "name": "adblock_rules_imported",
+      "value": "Imported %1$d rules"
+    },
+    {
+      "name": "adblock_rules_updated",
+      "value": "Updated %1$d rules"
+    },
+    {
+      "name": "adblock_subscription_update_failed",
+      "value": "Couldn't update the rule subscription"
+    },
+    {
+      "name": "web_runtime_switching_tab",
+      "value": "Switching tab content"
+    },
+    {
+      "name": "web_runtime_page_loading",
+      "value": "Page is loading"
+    },
+    {
+      "name": "web_runtime_page_loaded",
+      "value": "Page finished loading"
+    },
+    {
+      "name": "web_runtime_history_failed",
+      "value": "Couldn't switch history: %1$s"
+    },
+    {
+      "name": "web_runtime_no_address",
+      "value": "The page did not provide an address to open"
+    },
+    {
+      "name": "web_runtime_external_resource",
+      "value": "Trying to handle an external resource: %1$s"
+    },
+    {
+      "name": "web_runtime_popup_opened",
+      "value": "Opened the popup in a new tab"
+    },
+    {
+      "name": "web_runtime_link_opened",
+      "value": "Opened the link in a new tab"
+    },
+    {
+      "name": "web_runtime_new_window",
+      "value": "New window page"
+    },
+    {
+      "name": "web_runtime_current_page",
+      "value": "This page"
+    },
+    {
+      "name": "web_runtime_cert_title",
+      "value": "Certificate security warning"
+    },
+    {
+      "name": "web_runtime_cert_message",
+      "value": "The certificate for %1$s failed verification. Continuing may be risky."
+    },
+    {
+      "name": "web_runtime_back_safe",
+      "value": "Go back to a safe page"
+    },
+    {
+      "name": "web_runtime_continue",
+      "value": "Continue anyway"
+    },
+    {
+      "name": "web_runtime_https_title",
+      "value": "Couldn't establish a secure connection"
+    },
+    {
+      "name": "web_runtime_https_message",
+      "value": "%1$s cannot be opened securely over HTTPS. You can go back, or continue with the insecure HTTP connection %2$s."
+    },
+    {
+      "name": "web_runtime_use_http",
+      "value": "Continue with HTTP"
+    },
+    {
+      "name": "web_runtime_allowed_files",
+      "value": "Files allowed by the page"
+    },
+    {
+      "name": "adblock_downloading_named",
+      "value": "Downloading and parsing “%1$s”. Please wait."
+    },
+    {
+      "name": "web_error_tab_unrecoverable",
+      "value": "This tab can't be restored right now"
+    },
+    {
+      "name": "web_error_homepage_title",
+      "value": "Couldn't open the homepage"
+    },
+    {
+      "name": "web_error_certificate_title",
+      "value": "This connection needs a security check"
+    },
+    {
+      "name": "web_error_site_not_found",
+      "value": "This site can't be found"
+    },
+    {
+      "name": "web_error_site_unavailable",
+      "value": "This site can't be opened right now"
+    },
+    {
+      "name": "web_error_tab_crashed",
+      "value": "This tab hit a runtime error. Reload the page or go back home."
+    },
+    {
+      "name": "web_error_homepage_unavailable",
+      "value": "This custom homepage is unavailable"
+    },
+    {
+      "name": "web_error_edit_homepage",
+      "value": "Edit homepage"
+    },
+    {
+      "name": "web_error_hint_reload",
+      "value": "Reload the page"
+    },
+    {
+      "name": "web_error_hint_home_retry",
+      "value": "If it still fails, go home and open the site again"
+    },
+    {
+      "name": "web_error_hint_copy",
+      "value": "Copy the error details for diagnosis"
+    },
+    {
+      "name": "web_error_hint_time",
+      "value": "Check that the device time is correct"
+    },
+    {
+      "name": "web_error_hint_cert",
+      "value": "Be careful with sites that have certificate problems"
+    },
+    {
+      "name": "web_error_hint_network",
+      "value": "Check Wi-Fi or mobile data"
+    },
+    {
+      "name": "web_error_hint_url",
+      "value": "Check that the address was entered correctly"
+    },
+    {
+      "name": "web_error_hint_proxy",
+      "value": "If you use a VPN or proxy, try again later"
+    },
+    {
+      "name": "web_permission_system_on",
+      "value": "System permissions are on. Try the page request again."
+    },
+    {
+      "name": "web_permission_system_incomplete",
+      "value": "System permissions are still not fully on. Check system settings."
+    },
+    {
+      "name": "web_permission_settings_open_failed",
+      "value": "Couldn't open system permission settings: %1$s"
+    },
+    {
+      "name": "web_permission_settings_manual",
+      "value": "Couldn't open permission settings directly. Turn them on in system settings."
+    },
+    {
+      "name": "web_permission_wants_use",
+      "value": "%1$s wants to use %2$s."
+    },
+    {
+      "name": "web_permission_location_title",
+      "value": "Location permission request"
+    },
+    {
+      "name": "web_permission_wants_location",
+      "value": "%1$s wants your location."
+    },
+    {
+      "name": "web_permission_grant_failed",
+      "value": "Couldn't grant permission: %1$s"
+    },
+    {
+      "name": "web_permission_grant_denied",
+      "value": "Couldn't grant permission. The page request was denied."
+    },
+    {
+      "name": "web_permission_location_failed",
+      "value": "Couldn't grant location access: %1$s"
+    },
+    {
+      "name": "web_permission_location_denied",
+      "value": "Couldn't grant location access. The page request was denied."
+    },
+    {
+      "name": "web_permission_need_system",
+      "value": "System permissions are required"
+    },
+    {
+      "name": "web_permission_need_location",
+      "value": "Location access is required"
+    },
+    {
+      "name": "web_permission_need_system_label",
+      "value": "Aira needs the system %1$s permission before a site can use it."
+    },
+    {
+      "name": "web_permission_location_service_off",
+      "value": "Location services are off, so the site can't get your location yet."
+    },
+    {
+      "name": "feature_intro_ad_block_title",
+      "value": "Fewer ads in the way"
+    },
+    {
+      "name": "feature_intro_ad_block_body",
+      "value": "Filter page ads with the rules you turn on, or hide elements you don't want to see."
+    },
+    {
+      "name": "feature_intro_video_title",
+      "value": "Take over web video"
+    },
+    {
+      "name": "feature_intro_video_body",
+      "value": "Control the real video on a page with the Aira player. Change speed, switch picture, or download it."
+    },
+    {
+      "name": "feature_intro_scripts_title",
+      "value": "User scripts"
+    },
+    {
+      "name": "feature_intro_scripts_body",
+      "value": "Imported scripts change only matching sites, and each one can be turned on or off."
+    },
+    {
+      "name": "feature_intro_sync_title",
+      "value": "Continue on another device"
+    },
+    {
+      "name": "feature_intro_sync_body",
+      "value": "Bookmarks and settings can sync. After pairing a computer, you can see its tabs and send the current page there."
+    },
+    {
+      "name": "feature_intro_gate_label",
+      "value": "Slide right to start"
+    },
+    {
+      "name": "feature_intro_skip_title",
+      "value": "Skip the introduction"
+    },
+    {
+      "name": "feature_intro_skip_message",
+      "value": "Skipping goes straight to the homepage and hides these introductions."
+    },
+    {
+      "name": "feature_intro_enter_home",
+      "value": "Go to homepage"
+    },
+    {
+      "name": "adblock_native_dir_invalid_name",
+      "value": "The native rule directory contains an invalid file name"
+    },
+    {
+      "name": "adblock_native_dir_unknown",
+      "value": "The native rule directory contains an unknown folder"
+    },
+    {
+      "name": "adblock_native_source_unsupported",
+      "value": "This native rule source is not supported"
+    },
+    {
+      "name": "adblock_native_source_size_invalid",
+      "value": "The native rule source file size is invalid"
+    },
+    {
+      "name": "adblock_native_source_missing",
+      "value": "The native rule source file is missing"
+    },
+    {
+      "name": "adblock_native_source_validate_failed",
+      "value": "Couldn't validate the native rule source"
+    },
+    {
+      "name": "adblock_native_source_commit_failed",
+      "value": "Couldn't save the native rule source"
+    },
+    {
+      "name": "adblock_native_ruleset_size_invalid",
+      "value": "The native rule set size is invalid"
+    },
+    {
+      "name": "adblock_native_ruleset_commit_failed",
+      "value": "Couldn't save the native rule set"
+    },
+    {
+      "name": "adblock_native_manifest_size_invalid",
+      "value": "The native rule manifest size is invalid"
+    },
+    {
+      "name": "adblock_native_file_read_incomplete",
+      "value": "The native rule file was not read completely"
+    },
+    {
+      "name": "adblock_native_file_size_invalid",
+      "value": "The native rule file size is invalid"
+    },
+    {
+      "name": "adblock_native_file_write_incomplete",
+      "value": "The native rule file was not written completely"
+    },
+    {
+      "name": "homepage_preview_favorites",
+      "value": "Favorites"
+    },
+    {
+      "name": "web_threat_site_risk_title",
+      "value": "This site may be unsafe"
+    },
+    {
+      "name": "web_threat_site_risk_message",
+      "value": "Be careful entering passwords, codes, or payment details. Continue only if you trust the site."
+    },
+    {
+      "name": "page_push_http_failed",
+      "value": "The page push service request failed (%1$d)."
+    },
+    {
+      "name": "page_push_sign_in_first",
+      "value": "Sign in with your HUAWEI ID before pushing this page."
+    },
+    {
+      "name": "page_push_sign_in_again",
+      "value": "Sign in with your HUAWEI ID again before pushing this page."
+    },
+    {
+      "name": "page_push_empty",
+      "value": "The page push service did not return a result."
+    },
+    {
+      "name": "page_push_json_invalid",
+      "value": "The page push service returned JSON that could not be parsed."
+    },
+    {
+      "name": "page_push_body_invalid",
+      "value": "The page push service returned a body that could not be parsed."
+    },
+    {
+      "name": "toolbar_guide_got_it",
+      "value": "Got it"
+    },
+    {
+      "name": "toolbar_guide_hide_title",
+      "value": "Swipe down to hide the floating toolbar"
+    },
+    {
+      "name": "toolbar_guide_hide_message",
+      "value": "The toolbar tucks away so you can focus on the page."
+    },
+    {
+      "name": "toolbar_guide_home_title",
+      "value": "Swipe up on either side button to go home"
+    },
+    {
+      "name": "toolbar_guide_home_message",
+      "value": "Hold the back or tabs button and swipe up. Release to close this page and go home."
+    },
+    {
+      "name": "toolbar_guide_tools_title",
+      "value": "Swipe up on the search area to open tools"
+    },
+    {
+      "name": "toolbar_guide_tools_message",
+      "value": "Hold the search area in the middle and swipe up. The tools panel opens from the bottom."
+    },
+    {
+      "name": "toolbar_guide_tabs_title",
+      "value": "Swipe sideways to switch tabs"
+    },
+    {
+      "name": "toolbar_guide_tabs_message",
+      "value": "Swipe left or right on the search area to move to the next tab."
+    },
+    {
+      "name": "startup_welcome_sign_in_title",
+      "value": "Sign in"
+    },
+    {
+      "name": "startup_welcome_sign_in_subtitle",
+      "value": "Sign in with your HUAWEI ID, or connect your own server. You can skip this and sign in later in Settings."
+    },
+    {
+      "name": "startup_welcome_server_title",
+      "value": "Connect a server"
+    },
+    {
+      "name": "startup_welcome_server_subtitle",
+      "value": "Connect self-hosting or WebDAV. You can skip this and connect later in Settings."
+    },
+    {
+      "name": "startup_welcome_basic_title",
+      "value": "Welcome to Aira"
+    },
+    {
+      "name": "startup_welcome_basic_subtitle",
+      "value": "Basic mode is on. Account and sync need full mode. You can start browsing now."
+    },
+    {
+      "name": "startup_welcome_personal_server",
+      "value": "Sync with self-hosting"
+    },
+    {
+      "name": "app_icon_invalid",
+      "value": "The icon information is invalid."
+    },
+    {
+      "name": "app_icon_updated",
+      "value": "App icon updated."
+    },
+    {
+      "name": "app_icon_restored",
+      "value": "Restored the default app icon."
+    },
+    {
+      "name": "app_icon_read_failed",
+      "value": "Couldn't read app icons. Try again later."
+    },
+    {
+      "name": "app_icon_read_unavailable",
+      "value": "App icons can't be read right now."
+    },
+    {
+      "name": "app_icon_theme_conflict",
+      "value": "The system theme is using a custom icon, so the app icon can't be changed."
+    },
+    {
+      "name": "app_icon_select_retry",
+      "value": "Couldn't change the app icon. Try again later."
+    },
+    {
+      "name": "app_icon_restore_retry",
+      "value": "Couldn't restore the default icon. Try again later."
+    },
+    {
+      "name": "app_icon_service_error",
+      "value": "The icon management service failed. Try again later."
+    },
+    {
+      "name": "app_icon_select_failed",
+      "value": "Couldn't change the app icon."
+    },
+    {
+      "name": "app_icon_restore_failed",
+      "value": "Couldn't restore the default icon."
+    },
+    {
+      "name": "tabs_guide_private_title",
+      "value": "Private tabs are here"
+    },
+    {
+      "name": "tabs_guide_close_all",
+      "value": "Long-press to close all"
+    },
+    {
+      "name": "tabs_guide_continue",
+      "value": "Tap to continue"
+    },
+    {
+      "name": "tabs_guide_normal_title",
+      "value": "Regular tabs are here"
+    },
+    {
+      "name": "tabs_guide_devices_title",
+      "value": "Tabs from other devices are here"
+    },
+    {
+      "name": "tabs_guide_devices_message",
+      "value": "Pages open on other devices are listed here"
+    },
+    {
+      "name": "tabs_guide_done",
+      "value": "Tap to finish"
+    },
+    {
+      "name": "settings_launch_wifi_opened",
+      "value": "System settings opened. Go to Wi-Fi and connect."
+    },
+    {
+      "name": "settings_launch_wifi_failed",
+      "value": "Couldn't open system settings. Open Settings and connect to Wi-Fi."
+    },
+    {
+      "name": "settings_launch_permission_opened",
+      "value": "System settings opened. Open Aira's app permissions."
+    },
+    {
+      "name": "settings_launch_permission_failed",
+      "value": "Couldn't open system settings. Open Settings and allow Aira's permissions."
+    },
+    {
+      "name": "settings_launch_link_failed",
+      "value": "Couldn't open the link: %1$s"
+    },
+    {
+      "name": "settings_launch_link_failed_prefix",
+      "value": "Couldn't open the link: "
+    },
+    {
+      "name": "settings_launch_review_opened",
+      "value": "Opened the AppGallery review page."
+    },
+    {
+      "name": "settings_launch_detail_opened",
+      "value": "Opened the AppGallery details page."
+    },
+    {
+      "name": "settings_launch_upgrade_opened",
+      "value": "Opened AppGallery. Update Aira there."
+    },
+    {
+      "name": "settings_launch_rating_opened",
+      "value": "Opened the rating dialog."
+    },
+    {
+      "name": "settings_launch_rating_failed",
+      "value": "Couldn't open the rating dialog."
+    },
+    {
+      "name": "settings_launch_market_unavailable",
+      "value": "AppGallery can't be opened right now."
+    },
+    {
+      "name": "tab_close_count",
+      "value": "Closed %1$d tabs."
+    },
+    {
+      "name": "wallpaper_download_failed",
+      "value": "Couldn't download the wallpaper image."
+    },
+    {
+      "name": "wallpaper_signature_invalid",
+      "value": "The wallpaper image identifier is invalid."
+    },
+    {
+      "name": "wallpaper_bing_daily",
+      "value": "Bing daily wallpaper"
+    },
+    {
+      "name": "wallpaper_none_selected",
+      "value": "No wallpaper image was selected."
+    },
+    {
+      "name": "wallpaper_unavailable",
+      "value": "This wallpaper image is unavailable."
+    },
+    {
+      "name": "wallpaper_too_large",
+      "value": "The wallpaper image is larger than 30 MB."
+    },
+    {
+      "name": "wallpaper_custom_title",
+      "value": "Custom wallpaper"
+    },
+    {
+      "name": "wallpaper_save_failed",
+      "value": "Couldn't save this wallpaper. Try another image."
+    },
+    {
+      "name": "wallpaper_video_none",
+      "value": "No video wallpaper was selected."
+    },
+    {
+      "name": "wallpaper_video_signature_invalid",
+      "value": "The video wallpaper identifier is invalid."
+    },
+    {
+      "name": "wallpaper_video_unavailable",
+      "value": "This video is unavailable."
+    },
+    {
+      "name": "wallpaper_video_too_large",
+      "value": "The video is larger than 100 MB. Try a shorter one."
+    },
+    {
+      "name": "wallpaper_video_title",
+      "value": "Video wallpaper"
+    },
+    {
+      "name": "wallpaper_video_save_failed",
+      "value": "Couldn't save this video. Try another one."
+    },
+    {
+      "name": "wallpaper_footer",
+      "value": "Bing wallpapers check for updates every day. Video wallpapers loop silently. Both are only used on Aira's built-in homepage, not on a custom or private homepage."
+    },
+    {
+      "name": "wallpaper_auto_mono",
+      "value": "Automatic black and white"
+    },
+    {
+      "name": "wallpaper_solid",
+      "value": "Solid color"
+    },
+    {
+      "name": "wallpaper_bing",
+      "value": "Bing wallpaper"
+    },
+    {
+      "name": "wallpaper_checking",
+      "value": "Checking for today's Bing wallpaper…"
+    },
+    {
+      "name": "wallpaper_fetching",
+      "value": "Getting today's Bing wallpaper…"
+    },
+    {
+      "name": "wallpaper_update_failed_cache",
+      "value": "Couldn't update today's wallpaper. Still using the cached one."
+    },
+    {
+      "name": "wallpaper_load_failed_network",
+      "value": "Couldn't load Bing wallpapers. Check the network and try again."
+    },
+    {
+      "name": "wallpaper_selected",
+      "value": "%1$s, selected"
+    },
+    {
+      "name": "wallpaper_refresh_failed_cache",
+      "value": "Couldn't refresh. Still using the cache or the default wallpaper."
+    },
+    {
+      "name": "wallpaper_select_failed",
+      "value": "Couldn't choose the wallpaper. Try again later."
+    },
+    {
+      "name": "wallpaper_select_video_failed",
+      "value": "Couldn't choose the video wallpaper. Try again later."
     }
   ]
 }

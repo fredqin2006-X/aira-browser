@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   WebpageTranslationApplyItem,
   WebpageTranslationTextItem
@@ -36,13 +37,13 @@ export class WebpageTranslationBatchService {
     if (provider === undefined || provider.status !== 'configured') {
       throw new TranslationProviderError(this.failureClassifier.buildFailure(
         'missing_provider',
-        '当前没有可用的翻译服务。'
+        resolveAppResourceText($r('app.string.translation_provider_none'))
       ));
     }
     if (!this.providerRequestService.supportsProvider(provider.templateId)) {
       throw new TranslationProviderError(this.failureClassifier.buildFailure(
         'missing_provider',
-        '当前服务商接口尚未接入。'
+        resolveAppResourceText($r('app.string.translation_provider_not_connected'))
       ));
     }
     const resolvedProvider = this.secretService === undefined

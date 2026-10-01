@@ -1,4 +1,5 @@
 import { http } from '@kit.NetworkKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { image } from '@kit.ImageKit';
 import { fileIo } from '@kit.CoreFileKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
@@ -314,7 +315,7 @@ export class BingWallpaperService {
         id: BING_DAILY_CACHE_ASSET_ID,
         dayKey: dayKey,
         imageUrl: imageUrl,
-        title: item?.title ?? 'Bing 每日壁纸',
+        title: item?.title ?? resolveAppResourceText($r('app.string.wallpaper_bing_daily')),
         attribution: item?.copyright ?? ''
       };
     } finally {
@@ -504,7 +505,7 @@ export class BingWallpaperService {
       lastRefreshDay: current.lastRefreshDay,
       lastRefreshAt: current.lastRefreshAt,
       manualRefreshAvailableAt: nowMs + 30 * 60 * 1000,
-      failureReason: '刷新失败，继续使用缓存或默认壁纸'
+      failureReason: resolveAppResourceText($r('app.string.wallpaper_refresh_failed_cache'))
     };
   }
 

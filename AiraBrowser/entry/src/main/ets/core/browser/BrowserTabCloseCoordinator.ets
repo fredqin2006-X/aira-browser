@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   BrowserDataScope,
   BrowserProfileId,
@@ -206,14 +207,14 @@ export class BrowserTabCloseCoordinator {
     await this.removeClosedTabPreviewBeforeActivation(tabId, host);
     this.dependencies.backgroundOpenPromptCoordinator.dismissTab(tabId);
     this.refreshPostCloseBoundaryState(host.readState().activeTabId);
-    host.setHelperMessage('已将标签页移至新窗口。');
+    host.setHelperMessage(resolveAppResourceText($r('app.string.browser_browser_tab_close_coordinator_003')));
     if (postMoveSurfacePlan.kind === 'terminate_application') {
       await this.persistTabsAndWait();
       try {
         await this.applicationTerminationService.terminateCurrentApplication();
       } catch (_error) {
         this.dependencies.resolveTabHomeCoordinator().showHomeSurface(
-          '已将标签页移至新窗口。',
+          resolveAppResourceText($r('app.string.browser_browser_tab_close_coordinator_003')),
           postMoveSurfacePlan.homeOptions
         );
       }
@@ -317,7 +318,7 @@ export class BrowserTabCloseCoordinator {
     const activeTabId = state.activeTabId;
     const plan = this.tabManager.buildTerminalBackPlan(tabs, activeTabId);
     if (plan.kind === 'missing_active') {
-      const helperMessage = '已回到主页';
+      const helperMessage = resolveAppResourceText($r('app.string.browser_shell_008'));
       this.dependencies.resolveTabHomeCoordinator().showHomeSurface(
         helperMessage,
         this.buildHomeOptionsFromClosedTab(undefined)
@@ -346,7 +347,9 @@ export class BrowserTabCloseCoordinator {
     if (tabIds.length <= 0) {
       return {
         closedCount: 0,
-        helperMessage: helperMessageMode === 'closed_count' ? '已关闭 0 个标签页。' : helperMessage
+        helperMessage: helperMessageMode === 'closed_count'
+          ? resolveAppResourceText($r('app.string.tab_close_count', 0))
+          : helperMessage
       };
     }
     const cleanupPlans: BrowserCloseTabCleanupPlan[] = [];
@@ -376,7 +379,7 @@ export class BrowserTabCloseCoordinator {
       this.clearSiteDataForTabOnCloseIfNeeded(closingTabs[index]);
     }
     const resolvedHelperMessage = helperMessageMode === 'closed_count' ?
-      `已关闭 ${tabIds.length} 个标签页。` : helperMessage;
+      resolveAppResourceText($r('app.string.tab_close_count', tabIds.length)) : helperMessage;
     this.finalizeClosedTabs(resolvedHelperMessage, host);
     return {
       closedCount: tabIds.length,
@@ -423,7 +426,7 @@ export class BrowserTabCloseCoordinator {
       return {
         kind: 'tabs',
         homeOptions: this.buildHomeOptionsFromClosedTab(closedTab),
-        helperMessage: '已关闭标签页。'
+        helperMessage: resolveAppResourceText($r('app.string.browser_browser_tab_close_coordinator_001'))
       };
     }
     const homeOptions = this.buildHomeOptionsFromClosedTab(closedTab);
@@ -432,13 +435,17 @@ export class BrowserTabCloseCoordinator {
       return {
         kind: 'terminate_application',
         homeOptions: homeOptions,
-        helperMessage: privateHome ? '已进入隐私模式' : '已回到主页'
+        helperMessage: privateHome
+          ? resolveAppResourceText($r('app.string.browser_browser_tabs_overview_action_bar_policy_006'))
+          : resolveAppResourceText($r('app.string.browser_shell_008'))
       };
     }
     return {
       kind: 'home',
       homeOptions: homeOptions,
-      helperMessage: privateHome ? '已进入隐私模式' : '已回到主页'
+      helperMessage: privateHome
+        ? resolveAppResourceText($r('app.string.browser_browser_tabs_overview_action_bar_policy_006'))
+        : resolveAppResourceText($r('app.string.browser_shell_008'))
     };
   }
 
@@ -457,7 +464,7 @@ export class BrowserTabCloseCoordinator {
       tabs: mutation.tabs,
       activeTabId: mutation.activeTabId,
       tabSequence: Math.max(state.tabSequence, mutation.tabSequence),
-      helperMessage: '已关闭网页并回到主页。'
+      helperMessage: resolveAppResourceText($r('app.string.browser_browser_tab_close_coordinator_002'))
     };
     const postCloseSurfacePlan = this.buildBackToHomeSurfacePlan(activeTab);
     await this.executeCloseTabFlow({
@@ -486,7 +493,7 @@ export class BrowserTabCloseCoordinator {
       activeTab.id,
       plan.targetTabId,
       state.tabSequence,
-      '已返回原标签页。'
+      resolveAppResourceText($r('app.string.browser_browser_tab_close_coordinator_005'))
     );
     this.applyCloseTabTransition(transition, host);
     this.dependencies.tabSwitchCoordinator.synchronizeActiveTab();
@@ -574,7 +581,9 @@ export class BrowserTabCloseCoordinator {
     return {
       kind: 'home',
       homeOptions: homeOptions,
-      helperMessage: privateHome ? '已进入隐私模式' : '已关闭网页并回到主页。'
+      helperMessage: privateHome
+        ? resolveAppResourceText($r('app.string.browser_browser_tabs_overview_action_bar_policy_006'))
+        : resolveAppResourceText($r('app.string.browser_browser_tab_close_coordinator_002'))
     };
   }
 
@@ -797,7 +806,7 @@ export class BrowserTabCloseCoordinator {
       recordId
     );
     if (!result.restored) {
-      host.showToast('这个标签页已经无法恢复。');
+      host.showToast(resolveAppResourceText($r('app.string.browser_browser_tab_close_coordinator_006')));
       return this.buildSingleRestoreOutcome(result);
     }
     this.applySingleRestoreResult(result, host);
@@ -815,12 +824,12 @@ export class BrowserTabCloseCoordinator {
       state.activeTabId
     );
     if (!result.restored) {
-      host.setHelperMessage('没有最近关闭的标签页。');
-      host.showToast('没有最近关闭的标签页。');
+      host.setHelperMessage(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_030')));
+      host.showToast(resolveAppResourceText($r('app.string.browser_browser_keyboard_shortcut_coordinator_030')));
       return this.buildSingleRestoreOutcome(result);
     }
     this.applySingleRestoreResult(result, host);
-    host.showToast('已恢复最近关闭的标签页。');
+    host.showToast(resolveAppResourceText($r('app.string.browser_browser_tab_close_coordinator_004')));
     return this.buildSingleRestoreOutcome(result);
   }
 
@@ -966,7 +975,7 @@ export class BrowserTabCloseCoordinator {
     host.requestCloseTabsOverview();
     this.dependencies.tabSwitchCoordinator.synchronizeAfterTabChange();
     this.persistTabs();
-    host.setHelperMessage('已恢复最近关闭的标签页。');
+    host.setHelperMessage(resolveAppResourceText($r('app.string.browser_browser_tab_close_coordinator_004')));
   }
 
   private buildSingleRestoreOutcome(

@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   findHomeWallpaperChoice,
   HomeWallpaperChoice,
@@ -60,7 +61,7 @@ export class WallpaperSettingsViewModel {
     const hasBingPreview = this.findImageAsset('bing', snapshot) !== undefined;
     const bingPreviewStatusText = this.buildBingPreviewStatusText(bingPreviewStatus, hasBingPreview);
     const bingRetryVisible = bingPreviewStatus === 'error';
-    const footerText = '必应壁纸每天自动检查更新。视频壁纸静音循环播放。两者仅用于 Aira 原生主页；自定义主页和隐私主页不会显示。';
+    const footerText = resolveAppResourceText($r('app.string.wallpaper_footer'));
     return {
       mode: settings.mode,
       modeTitle: this.resolveModeTitle(snapshot),
@@ -130,7 +131,7 @@ export class WallpaperSettingsViewModel {
       return choice === undefined ? this.getModeTitle('solid') : choice.label;
     }
     if (settings.mode === 'custom' && this.findCustomMediaAsset(snapshot, 'video') !== undefined) {
-      return '视频壁纸';
+      return resolveAppResourceText($r('app.string.wallpaper_video_title'));
     }
     return this.getModeTitle(settings.mode);
   }
@@ -231,7 +232,7 @@ export class WallpaperSettingsViewModel {
 
   private resolveImageOptionTitle(mode: WallpaperImageMode): string {
     if (mode === 'video') {
-      return '视频壁纸';
+      return resolveAppResourceText($r('app.string.wallpaper_video_title'));
     }
     return this.getModeTitle(mode);
   }
@@ -239,17 +240,17 @@ export class WallpaperSettingsViewModel {
   private getModeTitle(mode: WallpaperMode): string {
     switch (mode) {
       case 'auto':
-        return '自动黑白';
+        return resolveAppResourceText($r('app.string.wallpaper_auto_mono'));
       case 'theme':
-        return '跟随主题色';
+        return resolveAppResourceText($r('app.string.settings_home_01'));
       case 'solid':
-        return '纯色背景';
+        return resolveAppResourceText($r('app.string.wallpaper_solid'));
       case 'bing':
-        return '必应壁纸';
+        return resolveAppResourceText($r('app.string.wallpaper_bing'));
       case 'custom':
-        return '自定义壁纸';
+        return resolveAppResourceText($r('app.string.wallpaper_custom_title'));
       default:
-        return '跟随主题色';
+        return resolveAppResourceText($r('app.string.settings_home_01'));
     }
   }
 
@@ -258,10 +259,14 @@ export class WallpaperSettingsViewModel {
     hasBingPreview: boolean
   ): string {
     if (status === 'loading') {
-      return hasBingPreview ? '正在检查必应每日壁纸更新…' : '正在获取必应每日壁纸…';
+      return hasBingPreview
+        ? resolveAppResourceText($r('app.string.wallpaper_checking'))
+        : resolveAppResourceText($r('app.string.wallpaper_fetching'));
     }
     if (status === 'error') {
-      return hasBingPreview ? '今日壁纸更新失败，正在继续使用缓存。' : '必应壁纸加载失败，请检查网络后重试。';
+      return hasBingPreview
+        ? resolveAppResourceText($r('app.string.wallpaper_update_failed_cache'))
+        : resolveAppResourceText($r('app.string.wallpaper_load_failed_network'));
     }
     return '';
   }

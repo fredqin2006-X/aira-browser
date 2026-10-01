@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { HomeShortcutEditDraft } from '../../features/newtab/HomeShortcutTypes';
 import {
   HomeShortcutApplicationEffect,
@@ -59,10 +60,10 @@ export class HomeShortcutFixedEffectApplication implements HomeShortcutEffectApp
         return;
       case 'confirm_delete':
         this.confirmDialog({
-          title: '删除快捷方式',
-          message: `确定删除“${effect.confirmation.title}”吗？`,
-          cancelLabel: '取消',
-          confirmLabel: '删除',
+          title: resolveAppResourceText($r('app.string.home_shortcut_delete_title')),
+          message: resolveAppResourceText($r('app.string.home_shortcut_delete_confirm', effect.confirmation.title)),
+          cancelLabel: resolveAppResourceText($r('app.string.settings_custom_home_cancel')),
+          confirmLabel: resolveAppResourceText($r('app.string.settings_delete')),
           onConfirm: (): void => confirmDelete(effect.confirmation)
         });
         return;
@@ -73,7 +74,7 @@ export class HomeShortcutFixedEffectApplication implements HomeShortcutEffectApp
         this.informDialog({
           title: effect.title,
           message: effect.message,
-          confirmLabel: '知道了'
+          confirmLabel: resolveAppResourceText($r('app.string.settings_custom_home_got_it'))
         });
         return;
       case 'set_helper_message':

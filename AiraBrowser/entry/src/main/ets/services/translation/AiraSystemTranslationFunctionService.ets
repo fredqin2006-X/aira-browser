@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { http } from '@kit.NetworkKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import {
@@ -84,7 +85,7 @@ class NetworkAiraSystemTranslationFunctionAdapter implements AiraSystemTranslati
         const errorResponse: AiraSystemTranslationResponseBody = {
           ok: false,
           code: 'http_error',
-          message: `Aira 系统翻译服务请求失败（${response.responseCode}）。`,
+          message: resolveAppResourceText($r('app.string.translation_aira_request_failed', response.responseCode)),
           statusCode: response.responseCode
         };
         return errorResponse;
@@ -147,7 +148,7 @@ export class AiraSystemTranslationFunctionService {
       if (responseItems.length === 0) {
         throw new TranslationProviderError(this.failureClassifier.buildFailure(
           'invalid_response',
-          `Aira 系统翻译没有返回可用译文。返回结构：${this.describeParsedShape(parsed)}`
+          resolveAppResourceText($r('app.string.translation_aira_no_translation_shape', this.describeParsedShape(parsed)))
         ));
       }
       return this.mapTranslations(items, responseItems);
@@ -163,7 +164,7 @@ export class AiraSystemTranslationFunctionService {
     if (value === undefined || value === null) {
       throw new TranslationProviderError(this.failureClassifier.buildFailure(
         'invalid_response',
-        'Aira 系统翻译服务返回为空。'
+        resolveAppResourceText($r('app.string.translation_aira_empty_response'))
       ));
     }
     if (typeof value === 'string') {
@@ -172,7 +173,7 @@ export class AiraSystemTranslationFunctionService {
       } catch (_error) {
         throw new TranslationProviderError(this.failureClassifier.buildFailure(
           'invalid_response',
-          'Aira 系统翻译返回的 JSON 无法解析。'
+          resolveAppResourceText($r('app.string.translation_aira_json_invalid'))
         ));
       }
     }
@@ -184,7 +185,7 @@ export class AiraSystemTranslationFunctionService {
     if (providerError.length > 0) {
       throw new TranslationProviderError(this.failureClassifier.buildFailure(
         'server_error',
-        `Aira 系统翻译失败：${providerError}`
+        resolveAppResourceText($r('app.string.translation_aira_failed_detail', providerError))
       ));
     }
     if (Array.isArray(parsed.items)) {
@@ -242,7 +243,7 @@ export class AiraSystemTranslationFunctionService {
     if (results.length === 0) {
       throw new TranslationProviderError(this.failureClassifier.buildFailure(
         'invalid_response',
-        'Aira 系统翻译返回的译文为空。'
+        resolveAppResourceText($r('app.string.translation_aira_empty_text'))
       ));
     }
     return results;
@@ -277,7 +278,7 @@ export class AiraSystemTranslationFunctionService {
       lowerMessage.indexOf('exceed') >= 0 || lowerMessage.indexOf('too many request') >= 0) {
       return this.failureClassifier.buildFailure(
         'quota_or_rate_limit',
-        'Aira 系统翻译额度或频率受限，稍后再试。',
+        resolveAppResourceText($r('app.string.translation_aira_quota')),
         statusCode
       );
     }
@@ -285,34 +286,36 @@ export class AiraSystemTranslationFunctionService {
       lowerMessage.indexOf('token') >= 0 || lowerMessage.indexOf('credential') >= 0) {
       return this.failureClassifier.buildFailure(
         'missing_provider',
-        'Aira 系统翻译鉴权失败，请检查自有服务配置。',
+        resolveAppResourceText($r('app.string.translation_aira_auth_failed')),
         statusCode
       );
     }
     if (lowerMessage.indexOf('timeout') >= 0 || lowerMessage.indexOf('network') >= 0) {
       return this.failureClassifier.buildFailure(
         'network_unavailable',
-        '网络连接异常，无法完成 Aira 系统翻译。',
+        resolveAppResourceText($r('app.string.translation_aira_network')),
         statusCode
       );
     }
     if (statusCode >= 500) {
       return this.failureClassifier.buildFailure(
         'server_error',
-        'Aira 系统翻译暂时不可用。',
+        resolveAppResourceText($r('app.string.translation_aira_unavailable')),
         statusCode
       );
     }
     if (lowerMessage.indexOf('cannot read') >= 0 || lowerMessage.indexOf('undefined') >= 0) {
       return this.failureClassifier.buildFailure(
         'server_error',
-        'Aira 系统翻译服务执行异常，请检查服务入参读取和返回结构。',
+        resolveAppResourceText($r('app.string.translation_aira_execution')),
         statusCode
       );
     }
     return this.failureClassifier.buildFailure(
       'server_error',
-      rawMessage.length > 0 ? `Aira 系统翻译失败：${rawMessage}` : 'Aira 系统翻译失败。',
+      rawMessage.length > 0
+        ? resolveAppResourceText($r('app.string.translation_aira_failed_detail', rawMessage))
+        : resolveAppResourceText($r('app.string.translation_aira_failed')),
       statusCode
     );
   }

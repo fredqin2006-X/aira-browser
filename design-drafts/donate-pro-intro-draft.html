@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>捐赠Pro 首次介绍弹窗 · 排版草稿</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "Segoe UI", sans-serif;
+    background: #26292e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    padding: 32px;
+  }
+
+  /* ---------- 手机画布 ---------- */
+  .phone {
+    width: 390px;
+    height: 800px;
+    border-radius: 48px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(160deg, #3a4a63 0%, #1f2733 55%, #171c24 100%);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .55);
+    flex-shrink: 0;
+  }
+
+  /* ---------- 底部弹窗 ---------- */
+  .sheet {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 86%;
+    background: #ffffff;
+    border-radius: 28px 28px 0 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .grabber {
+    width: 36px;
+    height: 5px;
+    border-radius: 3px;
+    background: #d8dce3;
+    margin: 9px auto 0;
+    flex-shrink: 0;
+  }
+
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px 12px;
+    display: flex;
+    flex-direction: column;
+  }
+  .content::-webkit-scrollbar { display: none; }
+
+  .title {
+    font-size: 30px;
+    line-height: 1.25;
+    font-weight: 700;
+    color: #111318;
+    text-align: center;
+    letter-spacing: -.2px;
+  }
+  .lead {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #5f6875;
+    text-align: center;
+  }
+
+  .features {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+  .feature {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .feature .icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: flex;
+  }
+  .feature .icon svg { width: 100%; height: 100%; }
+  .feature h3 {
+    font-size: 17px;
+    line-height: 1.35;
+    font-weight: 700;
+    color: #111318;
+  }
+  .feature p {
+    margin-top: 4px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #8a93a0;
+  }
+
+  .note {
+    margin-top: 30px;
+    font-size: 13px;
+    line-height: 1.65;
+    color: #8a93a0;
+    text-align: center;
+  }
+  .repo-link {
+    margin-top: 16px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #0a59f7;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .repo-link:active { opacity: .6; }
+
+  .footer {
+    flex-shrink: 0;
+    padding: 14px 24px 34px;
+    background: #ffffff;
+  }
+  .cta {
+    display: block;
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: 16px;
+    background: #0a59f7;
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .cta:active { opacity: .85; }
+
+  /* ---------- 旁边的说明 ---------- */
+  .caption {
+    max-width: 300px;
+    color: #c6cbd3;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .caption h2 {
+    font-size: 15px;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .caption p + p { margin-top: 10px; }
+  .caption b { color: #e8ebef; font-weight: 600; }
+  @media (max-width: 860px) { .caption { display: none; } }
+</style>
+</head>
+<body>
+
+  <div class="phone">
+    <div class="sheet">
+      <div class="grabber"></div>
+
+      <div class="content">
+        <h1 class="title">捐赠Pro</h1>
+        <p class="lead">浏览器全部功能免费，捐赠用于维护 Aira 自己的服务器。</p>
+
+        <div class="features">
+          <div class="feature">
+            <span class="icon">
+              <!-- 云同步 -->
+              <svg viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M25.983 13.342C25.988 13.228 26 13.116 26 13C26 8.582 22.418 5 18 5C14.89 5 12.2 6.779 10.877 9.371C10.296 9.136 9.665 9 9 9C6.47 9 4.401 10.885 4.068 13.324C1.703 14.129 0 16.363 0 19C0 22.314 2.686 25 6 25H24C27.314 25 30 22.314 30 19C30 16.382 28.321 14.162 25.983 13.342ZM15 23C11.691 23 9 20.309 9 17H7L10 14L13 17H11C11 19.206 12.794 21 15 21V23ZM20 20L17 17H19C19 14.794 17.206 13 15 13V11C18.309 11 21 13.691 21 17H23L20 20Z" fill="#00b0ad"/>
+              </svg>
+            </span>
+            <div>
+              <h3>云端同步</h3>
+              <p>不用自己搭服务器，直接用 Aira 的服务器同步书签和数据</p>
+            </div>
+          </div>
+
+          <div class="feature">
+            <span class="icon">
+              <!-- 跨设备互联 -->
+              <svg viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 5C3.36 5 2 6.36 2 8V21C2 21.77 2.29906 22.47 2.78906 23H0C0 24.66 1.34 26 3 26H27C28.66 26 30 24.66 30 23H27.2109C27.7009 22.47 28 21.77 28 21V8C28 6.36 26.64 5 25 5H5ZM5 7H25C25.57 7 26 7.43 26 8V21C26 21.57 25.57 22 25 22H5C4.43 22 4 21.57 4 21V8C4 7.43 4.43 7 5 7ZM18 11C17.74 11 17.4891 11.0991 17.2891 11.2891L14 14.5898L12.7109 13.2891C12.3209 12.8991 11.6791 12.8991 11.2891 13.2891C10.8991 13.6791 10.8991 14.3209 11.2891 14.7109L13.2891 16.7109C13.4891 16.9009 13.74 17 14 17C14.26 17 14.5109 16.9009 14.7109 16.7109L18.7109 12.7109C19.1009 12.3209 19.1009 11.6791 18.7109 11.2891C18.5109 11.0991 18.26 11 18 11Z" fill="#5b4fe8"/>
+              </svg>
+            </span>
+            <div>
+              <h3>跨设备互联</h3>
+              <p>登录同一账号，跨设备互联开箱可用</p>
+            </div>
+          </div>
+
+          <div class="feature">
+            <span class="icon">
+              <!-- 支持开发 -->
+              <svg viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 5C6.134 5 3 8.134 3 12C3 13.274 3.55034 14.6796 4.40234 16.1016C4.59234 16.0416 4.791 16 5 16C6.105 16 7 16.895 7 18C8.105 18 9 18.895 9 20C10.105 20 11 20.895 11 22C12.105 22 13 22.895 13 24C13 24.387 12.8853 24.7448 12.6953 25.0508C12.7623 25.1068 12.8344 25.1687 12.8984 25.2227C14.1194 26.2387 15.8806 26.2387 17.1016 25.2227C19.0566 23.5967 21.9805 20.9693 24.1445 18.1973C24.7955 17.3633 24.6546 16.1607 23.8516 15.4727C22.5776 14.3807 20.7469 12.8129 19.7559 11.9629C19.3579 11.6239 18.7665 11.6486 18.3965 12.0176L16.7852 13.6289C15.4932 14.9209 13.4449 15.2228 11.9199 14.2168C9.82292 12.8338 9.61397 9.97097 11.293 8.29297L13.5859 5.99805C12.5369 5.36805 11.313 5 10 5ZM20 5C18.688 5 17.466 5.36809 16.418 5.99609L12.707 9.70703C11.922 10.492 12.0004 11.8181 12.9434 12.4941C13.6844 13.0251 14.7212 12.8657 15.3652 12.2207L17.6387 9.94727C18.3777 9.20827 19.5595 9.16375 20.3535 9.84375L25.1602 13.9648C25.7182 14.4438 26.5862 14.1728 26.7832 13.4648C26.9222 12.9618 27 12.472 27 12C27 8.134 23.866 5 20 5Z" fill="#ff375f"/>
+              </svg>
+            </span>
+            <div>
+              <h3>支持开发</h3>
+              <p>你的捐赠支持我继续把 Aira 做下去</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="note">不想捐也没关系：可以自己搭服务器，或用华为云空间 / WebDAV 同步，页面下面还能一直免费领会员。</p>
+        <a class="repo-link">在 GitHub 上查看源码</a>
+      </div>
+
+      <div class="footer">
+        <button class="cta">查看Pro权益</button>
+      </div>
+    </div>
+  </div>
+
+  <aside class="caption">
+    <h2>捐赠Pro 首次介绍弹窗 · 排版草稿</h2>
+    <p><b>结构</b>：按参考图改为 居中大标题 → 副标题 → 三行「彩色图标 + 粗体小标题 + 灰色描述」→ 居中小字备注 → 居中文字链接 → 通栏大圆角主按钮。</p>
+    <p><b>文案映射</b>：三行特性对应原「捐赠Pro是什么」的三条；原「免费就有」三条和结尾备注合并成副标题 + 底部小字备注。</p>
+    <p><b>按钮</b>：参考图只有一个主按钮，去掉了「以后再说」——下滑关闭弹窗即等效。</p>
+    <p><b>颜色</b>：图标各自着色（青 / 紫 / 粉），按钮与链接先用 Aira 主题蓝（实际实现跟随系统主题强调色）。</p>
+  </aside>
+
+</body>
+</html>

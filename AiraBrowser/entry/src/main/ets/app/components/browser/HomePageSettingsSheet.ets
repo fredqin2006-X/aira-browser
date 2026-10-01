@@ -1,4 +1,5 @@
 import { display } from '@kit.ArkUI';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { DEFAULT_THEME_PALETTE } from '../../../features/theme/palettes/DefaultThemePalette';
 import { desktopDialogTierSpec } from '../../../core/browser/BrowserDialogPresentationTokens';
 import {
@@ -557,7 +558,7 @@ export struct HomePageSettingsContent {
 
   private resolveSheetTitle(): string {
     if (this.sheetPage === 'wallpaper') {
-      return '壁纸设置';
+      return resolveAppResourceText($r('app.string.settings_home_wallpaper'));
     }
     if (this.sheetPage === 'logo') {
       return 'Logo设置';
@@ -648,7 +649,7 @@ export struct HomePageSettingsContent {
       })
       .catch((error: Error) => {
         this.refreshWallpaperState();
-        this.showToast(error.message.length > 0 ? error.message : '选择壁纸失败，请稍后重试。');
+        this.showToast(error.message.length > 0 ? error.message : resolveAppResourceText($r('app.string.wallpaper_select_failed')));
       });
   }
 
@@ -662,7 +663,7 @@ export struct HomePageSettingsContent {
       })
       .catch((error: Error) => {
         this.refreshWallpaperState();
-        this.showToast(error.message.length > 0 ? error.message : '选择壁纸失败，请稍后重试。');
+        this.showToast(error.message.length > 0 ? error.message : resolveAppResourceText($r('app.string.wallpaper_select_failed')));
       });
   }
 
@@ -676,7 +677,7 @@ export struct HomePageSettingsContent {
       })
       .catch((error: Error) => {
         this.refreshWallpaperState();
-        this.showToast(error.message.length > 0 ? error.message : '选择视频壁纸失败，请稍后重试。');
+        this.showToast(error.message.length > 0 ? error.message : resolveAppResourceText($r('app.string.wallpaper_select_video_failed')));
       });
   }
 

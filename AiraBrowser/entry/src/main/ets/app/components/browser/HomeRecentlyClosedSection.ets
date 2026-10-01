@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import {
   HomeContentThemePresentationState,
   HomeRecentlyClosedPresentationState,
@@ -45,7 +46,7 @@ export struct HomeRecentlyClosedSection {
     Column({ space: 0 }) {
       if (this.showTitle) {
         HomeExpandableSectionHeader({
-          title: '最近关闭',
+          title: recentlyClosedText($r('app.string.settings_home_recently_closed'), '最近关闭'),
           expanded: this.expanded,
           leftInset: HOME_SECTION_CONTENT_INSET,
           rightInset: HOME_SECTION_CONTENT_INSET,
@@ -79,7 +80,7 @@ export struct HomeRecentlyClosedSection {
       records: this.recentlyClosed.records,
       recordLimit: displayLimit,
       emptyShowIcon: false,
-      emptyTitle: '暂无最近关闭',
+      emptyTitle: recentlyClosedText($r('app.string.custom_home_ui_system_homepage_live_preview_001'), '暂无最近关闭'),
       emptyMessage: '',
       emptyTopPadding: 8,
       emptyBottomPadding: 28,
@@ -146,4 +147,9 @@ export struct HomeRecentlyClosedSection {
     );
   }
 
+}
+
+function recentlyClosedText(resource: Resource, fallback: string): string {
+  const resolved = resolveAppResourceText(resource);
+  return resolved.length > 0 ? resolved : fallback;
 }

@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   HomeSystemShortcutTarget,
   ShortcutRecord,
@@ -42,7 +43,7 @@ export class HomeShortcutOpenPolicyService {
     if (resolveHomeShortcutKind(shortcut.kind) === 'system') {
       const target = resolveHomeSystemShortcutTarget(shortcut.url);
       if (target === undefined) {
-        throw new Error('这个系统快捷方式暂不可用。');
+        throw new Error(resolveAppResourceText($r('app.string.home_shortcut_open_unavailable')));
       }
       const systemPlan: HomeShortcutSystemOpenPlan = {
         kind: 'system',

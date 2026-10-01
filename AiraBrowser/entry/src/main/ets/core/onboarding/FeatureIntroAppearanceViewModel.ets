@@ -5,6 +5,7 @@ import {
   BrowserThemePaletteId
 } from '../../common/models/BrowserModels';
 import { BrowserThemePaletteService } from '../../services/theme/BrowserThemePaletteService';
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import { TabOverviewLayoutOptionState } from '../settings/TabOverviewLayoutSettingsCoordinator';
 
 const FEATURE_INTRO_APPEARANCE_TITLE: string = '选择外观';
@@ -85,31 +86,31 @@ export class FeatureIntroAppearanceViewModel {
   private readonly paletteService: BrowserThemePaletteService = new BrowserThemePaletteService();
 
   title(): string {
-    return FEATURE_INTRO_APPEARANCE_TITLE;
+    return featureIntroText($r('app.string.feature_intro_appearance_title'), FEATURE_INTRO_APPEARANCE_TITLE);
   }
 
   subtitle(): string {
-    return FEATURE_INTRO_APPEARANCE_SUBTITLE;
+    return featureIntroText($r('app.string.feature_intro_appearance_subtitle'), FEATURE_INTRO_APPEARANCE_SUBTITLE);
   }
 
   themeSectionTitle(): string {
-    return FEATURE_INTRO_APPEARANCE_THEME_SECTION;
+    return featureIntroText($r('app.string.settings_appearance_theme_color'), FEATURE_INTRO_APPEARANCE_THEME_SECTION);
   }
 
   tabSectionTitle(): string {
-    return FEATURE_INTRO_APPEARANCE_TAB_SECTION;
+    return featureIntroText($r('app.string.settings_appearance_tab_style'), FEATURE_INTRO_APPEARANCE_TAB_SECTION);
   }
 
   continueLabel(): string {
-    return FEATURE_INTRO_APPEARANCE_CONTINUE_LABEL;
+    return featureIntroText($r('app.string.settings_sync_next'), FEATURE_INTRO_APPEARANCE_CONTINUE_LABEL);
   }
 
   previousLabel(): string {
-    return FEATURE_INTRO_APPEARANCE_PREVIOUS_LABEL;
+    return featureIntroText($r('app.string.feature_intro_previous'), FEATURE_INTRO_APPEARANCE_PREVIOUS_LABEL);
   }
 
   skipLabel(): string {
-    return FEATURE_INTRO_APPEARANCE_SKIP_LABEL;
+    return featureIntroText($r('app.string.onboarding_ui_feature_intro_skip_control_001'), FEATURE_INTRO_APPEARANCE_SKIP_LABEL);
   }
 
   defaultPaletteId(): BrowserThemePaletteId {
@@ -142,17 +143,17 @@ export class FeatureIntroAppearanceViewModel {
     return [
       {
         mode: 'dark',
-        title: '深色',
+        title: featureIntroText($r('app.string.settings_appearance_dark'), '深色'),
         isSelected: selected === 'dark'
       },
       {
         mode: 'light',
-        title: '浅色',
+        title: featureIntroText($r('app.string.settings_appearance_light'), '浅色'),
         isSelected: selected === 'light'
       },
       {
         mode: 'system',
-        title: '系统',
+        title: featureIntroText($r('app.string.settings_general_system'), '系统'),
         isSelected: selected === 'system'
       }
     ];
@@ -176,12 +177,12 @@ export class FeatureIntroAppearanceViewModel {
     return [
       {
         placement: 'horizontal',
-        title: '水平标签页',
+        title: featureIntroText($r('app.string.settings_appearance_horizontal_tabs'), '水平标签页'),
         isSelected: selected === 'horizontal'
       },
       {
         placement: 'vertical',
-        title: '竖向标签页',
+        title: featureIntroText($r('app.string.feature_intro_vertical_tabs'), '竖向标签页'),
         isSelected: selected === 'vertical'
       }
     ];
@@ -192,24 +193,29 @@ export class FeatureIntroAppearanceViewModel {
     return [
       {
         style: 'grid',
-        title: '卡片平铺',
+        title: featureIntroText($r('app.string.settings_appearance_grid'), '卡片平铺'),
         isSelected: selected === 'grid'
       },
       {
         style: 'horizontal_cards',
-        title: '横向大卡片',
+        title: featureIntroText($r('app.string.settings_appearance_large_cards'), '横向大卡片'),
         isSelected: selected === 'horizontal_cards'
       },
       {
         style: 'stack',
-        title: '堆叠式',
+        title: featureIntroText($r('app.string.settings_appearance_stack'), '堆叠式'),
         isSelected: selected === 'stack'
       },
       {
         style: 'list',
-        title: '列表式',
+        title: featureIntroText($r('app.string.settings_appearance_list'), '列表式'),
         isSelected: selected === 'list'
       }
     ];
   }
+}
+
+function featureIntroText(resource: Resource, fallback: string): string {
+  const resolved = resolveAppResourceText(resource);
+  return resolved.length > 0 ? resolved : fallback;
 }

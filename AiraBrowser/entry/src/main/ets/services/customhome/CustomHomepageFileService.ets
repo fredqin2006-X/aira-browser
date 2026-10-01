@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { common } from '@kit.AbilityKit';
 import { fileIo, fileUri, picker } from '@kit.CoreFileKit';
 import { image } from '@kit.ImageKit';
@@ -137,7 +138,7 @@ export class CustomHomepageFileService {
   async importHtmlFile(sourceUri: string): Promise<CustomHomepageItem> {
     const normalizedSourceUri = sourceUri.trim();
     if (normalizedSourceUri.length === 0) {
-      throw new Error('未选择 HTML 文件。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_html_not_selected')));
     }
 
     await this.ensureDirectory(this.getRootDir());
@@ -199,7 +200,7 @@ export class CustomHomepageFileService {
   async prepareZipPackage(sourceUri: string): Promise<CustomHomepagePreparedPackageImport> {
     const normalizedSourceUri = sourceUri.trim();
     if (normalizedSourceUri.length === 0) {
-      throw new Error('未选择主页包。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_package_not_selected')));
     }
 
     await this.ensureDirectory(this.getPackageRootDir());
@@ -226,10 +227,10 @@ export class CustomHomepageFileService {
       const identityKey = this.buildZipPackageIdentityKey(manifest, itemId);
       const entryPath = this.normalizePackageRelativePath(manifest.entry ?? '');
       if (entryPath.length === 0) {
-        throw new Error('主页包缺少入口文件。');
+        throw new Error(resolveAppResourceText($r('app.string.custom_home_package_missing_entry')));
       }
       const previewPaths = this.resolvePackagePreviewPaths(manifest);
-      this.ensureHtmlFileName(entryPath, '入口文件必须是 HTML。');
+      this.ensureHtmlFileName(entryPath, resolveAppResourceText($r('app.string.custom_home_entry_must_html')));
       this.ensurePreviewFileName(previewPaths.light);
       this.ensurePreviewFileName(previewPaths.dark);
       const entryFullPath = this.resolvePackagePath(stagedPackageRootPath, entryPath);
@@ -295,7 +296,7 @@ export class CustomHomepageFileService {
       try {
         await this.removeDirectoryTree(stagingRootPath);
       } catch (cleanupError) {
-        throw this.buildCleanupFailureError(packageError, cleanupError, '隔离目录');
+        throw this.buildCleanupFailureError(packageError, cleanupError, resolveAppResourceText($r('app.string.custom_home_isolated_dir')));
       }
       throw packageError;
     } finally {
@@ -307,18 +308,18 @@ export class CustomHomepageFileService {
     this.ensurePreparedPackageImport(prepared);
     await this.ensureDirectory(this.getPackageRootDir());
     if (await this.exists(prepared.finalPackageRootPath)) {
-      throw new Error('主页包安装目录冲突，请重试。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_package_dir_conflict')));
     }
     try {
       await this.moveFile(prepared.stagedPackageRootPath, prepared.finalPackageRootPath);
       await this.removeDirectoryTree(prepared.stagingRootPath);
       return this.remapPreparedItem(prepared);
     } catch (error) {
-      const packageError = error instanceof Error ? error : new Error('主页包安装未完成。');
+      const packageError = error instanceof Error ? error : new Error(resolveAppResourceText($r('app.string.custom_home_package_install_incomplete')));
       try {
         await this.removeDirectoryTree(prepared.finalPackageRootPath);
       } catch (cleanupError) {
-        throw this.buildCleanupFailureError(packageError, cleanupError, '安装目录');
+        throw this.buildCleanupFailureError(packageError, cleanupError, resolveAppResourceText($r('app.string.custom_home_install_dir')));
       }
       throw new Error(packageError.message);
     }
@@ -353,20 +354,20 @@ export class CustomHomepageFileService {
     const documentPicker = new picker.DocumentViewPicker(context);
     const uris = await documentPicker.save({
       newFileNames: [this.buildHomepageExportFileName(item)],
-      fileSuffixChoices: [item.kind === 'zip_package' ? 'Aira 主页包|.zip' : 'HTML 主页|.html']
+      fileSuffixChoices: [item.kind === 'zip_package' ? resolveAppResourceText($r('app.string.custom_home_picker_package')) : resolveAppResourceText($r('app.string.custom_home_picker_html'))]
     });
     return uris.length > 0 && uris[0].trim().length > 0 ? uris[0] : undefined;
   }
 
   private async exportSingleHtmlHomepage(item: CustomHomepageItem, targetUri: string): Promise<void> {
     const sourcePath = item.filePath.trim();
-    await this.ensureExportFileExists(sourcePath, '自定义主页文件不存在。');
+    await this.ensureExportFileExists(sourcePath, resolveAppResourceText($r('app.string.custom_home_file_missing')));
     await fileIo.copy(fileUri.getUriFromPath(sourcePath), targetUri);
   }
 
   private async exportZipPackage(item: CustomHomepageItem, targetUri: string): Promise<void> {
     const rootPath = item.packageRootPath.trim().length > 0 ? item.packageRootPath.trim() : item.rootPath.trim();
-    await this.ensureExportDirectoryExists(rootPath, '自定义主页包不存在。');
+    await this.ensureExportDirectoryExists(rootPath, resolveAppResourceText($r('app.string.custom_home_package_missing')));
     await this.ensureDirectory(this.getTmpRootDir());
     const tempZipPath = `${this.getTmpRootDir()}/export-${item.id}-${Date.now()}.zip`;
     await this.deleteIfExists(tempZipPath);
@@ -386,7 +387,7 @@ export class CustomHomepageFileService {
   private async exportRemoteUrlHomepage(item: CustomHomepageItem, targetUri: string): Promise<void> {
     const url = item.remoteUrl.trim();
     if (url.length <= 0) {
-      throw new Error('网址主页地址不存在。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_url_missing')));
     }
     await this.ensureDirectory(this.getTmpRootDir());
     const tempHtmlPath = `${this.getTmpRootDir()}/export-${item.id}-${Date.now()}.html`;
@@ -421,8 +422,8 @@ export class CustomHomepageFileService {
       '<body>',
       '  <main>',
       `    <h1>${escapedTitle}</h1>`,
-      '    <p>此文件保存了 Aira 网址主页的地址。</p>',
-      `    <a href="${escapedUrl}">打开主页</a>`,
+      `    <p>${this.escapeHtml(resolveAppResourceText($r('app.string.custom_home_export_saved_url')))}</p>`,
+      `    <a href="${escapedUrl}">${this.escapeHtml(resolveAppResourceText($r('app.string.custom_home_export_open')))}</a>`,
       `    <p class="url">${escapedUrl}</p>`,
       '  </main>',
       '</body>',
@@ -495,14 +496,14 @@ export class CustomHomepageFileService {
   private async ensureUsableZipFile(path: string): Promise<fileIo.Stat> {
     const stat = await fileIo.stat(path);
     if (stat.isDirectory() || stat.size <= 0) {
-      throw new Error('主页包不可用。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_package_unavailable')));
     }
     if (stat.size > MAX_CUSTOM_HOMEPAGE_ZIP_BYTES) {
-      throw new Error('主页包超过 20 MB。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_package_too_big')));
     }
     const sample = await this.readFileBytes(path, 4);
     if (sample.length < 4 || sample[0] !== 0x50 || sample[1] !== 0x4B) {
-      throw new CustomHomepagePackageImportError('invalid_zip', '请选择有效的 ZIP 主页包。');
+      throw new CustomHomepagePackageImportError('invalid_zip', resolveAppResourceText($r('app.string.custom_home_package_invalid_zip')));
     }
     return stat;
   }
@@ -512,31 +513,31 @@ export class CustomHomepageFileService {
     try {
       originalSize = await zlib.getOriginalSize(path);
     } catch (_error) {
-      throw new CustomHomepagePackageImportError('invalid_zip', '请选择有效的 ZIP 主页包。');
+      throw new CustomHomepagePackageImportError('invalid_zip', resolveAppResourceText($r('app.string.custom_home_package_invalid_zip')));
     }
     if (!Number.isFinite(originalSize) || originalSize < 0) {
-      throw new CustomHomepagePackageImportError('invalid_zip', '请选择有效的 ZIP 主页包。');
+      throw new CustomHomepagePackageImportError('invalid_zip', resolveAppResourceText($r('app.string.custom_home_package_invalid_zip')));
     }
     if (originalSize > MAX_CUSTOM_HOMEPAGE_EXTRACTED_BYTES) {
-      throw new Error('主页包解压后超过 50 MB。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_package_extracted_too_big')));
     }
   }
 
   private async ensureUsableHtmlFile(path: string): Promise<number> {
     const stat = await fileIo.stat(path);
     if (stat.isDirectory() || stat.size <= 0) {
-      throw new Error('HTML 文件不可用。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_html_unavailable')));
     }
     if (stat.size > MAX_CUSTOM_HOMEPAGE_BYTES) {
-      throw new Error('HTML 文件超过 5 MB。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_html_too_big')));
     }
     const sample = await this.readFileSample(path);
     if (!this.htmlValidationService.looksLikeHtml(sample)) {
-      throw new Error('请选择有效的 HTML 文件。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_html_invalid')));
     }
     this.htmlValidationService.validateForImport({
       html: await this.readTextFile(path, MAX_CUSTOM_HOMEPAGE_BYTES),
-      sourceLabel: 'HTML 文件'
+      sourceLabel: resolveAppResourceText($r('app.string.custom_home_source_html'))
     });
     return Math.floor(stat.size);
   }
@@ -559,7 +560,7 @@ export class CustomHomepageFileService {
     };
     await this.scanPackageDirectory(rootPath, rootPath, result);
     if (result.fileCount <= 0) {
-      throw new Error('主页包为空。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_package_empty')));
     }
     return result;
   }
@@ -582,14 +583,14 @@ export class CustomHomepageFileService {
       } else {
         result.fileCount += 1;
         if (result.fileCount > MAX_CUSTOM_HOMEPAGE_PACKAGE_FILES) {
-          throw new Error('主页包文件数量超过 300 个。');
+          throw new Error(resolveAppResourceText($r('app.string.custom_home_package_too_many_files')));
         }
         if (stat.size > MAX_CUSTOM_HOMEPAGE_PACKAGE_FILE_BYTES) {
-          throw new Error(`主页包内文件过大：${name}`);
+          throw new Error(resolveAppResourceText($r('app.string.custom_home_package_file_too_big', name)));
         }
         result.totalBytes += Math.max(0, Math.floor(stat.size));
         if (result.totalBytes > MAX_CUSTOM_HOMEPAGE_EXTRACTED_BYTES) {
-          throw new Error('主页包解压后超过 50 MB。');
+          throw new Error(resolveAppResourceText($r('app.string.custom_home_package_extracted_too_big')));
         }
         const relativePath = path.substring(rootPath.length + 1);
         this.ensureAllowedPackageFileName(relativePath);
@@ -608,29 +609,29 @@ export class CustomHomepageFileService {
         await this.readTextFile(path, MAX_CUSTOM_HOMEPAGE_PACKAGE_FILE_BYTES)
       );
     } catch (error) {
-      throw new Error(`主页包脚本不安全：${this.stringifyError(error)}`);
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_package_script_unsafe', this.stringifyError(error))));
     }
   }
 
   private async readPackageManifest(rootPath: string): Promise<CustomHomepagePackageManifest> {
     const manifestPath = `${rootPath}/${CUSTOM_HOMEPAGE_PACKAGE_MANIFEST_NAME}`;
     try {
-      await this.ensurePackageFileExists(manifestPath, '主页包缺少 aira-homepage.json。');
+      await this.ensurePackageFileExists(manifestPath, resolveAppResourceText($r('app.string.custom_home_package_missing_manifest')));
     } catch (_error) {
       throw new CustomHomepagePackageImportError(
         'missing_manifest',
-        '主页包缺少 aira-homepage.json。'
+        resolveAppResourceText($r('app.string.custom_home_package_missing_manifest'))
       );
     }
     const text = await this.readTextFile(manifestPath, MAX_CUSTOM_HOMEPAGE_MANIFEST_BYTES);
     try {
       const manifest = JSON.parse(text) as CustomHomepagePackageManifest;
       if (manifest.schemaVersion !== 1) {
-        throw new Error('schemaVersion 必须为 1。');
+        throw new Error(resolveAppResourceText($r('app.string.custom_home_schema_version')));
       }
       return manifest;
     } catch (error) {
-      throw new Error(`主页包清单无效：${this.stringifyError(error)}`);
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_manifest_invalid', this.stringifyError(error))));
     }
   }
 
@@ -639,7 +640,7 @@ export class CustomHomepageFileService {
     const explicitLight = this.normalizeOptionalManifestPreviewPath(manifest.previewLight, 'previewLight');
     const explicitDark = this.normalizeOptionalManifestPreviewPath(manifest.previewDark, 'previewDark');
     if (fallback.length === 0 && explicitLight.length === 0 && explicitDark.length === 0) {
-      throw new Error('主页包缺少预览图。请配置 preview、previewLight 或 previewDark 中至少一个字段。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_preview_required')));
     }
     const light = explicitLight.length > 0 ? explicitLight : (fallback.length > 0 ? fallback : explicitDark);
     const dark = explicitDark.length > 0 ? explicitDark : (fallback.length > 0 ? fallback : explicitLight);
@@ -658,36 +659,36 @@ export class CustomHomepageFileService {
     }
     const normalized = this.normalizePackageRelativePath(rawValue);
     if (normalized.length === 0) {
-      throw new Error(`主页包清单字段 ${fieldName} 的路径无效。`);
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_manifest_path_invalid', fieldName)));
     }
     return normalized;
   }
 
   private async ensurePackageHtmlEntry(path: string): Promise<void> {
-    await this.ensurePackageFileExists(path, '入口 HTML 文件不存在。');
+    await this.ensurePackageFileExists(path, resolveAppResourceText($r('app.string.custom_home_entry_html_missing')));
     const stat = await fileIo.stat(path);
     if (stat.size > MAX_CUSTOM_HOMEPAGE_BYTES) {
-      throw new Error('入口 HTML 文件超过 5 MB。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_entry_html_too_big')));
     }
     const sample = await this.readFileSample(path);
     if (!this.htmlValidationService.looksLikeHtml(sample)) {
-      throw new Error('入口文件不是有效的 HTML。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_entry_html_invalid')));
     }
     this.htmlValidationService.validateForImport({
       html: await this.readTextFile(path, MAX_CUSTOM_HOMEPAGE_BYTES),
-      sourceLabel: '入口 HTML'
+      sourceLabel: resolveAppResourceText($r('app.string.custom_home_source_entry_html'))
     });
   }
 
   private async ensurePackagePreviewImage(path: string): Promise<void> {
-    await this.ensurePackageFileExists(path, '主页包预览图不存在。');
+    await this.ensurePackageFileExists(path, resolveAppResourceText($r('app.string.custom_home_preview_missing')));
     const stat = await fileIo.stat(path);
     if (stat.size > MAX_CUSTOM_HOMEPAGE_PACKAGE_FILE_BYTES) {
-      throw new Error('主页包预览图超过 8 MB。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_preview_too_big')));
     }
     const sample = await this.readFileBytes(path, 12);
     if (!this.looksLikePreviewImage(sample)) {
-      throw new Error('主页包预览图必须是 PNG、JPEG 或 WebP 图片。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_preview_type')));
     }
   }
 
@@ -770,7 +771,7 @@ export class CustomHomepageFileService {
   private async readTextFile(path: string, maxBytes: number): Promise<string> {
     const stat = await fileIo.stat(path);
     if (stat.size > maxBytes) {
-      throw new Error('文件过大。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_file_too_big')));
     }
     const file = await fileIo.open(path, fileIo.OpenMode.READ_ONLY);
     try {
@@ -804,14 +805,14 @@ export class CustomHomepageFileService {
   private async readFilePayload(path: string, maxBytes: number): Promise<ArrayBuffer> {
     const stat = await fileIo.stat(path);
     if (stat.isDirectory() || stat.size <= 0 || stat.size > maxBytes) {
-      throw new Error('文件过大。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_file_too_big')));
     }
     const file = await fileIo.open(path, fileIo.OpenMode.READ_ONLY);
     try {
       const data = new ArrayBuffer(Math.max(1, Math.floor(stat.size)));
       const readLength = await fileIo.read(file.fd, data);
       if (readLength <= 0) {
-        throw new Error('文件读取失败。');
+        throw new Error(resolveAppResourceText($r('app.string.custom_home_file_read_failed')));
       }
       return data;
     } finally {
@@ -836,7 +837,7 @@ export class CustomHomepageFileService {
     try {
       await this.removeDirectoryTreeOnce(dir);
     } catch (error) {
-      throw new Error(`目录清理失败：${this.stringifyError(error)}`);
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_dir_cleanup_failed', this.stringifyError(error))));
     }
   }
 
@@ -922,28 +923,28 @@ export class CustomHomepageFileService {
 
   private normalizeManifestVersion(value: string | undefined): string {
     if (value !== undefined && typeof value !== 'string') {
-      throw new Error('主页包 version 必须是字符串。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_version_type')));
     }
     const normalized = typeof value === 'string' ? value.trim() : '';
     if (normalized.length === 0) {
       return '';
     }
     if (normalized.length > MAX_CUSTOM_HOMEPAGE_VERSION_LENGTH) {
-      throw new Error(`主页包 version 不能超过 ${MAX_CUSTOM_HOMEPAGE_VERSION_LENGTH} 个字符。`);
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_version_length', MAX_CUSTOM_HOMEPAGE_VERSION_LENGTH)));
     }
     if (!CUSTOM_HOMEPAGE_VERSION_PATTERN.test(normalized)) {
-      throw new Error('主页包 version 必须使用 SemVer 格式，例如 1.0.0 或 1.2.0-beta.1。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_version_semver')));
     }
     return normalized;
   }
 
   private normalizeManifestDescription(value: string | undefined): string {
     if (value !== undefined && typeof value !== 'string') {
-      throw new Error('主页包 description 必须是字符串。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_description_type')));
     }
     const normalized = typeof value === 'string' ? value.trim() : '';
     if (normalized.length > MAX_CUSTOM_HOMEPAGE_DESCRIPTION_LENGTH) {
-      throw new Error(`主页包 description 不能超过 ${MAX_CUSTOM_HOMEPAGE_DESCRIPTION_LENGTH} 个字符。`);
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_description_length', MAX_CUSTOM_HOMEPAGE_DESCRIPTION_LENGTH)));
     }
     return normalized;
   }
@@ -965,11 +966,11 @@ export class CustomHomepageFileService {
 
   private normalizeManifestId(value: string | undefined): string {
     if (value !== undefined && typeof value !== 'string') {
-      throw new Error('主页包 id 必须是字符串。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_id_type')));
     }
     const normalized = typeof value === 'string' ? value.trim() : '';
     if (normalized.length > 128) {
-      throw new Error('主页包 id 不能超过 128 个字符。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_id_length')));
     }
     return normalized;
   }
@@ -988,7 +989,7 @@ export class CustomHomepageFileService {
       !stagingRoot.startsWith(`${tmpRoot}/`) ||
       stagedPackageRoot !== `${stagingRoot}/package` ||
       !finalPackageRoot.startsWith(`${packageRoot}/`)) {
-      throw new Error('主页包预检状态无效。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_precheck_invalid')));
     }
   }
 
@@ -1046,7 +1047,7 @@ export class CustomHomepageFileService {
   private resolvePackagePath(rootPath: string, relativePath: string): string {
     const normalizedRelativePath = this.normalizePackageRelativePath(relativePath);
     if (normalizedRelativePath.length === 0) {
-      throw new Error('主页包路径无效。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_path_invalid')));
     }
     const path = `${rootPath}/${normalizedRelativePath}`;
     this.ensurePathInsideRoot(rootPath, path);
@@ -1055,24 +1056,24 @@ export class CustomHomepageFileService {
 
   private ensurePathInsideRoot(rootPath: string, path: string): void {
     if (path !== rootPath && !path.startsWith(`${rootPath}/`)) {
-      throw new Error('主页包包含非法路径。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_illegal_path')));
     }
   }
 
   private ensureSafePackageSegment(segment: string): void {
     if (segment.length === 0 || segment === '.' || segment === '..' ||
       segment.includes('/') || segment.includes('\\') || segment.includes('\u0000')) {
-      throw new Error('主页包包含非法路径。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_illegal_path')));
     }
     if (segment.startsWith('.')) {
-      throw new Error('主页包不能包含隐藏文件或隐藏目录。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_hidden_entry')));
     }
   }
 
   private ensureAllowedPackageDirectoryName(name: string): void {
     const lower = name.trim().toLowerCase();
     if (CUSTOM_HOMEPAGE_BLOCKED_DIR_NAMES.indexOf(lower) >= 0) {
-      throw new Error(`主页包不能包含目录：${name}`);
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_contains_dir', name)));
     }
   }
 
@@ -1082,14 +1083,14 @@ export class CustomHomepageFileService {
     for (let index = 0; index < segments.length; index += 1) {
       const segment = segments[index];
       if (segment.startsWith('.') || CUSTOM_HOMEPAGE_BLOCKED_DIR_NAMES.indexOf(segment) >= 0) {
-        throw new Error('主页包包含不支持的路径。');
+        throw new Error(resolveAppResourceText($r('app.string.custom_home_unsupported_path')));
       }
     }
     if (CUSTOM_HOMEPAGE_BLOCKED_PACKAGE_SUFFIXES.some((suffix: string): boolean => lower.endsWith(suffix))) {
-      throw new Error('主页包包含不支持的文件类型。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_unsupported_type')));
     }
     if (!CUSTOM_HOMEPAGE_ALLOWED_PACKAGE_SUFFIXES.some((suffix: string): boolean => lower.endsWith(suffix))) {
-      throw new Error(`主页包包含不支持的文件：${relativePath}`);
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_unsupported_file', relativePath)));
     }
   }
 
@@ -1103,7 +1104,7 @@ export class CustomHomepageFileService {
   private ensurePreviewFileName(relativePath: string): void {
     const lower = relativePath.toLowerCase();
     if (!lower.endsWith('.png') && !lower.endsWith('.jpg') && !lower.endsWith('.jpeg') && !lower.endsWith('.webp')) {
-      throw new Error('主页包预览图必须是 PNG、JPEG 或 WebP 图片。');
+      throw new Error(resolveAppResourceText($r('app.string.custom_home_preview_type')));
     }
   }
 
@@ -1153,7 +1154,12 @@ export class CustomHomepageFileService {
     targetLabel: string
   ): Error {
     return new Error(
-      `${operationError.message} ${targetLabel}清理失败：${this.stringifyError(cleanupError)}`
+      resolveAppResourceText($r(
+        'app.string.custom_home_cleanup_failed',
+        operationError.message,
+        targetLabel,
+        this.stringifyError(cleanupError)
+      ))
     );
   }
 }

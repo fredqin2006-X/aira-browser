@@ -176,7 +176,7 @@ export default function elementInspectionRuntimeScriptServiceTest(): void {
       expect(preview.indexOf('runtime.previewByPath(') >= 0).assertTrue();
       expect(preview.indexOf('"1/0"') >= 0).assertTrue();
       expect(rejected.indexOf('runtime.previewByPath(') >= 0).assertFalse();
-      expect(install.indexOf('可键盘聚焦') >= 0).assertTrue();
+      expect(install.indexOf('airaInspectionCopy.focusable') >= 0).assertTrue();
     });
 
     it('builds a path-scoped context action and rejects an unsafe command', 0, () => {

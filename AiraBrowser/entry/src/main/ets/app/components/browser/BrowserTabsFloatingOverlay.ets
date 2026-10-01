@@ -40,7 +40,7 @@ import {
   BROWSER_TABS_OVERVIEW_BOTTOM_CHROME_CONTENT_GAP,
   BROWSER_TABS_OVERVIEW_BOTTOM_CHROME_HEIGHT
 } from './BrowserTabsOverviewBottomChrome';
-import { BrowserTabsOverviewClearButton } from './BrowserTabsOverviewClearButton';
+import { BrowserTabsOverviewSegmentGuide } from './BrowserTabsOverviewSegmentGuide';
 import { BrowserTabsOverviewEmptyState } from './BrowserTabsOverviewEmptyState';
 import { BrowserCrossDeviceTabsSheet } from './BrowserCrossDeviceTabsOverlay';
 import { CrossDeviceTabsEmptyAction } from '../../../core/deviceTabs/CrossDeviceTabsEmptyPresentation';
@@ -51,6 +51,8 @@ import {
 import {
   BrowserTabsOverviewSwipeFeedbackService
 } from '../../../core/browser/tabsOverview/BrowserTabsOverviewSwipeFeedbackService';
+import { advanceTabsOverviewSegmentGuide, tabsOverviewSegmentGuideBackGate } from '../../../core/onboarding/TabsOverviewSegmentGuidePolicy';
+import { sharedTabsOverviewSegmentGuideRepository } from '../../bootstrap/BrowserAppRuntime';
 import {
   BrowserTabsOverviewSwipeDismissPolicy
 } from '../../../core/browser/tabsOverview/BrowserTabsOverviewSwipeDismissPolicy';
@@ -119,7 +121,7 @@ const FLOATING_TABS_DECK_FRONT_CARD_Z_INDEX: number = 400;
 const FLOATING_TABS_SHARED_SNAPSHOT_Z_INDEX: number = 20;
 const FLOATING_TABS_SHARED_SNAPSHOT_DECORATION_Z_INDEX: number = 25;
 const FLOATING_TABS_BOTTOM_CHROME_Z_INDEX: number = 31;
-const FLOATING_TABS_CLEAR_BUTTON_Z_INDEX: number = 32;
+const FLOATING_TABS_SEGMENT_GUIDE_Z_INDEX: number = 500;
 const FLOATING_TABS_CROSS_DEVICE_LAYER_Z_INDEX: number = 30;
 const HORIZONTAL_DECK_DRAG_START_DISTANCE: number = 6;
 
@@ -248,6 +250,8 @@ export struct BrowserTabsFloatingOverlay {
   @Watch('refreshDeckPresentation')
   @State private siteIconStates: SiteIconListRenderState[] = [];
   @State private chromeMounted: boolean = false;
+  @State private segmentGuidePending: boolean = false;
+  @State private segmentGuideStep: number = 0;
   @State private bottomChromeRegularTabCount: number = 0;
   /**
    * Continuous deck position, in card units: 2 means the third card is focused, 2.4 means 40% of
@@ -401,6 +405,7 @@ export struct BrowserTabsFloatingOverlay {
     this.chromeMountTimer = setTimeout(() => {
       this.chromeMountTimer = 0;
       this.chromeMounted = true;
+      this.syncSegmentGuidePresence();
     }, 0);
   }
 
@@ -425,6 +430,8 @@ export struct BrowserTabsFloatingOverlay {
     // A close-all leaves this latched true. It used to be cleared by the remount;
     // a resident overlay must clear it here or every later open stays non-interactive.
     this.closeAllExitActive = false;
+    this.segmentGuideStep = 0;
+    void this.refreshSegmentGuidePending();
     this.syncLayoutState();
     // A cold open starts at 0 so its freshly mounted cards fly in; a resident re-open starts
     // settled so an already-built grid enters plainly instead of jumping back and settling.
@@ -448,6 +455,7 @@ export struct BrowserTabsFloatingOverlay {
   }
 
   aboutToDisappear(): void {
+    tabsOverviewSegmentGuideBackGate.setActive(false, () => {});
     this.commitPendingDeckDismiss();
     this.clearDeckDismissCommitTimer();
     this.stopDeckMotion();
@@ -491,22 +499,17 @@ export struct BrowserTabsFloatingOverlay {
       }
 
       if (this.chromeMounted) {
-        // Closing tabs is local-only: the cross-device page lists tabs owned by other
-        // installations, which this surface may open but never close.
-        if (!this.isCrossDeviceSectionSelected()) {
-          BrowserTabsOverviewClearButton({
-            selectedSection: this.selectedSection,
+        if (this.shouldPresentSegmentGuide()) {
+          BrowserTabsOverviewSegmentGuide({
+            stepIndex: this.segmentGuideStep,
             viewportWidth: this.resolveRootWidth(),
-            topSafeInsetVp: this.topSafeInsetVp,
-            surfaceOpacity: this.resolveClearButtonOpacity(),
-            interactionEnabled: this.interactionEnabled && !this.exiting && !this.closeAllExitActive,
-            regularChromeIconTone: this.regularChromeIconTone,
-            adaptiveForeground: true,
-            onClearAll: () => {
-              this.onRequestCloseAll();
+            viewportHeight: this.resolveRootHeight(),
+            bottomChromeLiftVp: this.bottomChromeLiftVp,
+            onAdvance: () => {
+              this.advanceSegmentGuide();
             }
           })
-          .zIndex(FLOATING_TABS_CLEAR_BUTTON_Z_INDEX)
+          .zIndex(FLOATING_TABS_SEGMENT_GUIDE_Z_INDEX)
         }
 
         if (this.shouldShowBottomChrome()) {
@@ -1695,6 +1698,7 @@ export struct BrowserTabsFloatingOverlay {
       }
     }, () => {
       this.closeAllExitActive = true;
+      this.syncSegmentGuidePresence();
     });
   }
 
@@ -2269,10 +2273,6 @@ export struct BrowserTabsFloatingOverlay {
       return 0;
     }
     return this.resolveSurfaceProgress();
-  }
-
-  private resolveClearButtonOpacity(): number {
-    return this.resolveBottomChromeOpacity();
   }
 
   private resolveLayerOpacity(): number {
@@ -2999,7 +2999,47 @@ export struct BrowserTabsFloatingOverlay {
   private handleDeckInteractionChanged(): void {
     if (!this.canInteractWithDeck()) {
       this.abortDeckMotion();
+      this.segmentGuideStep = 0;
     }
+    this.syncSegmentGuidePresence();
+  }
+
+  private async refreshSegmentGuidePending(): Promise<void> {
+    await sharedTabsOverviewSegmentGuideRepository.initialize();
+    this.segmentGuidePending = !sharedTabsOverviewSegmentGuideRepository.hasCompleted();
+    this.syncSegmentGuidePresence();
+  }
+
+  private shouldPresentSegmentGuide(): boolean {
+    return this.segmentGuidePending &&
+      this.chromeMounted &&
+      this.shouldShowBottomChrome() &&
+      this.interactionEnabled &&
+      !this.exiting &&
+      !this.closeAllExitActive;
+  }
+
+  private syncSegmentGuidePresence(): void {
+    const showing = this.shouldPresentSegmentGuide();
+    tabsOverviewSegmentGuideBackGate.setActive(showing, () => {
+      this.advanceSegmentGuide();
+    });
+  }
+
+  private advanceSegmentGuide(): void {
+    if (!this.shouldPresentSegmentGuide()) {
+      this.syncSegmentGuidePresence();
+      return;
+    }
+    const next = advanceTabsOverviewSegmentGuide(this.segmentGuideStep);
+    if (next.completed) {
+      this.segmentGuidePending = false;
+      this.segmentGuideStep = 0;
+      void sharedTabsOverviewSegmentGuideRepository.markCompleted();
+    } else {
+      this.segmentGuideStep = next.stepIndex;
+    }
+    this.syncSegmentGuidePresence();
   }
 
   private beginDeckDrag(): void {

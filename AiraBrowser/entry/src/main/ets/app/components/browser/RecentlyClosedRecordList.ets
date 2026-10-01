@@ -1,4 +1,5 @@
 import { image } from '@kit.ImageKit';
+import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { BrowserRecentlyClosedTabRecord } from '../../../core/browser/BrowserRecentlyClosedTabsService';
 import { HomeRecentlyClosedIconState } from '../../../core/browser/HomeRecentlyClosedIconHydrationCoordinator';
 import { RecentlyClosedRecordTimeViewModel } from '../../../core/browser/RecentlyClosedRecordTimeViewModel';
@@ -121,8 +122,8 @@ export struct RecentlyClosedRecordList {
         AppEmptyState({
           airaIconId: 'browser.toolbar.tabs',
           showIcon: this.emptyShowIcon,
-          title: this.emptyTitle,
-          message: this.emptyMessage,
+          title: this.resolveEmptyCopy(this.emptyTitle, $r('app.string.browser_ui_recently_closed_record_list_003'), '还没有最近关闭的标签页'),
+          message: this.resolveEmptyCopy(this.emptyMessage, $r('app.string.browser_ui_recently_closed_record_list_001'), '关闭网页后，这里会显示可恢复的会话记录。'),
           topPadding: this.emptyTopPadding,
           bottomPadding: this.emptyBottomPadding,
           primaryTextColor: this.resolvePrimaryTextColor(),
@@ -241,7 +242,7 @@ export struct RecentlyClosedRecordList {
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
           menuWidthVp: BROWSER_DESKTOP_MENU_COMPACT_WIDTH_VP,
-          label: '重新打开',
+          label: $r('app.string.browser_ui_recently_closed_record_list_004'),
           onAction: (): void => {
             this.onRestoreRecord(record.id);
           }
@@ -251,7 +252,7 @@ export struct RecentlyClosedRecordList {
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
           menuWidthVp: BROWSER_DESKTOP_MENU_COMPACT_WIDTH_VP,
-          label: '复制链接',
+          label: $r('app.string.bottom_panel_action_copy_link'),
           itemEnabled: this.resolveRecordUrl(record).length > 0,
           onAction: (): void => {
             this.onAction({ type: 'copy_record_url', recordId: record.id });
@@ -260,7 +261,9 @@ export struct RecentlyClosedRecordList {
 
         BrowserDesktopContextMenuItem({
           menuWidthVp: BROWSER_DESKTOP_MENU_COMPACT_WIDTH_VP,
-          label: this.isRecordAddedToHome(record) ? '从主页移除' : '添加到主页',
+          label: this.isRecordAddedToHome(record)
+            ? resolveAppResourceText($r('app.string.history_remove_home'))
+            : resolveAppResourceText($r('app.string.history_add_home')),
           itemEnabled: this.resolveRecordUrl(record).length > 0,
           onAction: (): void => {
             this.onAction({ type: 'toggle_home_shortcut', recordId: record.id });
@@ -271,7 +274,7 @@ export struct RecentlyClosedRecordList {
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
           menuWidthVp: BROWSER_DESKTOP_MENU_COMPACT_WIDTH_VP,
-          label: '删除记录',
+          label: $r('app.string.browser_ui_recently_closed_record_list_002'),
           onAction: (): void => {
             this.onAction({ type: 'request_delete_record', recordId: record.id });
           }
@@ -281,7 +284,7 @@ export struct RecentlyClosedRecordList {
       MenuItemGroup() {
         BrowserDesktopContextMenuItem({
           menuWidthVp: BROWSER_DESKTOP_MENU_COMPACT_WIDTH_VP,
-          label: '主页设置',
+          label: $r('app.string.settings_custom_home_title'),
           onAction: (): void => {
             this.runAfterContextMenuDismiss(() => {
               this.onOpenHomeSettings();
@@ -303,29 +306,31 @@ export struct RecentlyClosedRecordList {
 
   @Builder
   private buildTouchMenuItems(record: BrowserRecentlyClosedTabRecord) {
-    MenuItem({ content: '重新打开' })
+    MenuItem({ content: $r('app.string.browser_ui_recently_closed_record_list_004') })
       .onClick(() => {
         this.onRestoreRecord(record.id);
       })
 
-    MenuItem({ content: '复制链接' })
+    MenuItem({ content: $r('app.string.bottom_panel_action_copy_link') })
       .enabled(this.resolveRecordUrl(record).length > 0)
       .onClick(() => {
         this.onAction({ type: 'copy_record_url', recordId: record.id });
       })
 
-    MenuItem({ content: this.isRecordAddedToHome(record) ? '从主页移除' : '添加到主页' })
+    MenuItem({ content: this.isRecordAddedToHome(record)
+      ? resolveAppResourceText($r('app.string.history_remove_home'))
+      : resolveAppResourceText($r('app.string.history_add_home')) })
       .enabled(this.resolveRecordUrl(record).length > 0)
       .onClick(() => {
         this.onAction({ type: 'toggle_home_shortcut', recordId: record.id });
       })
 
-    MenuItem({ content: '删除记录' })
+    MenuItem({ content: $r('app.string.browser_ui_recently_closed_record_list_002') })
       .onClick(() => {
         this.onAction({ type: 'request_delete_record', recordId: record.id });
       })
 
-    MenuItem({ content: '主页设置' })
+    MenuItem({ content: $r('app.string.settings_custom_home_title') })
       .onClick(() => {
         this.runAfterContextMenuDismiss(() => {
           this.onOpenHomeSettings();
@@ -489,7 +494,19 @@ export struct RecentlyClosedRecordList {
       return title;
     }
     const url = this.resolveRecordUrl(record);
-    return url.length > 0 ? url : '未命名标签页';
+    return url.length > 0 ? url : this.resolveText($r('app.string.settings_custom_home_untitled_tab'), '未命名标签页');
+  }
+
+  private resolveEmptyCopy(value: string, resource: Resource, fallback: string): string {
+    if (value !== fallback) {
+      return value;
+    }
+    return this.resolveText(resource, fallback);
+  }
+
+  private resolveText(resource: Resource, fallback: string): string {
+    const resolved = resolveAppResourceText(resource);
+    return resolved.length > 0 ? resolved : fallback;
   }
 
   private resolveRecordSubtitle(record: BrowserRecentlyClosedTabRecord): string {

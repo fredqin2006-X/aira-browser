@@ -1,4 +1,5 @@
 import { http } from '@kit.NetworkKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   AIRA_DISTRIBUTION_CAPABILITY_OWNER,
   AIRA_HOSTED_API_BASE_URL
@@ -98,7 +99,7 @@ class NetworkCrossDeviceTabPresenceHttpAdapter implements CrossDeviceTabPresence
       const fallback: CrossDeviceTabPresenceApiResponse = {
         ok: false,
         code: 'http_error',
-        message: `跨设备标签页服务请求失败（${response.responseCode}）。`
+        message: resolveAppResourceText($r('app.string.device_tabs_request_failed', response.responseCode))
       };
       return fallback;
     } finally {
@@ -135,14 +136,14 @@ export class CrossDeviceTabPresenceApiService {
       tabs: tabs
     };
     const response = await this.post('/publish', body);
-    this.requireSuccess(response, '暂时无法发布这台手机的标签页。');
+    this.requireSuccess(response, resolveAppResourceText($r('app.string.device_tabs_publish_failed')));
   }
 
   async list(uid: string, deviceId: string): Promise<CrossDeviceTabPresenceListResult> {
     this.assertDistributionAvailable();
     const body = await this.buildAccessBody(uid, deviceId, 'harmonyos_cross_device_tabs_list');
     const response = await this.post('/list', body);
-    this.requireSuccess(response, '暂时无法读取跨设备标签页。');
+    this.requireSuccess(response, resolveAppResourceText($r('app.string.device_tabs_read_failed')));
     const devices: CrossDeviceTabPresenceDevice[] = [];
     const rawDevices = response.devices ?? [];
     rawDevices.forEach((raw: Object): void => {
@@ -162,7 +163,7 @@ export class CrossDeviceTabPresenceApiService {
     this.assertDistributionAvailable();
     const body = await this.buildAccessBody(uid, deviceId, 'harmonyos_cross_device_tabs_clear');
     const response = await this.post('/clear', body);
-    this.requireSuccess(response, '暂时无法清除这台手机的标签页状态。');
+    this.requireSuccess(response, resolveAppResourceText($r('app.string.device_tabs_clear_failed')));
   }
 
   async publishPersonalServer(
@@ -176,7 +177,7 @@ export class CrossDeviceTabPresenceApiService {
       tabs: tabs
     };
     const response = await this.postPersonalServer(baseUrl, deviceToken, '/publish', body);
-    this.requireSuccess(response, '暂时无法向私有化部署发布这台手机的标签页。');
+    this.requireSuccess(response, resolveAppResourceText($r('app.string.device_tabs_server_publish_failed')));
   }
 
   async listPersonalServer(
@@ -189,7 +190,7 @@ export class CrossDeviceTabPresenceApiService {
       '/list',
       new CrossDeviceTabPresenceEmptyBody()
     );
-    this.requireSuccess(response, '暂时无法从私有化部署读取跨设备标签页。');
+    this.requireSuccess(response, resolveAppResourceText($r('app.string.device_tabs_server_read_failed')));
     return this.parseListResult(response);
   }
 
@@ -200,7 +201,7 @@ export class CrossDeviceTabPresenceApiService {
       '/clear',
       new CrossDeviceTabPresenceEmptyBody()
     );
-    this.requireSuccess(response, '暂时无法清除私有化部署上的手机标签页状态。');
+    this.requireSuccess(response, resolveAppResourceText($r('app.string.device_tabs_server_clear_failed')));
   }
 
   private async buildAccessBody(
@@ -229,11 +230,11 @@ export class CrossDeviceTabPresenceApiService {
   private async requireAccessToken(uid: string): Promise<string> {
     const normalizedUid = uid.trim();
     if (normalizedUid.length === 0) {
-      throw new Error('请先使用华为账号登录。');
+      throw new Error(resolveAppResourceText($r('app.string.device_tabs_sign_in_huawei')));
     }
     const token = await this.authService.getCurrentAccessTokenForUid(normalizedUid, false);
     if (token.length === 0) {
-      throw new Error('请重新登录华为账号后再继续。');
+      throw new Error(resolveAppResourceText($r('app.string.device_tabs_sign_in_again')));
     }
     return token;
   }
@@ -257,7 +258,7 @@ export class CrossDeviceTabPresenceApiService {
     if (normalizedBaseUrl.length === 0 || normalizedToken.length === 0) {
       throw new CrossDeviceTabPresenceApiError(
         'personal_server_auth_required',
-        '请重新连接私有化部署后再继续。'
+        resolveAppResourceText($r('app.string.device_tabs_server_reconnect'))
       );
     }
     return await this.postUrl(
@@ -279,13 +280,13 @@ export class CrossDeviceTabPresenceApiService {
       authorizationHeader
     );
     if (value === undefined || value === null) {
-      throw new Error('跨设备标签页服务没有返回结果。');
+      throw new Error(resolveAppResourceText($r('app.string.device_tabs_empty_response')));
     }
     if (typeof value === 'string') {
       try {
         return JSON.parse(value) as CrossDeviceTabPresenceApiResponse;
       } catch (_error) {
-        throw new Error('跨设备标签页服务返回的数据无法解析。');
+        throw new Error(resolveAppResourceText($r('app.string.device_tabs_bad_response')));
       }
     }
     return value as CrossDeviceTabPresenceApiResponse;

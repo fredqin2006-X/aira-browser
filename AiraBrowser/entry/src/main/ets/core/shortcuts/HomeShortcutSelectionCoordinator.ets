@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../resources/AppResourceText';
 import {
   BookmarkNode,
   HomeSystemShortcutTarget,
@@ -219,7 +220,7 @@ export class HomeShortcutSelectionCoordinator {
       return item.target === target;
     });
     if (definition === undefined) {
-      this.shell.showMessage('这个系统入口暂不可添加到主页。');
+      this.shell.showMessage(resolveAppResourceText($r('app.string.home_shortcut_system_unavailable')));
       return;
     }
     const toggleTarget: HomeShortcutToggleTarget = {
@@ -236,7 +237,7 @@ export class HomeShortcutSelectionCoordinator {
     const bookmark = this.bookmarksFeature.findNodeById(bookmarkId);
     const url = (bookmark?.url ?? '').trim();
     if (bookmark === undefined || bookmark.type !== 'bookmark' || url.length <= 0) {
-      this.shell.showMessage('这个书签没有可添加到主页的网址。');
+      this.shell.showMessage(resolveAppResourceText($r('app.string.home_shortcut_bookmark_no_url')));
       return;
     }
     const toggleTarget: HomeShortcutToggleTarget = {
@@ -280,7 +281,7 @@ export class HomeShortcutSelectionCoordinator {
       const next = this.cloneState(current);
       next.bookmarksLoading = false;
       this.applyState(next);
-      this.shell.showMessage(`加载添加列表失败：${this.describeError(error)}`);
+      this.shell.showMessage(resolveAppResourceText($r('app.string.home_shortcut_list_load_failed', this.describeError(error))));
     }
   }
 
@@ -317,7 +318,7 @@ export class HomeShortcutSelectionCoordinator {
         const next = this.cloneState(current);
         next.busyKeys = next.busyKeys.filter((key: string) => key !== busyKey);
         this.applyState(next);
-        this.shell.showMessage(`更新首页快捷方式失败：${this.describeError(error)}`);
+        this.shell.showMessage(resolveAppResourceText($r('app.string.home_shortcut_update_failed', this.describeError(error))));
       });
   }
 
@@ -329,13 +330,13 @@ export class HomeShortcutSelectionCoordinator {
     if (target.kind !== 'system') {
       return;
     }
-    const title = target.title.trim().length > 0 ? target.title.trim() : '系统入口';
+    const title = target.title.trim().length > 0 ? target.title.trim() : resolveAppResourceText($r('app.string.browser_ui_home_shortcut_selection_sheet_004'));
     if (added) {
-      this.shell.showMessage(`已将“${title}”添加至首页。`);
+      this.shell.showMessage(resolveAppResourceText($r('app.string.home_shortcut_added', title)));
       return;
     }
     if (removed) {
-      this.shell.showMessage(`已从首页移除“${title}”。`);
+      this.shell.showMessage(resolveAppResourceText($r('app.string.home_shortcut_removed', title)));
     }
   }
 

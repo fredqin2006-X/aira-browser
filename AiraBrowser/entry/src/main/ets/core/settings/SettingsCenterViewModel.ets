@@ -80,7 +80,7 @@ export class SettingsCenterViewModel {
     );
     const accountRows: SettingsCenterRowState[] = [];
     if (AIRA_DISTRIBUTION_CAPABILITY_OWNER.isOfficial()) {
-      accountRows.push(this.buildRow('aira_pro', 'Aira Pro'));
+      accountRows.push(this.buildRow('aira_pro', '捐赠Pro'));
     }
     accountRows.push(this.buildRow(
       'sync',

@@ -1,3 +1,4 @@
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import { asset } from '@kit.AssetStoreKit';
 import { util } from '@kit.ArkTS';
 
@@ -21,7 +22,7 @@ export class TranslationSecretStore {
   getInfo(): TranslationSecretStoreInfo {
     return {
       status: 'available',
-      message: 'API 密钥将通过系统安全存储加密保存在本机。'
+      message: resolveAppResourceText($r('app.string.settings_web_translation_secure_storage_hint'))
     };
   }
 
@@ -55,7 +56,7 @@ export class TranslationSecretStore {
       if (this.isNotFoundError(error)) {
         return '';
       }
-      throw this.wrapAssetStoreError(error, '读取翻译密钥失败');
+      throw this.wrapAssetStoreError(error, resolveAppResourceText($r('app.string.translation_secret_read_failed')));
     }
   }
 
@@ -68,7 +69,7 @@ export class TranslationSecretStore {
       await asset.remove(this.buildAliasQueryAttributes(normalizedAlias));
     } catch (error) {
       if (!this.isNotFoundError(error)) {
-        throw this.wrapAssetStoreError(error, '删除翻译密钥失败');
+        throw this.wrapAssetStoreError(error, resolveAppResourceText($r('app.string.translation_secret_delete_failed')));
       }
     }
   }

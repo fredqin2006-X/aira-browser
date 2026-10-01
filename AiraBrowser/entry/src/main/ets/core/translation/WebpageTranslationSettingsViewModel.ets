@@ -4,7 +4,10 @@ import {
   TranslationSettings,
   TranslationSettingsPreferences
 } from '../../common/models/BrowserModels';
-import { TranslationProviderTemplateService } from '../../services/translation/TranslationProviderTemplateService';
+import {
+  resolveDisplayedTranslationProviderName,
+  TranslationProviderTemplateService
+} from '../../services/translation/TranslationProviderTemplateService';
 import { resolveAppResourceText } from '../resources/AppResourceText';
 
 export interface TranslationProviderRowView {
@@ -66,7 +69,7 @@ export class WebpageTranslationSettingsViewModel {
       return {
         id: provider.id,
         templateId: provider.templateId,
-        title: provider.displayName,
+        title: resolveDisplayedTranslationProviderName(provider.templateId, provider.displayName),
         subtitle: this.buildProviderSubtitle(provider),
         statusText: this.buildProviderStatusText(provider),
         isActive: provider.id === settings.activeProviderId,

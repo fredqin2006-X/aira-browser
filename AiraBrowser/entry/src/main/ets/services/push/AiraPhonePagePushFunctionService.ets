@@ -1,4 +1,5 @@
 import { http } from '@kit.NetworkKit';
+import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 import {
   AIRA_DISTRIBUTION_CAPABILITY_OWNER,
   AIRA_HOSTED_API_BASE_URL
@@ -89,7 +90,7 @@ class NetworkAiraPhonePagePushHttpAdapter implements AiraPhonePagePushHttpAdapte
         const errorResponse: AiraPhonePagePushResponseBody = {
           ok: false,
           code: 'http_error',
-          message: `网页推送服务请求失败（${response.responseCode}）。`
+          message: resolveAppResourceText($r('app.string.page_push_http_failed', response.responseCode))
         };
         return errorResponse;
       }
@@ -123,14 +124,14 @@ export class AiraPhonePagePushFunctionService {
       return {
         ok: false,
         code: 'missing_uid',
-        message: '请先使用华为账号登录后再推送网页。'
+        message: resolveAppResourceText($r('app.string.page_push_sign_in_first'))
       };
     }
     if (!this.isHttpUrl(normalizedUrl)) {
       return {
         ok: false,
         code: 'invalid_url',
-        message: '当前页面不能推送到电脑。'
+        message: resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_004'))
       };
     }
     const normalizedDesktopUrl = this.isHttpUrl(desktopUrl) && desktopUrl.trim() !== normalizedUrl
@@ -155,7 +156,7 @@ export class AiraPhonePagePushFunctionService {
       return {
         ok: false,
         code: 'auth_token_required',
-        message: '请重新登录华为账号后再推送网页。'
+        message: resolveAppResourceText($r('app.string.page_push_sign_in_again'))
       };
     }
     const value = await this.adapter.post(AIRA_PHONE_PAGE_PUSH_ENDPOINT, body, AIRA_PHONE_PAGE_PUSH_TIMEOUT_MS);
@@ -176,14 +177,14 @@ export class AiraPhonePagePushFunctionService {
       return {
         ok: false,
         code: 'personal_server_auth_required',
-        message: '请重新连接私有化部署后再推送网页。'
+        message: resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_012'))
       };
     }
     if (!this.isHttpUrl(normalizedUrl)) {
       return {
         ok: false,
         code: 'invalid_url',
-        message: '当前页面不能推送到电脑。'
+        message: resolveAppResourceText($r('app.string.browser_browser_phone_page_push_coordinator_004'))
       };
     }
     const normalizedDesktopUrl = this.isHttpUrl(desktopUrl) && desktopUrl.trim() !== normalizedUrl
@@ -212,7 +213,7 @@ export class AiraPhonePagePushFunctionService {
       return {
         ok: false,
         code: 'empty_response',
-        message: '网页推送服务没有返回结果。'
+        message: resolveAppResourceText($r('app.string.page_push_empty'))
       };
     }
     if (typeof value === 'string') {
@@ -222,7 +223,7 @@ export class AiraPhonePagePushFunctionService {
         return {
           ok: false,
           code: 'invalid_response',
-          message: '网页推送服务返回的 JSON 无法解析。'
+          message: resolveAppResourceText($r('app.string.page_push_json_invalid'))
         };
       }
     }
@@ -239,7 +240,7 @@ export class AiraPhonePagePushFunctionService {
         return {
           ok: false,
           code: 'invalid_response_body',
-          message: '网页推送服务返回的 body 无法解析。'
+          message: resolveAppResourceText($r('app.string.page_push_body_invalid'))
         };
       }
     }
