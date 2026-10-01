@@ -9509,6 +9509,14 @@
       "value": "繼續閱讀%1$s"
     },
     {
+      "name": "bottom_panel_edit_toolbar",
+      "value": "編輯工具欄"
+    },
+    {
+      "name": "bottom_panel_toolbar_add_empty",
+      "value": "沒有可添加的工具"
+    },
+    {
       "name": "bottom_panel_more_tools",
       "value": "更多瀏覽器工具"
     },

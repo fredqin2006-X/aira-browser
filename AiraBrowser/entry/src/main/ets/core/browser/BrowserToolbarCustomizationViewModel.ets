@@ -292,17 +292,19 @@ export class BrowserToolbarCustomizationViewModel {
   }
 
   normalizeSettings(settings: BrowserToolbarLayoutSettings): BrowserToolbarLayoutSettings {
-    const normalizedActionIds = this.toActionIds(
-      this.toActionIds(settings.primaryActionIds).concat(this.toActionIds(settings.secondaryActionIds))
-    );
+    const normalizedActionIds = this.toActionIds(settings.primaryActionIds);
+    const parkedActionIds = this.toActionIds(settings.secondaryActionIds)
+      .filter((actionId: BrowserBottomAddressPanelActionId): boolean => {
+        return !normalizedActionIds.includes(actionId);
+      });
     const missingActionIds = this.getCatalogActionIds().filter((actionId: BrowserBottomAddressPanelActionId) => {
-      return !normalizedActionIds.includes(actionId);
+      return !normalizedActionIds.includes(actionId) && !parkedActionIds.includes(actionId);
     });
     const normalized = cloneBrowserToolbarLayoutSettings(settings);
     normalized.primaryActionIds = this.toActionIds(
       insertMissingBrowserToolbarActions(normalizedActionIds, missingActionIds)
     );
-    normalized.secondaryActionIds = [];
+    normalized.secondaryActionIds = parkedActionIds;
     normalized.leadingSlotActionId = this.normalizeTapActionId('leading', settings.leadingSlotActionId);
     normalized.menuSlotActionId = this.normalizeTapActionId('menu', settings.menuSlotActionId);
     normalized.refreshSlotActionId = this.normalizeTapActionId('refresh', settings.refreshSlotActionId);
@@ -501,7 +503,8 @@ export class BrowserToolbarCustomizationViewModel {
 
   private isInteractionActionId(actionId: string): boolean {
     return TOOLBAR_CORE_ACTION_IDS.includes(actionId as BrowserToolbarCoreActionId) ||
-      this.getCatalogActionIds().includes(actionId as BrowserBottomAddressPanelActionId);
+      this.getCatalogActionIds().includes(actionId as BrowserBottomAddressPanelActionId) ||
+      actionId === 'settings';
   }
 
   private isCoreActionId(actionId: BrowserToolbarInteractionActionId): boolean {

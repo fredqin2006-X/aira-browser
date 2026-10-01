@@ -232,15 +232,6 @@ export class BrowserBottomAddressPanelViewModel {
         disabledMessage: ''
       },
       {
-        id: 'settings',
-        title: resolveBrowserBottomAddressPanelActionTitle('settings'),
-        trailingText: resolveBrowserBottomAddressPanelActionTrailingText('settings'),
-        icon: $r('sys.symbol.gearshape_fill'),
-        airaIconId: resolveBrowserBottomAddressPanelActionAiraIconId('settings'),
-        enabled: true,
-        disabledMessage: ''
-      },
-      {
         id: 'appProxySettings',
         title: resolveBrowserBottomAddressPanelActionTitle('appProxySettings'),
         trailingText: resolveBrowserBottomAddressPanelActionTrailingText('appProxySettings'),
@@ -570,15 +561,6 @@ export class BrowserBottomAddressPanelViewModel {
         disabledMessage: ''
       },
       {
-        id: 'settings',
-        title: resolveBrowserBottomAddressPanelActionTitle('settings'),
-        trailingText: resolveBrowserBottomAddressPanelActionTrailingText('settings'),
-        icon: $r('sys.symbol.gearshape_fill'),
-        airaIconId: resolveBrowserBottomAddressPanelActionAiraIconId('settings'),
-        enabled: true,
-        disabledMessage: ''
-      },
-      {
         id: 'appProxySettings',
         title: resolveBrowserBottomAddressPanelActionTitle('appProxySettings'),
         trailingText: resolveBrowserBottomAddressPanelActionTrailingText('appProxySettings'),
@@ -620,11 +602,7 @@ export class BrowserBottomAddressPanelViewModel {
     layout: BrowserBottomToolbarLayoutInput
   ): BrowserBottomAddressPanelAction[] {
     const catalog = this.buildActionCatalog(input);
-    return this.resolveActionsByIds(
-      catalog,
-      layout.primaryActionIds.concat(layout.secondaryActionIds),
-      catalog.length
-    );
+    return this.resolveActionsByIds(catalog, layout.primaryActionIds, catalog.length);
   }
 
   private buildActionCatalog(input: BrowserBottomAddressPanelBuildInput): BrowserBottomAddressPanelAction[] {

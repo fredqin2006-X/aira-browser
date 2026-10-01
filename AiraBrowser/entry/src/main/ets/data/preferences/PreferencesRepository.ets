@@ -65,7 +65,6 @@ export const DEFAULT_BROWSER_TOOLBAR_LAYOUT_SETTINGS: BrowserToolbarLayoutSettin
     'openBookmarks',
     'novel',
     'sendToDesktop',
-    'settings',
     'appProxySettings',
     'home',
     'newPrivateTab',
@@ -150,7 +149,6 @@ const BROWSER_TOOLBAR_CONFIGURABLE_ACTION_IDS: string[] = [
   'history',
   'savedPages',
   'downloads',
-  'settings',
   'appProxySettings',
   'newPrivateTab',
   'home'
@@ -1584,16 +1582,21 @@ export class PreferencesRepository {
       DEFAULT_BROWSER_TOOLBAR_LAYOUT_SETTINGS.secondaryActionIds
     );
     const hasStoredActionIds = Array.isArray(settings?.primaryActionIds) || Array.isArray(settings?.secondaryActionIds);
-    const storedActionIds = hasStoredActionIds ?
-      (settings?.primaryActionIds ?? []).concat(settings?.secondaryActionIds ?? []) :
-      fallbackActionIds;
+    const storedPrimaryActionIds = hasStoredActionIds ? (settings?.primaryActionIds ?? []) : fallbackActionIds;
     const primaryActionIds = this.normalizeToolbarActionIdList(
-      storedActionIds,
+      storedPrimaryActionIds,
       fallbackActionIds,
       BROWSER_TOOLBAR_CONFIGURABLE_ACTION_IDS.length
     );
-    const missingActionIds = BROWSER_TOOLBAR_CONFIGURABLE_ACTION_IDS.filter((actionId: string) => {
+    const secondaryActionIds = this.normalizeToolbarActionIdList(
+      hasStoredActionIds ? (settings?.secondaryActionIds ?? []) : [],
+      [],
+      BROWSER_TOOLBAR_CONFIGURABLE_ACTION_IDS.length
+    ).filter((actionId: string): boolean => {
       return !primaryActionIds.includes(actionId);
+    });
+    const missingActionIds = BROWSER_TOOLBAR_CONFIGURABLE_ACTION_IDS.filter((actionId: string) => {
+      return !primaryActionIds.includes(actionId) && !secondaryActionIds.includes(actionId);
     });
     const normalizedActionIds = insertMissingBrowserToolbarActions(
       primaryActionIds,
@@ -1601,7 +1604,7 @@ export class PreferencesRepository {
     );
     return {
       primaryActionIds: normalizedActionIds,
-      secondaryActionIds: [],
+      secondaryActionIds: secondaryActionIds,
       leadingSlotActionId: this.normalizeToolbarSlotActionId(settings?.leadingSlotActionId),
       menuSlotActionId: this.normalizeToolbarSlotActionId(settings?.menuSlotActionId),
       refreshSlotActionId: this.normalizeToolbarSlotActionId(settings?.refreshSlotActionId),
@@ -1719,7 +1722,8 @@ export class PreferencesRepository {
 
   private isToolbarInteractionActionId(actionId: string): boolean {
     return BROWSER_TOOLBAR_CORE_ACTION_IDS.includes(actionId) ||
-      BROWSER_TOOLBAR_CONFIGURABLE_ACTION_IDS.includes(actionId);
+      BROWSER_TOOLBAR_CONFIGURABLE_ACTION_IDS.includes(actionId) ||
+      actionId === 'settings';
   }
 
 

@@ -62,10 +62,11 @@ assertContract(addressPanel.includes('this.buildToolbarSystemSheetOptions()'),
   'Toolbar system Sheet must provide native Sheet options.');
 assertContract(addressPanel.includes('height: fullHeight') &&
   addressPanel.includes('detents: [previewHeight, fullHeight]') &&
-  addressPanel.includes('detentSelection: this.toolbarSystemSheetDetentSelection'),
-  'Toolbar system Sheet must expose native preview and full detents.');
+  addressPanel.includes('detentSelection: this.toolbarSystemSheetEditing ? fullHeight :') &&
+  addressPanel.includes('this.toolbarSystemSheetDetentSelection > 0 ?'),
+  'Toolbar system Sheet must expose native preview and full detents, and edit mode must select the full detent.');
 assertContract(addressPanel.includes('BROWSER_BOTTOM_TOOLBAR_SYSTEM_SHEET_DRAG_BAR_HEIGHT') &&
-  addressPanel.includes('this.resolveReadingContinuationHeight() +\n        BROWSER_BOTTOM_TOOLBAR_SYSTEM_SHEET_DRAG_BAR_HEIGHT') &&
+  addressPanel.includes('this.resolveToolbarSystemSheetHeaderHeight() +\n        BROWSER_BOTTOM_TOOLBAR_SYSTEM_SHEET_DRAG_BAR_HEIGHT') &&
   addressPanel.includes('Math.min(hostHeight, maxPanelHeight) -\n        BROWSER_BOTTOM_TOOLBAR_SYSTEM_SHEET_DRAG_BAR_HEIGHT'),
   'Toolbar Sheet sizing must reserve the native 16vp drag bar in both detents and layout height.');
 assertContract(addressPanel.includes('dragBar: true') && addressPanel.includes('showClose: false'),
@@ -143,6 +144,38 @@ assertContract(addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORN
   addressPanel.includes('cardCornerRadius: toolbarSystemSheetAction ?') &&
   addressPanel.includes('WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS : 0'),
   'Toolbar system Sheet action icons must use rounded rectangles without changing other quick-action surfaces.');
+assertContract(toolbarSheetContent.includes('this.buildToolbarSystemSheetHeaderRow()') &&
+  addressPanel.includes("this.buildToolbarSystemSheetHeaderButton('browser.toolbar.edit', 'browser.toolbar.edit', (): void => {") &&
+  addressPanel.includes('this.enterToolbarSystemSheetEditing();') &&
+  addressPanel.includes("this.buildToolbarSystemSheetHeaderButton('browser.shortcut.settings', 'browser.shortcut.settings', (): void => {") &&
+  addressPanel.includes("this.onAction('settings');") &&
+  addressPanel.includes("this.buildToolbarSystemSheetHeaderButton('browser.toolbar.back', 'browser.toolbar.back', (): void => {") &&
+  addressPanel.includes("this.buildToolbarSystemSheetHeaderButton('toolbar.sheet.done', undefined, (): void => {") &&
+  addressPanel.includes('private buildToolbarSystemSheetHeaderCheckIcon()') &&
+  addressPanel.includes('this.toolbarSystemSheetEditing = true;') &&
+  addressPanel.includes('this.resolveToolbarSystemSheetFullHeight(layoutState);') &&
+  addressPanel.includes('action.reason === DismissReason.PRESS_BACK && this.toolbarSystemSheetEditing') &&
+  addressPanel.includes('this.exitToolbarSystemSheetEditing();') &&
+  addressPanel.includes('this.resolveToolbarSystemSheetPreviewHeight(layoutState);') &&
+  addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_PRESSED_SCALE: number = 0.94;') &&
+  addressPanel.includes('this.toolbarSystemSheetHeaderPressedIconId === pressKey') &&
+  addressPanel.includes('removeBadgeVisible: toolbarSystemSheetAction && this.toolbarSystemSheetEditing') &&
+  addressPanel.includes('ButtonType.Circle') &&
+  addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BUTTON_SIZE: number = 48;') &&
+  addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ICON_SIZE: number = 22;') &&
+  addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP: number = 20;') &&
+  addressPanel.includes('margin({ bottom: WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP })') &&
+  addressPanel.includes('this.resolveToolbarSystemSheetHeaderHeight()') &&
+  addressPanel.includes('this.buildToolbarSystemSheetReadingCapsule()') &&
+  addressPanel.includes('WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT / 2'),
+  'Toolbar system Sheet header edit expands to the full detent with remove badges, settings opens the app settings page, and continue-reading sits in a capsule between the header buttons.');
+assertContract(quickActionCard.includes('@Prop removeBadgeVisible: boolean = false;') &&
+  quickActionCard.includes("const HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_COLOR: string = '#FF3B30';") &&
+  quickActionCard.includes('const HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_SIZE: number = 26;') &&
+  quickActionCard.includes('x: HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_OUTSET') &&
+  quickActionCard.includes('y: -HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_OUTSET') &&
+  quickActionCard.includes('private buildQuickActionRemoveBadge()'),
+  'Toolbar edit mode must draw a larger red remove badge on the outside top-right corner of each action tile.');
 assertContract(quickActionCard.includes('@Prop cardCornerRadius: number = 0;') &&
   quickActionCard.includes('this.cardCornerRadius > 0'),
   'Shared quick-action cards must keep circles by default and support an explicit rounded-rectangle radius.');

@@ -1,5 +1,10 @@
 import { BrowserAddressBarTabSwipeEvent } from '../../../core/browser/BrowserAddressBarTabSwipePolicy';
 import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
+import { cloneBrowserToolbarLayoutSettings } from '../../../core/browser/BrowserSplitToolbarCustomizationPolicy';
+import {
+  browserSheetHeaderBlurModifier,
+  resolveBrowserSheetHeaderBlurRadius
+} from './BrowserModalBottomSheet';
 import {
   BrowserBottomAddressPanelAction,
   BrowserBottomAddressPanelActionId,
@@ -236,6 +241,26 @@ const WEB_BOTTOM_READING_CONTINUATION_ICON_SIZE: number = 22;
 const WEB_BOTTOM_READING_CONTINUATION_TRAILING_ICON_SIZE: number = 16;
 const WEB_BOTTOM_READING_CONTINUATION_HORIZONTAL_PADDING: number = 16;
 const WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS: number = 16;
+const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BUTTON_SIZE: number = 48;
+const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ICON_SIZE: number = 22;
+const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ROW_HEIGHT: number = 48;
+const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP: number = 20;
+const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_HORIZONTAL_PADDING: number = 16;
+const WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT: number = 48;
+const WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_ICON_SIZE: number = 22;
+const WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_GAP: number = 10;
+const WEB_BOTTOM_TOOLBAR_EDIT_ADD_CAPSULE_WIDTH: number = 128;
+const WEB_BOTTOM_TOOLBAR_EDIT_ADD_CAPSULE_HEIGHT: number = 48;
+const WEB_BOTTOM_TOOLBAR_EDIT_ADD_ROW_HEIGHT: number = 72;
+const WEB_BOTTOM_TOOLBAR_ADD_SHEET_MIN_SCREEN_RATIO: number = 0.34;
+const WEB_BOTTOM_TOOLBAR_ADD_SHEET_MAX_SCREEN_RATIO: number = 0.68;
+const WEB_BOTTOM_TOOLBAR_ADD_SHEET_ENTER_OFFSET: number = 320;
+const WEB_BOTTOM_TOOLBAR_ADD_SHEET_TOP_SPACE: number = 28;
+const WEB_BOTTOM_TOOLBAR_ADD_SHEET_BOTTOM_SAFE: number = 56;
+const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_PRESSED_SCALE: number = 0.94;
+const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_PRESS_DURATION_MS: number = 90;
+const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_RELEASE_DURATION_MS: number = 260;
+const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_RELEASE_CURVE: string = 'interpolatingSpring(0, 1, 360, 24)';
 function buildDefaultBrowserBottomAddressPanelActionInput(): BrowserBottomAddressPanelBuildInput {
   return {
     chromeIconTone: 'light',
@@ -342,6 +367,21 @@ export struct BrowserBottomAddressPanel {
   @State private floatingActionSurfacePrepared: boolean = false;
   @State private toolbarSystemSheetVisible: boolean = false;
   @State private toolbarSystemSheetDetentSelection: Length = 0;
+  @State private toolbarSystemSheetEditing: boolean = false;
+  @State private toolbarAddSheetVisible: boolean = false;
+  @State private toolbarAddSheetReveal: number = 0;
+  @State private toolbarAddSheetScrollOffset: number = 0;
+  private toolbarAddSheetClosing: boolean = false;
+  private toolbarAddSheetScroller: Scroller = new Scroller();
+  private toolbarAddSheetSession: number = 0;
+  @State private toolbarParkedActionIds: BrowserBottomAddressPanelActionId[] = [];
+  @State private toolbarSheetVisibleActions: BrowserBottomAddressPanelAction[] = [];
+  @State private toolbarParkedActions: BrowserBottomAddressPanelAction[] = [];
+  @State private toolbarSystemSheetHeaderPressedIconId: string = '';
+  private toolbarSystemSheetLockedLayout: BrowserBottomToolbarQuickActionLayoutState | undefined = undefined;
+  private toolbarSystemSheetLockedLayoutKey: string = '';
+  private toolbarSystemSheetLockedPreviewHeight: number = 0;
+  private toolbarSystemSheetLockedFullHeight: number = 0;
   @State private floatingActionContentSettled: boolean = false;
   @State private floatingActionContentGestureRevealed: boolean = false;
   /**
@@ -540,6 +580,7 @@ export struct BrowserBottomAddressPanel {
   onKeyboardResizeSessionEnd: () => void = () => {};
 
   aboutToAppear(): void {
+    this.toolbarParkedActionIds = this.readStoredParkedActionIds();
     this.handledFloatingToolbarSearchOpenRequestVersion = this.floatingToolbarSearchOpenRequestVersion;
     this.floatingToolbarSearchRequestReady = true;
     this.requestedAddressFocused = false;
@@ -600,6 +641,9 @@ export struct BrowserBottomAddressPanel {
     this.floatingActionSurfacePrepared = false;
     this.toolbarSystemSheetVisible = false;
     this.toolbarSystemSheetDetentSelection = 0;
+    this.clearToolbarSystemSheetPresentationLock();
+    this.toolbarSystemSheetEditing = false;
+    this.resetToolbarAddSheet();
     this.pendingToolbarSystemSheetAction = undefined;
     this.floatingActionContentSettled = false;
     this.floatingActionContentGestureRevealed = false;
@@ -819,8 +863,9 @@ export struct BrowserBottomAddressPanel {
       preferType: SheetType.BOTTOM,
       height: fullHeight,
       detents: [previewHeight, fullHeight],
-      detentSelection: this.toolbarSystemSheetDetentSelection > 0 ?
-        this.toolbarSystemSheetDetentSelection : previewHeight,
+      detentSelection: this.toolbarSystemSheetEditing ? fullHeight :
+        this.toolbarSystemSheetDetentSelection > 0 ?
+          this.toolbarSystemSheetDetentSelection : previewHeight,
       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
       dragBar: true,
       showClose: false,
@@ -828,6 +873,16 @@ export struct BrowserBottomAddressPanel {
       blurStyle: BlurStyle.NONE,
       radiusRenderStrategy: RenderStrategy.OFFSCREEN,
       onWillDismiss: (action: DismissSheetAction): void => {
+        // Editing is an inner state of the open sheet. System back leaves that state and
+        // returns the sheet to its resting detent instead of closing it.
+        if (action.reason === DismissReason.PRESS_BACK && this.toolbarAddSheetVisible) {
+          this.closeToolbarAddSheet();
+          return;
+        }
+        if (action.reason === DismissReason.PRESS_BACK && this.toolbarSystemSheetEditing) {
+          this.exitToolbarSystemSheetEditing();
+          return;
+        }
         // Native interactive dismissal can finish its $$ writeback after the exit animation.
         // Clear the binding before it starts so a scrolling-page redraw cannot resubmit show=true.
         this.toolbarSystemSheetVisible = false;
@@ -856,29 +911,282 @@ export struct BrowserBottomAddressPanel {
       bottomPadding: 0,
       surfaceColor: this.storedPageBackgroundColor
     }) {
-      ForEach([this.resolveToolbarRenderSnapshot().layoutState],
+      ForEach([this.resolveToolbarSystemSheetPresentedLayoutState()],
         (layoutState: BrowserBottomToolbarQuickActionLayoutState) => {
-          Column({ space: 0 }) {
-            if (this.shouldShowReadingContinuation()) {
-              this.buildReadingContinuationRow()
+          Stack({ alignContent: Alignment.Bottom }) {
+            Column({ space: 0 }) {
+              this.buildToolbarSystemSheetHeaderRow()
+              this.buildToolbarSystemSheetActionGrid(
+                this.toolbarSheetVisibleActions,
+                layoutState
+              )
+              if (this.toolbarSystemSheetEditing) {
+                this.buildToolbarEditAddCapsule()
+              }
             }
-            this.buildToolbarSystemSheetActionGrid(
-              this.resolveToolbarRenderSnapshot().actions,
-              layoutState
-            )
+            .width('100%')
+            .height('100%')
+            .padding({
+              top: layoutState.surfaceVerticalPadding,
+              bottom: layoutState.surfaceVerticalPadding
+            })
+            .hitTestBehavior(this.toolbarAddSheetVisible ? HitTestMode.None : HitTestMode.Default)
+            if (this.toolbarAddSheetVisible) {
+              this.buildToolbarParkedSheet(layoutState)
+            }
           }
           .width('100%')
           .height('100%')
-          .padding({
-            top: layoutState.surfaceVerticalPadding,
-            bottom: layoutState.surfaceVerticalPadding
-          })
         }, (_layoutState: BrowserBottomToolbarQuickActionLayoutState) =>
-          this.resolveToolbarRenderSnapshot().layoutRenderKey)
+          this.resolveToolbarSystemSheetPresentedLayoutKey())
     }
   }
 
+  @Builder
+  private buildToolbarSystemSheetHeaderRow() {
+    Row() {
+      if (this.toolbarSystemSheetEditing) {
+        this.buildToolbarSystemSheetHeaderButton('browser.toolbar.back', 'browser.toolbar.back', (): void => {
+          this.exitToolbarSystemSheetEditing();
+        })
+      } else {
+        this.buildToolbarSystemSheetHeaderButton('browser.toolbar.edit', 'browser.toolbar.edit', (): void => {
+          this.enterToolbarSystemSheetEditing();
+        })
+      }
+      if (this.toolbarSystemSheetEditing) {
+        this.buildToolbarSystemSheetEditingTitle()
+      } else if (this.shouldShowReadingContinuation()) {
+        this.buildToolbarSystemSheetReadingCapsule()
+      } else {
+        Blank().layoutWeight(1)
+      }
+      if (this.toolbarSystemSheetEditing) {
+        this.buildToolbarSystemSheetHeaderButton('toolbar.sheet.done', undefined, (): void => {
+          this.exitToolbarSystemSheetEditing();
+        })
+      } else {
+        this.buildToolbarSystemSheetHeaderButton('browser.shortcut.settings', 'browser.shortcut.settings', (): void => {
+          this.openAppSettingsFromToolbarSheetHeader();
+        })
+      }
+    }
+    .width('100%')
+    .height(WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ROW_HEIGHT)
+    .padding({
+      left: WEB_BOTTOM_TOOLBAR_SHEET_HEADER_HORIZONTAL_PADDING,
+      right: WEB_BOTTOM_TOOLBAR_SHEET_HEADER_HORIZONTAL_PADDING
+    })
+    .justifyContent(FlexAlign.SpaceBetween)
+    .alignItems(VerticalAlign.Center)
+    .margin({ bottom: WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP })
+  }
+
+  @Builder
+  private buildToolbarSystemSheetReadingCapsule() {
+    Button({ type: ButtonType.Normal }) {
+      Row({ space: 8 }) {
+        AiraIcon({
+          airaIconId: 'browser.toolbar.reader',
+          iconSize: WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_ICON_SIZE,
+          iconColor: this.resolveItemTextColor(true)
+        })
+        Text(this.liveReadingContinuation.title)
+          .layoutWeight(1)
+          .fontSize(15)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(this.resolveItemTextColor(true))
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+        if (this.liveReadingContinuation.loading) {
+          LoadingProgress()
+            .width(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_ICON_SIZE)
+            .height(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_ICON_SIZE)
+            .color(this.resolveItemTextColor(true))
+        } else {
+          AiraIcon({
+            airaIconId: 'browser.toolbar.back',
+            iconSize: WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_ICON_SIZE,
+            iconColor: this.resolveItemTextColor(true)
+          })
+            .rotate({ angle: 180 })
+        }
+      }
+      .width('100%')
+      .height('100%')
+      .padding({ left: 12, right: 10 })
+      .alignItems(VerticalAlign.Center)
+    }
+    .layoutWeight(1)
+    .height(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT)
+    .margin({
+      left: WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_GAP,
+      right: WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_GAP
+    })
+    .padding(0)
+    .backgroundColor(resolveBrowserBottomToolbarSheetActionColor(this.resolveNeutralThemeMode()))
+    .borderRadius(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT / 2)
+    .stateEffect(false)
+    .enabled(!this.liveReadingContinuation.loading)
+    .accessibilityText(bottomPanelContinueReadingA11y(this.liveReadingContinuation.title))
+    .onClick((): void => {
+      this.onContinueReading();
+    })
+  }
+
+  @Builder
+  private buildToolbarSystemSheetEditingTitle() {
+    Text($r('app.string.bottom_panel_edit_toolbar'))
+      .layoutWeight(1)
+      .fontSize(22)
+      .fontWeight(FontWeight.Bold)
+      .fontColor(this.resolveItemTextColor(true))
+      .textAlign(TextAlign.Center)
+      .maxLines(1)
+      .textOverflow({ overflow: TextOverflow.Ellipsis })
+  }
+
+  @Builder
+  private buildToolbarSystemSheetHeaderButton(
+    pressKey: string,
+    iconId: AiraRenderableIconId | undefined,
+    onHeaderAction: () => void
+  ) {
+    Button() {
+      if (iconId === undefined) {
+        this.buildToolbarSystemSheetHeaderCheckIcon()
+      } else {
+        AiraIcon({
+          airaIconId: iconId,
+          iconSize: WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ICON_SIZE,
+          iconColor: resolveBrowserBottomExpandedToolbarActionIconColor(this.resolveNeutralThemeMode())
+        })
+      }
+    }
+    .width(WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BUTTON_SIZE)
+    .height(WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BUTTON_SIZE)
+    .type(ButtonType.Circle)
+    .padding(0)
+    .backgroundColor(resolveBrowserBottomToolbarSheetActionColor(this.resolveNeutralThemeMode()))
+    .stateEffect(false)
+    .scale({
+      x: this.resolveToolbarSystemSheetHeaderPressedScale(pressKey),
+      y: this.resolveToolbarSystemSheetHeaderPressedScale(pressKey)
+    })
+    .animation({
+      duration: this.toolbarSystemSheetHeaderPressedIconId === pressKey ?
+        WEB_BOTTOM_TOOLBAR_SHEET_HEADER_PRESS_DURATION_MS :
+        WEB_BOTTOM_TOOLBAR_SHEET_HEADER_RELEASE_DURATION_MS,
+      curve: this.toolbarSystemSheetHeaderPressedIconId === pressKey ? Curve.EaseOut :
+        WEB_BOTTOM_TOOLBAR_SHEET_HEADER_RELEASE_CURVE
+    })
+    .onTouch((event: TouchEvent): void => {
+      this.updateToolbarSystemSheetHeaderPressed(pressKey, event.type);
+    })
+    .onClick((): void => {
+      onHeaderAction();
+    })
+  }
+
+  @Builder
+  private buildToolbarSystemSheetHeaderCheckIcon() {
+    Polyline()
+      .width(WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ICON_SIZE)
+      .height(WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ICON_SIZE)
+      .points([[4, 11], [9, 16], [18, 6]])
+      .fill(Color.Transparent)
+      .stroke(resolveBrowserBottomExpandedToolbarActionIconColor(this.resolveNeutralThemeMode()))
+      .strokeWidth(2)
+      .strokeLineCap(LineCapStyle.Round)
+      .strokeLineJoin(LineJoinStyle.Round)
+  }
+
+  private resolveToolbarSystemSheetHeaderPressedScale(pressKey: string): number {
+    return this.toolbarSystemSheetHeaderPressedIconId === pressKey ?
+      WEB_BOTTOM_TOOLBAR_SHEET_HEADER_PRESSED_SCALE : 1;
+  }
+
+  private updateToolbarSystemSheetHeaderPressed(pressKey: string, type: TouchType): void {
+    if (type === TouchType.Down) {
+      this.toolbarSystemSheetHeaderPressedIconId = pressKey;
+      return;
+    }
+    if (type === TouchType.Up || type === TouchType.Cancel) {
+      this.toolbarSystemSheetHeaderPressedIconId = '';
+    }
+  }
+
+  private enterToolbarSystemSheetEditing(): void {
+    const layoutState = this.resolveToolbarRenderSnapshot().layoutState;
+    this.toolbarSystemSheetEditing = true;
+    this.toolbarSystemSheetDetentSelection = this.resolveToolbarSystemSheetFullHeight(layoutState);
+  }
+
+  private exitToolbarSystemSheetEditing(): void {
+    const layoutState = this.resolveToolbarRenderSnapshot().layoutState;
+    this.toolbarSystemSheetHeaderPressedIconId = '';
+    this.resetToolbarAddSheet();
+    this.toolbarSystemSheetEditing = false;
+    this.toolbarSystemSheetDetentSelection = this.resolveToolbarSystemSheetPreviewHeight(layoutState);
+  }
+
+  private openAppSettingsFromToolbarSheetHeader(): void {
+    this.pendingToolbarSystemSheetAction = undefined;
+    this.toolbarSystemSheetVisible = false;
+    this.onAction('settings');
+  }
+
+  private resolveToolbarSystemSheetHeaderHeight(): number {
+    return WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ROW_HEIGHT + WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP;
+  }
+
+  private resolveToolbarSystemSheetPresentedLayoutState(): BrowserBottomToolbarQuickActionLayoutState {
+    const fullActionCount = this.resolveToolbarSystemSheetFullActionCount();
+    if (fullActionCount > 0) {
+      return this.buildFloatingQuickActionLayoutState(fullActionCount);
+    }
+    return this.resolveToolbarRenderSnapshot().layoutState;
+  }
+
+  private resolveToolbarSystemSheetFullActionCount(): number {
+    const displayedCount = this.toolbarSheetVisibleActions.length + this.toolbarParkedActions.length;
+    if (displayedCount > 0) {
+      return displayedCount;
+    }
+    return this.resolveToolbarRenderSnapshot().actions.length + this.toolbarParkedActionIds.length;
+  }
+
+  private resolveToolbarSystemSheetPresentedLayoutKey(): string {
+    const layoutState = this.resolveToolbarSystemSheetPresentedLayoutState();
+    return `toolbar-sheet-columns=${layoutState.columnCount}:rows=${layoutState.rowCount}:` +
+      `button=${this.roundLayoutValue(layoutState.buttonSize)}`;
+  }
+
+  private lockToolbarSystemSheetPresentation(): void {
+    const snapshot = this.resolveToolbarRenderSnapshot();
+    this.toolbarSystemSheetLockedLayout = snapshot.layoutState;
+    this.toolbarSystemSheetLockedLayoutKey = snapshot.layoutRenderKey;
+    this.toolbarSystemSheetLockedPreviewHeight = this.measureToolbarSystemSheetPreviewHeight(snapshot.layoutState);
+    this.toolbarSystemSheetLockedFullHeight = this.measureToolbarSystemSheetFullHeight(snapshot.layoutState);
+  }
+
+  private clearToolbarSystemSheetPresentationLock(): void {
+    this.toolbarSystemSheetLockedLayout = undefined;
+    this.toolbarSystemSheetLockedLayoutKey = '';
+    this.toolbarSystemSheetLockedPreviewHeight = 0;
+    this.toolbarSystemSheetLockedFullHeight = 0;
+  }
+
   private resolveToolbarSystemSheetPreviewHeight(
+    layoutState: BrowserBottomToolbarQuickActionLayoutState
+  ): number {
+    if (this.toolbarSystemSheetLockedPreviewHeight > 0) {
+      return this.toolbarSystemSheetLockedPreviewHeight;
+    }
+    return this.measureToolbarSystemSheetPreviewHeight(layoutState);
+  }
+
+  private measureToolbarSystemSheetPreviewHeight(
     layoutState: BrowserBottomToolbarQuickActionLayoutState
   ): number {
     const previewRows = Math.min(3, layoutState.rowCount);
@@ -889,19 +1197,447 @@ export struct BrowserBottomAddressPanel {
     return Math.max(1,
       gridHeight +
         layoutState.surfaceVerticalPadding * 2 +
-        this.resolveReadingContinuationHeight() +
+        this.resolveToolbarSystemSheetHeaderHeight() +
         BROWSER_BOTTOM_TOOLBAR_SYSTEM_SHEET_DRAG_BAR_HEIGHT);
   }
 
   private resolveToolbarSystemSheetFullHeight(
     layoutState: BrowserBottomToolbarQuickActionLayoutState
   ): number {
+    if (this.toolbarSystemSheetLockedFullHeight > 0) {
+      return this.toolbarSystemSheetLockedFullHeight;
+    }
+    return this.measureToolbarSystemSheetFullHeight(layoutState);
+  }
+
+  private measureToolbarSystemSheetFullHeight(
+    layoutState: BrowserBottomToolbarQuickActionLayoutState
+  ): number {
     return Math.max(
-      this.resolveToolbarSystemSheetPreviewHeight(layoutState) + 1,
+      this.measureToolbarSystemSheetPreviewHeight(layoutState) + 1,
       layoutState.fullSurfaceHeight +
-        this.resolveReadingContinuationHeight() +
+        this.resolveToolbarSystemSheetHeaderHeight() +
+        WEB_BOTTOM_TOOLBAR_EDIT_ADD_ROW_HEIGHT +
         BROWSER_BOTTOM_TOOLBAR_SYSTEM_SHEET_DRAG_BAR_HEIGHT
     );
+  }
+
+  @Builder
+  private buildToolbarEditAddCapsule() {
+    Row() {
+      Button({ type: ButtonType.Normal }) {
+        AiraIcon({
+          airaIconId: 'browser.tabs.add',
+          iconSize: WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ICON_SIZE,
+          iconColor: resolveBrowserBottomExpandedToolbarActionIconColor(this.resolveNeutralThemeMode())
+        })
+      }
+      .width(WEB_BOTTOM_TOOLBAR_EDIT_ADD_CAPSULE_WIDTH)
+      .height(WEB_BOTTOM_TOOLBAR_EDIT_ADD_CAPSULE_HEIGHT)
+      .borderRadius(WEB_BOTTOM_TOOLBAR_EDIT_ADD_CAPSULE_HEIGHT / 2)
+      .backgroundColor(resolveBrowserBottomToolbarSheetActionColor(this.resolveNeutralThemeMode()))
+      .stateEffect(false)
+      .onClick((): void => {
+        this.openToolbarAddSheet();
+      })
+    }
+    .width('100%')
+    .height(WEB_BOTTOM_TOOLBAR_EDIT_ADD_ROW_HEIGHT)
+    .justifyContent(FlexAlign.Center)
+  }
+
+  @Builder
+  private buildToolbarParkedSheet(layoutState: BrowserBottomToolbarQuickActionLayoutState) {
+    Stack({ alignContent: Alignment.Bottom }) {
+      Scroll() {
+        Column()
+          .width('100%')
+          .height('100%')
+      }
+      .width('100%')
+      .height('100%')
+      .scrollable(ScrollDirection.Vertical)
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+      .nestedScroll({
+        scrollForward: NestedScrollMode.SELF_ONLY,
+        scrollBackward: NestedScrollMode.SELF_ONLY
+      })
+      .backgroundColor('#66000000')
+      .opacity(this.toolbarAddSheetReveal)
+      .hitTestBehavior(HitTestMode.Default)
+      .onClick((): void => {
+        this.closeToolbarAddSheet();
+      })
+      Stack({ alignContent: Alignment.Top }) {
+        if (this.toolbarParkedActions.length <= 0) {
+          Scroll() {
+            Column() {
+              Text($r('app.string.bottom_panel_toolbar_add_empty'))
+                .fontSize(16)
+                .fontColor(this.resolveItemTextColor(false))
+                .textAlign(TextAlign.Center)
+            }
+            .width('100%')
+            .height('100%')
+            .justifyContent(FlexAlign.Center)
+          }
+          .width('100%')
+          .height('100%')
+          .scrollable(ScrollDirection.Vertical)
+          .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+          .nestedScroll({
+            scrollForward: NestedScrollMode.SELF_ONLY,
+            scrollBackward: NestedScrollMode.SELF_ONLY
+          })
+          .hitTestBehavior(HitTestMode.Default)
+        } else {
+          this.buildToolbarParkedActionGrid(layoutState)
+        }
+        Row() {
+          Row()
+            .width(36)
+            .height(4)
+            .borderRadius(2)
+            .backgroundColor(this.resolveItemTextColor(false))
+            .opacity(0.45)
+        }
+        .width('100%')
+        .height(28)
+        .justifyContent(FlexAlign.Center)
+        .hitTestBehavior(HitTestMode.None)
+      }
+      .width('100%')
+      .height(this.resolveToolbarParkedSheetHeight(layoutState))
+      .clip(true)
+      .hitTestBehavior(HitTestMode.Default)
+      .backgroundColor(this.storedPageBackgroundColor)
+      .borderRadius({ topLeft: 28, topRight: 28 })
+      .shadow({ radius: 24, color: '#33000000', offsetY: -6 })
+      .translate({ y: (1 - this.toolbarAddSheetReveal) * WEB_BOTTOM_TOOLBAR_ADD_SHEET_ENTER_OFFSET })
+    }
+    .width('100%')
+    .height('100%')
+    .hitTestBehavior(HitTestMode.Default)
+  }
+
+  @Builder
+  private buildToolbarParkedActionGrid(layoutState: BrowserBottomToolbarQuickActionLayoutState) {
+    List({ scroller: this.toolbarAddSheetScroller, space: layoutState.rowGap }) {
+      ForEach(this.resolveToolbarAddSheetLaneIndexes(layoutState.columnCount),
+        (index: number) => {
+          ListItem() {
+            Row()
+              .width('100%')
+              .height(WEB_BOTTOM_TOOLBAR_ADD_SHEET_TOP_SPACE)
+          }
+          .width('100%')
+          .height(WEB_BOTTOM_TOOLBAR_ADD_SHEET_TOP_SPACE)
+        }, (index: number) => `add-sheet-top-${index}`)
+      ForEach(this.toolbarParkedActions, (item: BrowserBottomAddressPanelAction) => {
+        ListItem() {
+          Row() {
+            HomeSearchQuickActionCard({
+              imageIcon: item.imageIcon,
+              airaIconId: this.resolveActionAiraIconId(item),
+              label: item.title,
+              cardEnabled: item.enabled,
+              cardImageFillColor: this.resolveToolbarSystemSheetActionIconColor(item),
+              cardLabelColor: this.resolveItemTextColor(item.enabled),
+              cardBackgroundColor: this.resolveToolbarSystemSheetActionBackgroundColor(item),
+              cardDisabledOpacity: 1,
+              cardBorderWidth: 0,
+              cardCornerRadius: WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS,
+              addBadgeVisible: true,
+              buttonSize: layoutState.buttonSize,
+              imageRenderVersion: this.resolveActionRenderVersion(item),
+              onBadge: (): void => {
+                this.restoreToolbarSheetAction(item.id);
+              }
+            })
+          }
+          .width(this.resolveToolbarSystemSheetActionCellWidth(layoutState))
+          .height(layoutState.cardHeight)
+          .justifyContent(FlexAlign.Center)
+        }
+        .width('100%')
+        .height(layoutState.cardHeight)
+      }, (item: BrowserBottomAddressPanelAction) => item.id)
+      ForEach(this.resolveToolbarAddSheetLaneIndexes(
+        this.resolveToolbarAddSheetBottomSpacerCount(layoutState.columnCount, this.toolbarParkedActions.length)),
+        (index: number) => {
+          ListItem() {
+            Row()
+              .width('100%')
+              .height(this.resolveToolbarAddSheetBottomSpacerHeight(
+                index, layoutState.columnCount, this.toolbarParkedActions.length, layoutState.cardHeight))
+          }
+          .width('100%')
+          .height(this.resolveToolbarAddSheetBottomSpacerHeight(
+            index, layoutState.columnCount, this.toolbarParkedActions.length, layoutState.cardHeight))
+        }, (index: number) => `add-sheet-bottom-${index}`)
+    }
+    .width('100%')
+    .height('100%')
+    .lanes(layoutState.columnCount, layoutState.columnGap)
+    .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+    .nestedScroll({
+      scrollForward: NestedScrollMode.SELF_ONLY,
+      scrollBackward: NestedScrollMode.SELF_ONLY
+    })
+    .clip(false)
+    .onDidScroll((): void => {
+      this.toolbarAddSheetScrollOffset = this.toolbarAddSheetScroller.currentOffset().yOffset;
+    })
+    .attributeModifier(browserSheetHeaderBlurModifier(
+      resolveBrowserSheetHeaderBlurRadius(this.toolbarAddSheetScrollOffset)
+    ))
+    .padding({
+      left: BROWSER_BOTTOM_QUICK_ACTION_GROUP_HORIZONTAL_PADDING,
+      right: BROWSER_BOTTOM_QUICK_ACTION_GROUP_HORIZONTAL_PADDING
+    })
+  }
+
+  private resolveToolbarAddSheetLaneIndexes(count: number): number[] {
+    const indexes: number[] = [];
+    const safeCount = Math.max(0, Math.floor(count));
+    for (let index = 0; index < safeCount; index += 1) {
+      indexes.push(index);
+    }
+    return indexes;
+  }
+
+  private resolveToolbarAddSheetBottomSpacerCount(columnCount: number, actionCount: number): number {
+    const columns = Math.max(1, Math.floor(columnCount));
+    const remainder = Math.max(0, actionCount) % columns;
+    const fill = remainder === 0 ? 0 : columns - remainder;
+    return fill + columns;
+  }
+
+  private resolveToolbarAddSheetBottomSpacerHeight(
+    index: number,
+    columnCount: number,
+    actionCount: number,
+    cardHeight: number
+  ): number {
+    const columns = Math.max(1, Math.floor(columnCount));
+    const remainder = Math.max(0, actionCount) % columns;
+    const fill = remainder === 0 ? 0 : columns - remainder;
+    return index < fill ? cardHeight : WEB_BOTTOM_TOOLBAR_ADD_SHEET_BOTTOM_SAFE;
+  }
+
+  private resolveToolbarSheetVisibleActions(): BrowserBottomAddressPanelAction[] {
+    return this.resolveToolbarRenderSnapshot().actions.filter((action: BrowserBottomAddressPanelAction): boolean => {
+      return this.toolbarParkedActionIds.indexOf(action.id) < 0;
+    });
+  }
+
+  private resolveToolbarActionCatalog(): BrowserBottomAddressPanelAction[] {
+    const actionIds: BrowserBottomAddressPanelActionId[] = [];
+    this.resolveToolbarRenderSnapshot().actions.forEach((action: BrowserBottomAddressPanelAction): void => {
+      actionIds.push(action.id);
+    });
+    this.toolbarParkedActionIds.forEach((actionId: BrowserBottomAddressPanelActionId): void => {
+      if (actionIds.indexOf(actionId) < 0) {
+        actionIds.push(actionId);
+      }
+    });
+    return this.viewModel.buildQuickActionsByLayout(this.buildActionInput(), {
+      primaryActionIds: actionIds,
+      secondaryActionIds: []
+    });
+  }
+
+  private resolveToolbarParkedActions(): BrowserBottomAddressPanelAction[] {
+    const catalog = this.resolveToolbarActionCatalog();
+    const parked: BrowserBottomAddressPanelAction[] = [];
+    this.toolbarParkedActionIds.forEach((actionId: BrowserBottomAddressPanelActionId): void => {
+      const action = catalog.find((item: BrowserBottomAddressPanelAction): boolean => item.id === actionId);
+      if (action !== undefined) {
+        parked.push(action);
+      }
+    });
+    return parked;
+  }
+
+  private resolveToolbarSheetGridHeight(
+    layoutState: BrowserBottomToolbarQuickActionLayoutState,
+    actionCount: number
+  ): number {
+    const columns = Math.max(1, Math.floor(layoutState.columnCount));
+    const rows = Math.ceil(Math.max(0, actionCount) / columns);
+    if (rows <= 0) {
+      return 0;
+    }
+    return rows * layoutState.cardHeight +
+      Math.max(0, rows - 1) * layoutState.rowGap +
+      layoutState.groupVerticalPadding * 2;
+  }
+
+  private resetToolbarAddSheet(): void {
+    this.toolbarAddSheetSession += 1;
+    this.toolbarAddSheetClosing = false;
+    this.toolbarAddSheetReveal = 0;
+    this.toolbarAddSheetScrollOffset = 0;
+    this.toolbarAddSheetVisible = false;
+  }
+
+  private openToolbarAddSheet(): void {
+    if (this.toolbarAddSheetVisible) {
+      return;
+    }
+    this.toolbarAddSheetClosing = false;
+    this.toolbarAddSheetReveal = 0;
+    this.toolbarAddSheetScrollOffset = 0;
+    this.toolbarAddSheetVisible = true;
+    this.getUIContext().animateTo({
+      duration: 280,
+      curve: Curve.EaseOut
+    }, (): void => {
+      this.toolbarAddSheetReveal = 1;
+    });
+  }
+
+  private closeToolbarAddSheet(): void {
+    if (!this.toolbarAddSheetVisible || this.toolbarAddSheetClosing) {
+      return;
+    }
+    this.toolbarAddSheetClosing = true;
+    const session = this.toolbarAddSheetSession;
+    this.getUIContext().animateTo({
+      duration: 220,
+      curve: Curve.EaseIn,
+      onFinish: (): void => {
+        if (session !== this.toolbarAddSheetSession) {
+          return;
+        }
+        this.toolbarAddSheetVisible = false;
+        this.toolbarAddSheetReveal = 0;
+        this.toolbarAddSheetScrollOffset = 0;
+        this.toolbarAddSheetClosing = false;
+      }
+    }, (): void => {
+      this.toolbarAddSheetReveal = 0;
+    });
+  }
+
+  private resolveToolbarAddSheetScreenHeight(): number {
+    if (this.livePanelMotionState.overlayHostHeight > 0) {
+      return this.livePanelMotionState.overlayHostHeight;
+    }
+    if (this.livePanelMotionState.panelHeight > 0) {
+      return this.livePanelMotionState.panelHeight;
+    }
+    return Math.max(1, this.responsiveState.panelMaxHeight);
+  }
+
+  private resolveToolbarParkedSheetHeight(layoutState: BrowserBottomToolbarQuickActionLayoutState): number {
+    const screenHeight = this.resolveToolbarAddSheetScreenHeight();
+    const minHeight = Math.max(1, screenHeight * WEB_BOTTOM_TOOLBAR_ADD_SHEET_MIN_SCREEN_RATIO);
+    const maxHeight = Math.max(minHeight, screenHeight * WEB_BOTTOM_TOOLBAR_ADD_SHEET_MAX_SCREEN_RATIO);
+    const gridHeight = this.resolveToolbarSheetGridHeight(layoutState, this.toolbarParkedActions.length);
+    const contentHeight = WEB_BOTTOM_TOOLBAR_ADD_SHEET_TOP_SPACE +
+      WEB_BOTTOM_TOOLBAR_ADD_SHEET_BOTTOM_SAFE + gridHeight;
+    return Math.min(maxHeight, Math.max(minHeight, contentHeight));
+  }
+
+  private readStoredParkedActionIds(): BrowserBottomAddressPanelActionId[] {
+    return sharedPreferencesRepository.getPreferences().toolbarLayout.secondaryActionIds
+      .map((actionId: string): BrowserBottomAddressPanelActionId => actionId as BrowserBottomAddressPanelActionId);
+  }
+
+  private parkToolbarSheetAction(item: BrowserBottomAddressPanelAction): void {
+    const index = this.toolbarSheetVisibleActions.findIndex(
+      (action: BrowserBottomAddressPanelAction): boolean => action.id === item.id
+    );
+    if (index < 0 || this.toolbarParkedActionIds.indexOf(item.id) >= 0) {
+      return;
+    }
+    this.animateToolbarSheetMembership((): void => {
+      const removed = this.toolbarSheetVisibleActions.splice(index, 1);
+      const parkedAction = removed.length > 0 ? removed[0] : item;
+      this.toolbarParkedActions.push(parkedAction);
+      this.toolbarParkedActionIds = this.toolbarParkedActions.map(
+        (action: BrowserBottomAddressPanelAction): BrowserBottomAddressPanelActionId => action.id
+      );
+    });
+    const visibleIds = this.toolbarSheetVisibleActions.map(
+      (action: BrowserBottomAddressPanelAction): BrowserBottomAddressPanelActionId => action.id
+    );
+    this.updateLiveQuickActionOrderIds(visibleIds);
+    this.persistToolbarSheetMembership(visibleIds, this.toolbarParkedActionIds);
+  }
+
+  private restoreToolbarSheetAction(actionId: BrowserBottomAddressPanelActionId): void {
+    const index = this.toolbarParkedActions.findIndex(
+      (action: BrowserBottomAddressPanelAction): boolean => action.id === actionId
+    );
+    if (index < 0) {
+      return;
+    }
+    this.animateToolbarSheetMembership((): void => {
+      const removed = this.toolbarParkedActions.splice(index, 1);
+      const restored = removed.length > 0 ? removed[0] : undefined;
+      if (restored !== undefined &&
+        !this.toolbarSheetVisibleActions.some(
+          (action: BrowserBottomAddressPanelAction): boolean => action.id === restored.id
+        )) {
+        this.toolbarSheetVisibleActions.push(restored);
+      }
+      this.toolbarParkedActionIds = this.toolbarParkedActions.map(
+        (action: BrowserBottomAddressPanelAction): BrowserBottomAddressPanelActionId => action.id
+      );
+    });
+    const visibleIds = this.toolbarSheetVisibleActions.map(
+      (action: BrowserBottomAddressPanelAction): BrowserBottomAddressPanelActionId => action.id
+    );
+    this.updateLiveQuickActionOrderIds(visibleIds);
+    this.persistToolbarSheetMembership(visibleIds, this.toolbarParkedActionIds);
+  }
+
+  private animateToolbarSheetMembership(update: () => void): void {
+    const uiContext = this.getUIContext();
+    uiContext.animateTo({
+      duration: 280,
+      curve: Curve.EaseInOut
+    }, update);
+  }
+
+  private syncToolbarSheetDisplayedActions(): void {
+    const visible = this.resolveToolbarSheetVisibleActions();
+    const parked = this.resolveToolbarParkedActions();
+    this.replaceObservedActions(this.toolbarSheetVisibleActions, visible);
+    this.replaceObservedActions(this.toolbarParkedActions, parked);
+  }
+
+  private replaceObservedActions(
+    target: BrowserBottomAddressPanelAction[],
+    next: BrowserBottomAddressPanelAction[]
+  ): void {
+    target.splice(0, target.length);
+    next.forEach((action: BrowserBottomAddressPanelAction): void => {
+      target.push(action);
+    });
+  }
+
+  private persistToolbarSheetMembership(
+    visibleIds: BrowserBottomAddressPanelActionId[],
+    parkedIds: BrowserBottomAddressPanelActionId[]
+  ): void {
+    const next = cloneBrowserToolbarLayoutSettings(sharedPreferencesRepository.getPreferences().toolbarLayout);
+    next.primaryActionIds = visibleIds;
+    next.secondaryActionIds = parkedIds;
+    next.updatedAt = Date.now();
+    this.toolbarCustomizationCoordinator.persistSettings(
+      next,
+      new BrowserToolbarCustomizationBoundary(
+        this.privateMode ? 'session_ephemeral' : 'profile_persistent',
+        this.privateMode ? 'private' : 'regular'
+      )
+    ).catch((): void => {
+    });
   }
 
   @Builder
@@ -914,7 +1650,7 @@ export struct BrowserBottomAddressPanel {
     // actions without adding a competing custom gesture to the Sheet itself.
     // A stationary release does not get onDrop, so the lift must not latch reorder.
     List({ space: layoutState.rowGap }) {
-      ForEach(actions, (item: BrowserBottomAddressPanelAction) => {
+      ForEach(this.toolbarSheetVisibleActions, (item: BrowserBottomAddressPanelAction) => {
         ListItem() {
           Row() {
             ForEach([this.buildActionRenderKey(item)], (_renderKey: string) => {
@@ -929,6 +1665,7 @@ export struct BrowserBottomAddressPanel {
           }
           .width('100%')
           .height('100%')
+          .clip(false)
           // The lane is the full sheet column. The card is a fixed width taken
           // from the inset panel, so the default start alignment leaves the
           // icon left of the column. Lanes still pin a partial row to column one.
@@ -936,6 +1673,12 @@ export struct BrowserBottomAddressPanel {
         }
         .width('100%')
         .height(layoutState.cardHeight)
+        .clip(false)
+        .transition(TransitionEffect.asymmetric(
+          TransitionEffect.OPACITY.animation({ duration: 180, curve: Curve.EaseOut }),
+          TransitionEffect.OPACITY.combine(TransitionEffect.scale({ x: 0.86, y: 0.86 }))
+            .animation({ duration: 180, curve: Curve.EaseIn })
+        ))
       }, (item: BrowserBottomAddressPanelAction) => item.id)
         .onMove((from: number, to: number) => {
           this.handleQuickActionNativeMove(from, to);
@@ -952,7 +1695,8 @@ export struct BrowserBottomAddressPanel {
         })
     }
     .width('100%')
-    .height(layoutState.gridHeight)
+    .height(this.resolveToolbarSheetGridHeight(layoutState, this.toolbarSheetVisibleActions.length))
+    .animation({ duration: 280, curve: Curve.EaseInOut })
     .lanes(layoutState.columnCount, layoutState.columnGap)
     // Keep every action materialized while the Sheet moves between detents;
     // this prevents off-screen cards from appearing late during expansion.
@@ -1748,9 +2492,18 @@ export struct BrowserBottomAddressPanel {
         cardDisabledOpacity: 1,
         cardBorderWidth: 0,
         cardCornerRadius: toolbarSystemSheetAction ? WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS : 0,
+        removeBadgeVisible: toolbarSystemSheetAction && this.toolbarSystemSheetEditing,
+        onBadge: (): void => {
+          if (toolbarSystemSheetAction && this.toolbarSystemSheetEditing) {
+            this.parkToolbarSheetAction(item);
+          }
+        },
         buttonSize,
         imageRenderVersion: this.resolveActionRenderVersion(item),
         action: () => {
+          if (toolbarSystemSheetAction && this.toolbarSystemSheetEditing) {
+            return;
+          }
           if (toolbarSystemSheetAction) {
             this.requestToolbarSystemSheetAction(item);
             return;
@@ -1762,6 +2515,7 @@ export struct BrowserBottomAddressPanel {
     .width(actionCellWidth > 0 ? actionCellWidth : '100%')
     .height(cardHeight)
     .layoutWeight(actionCellWidth > 0 ? 0 : 1)
+    .clip(false)
   }
 
   private resolveQuickActionRowEntryTransition(rowIndex: number): TransitionEffect {
@@ -2107,7 +2861,7 @@ export struct BrowserBottomAddressPanel {
       actionCount: actionCount,
       availableWidth: this.resolveFloatingQuickActionLayoutWidth(),
       availableHeight: Math.max(1,
-        this.resolveFloatingQuickActionLayoutHeight() - this.resolveReadingContinuationHeight()),
+        this.resolveFloatingQuickActionLayoutHeight() - this.resolveToolbarSystemSheetHeaderHeight()),
       preferredColumns: this.resolveQuickActionColumnCount(),
       maxColumns: WEB_BOTTOM_QUICK_ACTION_MAX_COLUMNS,
       buttonSize: BROWSER_BOTTOM_QUICK_ACTION_BUTTON_SIZE,
@@ -2414,9 +3168,11 @@ export struct BrowserBottomAddressPanel {
     // would appear and vanish. The native Sheet supplies its own backdrop and the
     // staged-address state is irrelevant to the action grid.
     this.pendingToolbarSystemSheetAction = undefined;
-    this.toolbarSystemSheetDetentSelection = this.resolveToolbarSystemSheetPreviewHeight(
-      this.resolveToolbarRenderSnapshot().layoutState
-    );
+    this.toolbarSystemSheetEditing = false;
+    this.resetToolbarAddSheet();
+    this.syncToolbarSheetDisplayedActions();
+    this.lockToolbarSystemSheetPresentation();
+    this.toolbarSystemSheetDetentSelection = this.toolbarSystemSheetLockedPreviewHeight;
     this.toolbarSystemSheetVisible = true;
     this.onToolbarSystemSheetOpened(this.toolbarSystemSheetInstanceToken);
     return true;
@@ -2426,6 +3182,9 @@ export struct BrowserBottomAddressPanel {
     this.resetQuickActionReorderState();
     this.toolbarSystemSheetVisible = false;
     this.toolbarSystemSheetDetentSelection = 0;
+    this.clearToolbarSystemSheetPresentationLock();
+    this.toolbarSystemSheetEditing = false;
+    this.resetToolbarAddSheet();
     const pendingAction = this.pendingToolbarSystemSheetAction;
     this.pendingToolbarSystemSheetAction = undefined;
     // A panel remount also unmounts the bound Sheet, which is indistinguishable
@@ -2677,8 +3436,32 @@ export struct BrowserBottomAddressPanel {
     return this.resolveUnifiedQuickActions()[index];
   }
 
+  private moveToolbarSheetVisibleAction(from: number, to: number): void {
+    const visible = this.toolbarSheetVisibleActions;
+    if (from < 0 || from >= visible.length || from === to) {
+      return;
+    }
+    const safeTargetIndex = Math.max(0, Math.min(to, visible.length - 1));
+    const moved = visible.splice(from, 1);
+    const movedAction = moved.length > 0 ? moved[0] : undefined;
+    if (movedAction === undefined) {
+      return;
+    }
+    visible.splice(safeTargetIndex, 0, movedAction);
+    const nextOrder = visible.map(
+      (item: BrowserBottomAddressPanelAction): BrowserBottomAddressPanelActionId => item.id
+    );
+    this.updateLiveQuickActionOrderIds(nextOrder);
+    this.dragConsumedQuickActionId = movedAction.id;
+    this.persistToolbarSheetMembership(nextOrder, this.toolbarParkedActionIds);
+  }
+
   private handleQuickActionNativeMove(from: number, to: number): void {
     if (!this.shouldEnableQuickActionReorder() || from === to) {
+      return;
+    }
+    if (this.toolbarSystemSheetVisible) {
+      this.moveToolbarSheetVisibleAction(from, to);
       return;
     }
     const actions = this.resolveUnifiedQuickActions();

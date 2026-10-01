@@ -1723,7 +1723,7 @@
     {
       "id": "bottom-toolbar-customizable",
       "title": "Bottom toolbar customizable actions",
-      "description": "The 30 draggable actions shown in Settings > Bottom toolbar. These entries must stay one-to-one with BrowserBottomPanelActionCatalog.customizableActionIds().",
+      "description": "The 29 draggable actions shown in Settings > Bottom toolbar. These entries must stay one-to-one with BrowserBottomPanelActionCatalog.customizableActionIds().",
       "entryKind": "action",
       "entries": [
         {
@@ -1745,11 +1745,6 @@
           "actionId": "sendToDesktop",
           "title": "推送",
           "iconId": "browser.toolbar.sendToDesktop"
-        },
-        {
-          "actionId": "settings",
-          "title": "设置",
-          "iconId": "browser.shortcut.settings"
         },
         {
           "actionId": "appProxySettings",

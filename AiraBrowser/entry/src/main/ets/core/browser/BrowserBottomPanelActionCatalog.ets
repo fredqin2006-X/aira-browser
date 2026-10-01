@@ -257,7 +257,7 @@ export class BrowserBottomPanelActionCatalog {
       { id: 'history', customizable: true, surfaces: ['web', 'home'] },
       { id: 'savedPages', customizable: true, surfaces: ['web', 'home'] },
       { id: 'downloads', customizable: true, surfaces: ['web', 'home'] },
-      { id: 'settings', customizable: true, surfaces: ['web', 'home'] },
+      { id: 'settings', customizable: false, surfaces: ['web', 'home'] },
       { id: 'appProxySettings', customizable: true, surfaces: ['web', 'home'] },
       { id: 'home', customizable: true, surfaces: ['web', 'home', 'tabs', 'viewer'] },
       { id: 'find', customizable: true, surfaces: ['web', 'offline', 'reader'] },

@@ -17,6 +17,12 @@ import {
 import { AiraRenderableIconId } from '../../../core/resources/GeneratedAiraIconCatalog';
 import { AiraIcon } from '../common/AiraIcon';
 const HOME_SEARCH_QUICK_ACTION_CARD_IMAGE_ICON_SIZE: number = 26;
+const HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_SIZE: number = 26;
+const HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_MARK_WIDTH: number = 12;
+const HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_MARK_HEIGHT: number = 2;
+const HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_OUTSET: number = 10;
+const HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_COLOR: string = '#FF3B30';
+const HOME_SEARCH_QUICK_ACTION_ADD_BADGE_COLOR: string = '#34C759';
 const HOME_SEARCH_QUICK_ACTION_CARD_LABEL_SIZE: number = 11;
 const HOME_SEARCH_QUICK_ACTION_CARD_BORDER_WIDTH: number = 1;
 const HOME_SEARCH_QUICK_ACTION_CARD_PRESSED_SCALE: number = 0.94;
@@ -40,10 +46,22 @@ export struct HomeSearchQuickActionCard {
   @Prop cardCornerRadius: number = 0;
   @Prop imageRenderVersion: number = 0;
   @Prop buttonSize: number = BROWSER_BOTTOM_QUICK_ACTION_BUTTON_SIZE;
+  @Prop removeBadgeVisible: boolean = false;
+  @Prop addBadgeVisible: boolean = false;
   @State private pressed: boolean = false;
   action: () => void = () => {};
+  onBadge: () => void = () => {};
 
   build() {
+    if (this.removeBadgeVisible || this.addBadgeVisible) {
+      this.buildBadgeActionCard()
+    } else {
+      this.buildPlainActionCard()
+    }
+  }
+
+  @Builder
+  private buildPlainActionCard() {
     Button() {
       Column({ space: BROWSER_BOTTOM_QUICK_ACTION_VERTICAL_GAP }) {
         this.buildQuickActionButtonSurface()
@@ -65,9 +83,11 @@ export struct HomeSearchQuickActionCard {
       .width('100%')
       .height('100%')
       .alignItems(HorizontalAlign.Center)
+      .clip(false)
     }
     .width('100%')
     .height('100%')
+    .clip(false)
     .type(ButtonType.Normal)
     .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
     .stateEffect(false)
@@ -90,16 +110,75 @@ export struct HomeSearchQuickActionCard {
   }
 
   @Builder
+  private buildBadgeActionCard() {
+    Column({ space: BROWSER_BOTTOM_QUICK_ACTION_VERTICAL_GAP }) {
+      this.buildQuickActionButtonSurface()
+      Text(this.label)
+        .width('100%')
+        .fontSize(HOME_SEARCH_QUICK_ACTION_CARD_LABEL_SIZE)
+        .lineHeight(BROWSER_BOTTOM_QUICK_ACTION_LABEL_LINE_HEIGHT)
+        .fontWeight(FontWeight.Regular)
+        .fontColor(this.resolveLabelColor())
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+        .textAlign(TextAlign.Center)
+    }
+    .width('100%')
+    .height('100%')
+    .alignItems(HorizontalAlign.Center)
+    .clip(false)
+  }
+
+  @Builder
   private buildQuickActionButtonSurface() {
-    Stack({ alignContent: Alignment.Center }) {
-      this.buildQuickActionButtonIcon()
+    Stack({ alignContent: Alignment.TopEnd }) {
+      Stack({ alignContent: Alignment.Center }) {
+        this.buildQuickActionButtonIcon()
+      }
+      .width(this.resolveButtonSize())
+      .height(this.resolveButtonSize())
+      .backgroundColor(this.resolveBackgroundColor())
+      .borderWidth(this.cardBorderWidth)
+      .borderColor(this.storedDividerColor)
+      .borderRadius(this.resolveButtonRadius())
+
+      if (this.removeBadgeVisible || this.addBadgeVisible) {
+        this.buildQuickActionRemoveBadge()
+      }
     }
     .width(this.resolveButtonSize())
     .height(this.resolveButtonSize())
-    .backgroundColor(this.resolveBackgroundColor())
-    .borderWidth(this.cardBorderWidth)
-    .borderColor(this.storedDividerColor)
-    .borderRadius(this.resolveButtonRadius())
+    .clip(false)
+  }
+
+  @Builder
+  private buildQuickActionRemoveBadge() {
+    Stack({ alignContent: Alignment.Center }) {
+      Row()
+        .width(HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_MARK_WIDTH)
+        .height(HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_MARK_HEIGHT)
+        .borderRadius(HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_MARK_HEIGHT / 2)
+        .backgroundColor(Color.White)
+      if (this.addBadgeVisible) {
+        Row()
+          .width(HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_MARK_HEIGHT)
+          .height(HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_MARK_WIDTH)
+          .borderRadius(HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_MARK_HEIGHT / 2)
+          .backgroundColor(Color.White)
+      }
+    }
+    .width(HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_SIZE)
+    .height(HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_SIZE)
+    .translate({
+      x: HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_OUTSET,
+      y: -HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_OUTSET
+    })
+    .borderRadius(HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_SIZE / 2)
+    .backgroundColor(this.addBadgeVisible ? HOME_SEARCH_QUICK_ACTION_ADD_BADGE_COLOR :
+      HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_COLOR)
+    .onClick((): void => {
+      this.onBadge();
+    })
   }
 
   @Builder
