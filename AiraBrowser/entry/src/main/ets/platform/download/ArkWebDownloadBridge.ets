@@ -8,7 +8,7 @@ import {
   PlatformDownloadEventType,
   PlatformDownloadSnapshot
 } from './PlatformDownloadAdapter';
-import { LibcurlDownloadAdapter } from './LibcurlDownloadAdapter';
+import { DownloadNativeProxyResolver, LibcurlDownloadAdapter } from './LibcurlDownloadAdapter';
 import { DownloadRuntimeDiagnosticRecorder } from '../../common/models/RuntimeDiagnosticModels';
 import { resolveAppResourceText } from '../../core/resources/AppResourceText';
 
@@ -29,8 +29,11 @@ export class ArkWebDownloadBridge implements PlatformDownloadAdapter {
   private pendingCancelInFlightGuid: string = '';
   private libcurlAdapter: LibcurlDownloadAdapter;
 
-  constructor(diagnosticRecorder?: DownloadRuntimeDiagnosticRecorder) {
-    this.libcurlAdapter = new LibcurlDownloadAdapter();
+  constructor(
+    diagnosticRecorder?: DownloadRuntimeDiagnosticRecorder,
+    proxyResolver?: DownloadNativeProxyResolver
+  ) {
+    this.libcurlAdapter = new LibcurlDownloadAdapter(proxyResolver);
   }
 
   getDelegate(): PlatformDownloadDelegate {

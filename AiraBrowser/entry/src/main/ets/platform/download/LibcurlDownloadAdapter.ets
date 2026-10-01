@@ -20,6 +20,17 @@ interface AiraDownloadSnapshot {
   fileExtension: string;
 }
 
+export interface DownloadNativeProxyConfig {
+  scheme: string;
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  noProxy: string;
+}
+
+export type DownloadNativeProxyResolver = () => DownloadNativeProxyConfig;
+
 interface AiraDownloadNativeModule {
   createTask(
     url: string,
@@ -27,7 +38,13 @@ interface AiraDownloadNativeModule {
     headers: string[],
     hls: boolean,
     caPath: string,
-    hlsSegmentConcurrency: number
+    hlsSegmentConcurrency: number,
+    proxyScheme: string,
+    proxyHost: string,
+    proxyPort: number,
+    proxyUsername: string,
+    proxyPassword: string,
+    proxyNoProxy: string
   ): number;
   startTask(handle: number): boolean;
   pauseTask(handle: number): boolean;
@@ -62,12 +79,26 @@ const LIBCURL_POLL_INTERVAL_MS = 250;
 const LIBCURL_DIAGNOSTIC_PREFIX = '[DEBUG-DLSSL-827]';
 const DEFAULT_HLS_SEGMENT_CONCURRENCY = 8;
 
+const EMPTY_DOWNLOAD_PROXY: DownloadNativeProxyConfig = {
+  scheme: '',
+  host: '',
+  port: 0,
+  username: '',
+  password: '',
+  noProxy: ''
+};
+
 export class LibcurlDownloadAdapter {
   private callbacks: PlatformDownloadAdapterCallbacks = {};
   private nativeModule?: AiraDownloadNativeModule;
   private nativeModuleTask?: Promise<AiraDownloadNativeModule>;
   private bindingsByGuid: Record<string, LibcurlTaskBinding | undefined> = {};
   private pollTimer?: number;
+  private proxyResolver?: DownloadNativeProxyResolver;
+
+  constructor(proxyResolver?: DownloadNativeProxyResolver) {
+    this.proxyResolver = proxyResolver;
+  }
 
   getDelegate(): PlatformDownloadDelegate {
     throw new Error('LibcurlDownloadAdapter does not provide a Web download delegate.');
@@ -140,6 +171,7 @@ export class LibcurlDownloadAdapter {
     const hlsSegmentConcurrency = this.normalizeHlsSegmentConcurrency(snapshot.hlsSegmentConcurrency);
     const hlsRetryPolicy = nativeModule.hlsPolicySummary();
     const caPath = this.resolveSystemCaPath();
+    const proxy = this.resolveProxy();
     hilog.info(LIBCURL_DOWNLOAD_DOMAIN, LIBCURL_DOWNLOAD_TAG,
       '%{public}s start guid=%{public}s hls=%{public}s hlsConcurrency=%{public}d hlsRetry=%{public}s caPath=%{public}s headerNames=%{public}s',
       LIBCURL_DIAGNOSTIC_PREFIX, guid, String(hls), hlsSegmentConcurrency,
@@ -153,7 +185,13 @@ export class LibcurlDownloadAdapter {
         headers,
         hls,
         caPath,
-        hlsSegmentConcurrency
+        hlsSegmentConcurrency,
+        proxy.scheme,
+        proxy.host,
+        proxy.port,
+        proxy.username,
+        proxy.password,
+        proxy.noProxy
       );
       if (!nativeModule.startTask(handle)) {
         hilog.warn(LIBCURL_DOWNLOAD_DOMAIN, LIBCURL_DOWNLOAD_TAG,
@@ -560,6 +598,33 @@ export class LibcurlDownloadAdapter {
           this.bindingsByGuid[binding.guid] === binding) {
         this.bindingsByGuid[binding.guid] = undefined;
       }
+    }
+  }
+
+  private resolveProxy(): DownloadNativeProxyConfig {
+    const resolver = this.proxyResolver;
+    if (resolver === undefined) {
+      return EMPTY_DOWNLOAD_PROXY;
+    }
+    try {
+      const resolved = resolver();
+      const scheme = resolved.scheme.trim();
+      const host = resolved.host.trim();
+      const port = Math.floor(resolved.port);
+      if ((scheme !== 'http' && scheme !== 'https' && scheme !== 'socks5') ||
+          host.length === 0 || port <= 0 || port > 65535) {
+        return EMPTY_DOWNLOAD_PROXY;
+      }
+      return {
+        scheme: scheme,
+        host: host,
+        port: port,
+        username: resolved.username.trim(),
+        password: resolved.password,
+        noProxy: resolved.noProxy.trim()
+      };
+    } catch (_error) {
+      return EMPTY_DOWNLOAD_PROXY;
     }
   }
 

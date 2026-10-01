@@ -17,7 +17,13 @@ export interface AiraDownloadNativeModule {
     headers: string[],
     hls: boolean,
     caPath: string,
-    hlsSegmentConcurrency: number
+    hlsSegmentConcurrency: number,
+    proxyScheme: string,
+    proxyHost: string,
+    proxyPort: number,
+    proxyUsername: string,
+    proxyPassword: string,
+    proxyNoProxy: string
   ): number;
   startTask(handle: number): boolean;
   pauseTask(handle: number): boolean;

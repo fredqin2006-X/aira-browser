@@ -29,6 +29,14 @@ struct TaskOptions {
   std::string ca_path;
   bool hls = false;
   std::size_t hls_segment_concurrency = 8;
+  // Empty scheme or host disables the proxy. socks5 is applied as socks5h so the
+  // proxy resolves the target name, matching ArkWeb's socks:// rule.
+  std::string proxy_scheme;
+  std::string proxy_host;
+  int proxy_port = 0;
+  std::string proxy_username;
+  std::string proxy_password;
+  std::string proxy_noproxy;
 };
 
 struct TaskSnapshot {

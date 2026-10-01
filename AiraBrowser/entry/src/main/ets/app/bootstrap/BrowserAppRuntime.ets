@@ -374,8 +374,20 @@ sharedUserScriptRuntimeStateRepository.attachDiagnosticRecorder(
     );
   })
 );
+export const sharedNativeHttpProxyResolutionService: NativeHttpProxyResolutionService =
+  new NativeHttpProxyResolutionService(sharedPreferencesRepository);
 export const sharedPlatformDownloadBridge: ArkWebDownloadBridge =
-  new ArkWebDownloadBridge(sharedAppCrashDiagnosticsService);
+  new ArkWebDownloadBridge(sharedAppCrashDiagnosticsService, () => {
+    const proxy = sharedNativeHttpProxyResolutionService.resolveDownloadProxy();
+    return {
+      scheme: proxy.scheme,
+      host: proxy.host,
+      port: proxy.port,
+      username: proxy.username,
+      password: proxy.password,
+      noProxy: proxy.noProxy
+    };
+  });
 export const sharedDownloadPolicyService: DownloadPolicyService =
   new DownloadPolicyService(sharedPreferencesRepository);
 export const sharedDownloadV2SystemNotificationService: DownloadV2SystemNotificationService =
@@ -476,7 +488,7 @@ sharedCrossDeviceTabPresenceCoordinator.configureMembershipFacts(
   (): AiraLapsedProView => sharedMembershipFeature.getLapsedProState()
 );
 const sharedUserScriptSourceFetchService: UserScriptSourceFetchService = new UserScriptSourceFetchService(
-  new NativeHttpProxyResolutionService(sharedPreferencesRepository)
+  sharedNativeHttpProxyResolutionService
 );
 const sharedUserScriptPackageLifecycleCoordinator: UserScriptPackageLifecycleCoordinator =
   new UserScriptPackageLifecycleCoordinator(

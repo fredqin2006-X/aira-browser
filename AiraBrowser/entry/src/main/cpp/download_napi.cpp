@@ -17,6 +17,10 @@ using aira::download::TaskSnapshot;
 constexpr size_t kMaxUrlBytes = 64 * 1024;
 constexpr size_t kMaxPathBytes = 4096;
 constexpr size_t kMaxHeaderBytes = 16 * 1024;
+constexpr size_t kMaxProxySchemeBytes = 32;
+constexpr size_t kMaxProxyHostBytes = 512;
+constexpr size_t kMaxProxyCredentialBytes = 512;
+constexpr size_t kMaxProxyNoProxyBytes = 8192;
 
 DownloadManager g_manager;
 
@@ -91,25 +95,46 @@ bool ReadHeaders(napi_env env, napi_value value, std::vector<std::string>* outpu
   return true;
 }
 
+bool ReadInt32(napi_env env, napi_value value, std::int32_t* output) {
+  std::int32_t parsed = 0;
+  if (napi_get_value_int32(env, value, &parsed) != napi_ok) {
+    napi_throw_type_error(env, nullptr, "Invalid native download integer argument.");
+    return false;
+  }
+  *output = parsed;
+  return true;
+}
+
 napi_value CreateTask(napi_env env, napi_callback_info info) {
-  size_t argc = 6;
-  napi_value argv[6] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
-  if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok || argc != 6) {
+  size_t argc = 12;
+  napi_value argv[12] = {
+    nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+    nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
+  };
+  if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok || argc != 12) {
     napi_throw_type_error(
       env,
       nullptr,
-      "createTask expects url, targetPath, headers, hls flag, CA path and HLS segment concurrency."
+      "createTask expects url, targetPath, headers, hls flag, CA path, HLS segment concurrency, proxy scheme, proxy host, proxy port, proxy username, proxy password and proxy bypass list."
     );
     return Undefined(env);
   }
   TaskOptions options;
+  std::int32_t proxy_port = 0;
   if (!ReadString(env, argv[0], kMaxUrlBytes, false, &options.url) ||
       !ReadString(env, argv[1], kMaxPathBytes, false, &options.target_path) ||
       !ReadHeaders(env, argv[2], &options.headers) ||
       !ReadString(env, argv[4], kMaxPathBytes, true, &options.ca_path) ||
-      !ReadHlsSegmentConcurrency(env, argv[5], &options.hls_segment_concurrency)) {
+      !ReadHlsSegmentConcurrency(env, argv[5], &options.hls_segment_concurrency) ||
+      !ReadString(env, argv[6], kMaxProxySchemeBytes, true, &options.proxy_scheme) ||
+      !ReadString(env, argv[7], kMaxProxyHostBytes, true, &options.proxy_host) ||
+      !ReadInt32(env, argv[8], &proxy_port) ||
+      !ReadString(env, argv[9], kMaxProxyCredentialBytes, true, &options.proxy_username) ||
+      !ReadString(env, argv[10], kMaxProxyCredentialBytes, true, &options.proxy_password) ||
+      !ReadString(env, argv[11], kMaxProxyNoProxyBytes, true, &options.proxy_noproxy)) {
     return Undefined(env);
   }
+  options.proxy_port = proxy_port;
   if (napi_get_value_bool(env, argv[3], &options.hls) != napi_ok) {
     napi_throw_type_error(env, nullptr, "Native download hls flag must be boolean.");
     return Undefined(env);

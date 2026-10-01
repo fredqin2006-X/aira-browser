@@ -93,9 +93,89 @@ void AttachCurlDiagnostics(CURL* handle, CurlDiagnosticBuffer* diagnostics) {
   curl_easy_setopt(handle, CURLOPT_ERRORBUFFER, diagnostics->value.data());
 }
 
+std::string LowerAscii(std::string value) {
+  for (char& character : value) {
+    character = static_cast<char>(std::tolower(static_cast<unsigned char>(character)));
+  }
+  return value;
+}
+
+bool HostHasNoPeriod(const std::string& url) {
+  const std::string host = UrlHost(url.c_str());
+  return !host.empty() && host.find('.') == std::string::npos && host.find(':') == std::string::npos;
+}
+
+struct DownloadProxyPlan {
+  bool configured = false;
+  bool suppressed = false;
+  std::string scheme;
+  std::string host;
+  int port = 0;
+  std::string url;
+};
+
+DownloadProxyPlan BuildDownloadProxyPlan(const TaskOptions& options, const std::string& request_url) {
+  DownloadProxyPlan plan;
+  const std::string scheme = LowerAscii(Trim(options.proxy_scheme));
+  const std::string host = Trim(options.proxy_host);
+  if (host.empty() || options.proxy_port <= 0 || options.proxy_port > 65535) {
+    return plan;
+  }
+  if (scheme == "http" || scheme == "https") {
+    plan.scheme = scheme;
+  } else if (scheme == "socks5" || scheme == "socks") {
+    // ArkWeb documents socks:// as SOCKS and resolves the target on the proxy.
+    // socks5h is the libcurl scheme with that same remote-DNS behavior.
+    plan.scheme = "socks5h";
+  } else {
+    return plan;
+  }
+  plan.configured = true;
+  plan.host = host;
+  plan.port = options.proxy_port;
+  if (HostHasNoPeriod(request_url)) {
+    plan.suppressed = true;
+    return plan;
+  }
+  std::string formatted_host = host;
+  if (formatted_host.find(':') != std::string::npos && formatted_host.front() != '[') {
+    formatted_host = "[" + formatted_host + "]";
+  }
+  plan.url = plan.scheme + "://" + formatted_host + ":" + std::to_string(plan.port);
+  return plan;
+}
+
+void ApplyDownloadProxy(CURL* handle, const TaskOptions& options, const std::string& request_url) {
+  if (handle == nullptr) {
+    return;
+  }
+  const DownloadProxyPlan plan = BuildDownloadProxyPlan(options, request_url);
+  if (!plan.configured || plan.suppressed || plan.url.empty()) {
+    curl_easy_setopt(handle, CURLOPT_PROXY, "");
+    return;
+  }
+  curl_easy_setopt(handle, CURLOPT_PROXY, plan.url.c_str());
+  const std::string username = Trim(options.proxy_username);
+  if (!username.empty()) {
+    curl_easy_setopt(handle, CURLOPT_PROXYUSERNAME, username.c_str());
+    curl_easy_setopt(handle, CURLOPT_PROXYPASSWORD, options.proxy_password.c_str());
+    if (plan.scheme == "http" || plan.scheme == "https") {
+      // Basic is sent on the first request. ANY waits for a challenge, which drops
+      // credentials when a proxy accepts anonymous requests and only rejects bad ones.
+      curl_easy_setopt(handle, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+    }
+  }
+  const std::string no_proxy = Trim(options.proxy_noproxy);
+  if (!no_proxy.empty()) {
+    curl_easy_setopt(handle, CURLOPT_NOPROXY, no_proxy.c_str());
+  }
+}
+
 std::string DescribeCurlTransfer(CURL* handle, CURLcode result, long response_code,
-                                 const char* phase, const std::string& ca_path,
+                                 const char* phase, const TaskOptions& options,
+                                 const std::string& request_url,
                                  const CurlDiagnosticBuffer& diagnostics) {
+  const std::string& ca_path = options.ca_path;
   char* effective_url = nullptr;
   char* primary_ip = nullptr;
   char* local_ip = nullptr;
@@ -127,8 +207,27 @@ std::string DescribeCurlTransfer(CURL* handle, CURLcode result, long response_co
   const bool ca_exists = !ca_path.empty() && std::filesystem::exists(ca_path, ca_error);
   ca_error.clear();
   const bool ca_directory = ca_exists && std::filesystem::is_directory(ca_path, ca_error);
+  const DownloadProxyPlan proxy = BuildDownloadProxyPlan(options, request_url);
+  long used_proxy = 0;
+  if (handle != nullptr) {
+    // CURLINFO_USED_PROXY arrived in libcurl 7.86. The vendored 8.7.1 headers define it;
+    // older platform headers still link a new enough libcurl, so keep the numeric value.
+#ifndef CURLINFO_USED_PROXY
+    const CURLcode used_proxy_result = curl_easy_getinfo(
+      handle, static_cast<CURLINFO>(CURLINFO_LONG + 66), &used_proxy);
+#else
+    const CURLcode used_proxy_result = curl_easy_getinfo(handle, CURLINFO_USED_PROXY, &used_proxy);
+#endif
+    if (used_proxy_result != CURLE_OK) {
+      used_proxy = 0;
+    }
+  }
   std::ostringstream output;
-  output << "phase=" << (phase == nullptr ? "unknown" : phase)
+  output << "proxyConfigured=" << (proxy.configured ? 1 : 0)
+         << "|proxyUsed=" << used_proxy
+         << "|proxySuppressed=" << (proxy.suppressed ? 1 : 0)
+         << "|proxyScheme=" << proxy.scheme
+         << "|phase=" << (phase == nullptr ? "unknown" : phase)
          << "|curl=" << static_cast<int>(result)
          << "|curlText=" << curl_easy_strerror(result)
          << "|detail=" << CompactDiagnosticText(diagnostics.value.data())
@@ -153,6 +252,9 @@ std::string DescribeCurlTransfer(CURL* handle, CURLcode result, long response_co
 std::string CurlFailureMessage(CURLcode result, long response_code) {
   if (response_code >= 400) {
     return "下载服务器返回 HTTP " + std::to_string(response_code) + "。";
+  }
+  if (result == CURLE_COULDNT_RESOLVE_PROXY || result == CURLE_PROXY) {
+    return "无法连接下载代理。";
   }
   if (result == CURLE_SSL_CONNECT_ERROR) {
     return "SSL 连接失败。";
@@ -336,6 +438,7 @@ bool FetchText(const TaskOptions& options, const std::string& url, std::string* 
     AttachCurlDiagnostics(handle, &diagnostics);
     curl_slist* header_list = nullptr;
     curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
+    ApplyDownloadProxy(handle, options, url);
     curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(handle, CURLOPT_MAXREDIRS, 10L);
     curl_easy_setopt(handle, CURLOPT_CONNECTTIMEOUT_MS, 15000L);
@@ -366,7 +469,7 @@ bool FetchText(const TaskOptions& options, const std::string& url, std::string* 
     curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &response_code);
     const bool retryable = IsRetryableHlsTransferFailure(result, response_code);
     const std::string transfer_diagnostic = AppendRetryDiagnostic(
-      DescribeCurlTransfer(handle, result, response_code, phase, options.ca_path, diagnostics),
+      DescribeCurlTransfer(handle, result, response_code, phase, options, url, diagnostics),
       attempt, retryable);
     curl_slist_free_all(header_list);
     curl_easy_cleanup(handle);
@@ -772,6 +875,7 @@ bool DownloadTask::TransferHlsFile(const std::string& url, const std::string& pa
       return false;
     }
     curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
+    ApplyDownloadProxy(handle, options_, url);
     curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(handle, CURLOPT_MAXREDIRS, 10L);
     curl_easy_setopt(handle, CURLOPT_CONNECTTIMEOUT_MS, 15000L);
@@ -796,7 +900,7 @@ bool DownloadTask::TransferHlsFile(const std::string& url, const std::string& pa
     curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &response_code);
     const bool retryable = IsRetryableHlsTransferFailure(result, response_code);
     const std::string transfer_diagnostic = AppendRetryDiagnostic(
-      DescribeCurlTransfer(handle, result, response_code, phase.c_str(), options_.ca_path, diagnostics),
+      DescribeCurlTransfer(handle, result, response_code, phase.c_str(), options_, url, diagnostics),
       attempt, retryable);
     curl_slist_free_all(headers);
     curl_easy_cleanup(handle);
@@ -896,6 +1000,7 @@ void DownloadTask::RunHttp() {
       }
     }
     curl_easy_setopt(handle, CURLOPT_URL, options_.url.c_str());
+    ApplyDownloadProxy(handle, options_, options_.url);
     curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(handle, CURLOPT_MAXREDIRS, 10L);
     curl_easy_setopt(handle, CURLOPT_CONNECTTIMEOUT_MS, 15000L);
@@ -926,7 +1031,7 @@ void DownloadTask::RunHttp() {
     curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &response_code);
     failure_phase = use_resume ? "http_resume" : "http_download";
     diagnostic_message = DescribeCurlTransfer(
-      handle, result, response_code, failure_phase.c_str(), options_.ca_path, diagnostics);
+      handle, result, response_code, failure_phase.c_str(), options_, options_.url, diagnostics);
     const bool resume_valid = !use_resume || (response_code == 206 && context.saw_content_range &&
       context.content_range_start == context.initial_offset);
     curl_slist_free_all(headers);
@@ -959,8 +1064,8 @@ void DownloadTask::RunHttp() {
     speed_bytes_per_second_ = 0;
     error_code_ = 0;
     error_message_.clear();
-    diagnostic_message_.clear();
-    failure_phase_.clear();
+    diagnostic_message_ = diagnostic_message;
+    failure_phase_ = failure_phase;
   }
   worker_finished_.store(true, std::memory_order_release);
 }
