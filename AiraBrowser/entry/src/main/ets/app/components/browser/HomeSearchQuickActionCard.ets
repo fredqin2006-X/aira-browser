@@ -186,7 +186,7 @@ export struct HomeSearchQuickActionCard {
     if (this.airaIconId !== undefined) {
       AiraIcon({
         airaIconId: this.airaIconId,
-        iconSize: HOME_SEARCH_QUICK_ACTION_CARD_IMAGE_ICON_SIZE,
+        iconSize: this.resolveIconSize(),
         iconColor: this.resolveOperationalIconColor()
       })
         .opacity(this.resolveIconOpacity())
@@ -201,16 +201,16 @@ export struct HomeSearchQuickActionCard {
   private buildImageIcon() {
     if (this.cardImageFillColor !== undefined) {
       Image(this.imageIcon as Resource)
-        .width(HOME_SEARCH_QUICK_ACTION_CARD_IMAGE_ICON_SIZE)
-        .height(HOME_SEARCH_QUICK_ACTION_CARD_IMAGE_ICON_SIZE)
+        .width(this.resolveIconSize())
+        .height(this.resolveIconSize())
         .objectFit(ImageFit.Contain)
         .draggable(false)
         .fillColor(this.cardImageFillColor)
         .opacity(this.resolveIconOpacity())
     } else {
       Image(this.imageIcon as Resource)
-        .width(HOME_SEARCH_QUICK_ACTION_CARD_IMAGE_ICON_SIZE)
-        .height(HOME_SEARCH_QUICK_ACTION_CARD_IMAGE_ICON_SIZE)
+        .width(this.resolveIconSize())
+        .height(this.resolveIconSize())
         .objectFit(ImageFit.Contain)
         .draggable(false)
         .opacity(this.resolveIconOpacity())
@@ -259,6 +259,11 @@ export struct HomeSearchQuickActionCard {
 
   private resolveButtonSize(): number {
     return Math.max(1, Math.min(BROWSER_BOTTOM_QUICK_ACTION_BUTTON_SIZE, this.buttonSize));
+  }
+
+  private resolveIconSize(): number {
+    return HOME_SEARCH_QUICK_ACTION_CARD_IMAGE_ICON_SIZE * this.resolveButtonSize() /
+      BROWSER_BOTTOM_QUICK_ACTION_BUTTON_SIZE;
   }
 
   private resolveButtonRadius(): number {

@@ -44,6 +44,8 @@ export interface BrowserBottomToolbarQuickActionLayoutInput {
   surfaceVerticalPadding: number;
   expansionHintSlotHeight: number;
   expansionHintBottomGap: number;
+  // Width chooses the column count. Height must not shrink the button.
+  lockButtonSize?: boolean;
 }
 
 export interface BrowserBottomToolbarQuickActionLayoutState {
@@ -184,10 +186,14 @@ export class BrowserBottomToolbarExpansionViewModel {
     let bestCandidate: BrowserBottomToolbarQuickActionLayoutCandidate | undefined = undefined;
     for (let columnCount = preferredColumns; columnCount <= maximumColumns; columnCount += 1) {
       const candidate = this.buildFullQuickActionLayoutCandidate(input, actionCount, columnCount);
-      if (candidate === undefined || !candidate.fitsAvailableHeight) {
+      if (candidate === undefined || (input.lockButtonSize !== true && !candidate.fitsAvailableHeight)) {
         continue;
       }
-      if (this.shouldPreferQuickActionLayoutCandidate(candidate, bestCandidate, preferredColumns)) {
+      if (input.lockButtonSize === true) {
+        if (this.shouldPreferFullSizeColumnCandidate(candidate, bestCandidate, input.buttonSize)) {
+          bestCandidate = candidate;
+        }
+      } else if (this.shouldPreferQuickActionLayoutCandidate(candidate, bestCandidate, preferredColumns)) {
         bestCandidate = candidate;
       }
     }
@@ -223,7 +229,9 @@ export class BrowserBottomToolbarExpansionViewModel {
     );
     const buttonHeightLimit = rowCount > 0 ?
       (availableHeight - minimumSpacingHeight) / rowCount - labelBlockHeight : baseButtonSize;
-    const buttonSize = Math.min(baseButtonSize, buttonWidthLimit, buttonHeightLimit);
+    const buttonSize = input.lockButtonSize === true ?
+      Math.min(baseButtonSize, buttonWidthLimit) :
+      Math.min(baseButtonSize, buttonWidthLimit, buttonHeightLimit);
     if (buttonSize < BROWSER_BOTTOM_TOOLBAR_FULL_MIN_BUTTON_SIZE) {
       return undefined;
     }
@@ -380,6 +388,26 @@ export class BrowserBottomToolbarExpansionViewModel {
       ),
       progress
     };
+  }
+
+  private shouldPreferFullSizeColumnCandidate(
+    candidate: BrowserBottomToolbarQuickActionLayoutCandidate,
+    current: BrowserBottomToolbarQuickActionLayoutCandidate | undefined,
+    fullButtonSize: number
+  ): boolean {
+    if (current === undefined) {
+      return true;
+    }
+    const fullSize = Math.max(1, this.normalizeNumber(fullButtonSize));
+    const candidateKeepsSize = candidate.buttonSize + 0.5 >= fullSize;
+    const currentKeepsSize = current.buttonSize + 0.5 >= fullSize;
+    if (candidateKeepsSize !== currentKeepsSize) {
+      return candidateKeepsSize;
+    }
+    if (candidateKeepsSize) {
+      return candidate.columnCount > current.columnCount;
+    }
+    return candidate.buttonSize > current.buttonSize;
   }
 
   private shouldPreferQuickActionLayoutCandidate(

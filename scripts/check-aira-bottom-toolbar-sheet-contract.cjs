@@ -83,15 +83,18 @@ assertContract(!addressPanel.includes('onDetentsDidChange:') &&
   toolbarSheetContent.includes('this.resolveToolbarRenderSnapshot().actions') &&
   addressPanel.includes('scrollSizeMode: ScrollSizeMode.CONTINUOUS'),
   'Toolbar system Sheet must keep one stable full action list and resize it continuously between native detents.');
-assertContract(toolbarSheetGrid.includes('List({ space: layoutState.rowGap })') &&
+assertContract(toolbarSheetGrid.includes('List({ space: this.resolveToolbarSystemSheetRowGap(layoutState) })') &&
   toolbarSheetGrid.includes('.onMove((from: number, to: number) =>') &&
   toolbarSheetGrid.includes('onLongPress: (index: number) =>') &&
-  toolbarSheetGrid.includes('true,\n                this.resolveToolbarSystemSheetActionCellWidth(layoutState)') &&
-  !toolbarSheetGrid.includes('Scroll(') &&
+  toolbarSheetGrid.includes('this.resolveToolbarSystemSheetActionCellWidth(layoutState)') &&
+  toolbarSheetGrid.includes('.enableScrollInteraction(false)') &&
+  !toolbarSheetGrid.includes('Scroll()') &&
   !toolbarSheetGrid.includes('.scrollable(') &&
+  !toolbarSheetGrid.includes('BROWSER_SHEET_FOOTER_BLUR_STOPS') &&
+  toolbarSheetGrid.includes('.height(this.resolveToolbarSheetGridHeight(layoutState, this.toolbarSheetVisibleActions.length))') &&
   toolbarSheetGrid.includes('.cachedCount(actions.length)') &&
   toolbarSheetGrid.includes('.syncLoad(true)'),
-  'Toolbar system Sheet action grid must use the official List drag-sort seam with all cards preloaded.');
+  'Toolbar system Sheet action grid must use the official List drag-sort seam and stay as tall as its rows.');
 assertContract(addressPanel.includes(".width(actionCellWidth > 0 ? actionCellWidth : '100%')") &&
   addressPanel.includes('.layoutWeight(actionCellWidth > 0 ? 0 : 1)'),
   'Toolbar system Sheet cards must use fixed equal-width cells so a final partial row stays left aligned.');
@@ -140,11 +143,17 @@ assertContract(addressPanel.includes('backgroundColor: this.storedPageBackground
   addressPanel.includes('blurStyle: BlurStyle.NONE') &&
   !addressPanel.includes('systemMaterial: createFloatingGlassMaterialIfAvailable('),
   'Toolbar system Sheet must keep one opaque themed backplate and must not add a second glass blur.');
-assertContract(addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS: number = 16;') &&
-  addressPanel.includes('cardCornerRadius: toolbarSystemSheetAction ?') &&
-  addressPanel.includes('WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS : 0'),
-  'Toolbar system Sheet action icons must use rounded rectangles without changing other quick-action surfaces.');
-assertContract(toolbarSheetContent.includes('this.buildToolbarSystemSheetHeaderRow()') &&
+assertContract(addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_ROW_GAP_EXTRA: number = 14;') &&
+  addressPanel.includes('return layoutState.rowGap + WEB_BOTTOM_TOOLBAR_SHEET_ROW_GAP_EXTRA;') &&
+  addressPanel.includes('space: this.resolveToolbarSystemSheetRowGap(layoutState)'),
+  'Toolbar system Sheet action rows must keep extra vertical space between the circular buttons.');
+assertContract(!addressPanel.includes('WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS') &&
+  addressPanel.includes('cardCornerRadius: 0,') &&
+  quickActionCard.includes('return this.cardCornerRadius > 0 ? Math.min(this.cardCornerRadius, maximumRadius) : maximumRadius;'),
+  'Toolbar system Sheet action icons must be circles without changing other quick-action surfaces.');
+assertContract(toolbarSheetContent.includes('this.buildToolbarSystemSheetHeaderRow(layoutState)') &&
+  addressPanel.includes('this.resolveToolbarSystemSheetHeaderEdgeInset(layoutState)') &&
+  addressPanel.includes('private resolveToolbarSystemSheetHeaderEdgeInset(') &&
   addressPanel.includes("this.buildToolbarSystemSheetHeaderButton('browser.toolbar.edit', 'browser.toolbar.edit', (): void => {") &&
   addressPanel.includes('this.enterToolbarSystemSheetEditing();') &&
   addressPanel.includes("this.buildToolbarSystemSheetHeaderButton('browser.shortcut.settings', 'browser.shortcut.settings', (): void => {") &&
@@ -176,6 +185,18 @@ assertContract(quickActionCard.includes('@Prop removeBadgeVisible: boolean = fal
   quickActionCard.includes('y: -HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_OUTSET') &&
   quickActionCard.includes('private buildQuickActionRemoveBadge()'),
   'Toolbar edit mode must draw a larger red remove badge on the outside top-right corner of each action tile.');
+assertContract(quickActionCard.includes('private resolveIconSize(): number') &&
+  quickActionCard.includes('HOME_SEARCH_QUICK_ACTION_CARD_IMAGE_ICON_SIZE * this.resolveButtonSize() /') &&
+  quickActionCard.includes('BROWSER_BOTTOM_QUICK_ACTION_BUTTON_SIZE;'),
+  'Quick-action icons must scale with the button so a smaller circle does not stay filled by a full-size icon.');
+assertContract(!addressPanel.includes('WEB_BOTTOM_TOOLBAR_SHEET_LAYOUT_MAX_COLUMNS') &&
+  addressPanel.includes('maxColumns: maxColumns') &&
+  addressPanel.includes('maxColumns: number = WEB_BOTTOM_QUICK_ACTION_MAX_COLUMNS') &&
+  addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_BUTTON_SIZE: number = 54;') &&
+  addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_COLUMN_GAP: number = 8;') &&
+  addressPanel.includes('lockButtonSize: !reserveExpansionHint') &&
+  addressPanel.includes('return Math.min(layoutState.buttonSize, this.resolveToolbarSystemSheetActionCellWidth(layoutState));'),
+  'Toolbar system Sheet adds columns from width and keeps the full button size instead of shrinking it for height.');
 assertContract(quickActionCard.includes('@Prop cardCornerRadius: number = 0;') &&
   quickActionCard.includes('this.cardCornerRadius > 0'),
   'Shared quick-action cards must keep circles by default and support an explicit rounded-rectangle radius.');

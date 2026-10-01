@@ -206,6 +206,11 @@ const WEB_BOTTOM_ADDRESS_HORIZONTAL_PADDING: number = 2;
 const WEB_BOTTOM_CENTER_ACTION_PRESS_RADIUS: number = WEB_BOTTOM_ADDRESS_BAR_HEIGHT / 2;
 const WEB_BOTTOM_QUICK_ACTION_GROUP_VERTICAL_PADDING: number = 12;
 const WEB_BOTTOM_QUICK_ACTION_MAX_COLUMNS: number = 8;
+// Flagship phones are about 366–377vp wide (Mate 80 / Pro Max at density 3.5).
+// A 64vp circle only fits four across that width. 54vp with an 8vp gap fits five,
+// and the same circle is reused in landscape; only the column count grows.
+const WEB_BOTTOM_TOOLBAR_SHEET_BUTTON_SIZE: number = 54;
+const WEB_BOTTOM_TOOLBAR_SHEET_COLUMN_GAP: number = 8;
 const WEB_BOTTOM_TOOLBAR_EXPANSION_HINT_ICON_ID: AiraRenderableIconId = 'browser.toolbar.expandHint';
 const WEB_BOTTOM_LIST_IMAGE_ICON_SIZE: number = 26;
 const WEB_BOTTOM_LIST_TEXT_SIZE: number = 15;
@@ -240,12 +245,10 @@ const WEB_BOTTOM_READING_CONTINUATION_HEIGHT: number = 64;
 const WEB_BOTTOM_READING_CONTINUATION_ICON_SIZE: number = 22;
 const WEB_BOTTOM_READING_CONTINUATION_TRAILING_ICON_SIZE: number = 16;
 const WEB_BOTTOM_READING_CONTINUATION_HORIZONTAL_PADDING: number = 16;
-const WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS: number = 16;
 const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BUTTON_SIZE: number = 48;
 const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ICON_SIZE: number = 22;
 const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ROW_HEIGHT: number = 48;
 const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP: number = 20;
-const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_HORIZONTAL_PADDING: number = 16;
 const WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT: number = 48;
 const WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_ICON_SIZE: number = 22;
 const WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_GAP: number = 10;
@@ -258,6 +261,7 @@ const WEB_BOTTOM_TOOLBAR_ADD_SHEET_ENTER_OFFSET: number = 320;
 const WEB_BOTTOM_TOOLBAR_ADD_SHEET_TOP_SPACE: number = 28;
 const WEB_BOTTOM_TOOLBAR_ADD_SHEET_BOTTOM_SAFE: number = 56;
 const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_PRESSED_SCALE: number = 0.94;
+const WEB_BOTTOM_TOOLBAR_SHEET_ROW_GAP_EXTRA: number = 14;
 const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_PRESS_DURATION_MS: number = 90;
 const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_RELEASE_DURATION_MS: number = 260;
 const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_RELEASE_CURVE: string = 'interpolatingSpring(0, 1, 360, 24)';
@@ -378,6 +382,7 @@ export struct BrowserBottomAddressPanel {
   @State private toolbarSheetVisibleActions: BrowserBottomAddressPanelAction[] = [];
   @State private toolbarParkedActions: BrowserBottomAddressPanelAction[] = [];
   @State private toolbarSystemSheetHeaderPressedIconId: string = '';
+  @State private toolbarSheetHeaderTrackWidth: number = 0;
   private toolbarSystemSheetLockedLayout: BrowserBottomToolbarQuickActionLayoutState | undefined = undefined;
   private toolbarSystemSheetLockedLayoutKey: string = '';
   private toolbarSystemSheetLockedPreviewHeight: number = 0;
@@ -915,7 +920,7 @@ export struct BrowserBottomAddressPanel {
         (layoutState: BrowserBottomToolbarQuickActionLayoutState) => {
           Stack({ alignContent: Alignment.Bottom }) {
             Column({ space: 0 }) {
-              this.buildToolbarSystemSheetHeaderRow()
+              this.buildToolbarSystemSheetHeaderRow(layoutState)
               this.buildToolbarSystemSheetActionGrid(
                 this.toolbarSheetVisibleActions,
                 layoutState
@@ -943,45 +948,71 @@ export struct BrowserBottomAddressPanel {
   }
 
   @Builder
-  private buildToolbarSystemSheetHeaderRow() {
+  private buildToolbarSystemSheetHeaderRow(layoutState: BrowserBottomToolbarQuickActionLayoutState) {
     Row() {
-      if (this.toolbarSystemSheetEditing) {
-        this.buildToolbarSystemSheetHeaderButton('browser.toolbar.back', 'browser.toolbar.back', (): void => {
-          this.exitToolbarSystemSheetEditing();
+      this.buildToolbarSystemSheetHeaderLeadingButton()
+      if (this.toolbarSystemSheetEditing || this.isWebContentMode() || this.shouldShowReadingContinuation()) {
+        Row() {
+          if (this.toolbarSystemSheetEditing) {
+            this.buildToolbarSystemSheetEditingTitle()
+          } else if (this.isWebContentMode()) {
+            this.buildToolbarSystemSheetWebAddressCapsule()
+          } else {
+            this.buildToolbarSystemSheetReadingCapsule()
+          }
+        }
+        .layoutWeight(1)
+        .height(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT)
+        .margin({
+          left: WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_GAP,
+          right: WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_GAP
         })
-      } else {
-        this.buildToolbarSystemSheetHeaderButton('browser.toolbar.edit', 'browser.toolbar.edit', (): void => {
-          this.enterToolbarSystemSheetEditing();
-        })
-      }
-      if (this.toolbarSystemSheetEditing) {
-        this.buildToolbarSystemSheetEditingTitle()
-      } else if (this.isWebContentMode()) {
-        this.buildToolbarSystemSheetWebAddressCapsule()
-      } else if (this.shouldShowReadingContinuation()) {
-        this.buildToolbarSystemSheetReadingCapsule()
       } else {
         Blank().layoutWeight(1)
       }
-      if (this.toolbarSystemSheetEditing) {
-        this.buildToolbarSystemSheetHeaderButton('toolbar.sheet.done', undefined, (): void => {
-          this.exitToolbarSystemSheetEditing();
-        })
-      } else {
-        this.buildToolbarSystemSheetHeaderButton('browser.shortcut.settings', 'browser.shortcut.settings', (): void => {
-          this.openAppSettingsFromToolbarSheetHeader();
-        })
-      }
+      this.buildToolbarSystemSheetHeaderTrailingButton()
     }
     .width('100%')
     .height(WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ROW_HEIGHT)
-    .padding({
-      left: WEB_BOTTOM_TOOLBAR_SHEET_HEADER_HORIZONTAL_PADDING,
-      right: WEB_BOTTOM_TOOLBAR_SHEET_HEADER_HORIZONTAL_PADDING
-    })
     .justifyContent(FlexAlign.SpaceBetween)
     .alignItems(VerticalAlign.Center)
+    .padding({
+      left: this.resolveToolbarSystemSheetHeaderEdgeInset(layoutState),
+      right: this.resolveToolbarSystemSheetHeaderEdgeInset(layoutState)
+    })
     .margin({ bottom: WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP })
+    .onAreaChange((_oldValue: Area, area: Area) => {
+      const width = Number(area.width);
+      if (width > 0 && Math.abs(width - this.toolbarSheetHeaderTrackWidth) > 0.5) {
+        this.toolbarSheetHeaderTrackWidth = width;
+      }
+    })
+  }
+
+  @Builder
+  private buildToolbarSystemSheetHeaderLeadingButton() {
+    if (this.toolbarSystemSheetEditing) {
+      this.buildToolbarSystemSheetHeaderButton('browser.toolbar.back', 'browser.toolbar.back', (): void => {
+        this.exitToolbarSystemSheetEditing();
+      })
+    } else {
+      this.buildToolbarSystemSheetHeaderButton('browser.toolbar.edit', 'browser.toolbar.edit', (): void => {
+        this.enterToolbarSystemSheetEditing();
+      })
+    }
+  }
+
+  @Builder
+  private buildToolbarSystemSheetHeaderTrailingButton() {
+    if (this.toolbarSystemSheetEditing) {
+      this.buildToolbarSystemSheetHeaderButton('toolbar.sheet.done', undefined, (): void => {
+        this.exitToolbarSystemSheetEditing();
+      })
+    } else {
+      this.buildToolbarSystemSheetHeaderButton('browser.shortcut.settings', 'browser.shortcut.settings', (): void => {
+        this.openAppSettingsFromToolbarSheetHeader();
+      })
+    }
   }
 
   @Builder
@@ -1019,12 +1050,8 @@ export struct BrowserBottomAddressPanel {
       .padding({ left: 12, right: 10 })
       .alignItems(VerticalAlign.Center)
     }
-    .layoutWeight(1)
+    .width('100%')
     .height(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT)
-    .margin({
-      left: WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_GAP,
-      right: WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_GAP
-    })
     .padding(0)
     .backgroundColor(resolveBrowserBottomToolbarSheetActionColor(this.resolveNeutralThemeMode()))
     .borderRadius(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT / 2)
@@ -1090,12 +1117,8 @@ export struct BrowserBottomAddressPanel {
         this.dispatchToolbarSystemSheetHeaderAction('translate');
       })
     }
-    .layoutWeight(1)
+    .width('100%')
     .height(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT)
-    .margin({
-      left: WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_GAP,
-      right: WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_GAP
-    })
     .padding({ left: 4, right: 4 })
     .alignItems(VerticalAlign.Center)
     .backgroundColor(resolveBrowserBottomToolbarSheetActionColor(this.resolveNeutralThemeMode()))
@@ -1122,7 +1145,7 @@ export struct BrowserBottomAddressPanel {
   @Builder
   private buildToolbarSystemSheetEditingTitle() {
     Text($r('app.string.bottom_panel_edit_toolbar'))
-      .layoutWeight(1)
+      .width('100%')
       .fontSize(22)
       .fontWeight(FontWeight.Bold)
       .fontColor(this.resolveItemTextColor(true))
@@ -1225,10 +1248,31 @@ export struct BrowserBottomAddressPanel {
     return WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ROW_HEIGHT + WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP;
   }
 
+  private resolveToolbarSystemSheetHeaderContentWidth(): number {
+    if (this.toolbarSheetHeaderTrackWidth > 0) {
+      return this.toolbarSheetHeaderTrackWidth;
+    }
+    return this.resolveFloatingQuickActionLayoutWidth();
+  }
+
+  // Left and right buttons share the outer edges of the first and last tool circles.
+  // The middle capsule is the only piece that stretches.
+  private resolveToolbarSystemSheetHeaderEdgeInset(
+    layoutState: BrowserBottomToolbarQuickActionLayoutState
+  ): number {
+    const columnCount = Math.max(1, Math.floor(layoutState.columnCount));
+    const columnGap = Math.max(0, layoutState.columnGap);
+    const horizontalPadding = BROWSER_BOTTOM_QUICK_ACTION_GROUP_HORIZONTAL_PADDING * 2;
+    const laneWidth = (this.resolveToolbarSystemSheetHeaderContentWidth() - horizontalPadding -
+      Math.max(0, columnCount - 1) * columnGap) / columnCount;
+    const buttonSize = this.resolveToolbarSystemSheetButtonSize(layoutState);
+    return Math.max(0, BROWSER_BOTTOM_QUICK_ACTION_GROUP_HORIZONTAL_PADDING + (laneWidth - buttonSize) / 2);
+  }
+
   private resolveToolbarSystemSheetPresentedLayoutState(): BrowserBottomToolbarQuickActionLayoutState {
     const fullActionCount = this.resolveToolbarSystemSheetFullActionCount();
     if (fullActionCount > 0) {
-      return this.buildFloatingQuickActionLayoutState(fullActionCount);
+      return this.buildFloatingQuickActionLayoutState(fullActionCount, false);
     }
     return this.resolveToolbarRenderSnapshot().layoutState;
   }
@@ -1248,11 +1292,11 @@ export struct BrowserBottomAddressPanel {
   }
 
   private lockToolbarSystemSheetPresentation(): void {
-    const snapshot = this.resolveToolbarRenderSnapshot();
-    this.toolbarSystemSheetLockedLayout = snapshot.layoutState;
-    this.toolbarSystemSheetLockedLayoutKey = snapshot.layoutRenderKey;
-    this.toolbarSystemSheetLockedPreviewHeight = this.measureToolbarSystemSheetPreviewHeight(snapshot.layoutState);
-    this.toolbarSystemSheetLockedFullHeight = this.measureToolbarSystemSheetFullHeight(snapshot.layoutState);
+    const layoutState = this.resolveToolbarSystemSheetPresentedLayoutState();
+    this.toolbarSystemSheetLockedLayout = layoutState;
+    this.toolbarSystemSheetLockedLayoutKey = this.resolveToolbarSystemSheetPresentedLayoutKey();
+    this.toolbarSystemSheetLockedPreviewHeight = this.measureToolbarSystemSheetPreviewHeight(layoutState);
+    this.toolbarSystemSheetLockedFullHeight = this.measureToolbarSystemSheetFullHeight(layoutState);
   }
 
   private clearToolbarSystemSheetPresentationLock(): void {
@@ -1271,13 +1315,19 @@ export struct BrowserBottomAddressPanel {
     return this.measureToolbarSystemSheetPreviewHeight(layoutState);
   }
 
+  private resolveToolbarSystemSheetRowGap(
+    layoutState: BrowserBottomToolbarQuickActionLayoutState
+  ): number {
+    return layoutState.rowGap + WEB_BOTTOM_TOOLBAR_SHEET_ROW_GAP_EXTRA;
+  }
+
   private measureToolbarSystemSheetPreviewHeight(
     layoutState: BrowserBottomToolbarQuickActionLayoutState
   ): number {
     const previewRows = Math.min(3, layoutState.rowCount);
     const gridHeight = previewRows > 0 ?
       previewRows * layoutState.cardHeight +
-        Math.max(0, previewRows - 1) * layoutState.rowGap +
+        Math.max(0, previewRows - 1) * this.resolveToolbarSystemSheetRowGap(layoutState) +
         layoutState.groupVerticalPadding * 2 : 0;
     return Math.max(1,
       gridHeight +
@@ -1301,6 +1351,7 @@ export struct BrowserBottomAddressPanel {
     return Math.max(
       this.measureToolbarSystemSheetPreviewHeight(layoutState) + 1,
       layoutState.fullSurfaceHeight +
+        Math.max(0, layoutState.rowCount - 1) * WEB_BOTTOM_TOOLBAR_SHEET_ROW_GAP_EXTRA +
         this.resolveToolbarSystemSheetHeaderHeight() +
         WEB_BOTTOM_TOOLBAR_EDIT_ADD_ROW_HEIGHT +
         BROWSER_BOTTOM_TOOLBAR_SYSTEM_SHEET_DRAG_BAR_HEIGHT
@@ -1409,7 +1460,7 @@ export struct BrowserBottomAddressPanel {
 
   @Builder
   private buildToolbarParkedActionGrid(layoutState: BrowserBottomToolbarQuickActionLayoutState) {
-    List({ scroller: this.toolbarAddSheetScroller, space: layoutState.rowGap }) {
+    List({ scroller: this.toolbarAddSheetScroller, space: this.resolveToolbarSystemSheetRowGap(layoutState) }) {
       ForEach(this.resolveToolbarAddSheetLaneIndexes(layoutState.columnCount),
         (index: number) => {
           ListItem() {
@@ -1433,9 +1484,9 @@ export struct BrowserBottomAddressPanel {
               cardBackgroundColor: this.resolveToolbarSystemSheetActionBackgroundColor(item),
               cardDisabledOpacity: 1,
               cardBorderWidth: 0,
-              cardCornerRadius: WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS,
+              cardCornerRadius: 0,
               addBadgeVisible: true,
-              buttonSize: layoutState.buttonSize,
+              buttonSize: this.resolveToolbarSystemSheetButtonSize(layoutState),
               imageRenderVersion: this.resolveActionRenderVersion(item),
               onBadge: (): void => {
                 this.restoreToolbarSheetAction(item.id);
@@ -1557,7 +1608,7 @@ export struct BrowserBottomAddressPanel {
       return 0;
     }
     return rows * layoutState.cardHeight +
-      Math.max(0, rows - 1) * layoutState.rowGap +
+      Math.max(0, rows - 1) * this.resolveToolbarSystemSheetRowGap(layoutState) +
       layoutState.groupVerticalPadding * 2;
   }
 
@@ -1734,14 +1785,14 @@ export struct BrowserBottomAddressPanel {
     // uses the official List drag-sort contract so a long press can reorder
     // actions without adding a competing custom gesture to the Sheet itself.
     // A stationary release does not get onDrop, so the lift must not latch reorder.
-    List({ space: layoutState.rowGap }) {
+    List({ space: this.resolveToolbarSystemSheetRowGap(layoutState) }) {
       ForEach(this.toolbarSheetVisibleActions, (item: BrowserBottomAddressPanelAction) => {
         ListItem() {
           Row() {
             ForEach([this.buildActionRenderKey(item)], (_renderKey: string) => {
               this.buildQuickActionCard(
                 item,
-                layoutState.buttonSize,
+                this.resolveToolbarSystemSheetButtonSize(layoutState),
                 layoutState.cardHeight,
                 true,
                 this.resolveToolbarSystemSheetActionCellWidth(layoutState)
@@ -1783,6 +1834,11 @@ export struct BrowserBottomAddressPanel {
     .height(this.resolveToolbarSheetGridHeight(layoutState, this.toolbarSheetVisibleActions.length))
     .animation({ duration: 280, curve: Curve.EaseInOut })
     .lanes(layoutState.columnCount, layoutState.columnGap)
+    .enableScrollInteraction(false)
+    .nestedScroll({
+      scrollForward: NestedScrollMode.PARENT_FIRST,
+      scrollBackward: NestedScrollMode.PARENT_FIRST
+    })
     // Keep every action materialized while the Sheet moves between detents;
     // this prevents off-screen cards from appearing late during expansion.
     .cachedCount(actions.length)
@@ -1799,6 +1855,12 @@ export struct BrowserBottomAddressPanel {
     .onTouch((event: TouchEvent) => {
       this.noteQuickActionGridTouch(event.type);
     })
+  }
+
+  private resolveToolbarSystemSheetButtonSize(
+    layoutState: BrowserBottomToolbarQuickActionLayoutState
+  ): number {
+    return Math.min(layoutState.buttonSize, this.resolveToolbarSystemSheetActionCellWidth(layoutState));
   }
 
   private resolveToolbarSystemSheetActionCellWidth(
@@ -2576,7 +2638,7 @@ export struct BrowserBottomAddressPanel {
           this.resolveToolbarSystemSheetActionBackgroundColor(item) : this.resolveQuickActionCardBackgroundColor(item),
         cardDisabledOpacity: 1,
         cardBorderWidth: 0,
-        cardCornerRadius: toolbarSystemSheetAction ? WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS : 0,
+        cardCornerRadius: 0,
         removeBadgeVisible: toolbarSystemSheetAction && this.toolbarSystemSheetEditing,
         onBadge: (): void => {
           if (toolbarSystemSheetAction && this.toolbarSystemSheetEditing) {
@@ -2941,23 +3003,32 @@ export struct BrowserBottomAddressPanel {
     return this.resolveToolbarRenderSnapshot().layoutState;
   }
 
-  private buildFloatingQuickActionLayoutState(actionCount: number): BrowserBottomToolbarQuickActionLayoutState {
+  private buildFloatingQuickActionLayoutState(
+    actionCount: number,
+    reserveExpansionHint: boolean = true,
+    maxColumns: number = WEB_BOTTOM_QUICK_ACTION_MAX_COLUMNS
+  ): BrowserBottomToolbarQuickActionLayoutState {
+    const expansionHintSlotHeight = reserveExpansionHint ? BROWSER_BOTTOM_TOOLBAR_EXPANSION_HINT_ICON_SIZE : 0;
+    const expansionHintBottomGap = reserveExpansionHint ? BROWSER_BOTTOM_TOOLBAR_EXPANSION_HINT_BOTTOM_GAP : 0;
     return this.toolbarExpansionViewModel.resolveQuickActionLayout({
       actionCount: actionCount,
       availableWidth: this.resolveFloatingQuickActionLayoutWidth(),
       availableHeight: Math.max(1,
         this.resolveFloatingQuickActionLayoutHeight() - this.resolveToolbarSystemSheetHeaderHeight()),
       preferredColumns: this.resolveQuickActionColumnCount(),
-      maxColumns: WEB_BOTTOM_QUICK_ACTION_MAX_COLUMNS,
-      buttonSize: BROWSER_BOTTOM_QUICK_ACTION_BUTTON_SIZE,
+      maxColumns: maxColumns,
+      buttonSize: reserveExpansionHint ? BROWSER_BOTTOM_QUICK_ACTION_BUTTON_SIZE :
+        WEB_BOTTOM_TOOLBAR_SHEET_BUTTON_SIZE,
       labelBlockHeight: BROWSER_BOTTOM_QUICK_ACTION_VERTICAL_GAP + BROWSER_BOTTOM_QUICK_ACTION_LABEL_LINE_HEIGHT,
-      columnGap: this.responsiveState.quickActionColumnGap,
+      columnGap: reserveExpansionHint ? this.responsiveState.quickActionColumnGap :
+        WEB_BOTTOM_TOOLBAR_SHEET_COLUMN_GAP,
       rowGap: this.responsiveState.quickActionRowGap,
       groupHorizontalPadding: BROWSER_BOTTOM_QUICK_ACTION_GROUP_HORIZONTAL_PADDING,
       groupVerticalPadding: WEB_BOTTOM_QUICK_ACTION_GROUP_VERTICAL_PADDING,
       surfaceVerticalPadding: this.responsiveState.quickActionTopGap,
-      expansionHintSlotHeight: BROWSER_BOTTOM_TOOLBAR_EXPANSION_HINT_ICON_SIZE,
-      expansionHintBottomGap: BROWSER_BOTTOM_TOOLBAR_EXPANSION_HINT_BOTTOM_GAP
+      expansionHintSlotHeight: expansionHintSlotHeight,
+      expansionHintBottomGap: expansionHintBottomGap,
+      lockButtonSize: !reserveExpansionHint
     });
   }
 

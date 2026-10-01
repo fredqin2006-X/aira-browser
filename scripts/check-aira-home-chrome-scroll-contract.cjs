@@ -661,8 +661,10 @@ function checkExpansionHintContract() {
     panelSource.includes('.justifyContent(FlexAlign.Center)') &&
     panelSource.includes('.rotate({ angle: this.resolveToolbarExpansionHintRotationAngle() })') &&
     panelSource.includes('WEB_BOTTOM_TOOLBAR_EXPANSION_HINT_ROTATION_DURATION_MS') &&
-    panelSource.includes('expansionHintSlotHeight: BROWSER_BOTTOM_TOOLBAR_EXPANSION_HINT_ICON_SIZE') &&
-    panelSource.includes('expansionHintBottomGap: BROWSER_BOTTOM_TOOLBAR_EXPANSION_HINT_BOTTOM_GAP'),
+    panelSource.includes('reserveExpansionHint ? BROWSER_BOTTOM_TOOLBAR_EXPANSION_HINT_ICON_SIZE : 0') &&
+    panelSource.includes('reserveExpansionHint ? BROWSER_BOTTOM_TOOLBAR_EXPANSION_HINT_BOTTOM_GAP : 0') &&
+    panelSource.includes('expansionHintSlotHeight: expansionHintSlotHeight') &&
+    panelSource.includes('expansionHintBottomGap: expansionHintBottomGap'),
   'toolbar must render one centered font-backed hint with stable geometry and animated direction');
 }
 
