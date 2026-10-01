@@ -94,6 +94,7 @@ export interface BrowserTabSwitchApplicationSink {
   notifyTabPreviewChanged: () => void;
   applyTabSequence: (tabSequence: number) => void;
   captureOpenerPreviewBeforeBackgroundPromptSwitch: (openerTabId: string, targetTabId: string) => Promise<void>;
+  captureVisibleTabPreviewBeforeSwitch: (leavingTabId: string, targetTabId: string) => Promise<void>;
   applyShellApplication: (application: BrowserActiveTabShellStateApplication) => void;
   applyHelperMessage: (message: string) => void;
   executePlatformAction: (action: BrowserTabSwitchPlatformAction) => void;
@@ -171,6 +172,18 @@ export class BrowserTabSwitchCoordinator {
       this.synchronizeActiveTab();
       return;
     }
+    // Tab strip, swipe, shortcuts and suggestion jumps all leave through here.
+    // Save the page that is still on screen, or its card is blank afterwards.
+    if (!facts.showHomePage && facts.activeTabId.trim().length > 0) {
+      await this.dependencies.sink.captureVisibleTabPreviewBeforeSwitch(facts.activeTabId, tabId);
+    }
+    if (canApply !== undefined && !canApply()) {
+      return;
+    }
+    const latestFacts = this.dependencies.sink.resolveFacts();
+    if (latestFacts.activeTabId !== facts.activeTabId) {
+      return;
+    }
     this.applyTabSwitchTransition(tabId, 'standard');
   }
 
@@ -182,7 +195,6 @@ export class BrowserTabSwitchCoordinator {
     if (this.findTabById(facts.tabs, tabId) === undefined) {
       return;
     }
-    await this.dependencies.sink.captureOpenerPreviewBeforeBackgroundPromptSwitch(facts.activeTabId, tabId);
     await this.switchToTab(tabId);
   }
 

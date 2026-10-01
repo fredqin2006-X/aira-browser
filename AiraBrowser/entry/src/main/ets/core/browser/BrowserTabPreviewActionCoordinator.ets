@@ -62,7 +62,7 @@ export function shouldCaptureTabPreviewOnLifecycleExit(
   return input.tabsOverviewVisible !== true;
 }
 
-export type BrowserTabPreviewOpenerBeforeSwitchSource = 'background_prompt' | 'window_open';
+export type BrowserTabPreviewOpenerBeforeSwitchSource = 'background_prompt' | 'window_open' | 'tab_switch';
 
 export interface BrowserTabPreviewOpenerBeforeSwitchInput {
   openerTabId: string;
@@ -74,6 +74,9 @@ export interface BrowserTabPreviewOpenerBeforeSwitchInput {
   // Large-screen shells pass true so the opener thumbnail includes the top
   // chrome; phone shells keep the bare page capture (their existing look).
   captureVisibleTabSurface?: boolean;
+  // Window-open must not switch until the frame is stored. A timed return lets
+  // the caller detach the page while the capture is still in flight.
+  completeBeforeSwitch?: boolean;
 }
 
 export interface BrowserTabPreviewSeedFromTabInput {
@@ -239,6 +242,10 @@ export class BrowserTabPreviewActionCoordinator {
           normalizedOpenerTabId
         );
       });
+    if (input.completeBeforeSwitch === true) {
+      await captureTask;
+      return;
+    }
     await Promise.race([
       captureTask,
       new Promise<void>((resolve) => {

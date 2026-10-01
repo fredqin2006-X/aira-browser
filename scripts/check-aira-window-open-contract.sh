@@ -777,6 +777,14 @@ require_order "${WINDOW_OPEN_APP}" \
   'this.windowOpenCoordinator.claimStoredEvent(targetTabId, controller)' \
   'await previewPromise' \
   'must bind the child controller before the onWindowNew callback can await.'
+require_order "${WINDOW_OPEN_APP}" \
+  'await previewPromise' \
+  'host.setActiveTabId(targetTabId)' \
+  'must save the opener page frame before switching to the new tab, or the source card is blank.'
+require_order "${WINDOW_OPEN_APP}" \
+  'await previewPromise' \
+  'host.retainWindowOpenOpener(openerTabId, targetTabId)' \
+  'must not park the opener page until its frame is saved.'
 require_literal "${WINDOW_OPEN_APP}" \
   'resolveWindowOpenInputSync()' \
   'must not await window metrics before claiming the ArkWeb child controller.'

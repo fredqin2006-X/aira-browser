@@ -206,8 +206,7 @@ export class BrowserWindowOpenApplicationCoordinator {
         targetTabId
       );
       // ArkWeb on PC opens a chromeless page window if this callback returns before
-      // setWebController. Bind the tab controller, then schedule its Web component,
-      // before the opener-preview await yields.
+      // setWebController. Claim the child controller before the preview await.
       const preparedTab = this.findTransitionTab(transition.tabs, targetTabId);
       const controller = preparedTab === undefined ? undefined : host.resolveManagedTabController(preparedTab);
       const controllerClaimed = controller !== undefined &&
@@ -230,6 +229,9 @@ export class BrowserWindowOpenApplicationCoordinator {
         targetTabId
       );
       const previewPromise = host.captureOpenerPreviewBeforeManagedTabOpen(openerTabId, targetTabId, 'window_open');
+      // The source card is a saved frame. Switching first detaches the page, the
+      // later capture is refused, and the original tab is blank in the tab manager.
+      await previewPromise;
       host.retainWindowOpenOpener(openerTabId, targetTabId);
       host.setTabs(transition.tabs);
       host.syncTabPreviewCacheWithTabs();
@@ -243,7 +245,6 @@ export class BrowserWindowOpenApplicationCoordinator {
       }
 
       host.syncActiveTabToView();
-      await previewPromise;
       host.recordRuntimeEvent(
         'normal_runtime_controller_created_or_resolved',
         `targetTab=${targetTabId} source=sync_active_tab_to_view`,

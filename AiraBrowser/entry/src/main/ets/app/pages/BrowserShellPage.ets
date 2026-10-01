@@ -2111,6 +2111,8 @@ struct BrowserShellPage {
     },
     captureOpenerPreviewBeforeBackgroundPromptSwitch: (openerTabId: string, targetTabId: string): Promise<void> =>
       this.captureCurrentTabPreviewBeforeLeavingOpenerTab(openerTabId, targetTabId, 'background_prompt'),
+    captureVisibleTabPreviewBeforeSwitch: (leavingTabId: string, targetTabId: string): Promise<void> =>
+      this.captureCurrentTabPreviewBeforeLeavingOpenerTab(leavingTabId, targetTabId, 'tab_switch'),
     applyShellApplication: (application): void => {
       if (application.resetHomeTransientUiState) {
         this.resetHomeTransientUiState();
@@ -11057,7 +11059,7 @@ struct BrowserShellPage {
   private lastOutgoingPreviewCaptureTabId: string = '';
 
   private async captureOutgoingTabVisibleSurfacePreview(): Promise<boolean> {
-    if (this.showHomePage || this.activeTabId.trim().length <= 0) {
+    if (this.showHomePage || this.showTabsSheet || this.activeTabId.trim().length <= 0) {
       return false;
     }
     this.lastOutgoingPreviewCaptureTabId = this.activeTabId;
@@ -12510,18 +12512,26 @@ struct BrowserShellPage {
     targetTabId: string,
     source: BrowserTabPreviewOpenerBeforeSwitchSource
   ): Promise<void> {
-    if (openerTabId === this.activeTabId && !this.showHomePage &&
-      await this.probeAndAdoptVisibleSurfaceSnapshot(openerTabId)) {
+    // Freeze the visible-page fact before any await. A new-tab switch that lands
+    // during the snapshot must not make this read the destination tab and skip.
+    const leavingVisibleWeb = openerTabId === this.activeTabId && !this.showHomePage && !this.showTabsSheet;
+    if (!leavingVisibleWeb) {
+      return;
+    }
+    if (await this.probeAndAdoptVisibleSurfaceSnapshot(openerTabId)) {
       return;
     }
     const input: BrowserTabPreviewOpenerBeforeSwitchInput = {
       openerTabId: openerTabId,
-      activeTabId: this.activeTabId,
-      showHomePage: this.showHomePage,
+      activeTabId: openerTabId,
+      showHomePage: false,
       targetTabId: targetTabId,
       waitMs: OPENER_TAB_PREVIEW_BEFORE_SWITCH_WAIT_MS,
       source: source,
-      captureVisibleTabSurface: this.isLargeScreenShellFamilyActive()
+      captureVisibleTabSurface: this.isLargeScreenShellFamilyActive(),
+      // Both callers switch away as soon as this returns. A timed return lets
+      // that switch detach the page while the frame is still being stored.
+      completeBeforeSwitch: true
     };
     await this.browserTabPreviewActionCoordinator.captureOpenerBeforeSwitch(
       this.buildTabPreviewActionPort(),

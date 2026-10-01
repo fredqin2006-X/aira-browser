@@ -134,6 +134,11 @@
           "resourceFamily": "app_reader_increase_font"
         },
         {
+          "actionId": "webZoom",
+          "title": "网页缩放",
+          "resourceFamily": "app_toolbar_zoom_in"
+        },
+        {
           "actionId": "find",
           "title": "查找网页",
           "resourceFamily": "app_toolbar_search"

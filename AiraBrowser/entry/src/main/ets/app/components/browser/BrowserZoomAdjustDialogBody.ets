@@ -29,9 +29,8 @@ export struct BrowserZoomAdjustDialogBody {
   @Prop canReset: boolean = false;
   decreaseLabel: ResourceStr = '';
   increaseLabel: ResourceStr = '';
-  onDecrease: () => void = (): void => {};
-  onIncrease: () => void = (): void => {};
-  onReset: () => void = (): void => {};
+  onAdjust: (action: 'decrease' | 'increase' | 'reset') => void =
+    (_action: 'decrease' | 'increase' | 'reset'): void => {};
   onDone: () => void = (): void => {};
 
   build() {
@@ -57,7 +56,7 @@ export struct BrowserZoomAdjustDialogBody {
           fontSize: 15,
           actionEnabled: this.canReset,
           onAction: (): void => {
-            this.onReset();
+            this.onAdjust('reset');
           }
         })
       }
@@ -69,11 +68,11 @@ export struct BrowserZoomAdjustDialogBody {
         BrowserZoomAdjustCircleButton({
           iconId: 'browser.toolbar.zoomOut',
           label: resolveAppResourceText(this.decreaseLabel),
-          enabled: this.canDecrease,
+          actionEnabled: this.canDecrease,
           iconColor: this.canDecrease ? this.storedPrimaryTextColor : this.storedSecondaryTextColor,
-          backgroundColor: this.storedControlBackgroundColor,
+          circleBackgroundColor: this.storedControlBackgroundColor,
           onAction: (): void => {
-            this.onDecrease();
+            this.onAdjust('decrease');
           }
         })
 
@@ -88,11 +87,11 @@ export struct BrowserZoomAdjustDialogBody {
         BrowserZoomAdjustCircleButton({
           iconId: 'browser.toolbar.zoomIn',
           label: resolveAppResourceText(this.increaseLabel),
-          enabled: this.canIncrease,
+          actionEnabled: this.canIncrease,
           iconColor: this.canIncrease ? this.storedPrimaryTextColor : this.storedSecondaryTextColor,
-          backgroundColor: this.storedControlBackgroundColor,
+          circleBackgroundColor: this.storedControlBackgroundColor,
           onAction: (): void => {
-            this.onIncrease();
+            this.onAdjust('increase');
           }
         })
       }
@@ -125,9 +124,9 @@ export struct BrowserZoomAdjustDialogBody {
 struct BrowserZoomAdjustCircleButton {
   @Prop iconId: AiraRenderableIconId = 'browser.toolbar.zoomIn';
   @Prop label: string = '';
-  @Prop enabled: boolean = true;
+  @Prop actionEnabled: boolean = true;
   @Prop iconColor: ResourceColor = '#111318';
-  @Prop backgroundColor: ResourceColor = '#EEF2F6';
+  @Prop circleBackgroundColor: ResourceColor = '#EEF2F6';
   onAction: () => void = (): void => {};
   @State private pressed: boolean = false;
 
@@ -142,8 +141,8 @@ struct BrowserZoomAdjustCircleButton {
     .width(ZOOM_ADJUST_CIRCLE_SIZE)
     .height(ZOOM_ADJUST_CIRCLE_SIZE)
     .borderRadius(ZOOM_ADJUST_CIRCLE_SIZE / 2)
-    .backgroundColor(this.backgroundColor)
-    .opacity(this.enabled ? 1 : 0.38)
+    .backgroundColor(this.circleBackgroundColor)
+    .opacity(this.actionEnabled ? 1 : 0.38)
     .scale({
       x: this.pressed ? ZOOM_ADJUST_PRESSED_SCALE : 1,
       y: this.pressed ? ZOOM_ADJUST_PRESSED_SCALE : 1
@@ -157,7 +156,7 @@ struct BrowserZoomAdjustCircleButton {
       this.updatePressed(event.type);
     })
     .onClick((): void => {
-      if (!this.enabled) {
+      if (!this.actionEnabled) {
         return;
       }
       this.onAction();
@@ -165,7 +164,7 @@ struct BrowserZoomAdjustCircleButton {
   }
 
   private updatePressed(type: TouchType): void {
-    if (!this.enabled) {
+    if (!this.actionEnabled) {
       this.pressed = false;
       return;
     }

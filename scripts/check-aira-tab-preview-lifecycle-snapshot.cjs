@@ -273,7 +273,9 @@ async function main() {
     '../AiraBrowser/entry/src/main/ets/core/browser/BrowserBackgroundTabPreviewRuntimeCoordinator.ets'), 'utf8');
   const schedule = background.slice(background.indexOf('scheduleCandidate('),
     background.indexOf('startIfNeeded('));
-  assert.doesNotMatch(schedule, /enqueueCandidate/);
+  const implementation = background.slice(background.indexOf('export class BrowserBackgroundTabPreviewRuntimeCoordinator'));
+  assert.match(schedule, /enqueueCandidate/, 'background open must load the hidden page');
+  assert.doesNotMatch(implementation, /capturePreview/, 'a hidden background page must not be snapshotted');
   console.log('Tab preview lifecycle snapshot checks passed.');
 }
 

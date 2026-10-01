@@ -38,22 +38,11 @@ export interface BrowserBackgroundTabPreviewRuntimeOptions {
   attachRetryDelayMs: number;
 }
 
-interface BrowserBackgroundTabPreviewRuntimeCapturePlan {
-  tabId: string;
-  finishReason: BrowserBackgroundTabPreviewFinishReason;
-}
-
-interface BrowserBackgroundTabPreviewRuntimeInitialCapturePlan {
-  tabId: string;
-}
-
 export class BrowserBackgroundTabPreviewRuntimeCoordinator {
   private readonly previewCoordinator: BrowserBackgroundTabPreviewCoordinator;
   private readonly host: BrowserBackgroundTabPreviewRuntimeHost;
   private readonly options: BrowserBackgroundTabPreviewRuntimeOptions;
   private loadIssuedTabIds: string[] = [];
-  private initialCaptureTimer: number = -1;
-  private captureTimer: number = -1;
   private timeoutTimer: number = -1;
 
   constructor(
@@ -88,14 +77,6 @@ export class BrowserBackgroundTabPreviewRuntimeCoordinator {
   }
 
   clearCaptureTimers(): void {
-    if (this.initialCaptureTimer >= 0) {
-      clearTimeout(this.initialCaptureTimer);
-      this.initialCaptureTimer = -1;
-    }
-    if (this.captureTimer >= 0) {
-      clearTimeout(this.captureTimer);
-      this.captureTimer = -1;
-    }
     if (this.timeoutTimer >= 0) {
       clearTimeout(this.timeoutTimer);
       this.timeoutTimer = -1;
@@ -106,10 +87,27 @@ export class BrowserBackgroundTabPreviewRuntimeCoordinator {
     tabId: string,
     source: string
   ): void {
-    // Off-screen tabs keep the snapshot taken while they were visible. Attaching a hidden
-    // web just to snapshot it re-lays the page and is what paints a white card.
-    void tabId;
-    void source;
+    // Background open has to load the hidden page, or the prompt stays at its 1% placeholder.
+    // Do not snapshot that page: webPageSnapshot re-lays a detached document and stores a white card.
+    const host = this.resolveHost();
+    const options = this.resolveOptions();
+    if (host === undefined || options === undefined) {
+      return;
+    }
+    const tab = host.resolveTab(tabId);
+    if (tab === undefined) {
+      return;
+    }
+    const request = this.previewCoordinator.enqueueCandidate({
+      tab: tab,
+      activeTabId: host.getActiveTabId(),
+      hasPreview: host.hasUsablePreview(tabId)
+    });
+    if (request === undefined || request.tabId !== tabId) {
+      return;
+    }
+    host.recordRuntimeEvent('background_tab_preview_queued', `source=${source} url=${request.url}`, tabId);
+    this.startIfNeeded();
   }
 
   startIfNeeded(): void {
@@ -225,7 +223,7 @@ export class BrowserBackgroundTabPreviewRuntimeCoordinator {
     }
     this.markLoadIssued(tabId);
     this.applyBackgroundPreviewRuntimeState(request.tabId, 'background-hot', host);
-    this.scheduleCaptureTimers(request, host);
+    this.scheduleLoadTimeout(request);
     const issued = host.loadUrl(request);
     host.recordRuntimeEvent(
       issued ? 'background_tab_preview_load_issued' : 'background_tab_preview_load_failed',
@@ -246,86 +244,11 @@ export class BrowserBackgroundTabPreviewRuntimeCoordinator {
       return;
     }
     const request = this.previewCoordinator.getActiveRequest();
-    if (request === undefined || request.tabId !== tabId || host.getPreviewHostedTabId() !== tabId) {
-      return;
-    }
-    const plan = this.previewCoordinator.buildPageReadyCapturePlan(request);
-    if (this.captureTimer >= 0) {
-      host.recordRuntimeEvent('background_tab_preview_capture_ready_already_scheduled', source, tabId);
-      return;
-    }
-    host.recordRuntimeEvent('background_tab_preview_capture_ready', source, tabId);
-    if (plan.cancelInitialCapture && this.initialCaptureTimer >= 0) {
-      clearTimeout(this.initialCaptureTimer);
-      this.initialCaptureTimer = -1;
-    }
-    this.captureTimer = setTimeout(() => {
-      this.captureTimer = -1;
-      void this.captureIfReady(tabId, 'captured', host);
-    }, plan.captureDelayMs);
-  }
-
-  private buildCapturePlan(
-    tabId: string,
-    finishReason: BrowserBackgroundTabPreviewFinishReason
-  ): BrowserBackgroundTabPreviewRuntimeCapturePlan | undefined {
-    const request = this.previewCoordinator.getActiveRequest();
     if (request === undefined || request.tabId !== tabId) {
-      return undefined;
-    }
-    return {
-      tabId: tabId,
-      finishReason: finishReason
-    };
-  }
-
-  private applyCaptureResult(
-    plan: BrowserBackgroundTabPreviewRuntimeCapturePlan,
-    captured: boolean,
-    host: BrowserBackgroundTabPreviewRuntimeHost
-  ): void {
-    const request = this.previewCoordinator.getActiveRequest();
-    if (request === undefined || request.tabId !== plan.tabId) {
       return;
     }
-    if (captured || plan.finishReason === 'timeout') {
-      this.finishPreview(plan.tabId, captured ? 'captured' : plan.finishReason);
-      return;
-    }
-    host.recordRuntimeEvent('background_tab_preview_capture_deferred', `reason=${plan.finishReason}`, plan.tabId);
-  }
-
-  private buildInitialCapturePlan(
-    tabId: string,
-    host: BrowserBackgroundTabPreviewRuntimeHost
-  ): BrowserBackgroundTabPreviewRuntimeInitialCapturePlan | undefined {
-    const request = this.previewCoordinator.getActiveRequest();
-    if (request === undefined || request.tabId !== tabId || host.getPreviewHostedTabId() !== tabId) {
-      return undefined;
-    }
-    if (this.previewCoordinator.hasInitialCapture(tabId)) {
-      return undefined;
-    }
-    return {
-      tabId: tabId
-    };
-  }
-
-  private applyInitialCaptureResult(
-    plan: BrowserBackgroundTabPreviewRuntimeInitialCapturePlan,
-    captured: boolean,
-    host: BrowserBackgroundTabPreviewRuntimeHost
-  ): void {
-    const request = this.previewCoordinator.getActiveRequest();
-    if (request === undefined || request.tabId !== plan.tabId || host.getPreviewHostedTabId() !== plan.tabId) {
-      return;
-    }
-    if (!captured) {
-      host.recordRuntimeEvent('background_tab_preview_initial_capture_deferred', request.url, plan.tabId);
-      return;
-    }
-    this.previewCoordinator.markInitialCapture(plan.tabId);
-    host.recordRuntimeEvent('background_tab_preview_initial_captured', request.url, plan.tabId);
+    host.recordRuntimeEvent('background_tab_preview_load_ready', source, tabId);
+    this.finishPreview(tabId, 'loaded');
   }
 
   finishPreview(
@@ -386,48 +309,16 @@ export class BrowserBackgroundTabPreviewRuntimeCoordinator {
     host.applyBackgroundPreviewRuntimeState(tabId, runtimeState);
   }
 
-  private scheduleCaptureTimers(
-    request: BrowserBackgroundTabPreviewRequest,
-    host: BrowserBackgroundTabPreviewRuntimeHost
-  ): void {
+  private scheduleLoadTimeout(request: BrowserBackgroundTabPreviewRequest): void {
     this.clearCaptureTimers();
-    this.initialCaptureTimer = setTimeout(() => {
-      this.initialCaptureTimer = -1;
-      void this.captureInitialIfReady(request.tabId, host);
-    }, request.initialCaptureDelayMs);
-    this.captureTimer = setTimeout(() => {
-      this.captureTimer = -1;
-      void this.captureIfReady(request.tabId, 'captured', host);
-    }, request.captureDelayMs);
     this.timeoutTimer = setTimeout(() => {
       this.timeoutTimer = -1;
-      void this.captureIfReady(request.tabId, 'timeout', host);
+      const activeRequest = this.previewCoordinator.getActiveRequest();
+      if (activeRequest === undefined || activeRequest.tabId !== request.tabId) {
+        return;
+      }
+      this.finishPreview(request.tabId, 'timeout');
     }, request.maxRuntimeMs);
-  }
-
-  private async captureIfReady(
-    tabId: string,
-    finishReason: BrowserBackgroundTabPreviewFinishReason,
-    host: BrowserBackgroundTabPreviewRuntimeHost
-  ): Promise<void> {
-    const plan = this.buildCapturePlan(tabId, finishReason);
-    if (plan === undefined) {
-      return;
-    }
-    const captured = await host.capturePreview(plan.tabId);
-    this.applyCaptureResult(plan, captured, host);
-  }
-
-  private async captureInitialIfReady(
-    tabId: string,
-    host: BrowserBackgroundTabPreviewRuntimeHost
-  ): Promise<void> {
-    const plan = this.buildInitialCapturePlan(tabId, host);
-    if (plan === undefined) {
-      return;
-    }
-    const captured = await host.capturePreview(plan.tabId);
-    this.applyInitialCaptureResult(plan, captured, host);
   }
 
   private scheduleAttach(

@@ -52,7 +52,6 @@ export interface BrowserTabCreationStateApplication {
 // long enough for a component snapshot of the visible shell (typically well
 // under 200ms, but slower while the page is still rendering), short enough
 // that a stuck capture never blocks the "+" action noticeably.
-const FOREGROUND_HOME_TAB_PREVIEW_CAPTURE_TIMEOUT_MS: number = 600;
 
 export interface BrowserForegroundTabCreationHost {
   resolveForegroundTabCreationState: () => BrowserForegroundTabCreationState;
@@ -122,29 +121,31 @@ export class BrowserForegroundTabCreationCoordinator {
       this.dependencies.privateModeLockCoordinator.synchronizeCurrentBoundary();
       return host.resolveForegroundTabCreationState().activeTabId;
     }
-    const createdTabId = this.createNewTabNow(request);
+    // A context-menu "open in new tab" swaps the visible page immediately.
+    // Save the current frame first, or the source card is blank in the tab manager.
+    if (request.runtimeOptions.skipCurrentTabPreviewForForegroundOpen !== true) {
+      await host.captureCurrentTabPreviewForForegroundCreationAsync();
+    }
+    const createdTabId = this.createNewTabNow({
+      initialUrl: request.initialUrl,
+      initialTitle: request.initialTitle,
+      options: request.options,
+      runtimeOptions: {
+        skipCurrentTabPreviewForForegroundOpen: true,
+        restoreAsColdStart: request.runtimeOptions.restoreAsColdStart
+      },
+      homePresentationMode: request.homePresentationMode,
+      prepareCreatedTab: request.prepareCreatedTab
+    });
     this.dependencies.privateModeLockCoordinator.synchronizeCurrentBoundary();
     return createdTabId;
   }
 
   private async captureOutgoingTabPreviewBeforeHome(host: BrowserForegroundTabCreationHost): Promise<void> {
     try {
-      let timedOut = false;
-      await Promise.race([
-        host.captureCurrentTabPreviewForForegroundCreationAsync(),
-        new Promise<boolean>((resolve: (value: boolean) => void) => {
-          setTimeout(() => {
-            timedOut = true;
-            resolve(false);
-          }, FOREGROUND_HOME_TAB_PREVIEW_CAPTURE_TIMEOUT_MS);
-        })
-      ]);
-      if (timedOut) {
-        // The shell is about to swap to the home surface. A snapshot that is
-        // still running must not store whatever it ends up seeing (it could
-        // capture HOME and attribute it to the outgoing web tab).
-        host.cancelOutgoingTabPreviewCapture();
-      }
+      // Wait until the outgoing page frame is stored. Switching to home first
+      // would leave that tab's card blank, and a late capture could store home.
+      await host.captureCurrentTabPreviewForForegroundCreationAsync();
     } catch (_error) {
       // Best-effort: never block home creation on a preview-capture failure.
     }

@@ -1817,6 +1817,11 @@
           "iconId": "reader.increaseFont"
         },
         {
+          "actionId": "webZoom",
+          "title": "网页缩放",
+          "iconId": "browser.toolbar.zoomIn"
+        },
+        {
           "actionId": "find",
           "title": "查找网页",
           "iconId": "browser.toolbar.search"

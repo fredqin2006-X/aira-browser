@@ -8,6 +8,7 @@ const BACKGROUND_PREVIEW_CAPTURE_TIMEOUT_MS: number = 5200;
 
 export type BrowserBackgroundTabPreviewFinishReason =
   'captured' |
+  'loaded' |
   'timeout' |
   'cancelled' |
   'tab_removed' |

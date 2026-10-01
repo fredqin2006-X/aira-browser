@@ -20,14 +20,8 @@ export struct BrowserWebTextZoomSheet {
       canReset: this.state.ratio !== 100,
       decreaseLabel: $r('app.string.web_text_zoom_decrease'),
       increaseLabel: $r('app.string.web_text_zoom_increase'),
-      onDecrease: (): void => {
-        this.onAction('decrease');
-      },
-      onIncrease: (): void => {
-        this.onAction('increase');
-      },
-      onReset: (): void => {
-        this.onAction('reset');
+      onAdjust: (action: 'decrease' | 'increase' | 'reset'): void => {
+        this.onAction(action);
       },
       onDone: (): void => {
         this.controller?.close();
