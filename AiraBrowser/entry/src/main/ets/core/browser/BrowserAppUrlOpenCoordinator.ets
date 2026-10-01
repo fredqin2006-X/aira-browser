@@ -54,6 +54,10 @@ import {
   sharedBrowserHttpsFirstNavigationService
 } from '../../services/web/BrowserHttpsFirstNavigationService';
 
+// The link menu is hidden in state before the open runs, but the last painted
+// frame still includes it. Wait one short beat so the screenshot is the page.
+const WEB_CONTEXT_MENU_PREVIEW_SETTLE_MS: number = 100;
+
 export type BrowserAppUrlOpenIntent = 'current_tab' | 'new_tab' | 'background_tab';
 
 export type BrowserAppUrlOpenSource =
@@ -184,7 +188,7 @@ export class BrowserAppUrlOpenCoordinator {
         this.openForegroundTab(plan);
         return;
       case 'open_background_tab':
-        this.openBackgroundTab(plan);
+        void this.openBackgroundTab(plan);
         return;
       case 'reject':
       default:
@@ -340,8 +344,12 @@ export class BrowserAppUrlOpenCoordinator {
     this.host.applyMessage('helper', plan.message);
   }
 
-  private openBackgroundTab(plan: BrowserAppUrlOpenPlan): void {
+  private async openBackgroundTab(plan: BrowserAppUrlOpenPlan): Promise<void> {
     this.dependencies.recentActionManager.recordOperate(Date.now());
+    await this.settleWebContextMenuBeforePreview(plan.source);
+    if (!this.host.isHomeSurfaceVisible()) {
+      await this.host.captureCurrentTabPreviewForForegroundCreationAsync();
+    }
     this.host.persistActiveTabSnapshot(`app-url-open-${plan.source}-background-tab`);
     const state = this.host.resolveForegroundTabCreationState();
     const transition = this.transitionCoordinator.createBackgroundTab(
@@ -395,7 +403,8 @@ export class BrowserAppUrlOpenCoordinator {
       '[DIAG-home-submit-20260828] foreground_create_begin targetLength=%{public}d',
       plan.url.length
     );
-    void this.dependencies.foregroundTabCreationCoordinator.createNewTab(request)
+    void this.settleWebContextMenuBeforePreview(plan.source)
+      .then((): Promise<string> => this.dependencies.foregroundTabCreationCoordinator.createNewTab(request))
       .then((createdTabId: string): void => {
         this.registerBrowserGeneratedHttpsAttempt(createdTabId, plan);
         this.primeExternalForegroundNavigation(createdTabId, plan);
@@ -586,9 +595,23 @@ export class BrowserAppUrlOpenCoordinator {
       normalizeBrowserDataScope(options.dataScope, privacyMode) === 'profile_persistent';
   }
 
+  private settleWebContextMenuBeforePreview(source: string): Promise<void> {
+    if (source !== 'web_context_menu') {
+      return Promise.resolve();
+    }
+    return new Promise<void>((resolve: () => void) => {
+      setTimeout((): void => {
+        resolve();
+      }, WEB_CONTEXT_MENU_PREVIEW_SETTLE_MS);
+    });
+  }
+
   private buildForegroundRuntimeOptions(): CreateNewTabRuntimeOptions {
+    // A visible page must be snapshotted again before the new tab takes over.
+    // Skipping here reused the last card image, so a long-press "open in new tab"
+    // left the source card on an outdated frame.
     return {
-      skipCurrentTabPreviewForForegroundOpen: true
+      skipCurrentTabPreviewForForegroundOpen: this.host.isHomeSurfaceVisible()
     };
   }
 

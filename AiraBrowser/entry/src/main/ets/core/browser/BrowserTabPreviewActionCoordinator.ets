@@ -64,6 +64,26 @@ export function shouldCaptureTabPreviewOnLifecycleExit(
 
 export type BrowserTabPreviewOpenerBeforeSwitchSource = 'background_prompt' | 'window_open' | 'tab_switch';
 
+/**
+ * Leave-captures that happen off the tab-manager button. The button itself is a
+ * fast path: it snapshots, opens, and writes the file afterwards. These reasons
+ * must finish a new file before the page leaves, or the card keeps the old image.
+ */
+export type BrowserVisibleTabPreviewReplaceReason =
+  'new_tab' |
+  'background_tab' |
+  'background_prompt' |
+  'window_open' |
+  'tab_switch';
+
+export function visibleTabPreviewMustBeReplaced(reason: string): boolean {
+  return reason === 'new_tab' ||
+    reason === 'background_tab' ||
+    reason === 'background_prompt' ||
+    reason === 'window_open' ||
+    reason === 'tab_switch';
+}
+
 export interface BrowserTabPreviewOpenerBeforeSwitchInput {
   openerTabId: string;
   activeTabId: string;

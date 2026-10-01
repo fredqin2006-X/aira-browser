@@ -36,8 +36,16 @@ function load(filename, dependencies) {
 const actionModule = load(path.join(coreRoot, 'BrowserTabPreviewActionCoordinator.ets'), {});
 const {
   shouldCaptureTabPreviewOnLifecycleExit,
+  visibleTabPreviewMustBeReplaced,
   BrowserTabPreviewActionCoordinator
 } = actionModule;
+
+for (const reason of ['new_tab', 'background_tab', 'background_prompt', 'window_open', 'tab_switch']) {
+  assert.equal(visibleTabPreviewMustBeReplaced(reason), true, `${reason} must store a new screenshot before leaving`);
+}
+assert.equal(visibleTabPreviewMustBeReplaced('tabs_overview'), false,
+  'the tab-manager button stays on the fast snapshot path and must not wait for the file write');
+assert.equal(visibleTabPreviewMustBeReplaced('passive'), false, 'an unnamed refresh must not claim a forced replace');
 
 assert.equal(shouldCaptureTabPreviewOnLifecycleExit({
   activeTabId: 'tab-1',
@@ -276,6 +284,11 @@ async function main() {
   const implementation = background.slice(background.indexOf('export class BrowserBackgroundTabPreviewRuntimeCoordinator'));
   assert.match(schedule, /enqueueCandidate/, 'background open must load the hidden page');
   assert.doesNotMatch(implementation, /capturePreview/, 'a hidden background page must not be snapshotted');
+  const shell = fs.readFileSync(path.resolve(__dirname,
+    '../AiraBrowser/entry/src/main/ets/app/pages/BrowserShellPage.ets'), 'utf8');
+  assert.match(shell, /persistImmediateSharedSnapshot\(/, 'a visible leave must write a new card file before returning');
+  assert.match(shell, /captureOutgoingTabVisibleSurfacePreview[\s\S]{0,180}replaceVisibleTabCardImage/,
+    'opening a new tab must replace the visible card image');
   console.log('Tab preview lifecycle snapshot checks passed.');
 }
 

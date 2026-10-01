@@ -376,7 +376,6 @@ import {
 } from '../../core/browser/BrowserTabsOverviewSessionCoordinator';
 import {
   BrowserTabsOverviewSnapshotPipelineEntryCaptureInput,
-  BrowserTabsOverviewSnapshotPipelineExternalCaptureInput,
   BrowserTabsOverviewSnapshotPipelineCoordinator,
   BrowserTabsOverviewSnapshotPipelineState
 } from '../../core/browser/tabsOverview/BrowserTabsOverviewSnapshotPipelineCoordinator';
@@ -562,8 +561,9 @@ import {
   BrowserTabPreviewActionCoordinator,
   BrowserTabPreviewActionPort,
   BrowserTabPreviewActionRequestOptions,
-  BrowserTabPreviewOpenerBeforeSwitchInput,
-  BrowserTabPreviewOpenerBeforeSwitchSource
+  BrowserTabPreviewOpenerBeforeSwitchSource,
+  BrowserVisibleTabPreviewReplaceReason,
+  visibleTabPreviewMustBeReplaced
 } from '../../core/browser/BrowserTabPreviewActionCoordinator';
 import {
   BrowserBackgroundTabPreviewRequest
@@ -1013,7 +1013,6 @@ import {
   MAX_BACKGROUND_HOT_TAB_COUNT,
   NEW_WINDOW_TEST_URL,
   OFFLINE_SAVE_ACTION_PROMPT_HIDE_DELAY_MS,
-  OPENER_TAB_PREVIEW_BEFORE_SWITCH_WAIT_MS,
   PRIVATE_MODE_LOCK_OVERLAY_Z_INDEX,
   READER_MODE_THEME_TRANSITION_DURATION_MS,
   READER_SPEECH_PLAYER_OPEN_DELAY_MS,
@@ -11059,22 +11058,7 @@ struct BrowserShellPage {
   private lastOutgoingPreviewCaptureTabId: string = '';
 
   private async captureOutgoingTabVisibleSurfacePreview(): Promise<boolean> {
-    if (this.showHomePage || this.showTabsSheet || this.activeTabId.trim().length <= 0) {
-      return false;
-    }
-    this.lastOutgoingPreviewCaptureTabId = this.activeTabId;
-    if (await this.probeAndAdoptVisibleSurfaceSnapshot(this.activeTabId)) {
-      return true;
-    }
-    return await this.browserTabPreviewActionCoordinator.captureExplicit(
-      this.buildTabPreviewActionPort(),
-      {
-        tabId: this.activeTabId,
-        force: true,
-        requireSharedSnapshot: true,
-        captureVisibleTabSurface: this.isLargeScreenShellFamilyActive()
-      }
-    );
+    return await this.replaceVisibleTabCardImage(this.activeTabId, 'new_tab');
   }
 
   // Called when the "+" flow's leave-capture time-box expires: the shell is
@@ -12512,51 +12496,70 @@ struct BrowserShellPage {
     targetTabId: string,
     source: BrowserTabPreviewOpenerBeforeSwitchSource
   ): Promise<void> {
-    // Freeze the visible-page fact before any await. A new-tab switch that lands
-    // during the snapshot must not make this read the destination tab and skip.
-    const leavingVisibleWeb = openerTabId === this.activeTabId && !this.showHomePage && !this.showTabsSheet;
-    if (!leavingVisibleWeb) {
-      return;
-    }
-    if (await this.probeAndAdoptVisibleSurfaceSnapshot(openerTabId)) {
-      return;
-    }
-    const input: BrowserTabPreviewOpenerBeforeSwitchInput = {
-      openerTabId: openerTabId,
-      activeTabId: openerTabId,
-      showHomePage: false,
-      targetTabId: targetTabId,
-      waitMs: OPENER_TAB_PREVIEW_BEFORE_SWITCH_WAIT_MS,
-      source: source,
-      captureVisibleTabSurface: this.isLargeScreenShellFamilyActive(),
-      // Both callers switch away as soon as this returns. A timed return lets
-      // that switch detach the page while the frame is still being stored.
-      completeBeforeSwitch: true
-    };
-    await this.browserTabPreviewActionCoordinator.captureOpenerBeforeSwitch(
-      this.buildTabPreviewActionPort(),
-      input
-    );
+    // The destination id is part of the caller contract; the screenshot belongs
+    // to the page that is still visible, not to the tab being opened.
+    void targetTabId;
+    await this.replaceVisibleTabCardImage(openerTabId, source);
   }
 
-  private async probeAndAdoptVisibleSurfaceSnapshot(tabId: string): Promise<boolean> {
-    if (!this.isLargeScreenShellFamilyActive()) {
+  /**
+   * Leave-capture for a new tab, a background open, a site popup, and a tab
+   * switch. Writes a new image file before returning. The tab-manager button
+   * does not use this; that path snapshots and opens first, then writes the file.
+   */
+  private async replaceVisibleTabCardImage(
+    tabId: string,
+    reason: BrowserVisibleTabPreviewReplaceReason
+  ): Promise<boolean> {
+    const normalizedTabId = tabId.trim();
+    if (!visibleTabPreviewMustBeReplaced(reason) ||
+      normalizedTabId.length <= 0 ||
+      normalizedTabId !== this.activeTabId ||
+      this.showHomePage ||
+      this.showTabsSheet) {
       return false;
     }
-    const tab = this.tabManager.getTab(this.tabs, tabId);
+    const tab = this.tabManager.getTab(this.tabs, normalizedTabId);
     if (tab === undefined || tab.isHome) {
       return false;
     }
-    const input: BrowserTabsOverviewSnapshotPipelineExternalCaptureInput = {
-      tab: tab,
-      uiContext: this.getUIContext(),
-      componentSnapshotId: buildBrowserTabPreviewVisibleSurfaceSnapshotId(tab.id),
-      componentSnapshotScale: TABS_OVERVIEW_ENTRY_PIXELMAP_SCALE,
-      transitionSource: this.tabsOverviewSnapshotPipelineCoordinator
-        .buildCurrentWebVisibleTabSurfaceTransitionSource(),
-      shouldKeepPixelMap: (): boolean => this.activeTabId === tab.id && !this.showHomePage
-    };
-    return await this.tabsOverviewSnapshotPipelineCoordinator.captureAndAdoptExternalTransitionSnapshot(input);
+    this.lastOutgoingPreviewCaptureTabId = normalizedTabId;
+    let pixelMap: image.PixelMap | undefined = undefined;
+    try {
+      pixelMap = await this.getUIContext().getComponentSnapshot().get(
+        buildBrowserTabPreviewVisibleSurfaceSnapshotId(normalizedTabId),
+        {
+          scale: TABS_OVERVIEW_ENTRY_PIXELMAP_SCALE,
+          waitUntilRenderFinished: false
+        }
+      );
+      if (this.activeTabId !== normalizedTabId || this.showHomePage || this.showTabsSheet) {
+        return false;
+      }
+      const persisted = await this.browserTabPreviewCoordinator.persistImmediateSharedSnapshot(
+        tab,
+        pixelMap,
+        this.tabsOverviewSnapshotPipelineCoordinator.buildCurrentWebVisibleTabSurfaceTransitionSource()
+      );
+      if (!persisted) {
+        return false;
+      }
+      pixelMap = undefined;
+      this.notifyTabPreviewChanged();
+      this.recordRuntimeEvent('tab_preview_visible_replaced', `reason=${reason}`, normalizedTabId);
+      return true;
+    } catch (error) {
+      this.recordRuntimeEvent(
+        'tab_preview_visible_replace_failed',
+        `reason=${reason} error=${JSON.stringify(error)}`,
+        normalizedTabId
+      );
+      return false;
+    } finally {
+      if (pixelMap !== undefined) {
+        void pixelMap.release().catch((_error: Error) => {});
+      }
+    }
   }
 
   private handleCustomHomepageScroll(event: OnScrollEvent): void {

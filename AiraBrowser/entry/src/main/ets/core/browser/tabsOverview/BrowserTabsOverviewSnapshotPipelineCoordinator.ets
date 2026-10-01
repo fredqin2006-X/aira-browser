@@ -541,6 +541,8 @@ export class BrowserTabsOverviewSnapshotPipelineCoordinator {
     // The page on screen is what shrinks. The card draws a cache copy of this frame, the same
     // split as PixelMapCache: the raw component snapshot is not the image the card paints.
     void this.publishDrawableSnapshotCopy(tabId, pixelMap);
+    // The tab-manager button is the fast path: the on-screen snapshot is already
+    // in hand, so the overview opens now and the file write finishes afterwards.
     void this.persistEntrySnapshotForGallery(input, pixelMap, transitionSource);
     this.dependencies.onCapturedEntryReady(tabId, input.generation);
   }
