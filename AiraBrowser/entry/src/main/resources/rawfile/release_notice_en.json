@@ -1,15 +1,20 @@
 {
   "enabled": true,
-  "noticeId": "aira-3.5.3-1000480",
-  "title": "Aira 3.5.3 update",
-  "updatedAt": "2026-09-30",
-  "summary": "This release runs a National Day offer for long-term members and fixes a few issues in the launch screen, the membership page, and the tab list.",
+  "noticeId": "aira-3.5.4-1000485",
+  "title": "Aira 3.5.4 update",
+  "updatedAt": "2026-10-01",
+  "summary": "This release adds a language choice and webpage translation, and adjusts the home toolbar, tab titles, and tab cards.",
   "items": [
-    "From October 1 to October 7, the long-term membership costs ¥48, marked 30% off. The regular price returns after the offer ends.",
-    "The membership page no longer lists the phone client separately.",
-    "After changing the app icon, the launch screen no longer keeps showing the old icon.",
-    "Opening the tab list no longer squashes the page.",
-    "Automatic and solid-color wallpapers now sync correctly."
+    "Settings can follow the system, or use Simplified Chinese, Traditional Chinese, or English.",
+    "The toolbar can translate the current page. Scrolling stays smooth while translation is on.",
+    "Phones can zoom the current page.",
+    "Toolbar gestures are explained one step at a time.",
+    "On the classic home with a photo or video wallpaper, the split top and bottom bars turn clear and the icons follow the wallpaper.",
+    "Site slogans no longer trail the tab title. Zhihu shows “知乎”; an article still shows its own title.",
+    "Tiled tab cards frame the middle of the page and leave out the address bar. Leaving the page keeps that picture on the card.",
+    "The computer-link page and its tutorial are easier to follow. The phone shows the desktop browser’s own name and icon.",
+    "After a portrait video, the screen returns to the previous landscape orientation.",
+    "With the in-app proxy on, file downloads use that proxy too."
   ],
   "actionLabel": "View changelog"
 }

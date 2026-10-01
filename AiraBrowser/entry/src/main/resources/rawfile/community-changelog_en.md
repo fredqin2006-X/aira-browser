@@ -1,5 +1,22 @@
 # Changelog
 
+## 3.5.4 (1000485)
+
+2026-10-01
+
+This release adds a language choice and webpage translation, and adjusts the home toolbar, tab titles, and tab cards.
+
+- Settings can follow the system, or use Simplified Chinese, Traditional Chinese, or English.
+- The toolbar can translate the current page. Scrolling stays smooth while translation is on.
+- Phones can zoom the current page.
+- Toolbar gestures are explained one step at a time.
+- On the classic home with a photo or video wallpaper, the split top and bottom bars turn clear and the icons follow the wallpaper.
+- Site slogans no longer trail the tab title. Zhihu shows “知乎”; an article still shows its own title.
+- Tiled tab cards frame the middle of the page and leave out the address bar. Leaving the page keeps that picture on the card.
+- The computer-link page and its tutorial are easier to follow. The phone shows the desktop browser’s own name and icon.
+- After a portrait video, the screen returns to the previous landscape orientation.
+- With the in-app proxy on, file downloads use that proxy too.
+
 ## 3.5.3 (1000480)
 
 2026-09-30
