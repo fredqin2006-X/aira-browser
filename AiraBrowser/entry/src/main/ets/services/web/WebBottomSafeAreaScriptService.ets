@@ -11,8 +11,9 @@ export class WebBottomSafeAreaScriptService {
         var deadline = performance.now() + 4;
         if (document.hidden || document.fullscreenElement) return 'suspended';
         var viewport = window.visualViewport;
+        // Our own reserve is about 100px. Only a much larger shrink is the keyboard.
         if (viewport && (Math.abs(viewport.scale - 1) > 0.05 ||
-          viewport.height < window.innerHeight - 100)) return 'suspended';
+          viewport.height < window.innerHeight - 180)) return 'suspended';
         var width = document.documentElement.clientWidth;
         var height = window.innerHeight;
         if (width < 180 || height < 200) return 'suspended';
@@ -26,11 +27,11 @@ export class WebBottomSafeAreaScriptService {
           return true;
         }
         var visited = [];
-        function visible(node, rect) {
+        function visible(node, rect, allowPassthrough) {
           var style = getComputedStyle(node);
           return rect.width > 0 && rect.height > 0 && style.display !== 'none' &&
             style.visibility === 'visible' && Number(style.opacity) > 0 &&
-            style.pointerEvents !== 'none';
+            (allowPassthrough || style.pointerEvents !== 'none');
         }
         function geometry(node, slack) {
           var rect = node.getBoundingClientRect();
@@ -111,7 +112,8 @@ export class WebBottomSafeAreaScriptService {
             var centerX = (item.left + item.right) / 2;
             var centerY = (item.top + item.bottom) / 2;
             var hit = document.elementFromPoint(centerX, centerY);
-            if (!hit || !child.contains(hit)) continue;
+            // contains() does not include the node itself, and that node is often the hit.
+            if (!hit || (hit !== child && !child.contains(hit))) continue;
             if (minimum < 2) return true;
             controls.push({ node: child, x: centerX, y: centerY });
             // Two horizontally separated, visible click targets are sufficient. This also
@@ -193,8 +195,50 @@ export class WebBottomSafeAreaScriptService {
           // but they stay on the screen bottom while the transcript scrolls beside them.
           return !insideDialog(node) && unscrolledFooter(node);
         }
+        function bottomIsland(node) {
+          // A glass capsule sets pointer-events:none on the full-width shell and puts the
+          // buttons in a shorter centered pill. Hit-testing skips the shell, and the buttons
+          // are too close together to satisfy a full-width two-target rule.
+          var style = getComputedStyle(node);
+          if (style.position !== 'fixed' && style.position !== 'sticky') return false;
+          if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) <= 0) return false;
+          var rect = node.getBoundingClientRect();
+          if (stickyRejected(style, rect) || insideDialog(node)) return false;
+          if (rect.width < width * 0.85 || rect.height < 36 || rect.height > 96 ||
+            rect.left > width * 0.12 || rect.right < width * 0.88 ||
+            Math.abs(height - rect.bottom) > 28) return false;
+          var controls = [];
+          var walker = document.createTreeWalker(node, 1);
+          var child;
+          var budget = 64;
+          while (budget-- > 0 && (child = walker.nextNode())) {
+            if (!withinBudget()) return false;
+            var role = child.getAttribute('role');
+            var interactive = child.tagName === 'A' && child.hasAttribute('href') ||
+              child.tagName === 'BUTTON' || role === 'tab' || role === 'button' ||
+              role === 'link' || child.hasAttribute('onclick') ||
+              getComputedStyle(child).cursor === 'pointer';
+            if (!interactive) continue;
+            var item = child.getBoundingClientRect();
+            var childStyle = getComputedStyle(child);
+            if (item.width < 20 || item.height < 20 || childStyle.pointerEvents === 'none' ||
+              childStyle.display === 'none' || childStyle.visibility === 'hidden' ||
+              Number(childStyle.opacity) <= 0 || item.top < rect.top - 2 ||
+              item.bottom > rect.bottom + 8) continue;
+            if (controls.some(function(entry) { return entry.contains(child); })) continue;
+            var center = (item.left + item.right) / 2;
+            var hit = document.elementFromPoint(center, (item.top + item.bottom) / 2);
+            if (!hit || (hit !== child && !child.contains(hit) && !node.contains(hit))) continue;
+            for (var i = 0; i < controls.length; i++) {
+              var other = controls[i].getBoundingClientRect();
+              if (Math.abs((other.left + other.right) / 2 - center) >= 24) return true;
+            }
+            controls.push(child);
+          }
+          return false;
+        }
         function matches(node) {
-          if (pinnedComposer(node)) return true;
+          if (pinnedComposer(node) || bottomIsland(node)) return true;
           var style = getComputedStyle(node);
           var positioned = style.position === 'fixed' || style.position === 'sticky';
           var rect = geometry(node, 32);
@@ -445,7 +489,7 @@ export class WebBottomSafeAreaScriptService {
       var runtime = {
         token: token,
         resume: function() {
-          if (!active) lastResult = '';
+          lastResult = '';
           hostEnabled = true; start();
         },
         pause: function() { hostEnabled = false; stop(); },

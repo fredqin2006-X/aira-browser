@@ -6577,6 +6577,7 @@ struct BrowserShellPage {
       const appearance = sharedPreferencesRepository.getPreferences().appearance;
       this.toolbarChromeStyle = appearance.toolbarChromeStyle;
       this.syncWebBottomSafeAreaEnabled();
+      this.browserWebBottomSafeAreaCoordinator.requestCheck(this.activeTabId);
       this.syncWebToolbarClearance();
       if (this.toolbarChromeStyle === 'split' && !this.isLargeScreenShellFamilyActive()) {
         this.browserWebScrollInteractionCoordinator.applyBottomToolbarScrollBehavior(

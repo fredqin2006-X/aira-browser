@@ -282,7 +282,7 @@ export const DEFAULT_BROWSER_EXPERIMENT_SETTINGS: BrowserExperimentSettings = {
   strengthenAdBlockingForSmoothScroll: false,
   pullRefreshEnabled: true,
   forceEnableWebZoom: false,
-  webBottomSafeAreaEnabled: false,
+  webBottomSafeAreaEnabled: true,
   smartGripTabsActionsEnabled: true,
   webVideoTakeoverEnabled: true,
   novelModeEnabled: true,

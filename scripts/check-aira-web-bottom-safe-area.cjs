@@ -52,7 +52,8 @@ const script = WebBottomSafeAreaScriptService.buildSampleScript();
 // Controlled geometry fixtures execute the production detector, not a duplicate algorithm.
 function fixture({ position = 'fixed', width = 390, barWidth = width, bottom = 800,
   barHeight = 60, count = 5, role = '', cursorTabs = false, hidden = false, dialog = false,
-  overlay = false, stickyBottom = '0px', viewportHeight = 800, nested = false } = {}) {
+  overlay = false, stickyBottom = '0px', viewportHeight = 800, nested = false,
+  barPointerEvents = 'auto' } = {}) {
   const nodes = [];
   function node(tagName, left, top, w, h, parent, attrs = {}, style = {}) {
     const item = {
@@ -71,7 +72,7 @@ function fixture({ position = 'fixed', width = 390, barWidth = width, bottom = 8
   }
   const body = node('BODY', 0, 0, width, viewportHeight, null);
   const bar = node('NAV', 0, bottom - barHeight, barWidth, barHeight, body, { role },
-    { position, bottom: stickyBottom, display: hidden ? 'none' : 'block' });
+    { position, bottom: stickyBottom, display: hidden ? 'none' : 'block', pointerEvents: barPointerEvents });
   for (let i = 0; i < count; i++) {
     const control = node(cursorTabs ? 'DIV' : 'A', i * barWidth / count, bottom - barHeight,
       barWidth / count, barHeight, bar, cursorTabs ? {} : { href: `/tab/${i}` },
@@ -103,6 +104,7 @@ function fixture({ position = 'fixed', width = 390, barWidth = width, bottom = 8
   return { run, document, window, performance, bar, body, node, hits: () => hitTests };
 }
 assert.equal(fixture().run(), 'detected', 'five-tab bottom navigation');
+assert.equal(fixture({ barPointerEvents: 'none' }).run(), 'detected', 'pointer-events-none bottom capsule');
 assert.equal(fixture({ nested: true }).run(), 'detected', 'nested icon/label targets are deduplicated');
 assert.equal(fixture({ cursorTabs: true }).run(), 'detected', 'framework div tabs');
 assert.equal(fixture({ viewportHeight: 699, bottom: 699 }).run(), 'detected', 'still detected after reserving 101vp');
@@ -529,12 +531,12 @@ function runtime() {
   assert.equal(timers.size, 0);
 
   const { DEFAULT_BROWSER_EXPERIMENT_SETTINGS, PreferencesRepository } = load('data/preferences/PreferencesRepository.ets');
-  assert.equal(DEFAULT_BROWSER_EXPERIMENT_SETTINGS.webBottomSafeAreaEnabled, false);
+  assert.equal(DEFAULT_BROWSER_EXPERIMENT_SETTINGS.webBottomSafeAreaEnabled, true);
   const repository = new PreferencesRepository();
   const legacy = { ...DEFAULT_BROWSER_EXPERIMENT_SETTINGS };
   delete legacy.webBottomSafeAreaEnabled;
   await repository.updateExperimentSettings(legacy);
-  assert.equal(repository.getPreferences().experiments.webBottomSafeAreaEnabled, false, 'older settings default off');
+  assert.equal(repository.getPreferences().experiments.webBottomSafeAreaEnabled, true, 'older settings default on');
   const { SettingsDetailActionResolver } = load('core/settings/SettingsDetailActionResolver.ets');
   const resolver = new SettingsDetailActionResolver();
   let settings = resolver.buildExperimentSettingsForAction('toggle_web_bottom_safe_area', true, legacy);
@@ -554,10 +556,13 @@ function runtime() {
     true, 'opt-in survives storage serialization and a fresh adapter');
   await adapter.writeExperimentSettings(legacy);
   assert.equal((await reopened.readExperimentSettings(DEFAULT_BROWSER_EXPERIMENT_SETTINGS)).webBottomSafeAreaEnabled,
-    false, 'legacy persisted settings default off');
+    true, 'legacy persisted settings default on');
+  await adapter.writeExperimentSettings({ ...settings, webBottomSafeAreaEnabled: false });
+  assert.equal((await reopened.readExperimentSettings(DEFAULT_BROWSER_EXPERIMENT_SETTINGS)).webBottomSafeAreaEnabled,
+    false, 'an explicit off stays off');
   await adapter.writeExperimentSettings({ ...legacy, webBottomSafeAreaEnabled: 'true' });
   assert.equal((await reopened.readExperimentSettings(DEFAULT_BROWSER_EXPERIMENT_SETTINGS)).webBottomSafeAreaEnabled,
-    false, 'malformed persisted opt-in cannot enable the experiment');
+    true, 'a malformed value uses the default');
 
   // The tabs overview covers the page inside the same shell instead of navigating away, so nothing
   // else re-evaluates bottom avoidance on the way out. Without this callback the observer stays

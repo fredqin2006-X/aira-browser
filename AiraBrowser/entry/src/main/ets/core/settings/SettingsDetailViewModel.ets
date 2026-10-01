@@ -339,7 +339,7 @@ export class SettingsDetailViewModel {
       strengthenAdBlockingForSmoothScroll: false,
       pullRefreshEnabled: false,
       forceEnableWebZoom: false,
-      webBottomSafeAreaEnabled: false,
+      webBottomSafeAreaEnabled: true,
       smartGripTabsActionsEnabled: true,
       webVideoTakeoverEnabled: true,
       novelModeEnabled: true,

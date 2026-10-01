@@ -66,6 +66,7 @@ export class BrowserWebBottomSafeAreaCoordinator {
   private touchActive: boolean = false;
   private pendingPresentation: boolean = false;
   private timer: number = -1;
+  private recheckTimer: number = -1;
 
   constructor(port: BrowserWebBottomSafeAreaPort) {
     this.port = port;
@@ -77,7 +78,11 @@ export class BrowserWebBottomSafeAreaCoordinator {
     if (!enabled) {
       this.clearSessions();
       this.publish(0);
-    } else this.reconcile();
+    } else {
+      this.reconcile();
+      // Leaving split toolbar for the floating capsule must scan the page already on screen.
+      if (this.activeTabId.length > 0) this.requestCheck(this.activeTabId);
+    }
   }
 
   setVisible(visible: boolean): void {
@@ -86,6 +91,7 @@ export class BrowserWebBottomSafeAreaCoordinator {
     if (!visible) this.clearInteraction();
     // Keep the document result and geometry while settings cover this shell.
     this.reconcile();
+    if (visible && this.enabled && this.activeTabId.length > 0) this.requestCheck(this.activeTabId);
   }
 
   handleScroll(tabId: string): void {
@@ -122,6 +128,7 @@ export class BrowserWebBottomSafeAreaCoordinator {
     if (!this.enabled) return;
     const session = this.resolveSession(this.port.readFacts());
     if (session !== undefined) session.ready = false;
+    this.scheduleRecheck(tabId);
   }
 
   retainTabs(tabIds: string[]): void {
@@ -233,9 +240,24 @@ export class BrowserWebBottomSafeAreaCoordinator {
   private clearInteraction(): void {
     if (this.timer >= 0) clearTimeout(this.timer);
     this.timer = -1;
+    if (this.recheckTimer >= 0) clearTimeout(this.recheckTimer);
+    this.recheckTimer = -1;
     this.touchActive = false;
     this.pendingPresentation = false;
     this.lastInteractionAt = 0;
+  }
+
+  private scheduleRecheck(tabId: string): void {
+    if (this.recheckTimer >= 0) clearTimeout(this.recheckTimer);
+    this.recheckTimer = setTimeout(() => {
+      this.recheckTimer = -1;
+      if (!this.enabled || !this.visible || tabId !== this.activeTabId) return;
+      const session = this.sessions.get(tabId);
+      if (session === undefined || !this.canRun(this.port.readFacts())) return;
+      session.ready = true;
+      this.install(session);
+      this.applyPresentation(this.port.readFacts(), session);
+    }, 700);
   }
 
   private applyPresentation(facts: BrowserWebBottomSafeAreaFacts,
