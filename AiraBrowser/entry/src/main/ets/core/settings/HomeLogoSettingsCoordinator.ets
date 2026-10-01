@@ -5,7 +5,8 @@ import {
   HomeLogoCustomAsset,
   HomeLogoPickSource,
   HomeLogoSelection,
-  normalizeHomeLogoSelection
+  normalizeHomeLogoSelection,
+  withoutHomeLogoCustomAsset
 } from '../../common/models/HomeLogoModels';
 import { HomeLogoImageService } from '../../services/settings/HomeLogoImageService';
 import {
@@ -75,6 +76,19 @@ export class HomeLogoSettingsCoordinator {
       // The tile is gone, so its file has no reader left.
       await this.imageService.removeStoredImage(dropped[index].uri);
     }
+    return selection;
+  }
+
+  /** Removes one imported logo and its file. A selected import falls back to the shipped wordmark. */
+  async removeCustomLogo(id: string): Promise<HomeLogoSelection> {
+    const current = this.getSelection();
+    const asset = findHomeLogoCustomAsset(current.customAssets, id);
+    const next = withoutHomeLogoCustomAsset(current, id);
+    if (asset === undefined || next === undefined) {
+      throw new Error('这个 Logo 不可用。');
+    }
+    const selection = await this.writeSelection(next);
+    await this.imageService.removeStoredImage(asset.uri);
     return selection;
   }
 

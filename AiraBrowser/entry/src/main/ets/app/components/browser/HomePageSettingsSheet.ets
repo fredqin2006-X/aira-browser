@@ -387,6 +387,9 @@ export struct HomePageSettingsContent {
           onAddCustom: (source: HomeLogoPickSource) => {
             this.addCustomLogo(source);
           },
+          onDeleteCustom: (id: string) => {
+            this.deleteCustomLogo(id);
+          },
           onScaleCommit: (scaleRatio: number) => {
             this.commitLogoScale(scaleRatio);
           },
@@ -627,6 +630,23 @@ export struct HomePageSettingsContent {
         this.logoBusy = false;
         this.refreshLogoSelection();
         this.showToast(error.message.length > 0 ? error.message : resolveAppResourceText($r('app.string.browser_ui_home_page_settings_sheet_001')));
+      });
+  }
+
+  private deleteCustomLogo(id: string): void {
+    if (this.logoBusy) {
+      return;
+    }
+    this.logoBusy = true;
+    this.logoCoordinator.removeCustomLogo(id)
+      .then((selection: HomeLogoSelection) => {
+        this.logoBusy = false;
+        this.logoSelection = selection;
+      })
+      .catch((error: Error) => {
+        this.logoBusy = false;
+        this.refreshLogoSelection();
+        this.showToast(error.message.length > 0 ? error.message : resolveAppResourceText($r('app.string.settings_home_04')));
       });
   }
 

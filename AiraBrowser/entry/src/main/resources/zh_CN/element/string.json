@@ -397,6 +397,26 @@
       "value": "从文件选择（SVG / GIF）"
     },
     {
+      "name": "settings_home_logo_delete",
+      "value": "删除"
+    },
+    {
+      "name": "settings_home_logo_delete_cancel",
+      "value": "取消"
+    },
+    {
+      "name": "settings_home_logo_delete_title",
+      "value": "删除导入的 Logo"
+    },
+    {
+      "name": "settings_home_logo_delete_message",
+      "value": "确定删除“%1$s”吗？删除后不能恢复。"
+    },
+    {
+      "name": "settings_home_logo_delete_a11y",
+      "value": "删除 %1$s"
+    },
+    {
       "name": "settings_custom_home_title",
       "value": "主页设置"
     },
@@ -1670,7 +1690,7 @@
     },
     {
       "name": "settings_pro_donate_intro_title",
-      "value": "捐赠Pro"
+      "value": "捐赠支持 Pro"
     },
     {
       "name": "settings_pro_donate_intro_lead",
@@ -6730,7 +6750,11 @@
     },
     {
       "name": "settings_link_install_note",
-      "value": "手机上装不了电脑浏览器的扩展：把链接发到电脑，在电脑上安装。"
+      "value": "点「复制」后，把链接发到电脑，在电脑上安装。"
+    },
+    {
+      "name": "settings_link_install_family",
+      "value": "Chrome 系浏览器可以直接安装 Chrome 的，Firefox 系浏览器可以直接安装 Firefox 的。"
     },
     {
       "name": "settings_link_ext_local",
@@ -9682,7 +9706,7 @@
     },
     {
       "name": "bottom_panel_home_web_zoom",
-      "value": "请先打开网页后再缩放。"
+      "value": "请先打开网页后调整缩放。"
     },
     {
       "name": "bottom_panel_home_tool",

@@ -104,6 +104,8 @@ export interface BrowserRootBottomPanelFixedActionFacts {
   fullscreenPresentation: BrowserFullscreenSessionPresentation;
   textZoomRatio: number;
   textZoomActionVersion: number;
+  webZoomActionTrailingText: ResourceStr;
+  webZoomActionVersion: number;
   themeModeActionVersion: number;
   toolbarLayoutVersion: number;
 }
@@ -211,6 +213,8 @@ export class BrowserRootBottomPanelFixedActionApplication implements BrowserRoot
       userAgentActionVersion: userAgentPresentation.desktopSiteActionVersion,
       textZoomRatio: facts.textZoomRatio,
       textZoomActionVersion: facts.textZoomActionVersion,
+      webZoomActionTrailingText: facts.webZoomActionTrailingText,
+      webZoomActionVersion: facts.webZoomActionVersion,
       userAgentPresetSettings: userAgentPresentation.settings,
       userAgentPresetActionVersion: userAgentPresentation.userAgentPresetActionVersion,
       screenOrientationMode: fullscreenPresentation.screenOrientationMode,
@@ -460,6 +464,8 @@ export class BrowserRootBottomPanelFixedActionApplication implements BrowserRoot
         return undefined;
       case 'textZoom':
         return 'open_text_zoom';
+      case 'webZoom':
+        return 'open_web_zoom';
       case 'userAgentPreset':
         this.dependencies.userAgentActionCoordinator.openUserAgentPresetSheet();
         return undefined;

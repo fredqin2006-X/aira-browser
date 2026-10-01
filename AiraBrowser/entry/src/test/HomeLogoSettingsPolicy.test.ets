@@ -2,6 +2,7 @@ import { describe, expect, it } from '@ohos/hypium';
 import {
   buildHomeLogoCustomAssetId,
   findHomeLogoCustomAsset,
+  findHomeLogoPreset,
   HOME_LOGO_BUILTIN_ID,
   HOME_LOGO_CUSTOM_ASSET_ID_PREFIX,
   HomeLogoCustomAsset,
@@ -11,7 +12,8 @@ import {
   listHomeLogoPresets,
   normalizeHomeLogoSelection,
   resolveHomeLogoDisplaySource,
-  resolveHomeLogoRowLabel
+  resolveHomeLogoRowLabel,
+  withoutHomeLogoCustomAsset
 } from '../main/ets/common/models/HomeLogoModels';
 import {
   buildHomeLogoGridRows,
@@ -29,6 +31,7 @@ import {
   homeLogoSliderValueToScale,
   normalizeHomeLogoOpacity,
   normalizeHomeLogoScaleRatio,
+  resolveHomeLogoCornerRadiusVp,
   resolveHomeLogoDisplayWidthVp,
   resolveHomeLogoGridColumns,
   resolveHomeLogoHeightVp
@@ -178,6 +181,52 @@ export default function homeLogoSettingsPolicyTest(): void {
       expect(source.fileUri).assertEqual('file://a.png');
       expect(source.colorMode).assertEqual('authored');
       expect(resolveHomeLogoRowLabel(selection)).assertEqual('自定义');
+    });
+
+    it('offers_the_shipped_app_icons_as_rounded_presets', 0, () => {
+      const classic = findHomeLogoPreset('icon-classic');
+      const night = findHomeLogoPreset('icon-night');
+      const blue = findHomeLogoPreset('icon-blue');
+      const color = findHomeLogoPreset('icon-color');
+      const texture = findHomeLogoPreset('icon-texture');
+      expect(classic !== undefined).assertTrue();
+      expect(night !== undefined).assertTrue();
+      expect(blue !== undefined).assertTrue();
+      expect(color !== undefined).assertTrue();
+      expect(texture !== undefined).assertTrue();
+      expect(classic?.title).assertEqual('经典');
+      expect(night?.title).assertEqual('夜色');
+      expect(blue?.title).assertEqual('海蓝');
+      expect(color?.title).assertEqual('缤纷');
+      expect(texture?.title).assertEqual('磨砂');
+      expect(classic?.shape).assertEqual('icon');
+      expect(texture?.shape).assertEqual('icon');
+      expect(classic?.colorMode).assertEqual('authored');
+      expect(blue?.rawfileName).assertEqual('home_logo_icon_blue.png');
+      expect(color?.rawfileName).assertEqual('home_logo_icon_color.png');
+      expect(texture?.rawfileName).assertEqual('home_logo_icon_texture.png');
+      const presets = listHomeLogoPresets();
+      expect(presets[1].id).assertEqual('icon-classic');
+      expect(presets[2].id).assertEqual('icon-night');
+      expect(presets[3].id).assertEqual('icon-blue');
+      expect(presets[4].id).assertEqual('icon-color');
+      expect(presets[5].id).assertEqual('icon-texture');
+      expect(resolveHomeLogoDisplaySource({ id: 'icon-classic', customAssets: [] }).shape).assertEqual('icon');
+      expect(resolveHomeLogoCornerRadiusVp(40, 'icon')).assertEqual(9);
+      expect(resolveHomeLogoCornerRadiusVp(40, 'wordmark')).assertEqual(0);
+    });
+
+    it('removes_an_imported_logo_and_falls_back_when_it_was_selected', 0, () => {
+      const selection = selectionWith('custom-1000', ['file://a.png', 'file://b.png']);
+      const removed = withoutHomeLogoCustomAsset(selection, 'custom-1000');
+      expect(removed !== undefined).assertTrue();
+      expect(removed?.id).assertEqual(HOME_LOGO_BUILTIN_ID);
+      expect(removed?.customAssets.length).assertEqual(1);
+      expect(removed?.customAssets[0].uri).assertEqual('file://b.png');
+      const kept = withoutHomeLogoCustomAsset(selection, 'custom-1001');
+      expect(kept?.id).assertEqual('custom-1000');
+      expect(kept?.customAssets.length).assertEqual(1);
+      expect(withoutHomeLogoCustomAsset(selection, 'icon-classic') === undefined).assertTrue();
     });
 
     it('follows_the_wallpaper_only_for_single_color_masks', 0, () => {

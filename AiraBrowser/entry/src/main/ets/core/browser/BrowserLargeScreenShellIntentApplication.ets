@@ -66,7 +66,6 @@ import {
   browserNativeTabSceneService
 } from './BrowserNativeTabSceneService';
 
-const WEB_ZOOM_DIALOG_AUTO_DISMISS_DELAY_MS: number = 2000;
 const WEB_ZOOM_DIAG_DOMAIN: number = 0x0000;
 const WEB_ZOOM_DIAG_TAG: string = 'DesktopZoomDiag';
 const WEB_ZOOM_DIAG_PREFIX: string = '[DEBUG-desktop-zoom-20260726]';
@@ -226,7 +225,6 @@ export class BrowserLargeScreenShellIntentApplication {
   private movingTabIds: Record<string, boolean> = {};
   private closingAllTabs: boolean = false;
   private webZoomDialogVisible: boolean = false;
-  private webZoomDialogDismissTimer: number = -1;
 
   constructor(dependencies: BrowserLargeScreenShellIntentDependencies) {
     this.dependencies = dependencies;
@@ -332,13 +330,11 @@ export class BrowserLargeScreenShellIntentApplication {
     hilog.info(
       WEB_ZOOM_DIAG_DOMAIN,
       WEB_ZOOM_DIAG_TAG,
-      '%{public}s dialog dismissed-callback logicalVisibleBefore=%{public}s timerActive=%{public}s',
+      '%{public}s dialog dismissed-callback logicalVisibleBefore=%{public}s',
       WEB_ZOOM_DIAG_PREFIX,
-      this.webZoomDialogVisible ? 'true' : 'false',
-      this.webZoomDialogDismissTimer >= 0 ? 'true' : 'false'
+      this.webZoomDialogVisible ? 'true' : 'false'
     );
     this.webZoomDialogVisible = false;
-    this.clearWebZoomDialogDismissTimer();
   }
 
   dispose(): void {
@@ -1011,7 +1007,6 @@ export class BrowserLargeScreenShellIntentApplication {
       presentationMode,
       this.webZoomDialogVisible ? 'true' : 'false'
     );
-    this.scheduleWebZoomDialogDismiss();
   }
 
   private isControlPressed(event: KeyEvent): boolean {
@@ -1039,56 +1034,14 @@ export class BrowserLargeScreenShellIntentApplication {
     return undefined;
   }
 
-  private scheduleWebZoomDialogDismiss(): void {
-    const replacedTimer = this.webZoomDialogDismissTimer >= 0;
-    this.clearWebZoomDialogDismissTimer();
-    this.webZoomDialogDismissTimer = setTimeout(() => {
-      hilog.info(
-        WEB_ZOOM_DIAG_DOMAIN,
-        WEB_ZOOM_DIAG_TAG,
-        '%{public}s dialog timer-fired logicalVisible=%{public}s',
-        WEB_ZOOM_DIAG_PREFIX,
-        this.webZoomDialogVisible ? 'true' : 'false'
-      );
-      this.webZoomDialogDismissTimer = -1;
-      this.dismissWebZoomDialog();
-    }, WEB_ZOOM_DIALOG_AUTO_DISMISS_DELAY_MS);
-    hilog.info(
-      WEB_ZOOM_DIAG_DOMAIN,
-      WEB_ZOOM_DIAG_TAG,
-      '%{public}s dialog timer-scheduled delayMs=%{public}d replaced=%{public}s timerId=%{public}d',
-      WEB_ZOOM_DIAG_PREFIX,
-      WEB_ZOOM_DIALOG_AUTO_DISMISS_DELAY_MS,
-      replacedTimer ? 'true' : 'false',
-      this.webZoomDialogDismissTimer
-    );
-  }
-
-  private clearWebZoomDialogDismissTimer(): void {
-    if (this.webZoomDialogDismissTimer < 0) {
-      return;
-    }
-    hilog.info(
-      WEB_ZOOM_DIAG_DOMAIN,
-      WEB_ZOOM_DIAG_TAG,
-      '%{public}s dialog timer-cleared timerId=%{public}d',
-      WEB_ZOOM_DIAG_PREFIX,
-      this.webZoomDialogDismissTimer
-    );
-    clearTimeout(this.webZoomDialogDismissTimer);
-    this.webZoomDialogDismissTimer = -1;
-  }
-
   private dismissWebZoomDialog(): void {
     hilog.info(
       WEB_ZOOM_DIAG_DOMAIN,
       WEB_ZOOM_DIAG_TAG,
-      '%{public}s dialog dismiss-request logicalVisible=%{public}s timerActive=%{public}s',
+      '%{public}s dialog dismiss-request logicalVisible=%{public}s',
       WEB_ZOOM_DIAG_PREFIX,
-      this.webZoomDialogVisible ? 'true' : 'false',
-      this.webZoomDialogDismissTimer >= 0 ? 'true' : 'false'
+      this.webZoomDialogVisible ? 'true' : 'false'
     );
-    this.clearWebZoomDialogDismissTimer();
     if (!this.webZoomDialogVisible) {
       hilog.info(
         WEB_ZOOM_DIAG_DOMAIN,

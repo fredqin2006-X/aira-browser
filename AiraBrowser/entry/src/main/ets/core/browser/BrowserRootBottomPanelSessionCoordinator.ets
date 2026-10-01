@@ -489,6 +489,7 @@ export type BrowserRootBottomPanelShellAction =
   'scan_qr' |
   'toggle_private_mode' |
   'open_text_zoom' |
+  'open_web_zoom' |
   'open_site_report' |
   'open_tabs_overview' |
   'request_browser_back';

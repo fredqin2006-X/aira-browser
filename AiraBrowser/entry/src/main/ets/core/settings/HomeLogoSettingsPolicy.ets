@@ -2,6 +2,7 @@ import { CENTERED_HOME_WORDMARK_HEIGHT } from '../../features/newtab/CenteredHom
 import {
   HomeLogoColorMode,
   HomeLogoSelection,
+  HomeLogoShape,
   listHomeLogoPresets,
   normalizeHomeLogoSelection,
   resolveHomeLogoRowLabel
@@ -26,6 +27,8 @@ export const HOME_LOGO_OPACITY_MAX: number = 1;
 export const HOME_LOGO_OPACITY_DEFAULT: number = 1;
 export const HOME_LOGO_OPACITY_SLIDER_STEP: number = 1;
 export const HOME_LOGO_PREVIEW_HEIGHT_VP: number = 40;
+/** Share of the drawn side. Matches a rounded app icon, not a circle. */
+export const HOME_LOGO_ICON_CORNER_RATIO: number = 0.22;
 export const HOME_LOGO_GRID_GAP_VP: number = 12;
 /** The trailing "add" tile is only a picker affordance, never a selectable logo. */
 export const HOME_LOGO_ADD_ITEM_ID: string = 'add';
@@ -44,6 +47,7 @@ export interface HomeLogoGridItem {
   intrinsicWidth: number;
   intrinsicHeight: number;
   colorMode: HomeLogoColorMode;
+  shape: HomeLogoShape;
   selected: boolean;
 }
 
@@ -145,6 +149,14 @@ export function resolveHomeLogoDisplayWidthVp(
   return natural;
 }
 
+/** Wordmarks stay square-cornered. An app icon takes a rounded-rect mask of its own height. */
+export function resolveHomeLogoCornerRadiusVp(heightVp: number, shape: HomeLogoShape): number {
+  if (shape !== 'icon' || !(heightVp > 0)) {
+    return 0;
+  }
+  return Math.max(1, Math.round(heightVp * HOME_LOGO_ICON_CORNER_RATIO));
+}
+
 export function resolveHomeLogoPreviewMaxWidthVp(
   containerWidth: number,
   columns: number,
@@ -175,6 +187,7 @@ export function buildHomeLogoGridItems(selection: HomeLogoSelection | undefined)
       intrinsicWidth: preset.intrinsicWidth,
       intrinsicHeight: preset.intrinsicHeight,
       colorMode: preset.colorMode,
+      shape: preset.shape,
       selected: preset.id === normalized.id
     });
   }
@@ -189,6 +202,7 @@ export function buildHomeLogoGridItems(selection: HomeLogoSelection | undefined)
       intrinsicWidth: asset.width,
       intrinsicHeight: asset.height,
       colorMode: 'authored',
+      shape: 'wordmark',
       selected: asset.id === normalized.id
     });
   }
@@ -201,6 +215,7 @@ export function buildHomeLogoGridItems(selection: HomeLogoSelection | undefined)
     intrinsicWidth: 0,
     intrinsicHeight: 0,
     colorMode: 'authored',
+    shape: 'wordmark',
     selected: false
   });
   return items;

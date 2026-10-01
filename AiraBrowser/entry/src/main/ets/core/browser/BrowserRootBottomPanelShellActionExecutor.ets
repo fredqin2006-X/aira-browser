@@ -8,6 +8,7 @@ export interface BrowserRootBottomPanelShellActionHost {
   scanQrCode: () => void;
   togglePrivateMode: () => void;
   openTextZoom: () => void;
+  openWebZoom: () => void;
   openSiteReport: () => void;
   openTabsOverview: () => void;
   requestBrowserBack: () => void;
@@ -42,6 +43,9 @@ export class BrowserRootBottomPanelShellActionExecutor {
         return;
       case 'open_text_zoom':
         this.host.openTextZoom();
+        return;
+      case 'open_web_zoom':
+        this.host.openWebZoom();
         return;
       case 'open_site_report':
         this.host.openSiteReport();

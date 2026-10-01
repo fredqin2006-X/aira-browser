@@ -427,6 +427,13 @@ export struct CrossDeviceLinkSetupScreen {
         .lineHeight(19)
         .fontColor(this.storedSecondaryTextColor)
         .padding({ left: 4, right: 4 })
+
+      Text($r('app.string.settings_link_install_family'))
+        .width('100%')
+        .fontSize(13)
+        .lineHeight(19)
+        .fontColor(this.storedSecondaryTextColor)
+        .padding({ left: 4, right: 4 })
     }
   }
 

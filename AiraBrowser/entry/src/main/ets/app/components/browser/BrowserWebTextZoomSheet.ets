@@ -2,117 +2,37 @@ import {
   BrowserWebTextZoomAction,
   BrowserWebTextZoomState
 } from '../../../core/browser/BrowserWebTextZoomViewModel';
-import {
-  BROWSER_THEME_STORAGE_DIVIDER_KEY,
-  BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY
-} from '../../../core/theme/BrowserThemeStorageKeys';
-import { AiraRenderableIconId } from '../../../core/resources/GeneratedAiraIconCatalog';
-import { BrowserSheetActionButton, BrowserSheetIconButton } from './BrowserModalBottomSheet';
 import { CENTERED_DIALOG_SYSTEM_SURFACE_MODIFIER } from '../common/CenteredDialogSurface';
-
-const WEB_TEXT_ZOOM_CONTROL_HEIGHT: number = 40;
-const WEB_TEXT_ZOOM_CONTROL_RADIUS: number = 15;
-const WEB_TEXT_ZOOM_DIVIDER_WIDTH: number = 1;
+import { BrowserZoomAdjustDialogBody } from './BrowserZoomAdjustDialogBody';
 
 @CustomDialog
 export struct BrowserWebTextZoomSheet {
-  @StorageProp(BROWSER_THEME_STORAGE_DIVIDER_KEY) private storedDividerColor: string = '#E3E8EF';
-  @StorageProp(BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY) private storedPrimaryTextColor: string = '#111318';
   controller?: CustomDialogController;
   @Link state: BrowserWebTextZoomState;
   onAction: (action: BrowserWebTextZoomAction) => void = (_action: BrowserWebTextZoomAction) => {};
 
   build() {
-    Column({ space: 16 }) {
-      Row() {
-        Blank()
-          .width(56)
-          .height(44)
-
-        Text($r('app.string.web_text_zoom_title'))
-          .layoutWeight(1)
-          .fontSize(20)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(this.storedPrimaryTextColor)
-          .textAlign(TextAlign.Center)
-          .maxLines(1)
-
-        BrowserSheetActionButton({
-          label: $r('app.string.web_text_zoom_default'),
-          fillAvailableWidth: false,
-          buttonWidth: 56,
-          buttonHeight: 44,
-          fontSize: 15,
-          actionEnabled: this.state.ratio !== 100,
-          onAction: () => {
-            this.onAction('reset');
-          }
-        })
-      }
-      .width('100%')
-      .height(44)
-      .alignItems(VerticalAlign.Center)
-
-      Row({ space: 0 }) {
-        this.buildZoomButton('browser.toolbar.zoomOut', $r('app.string.web_text_zoom_decrease'), this.state.canDecrease, () => {
-          this.onAction('decrease');
-        })
-
-        this.buildDivider()
-
-        Text(this.state.percentLabel)
-          .layoutWeight(1)
-          .height(WEB_TEXT_ZOOM_CONTROL_HEIGHT)
-          .fontSize(15)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(this.storedPrimaryTextColor)
-          .textAlign(TextAlign.Center)
-          .maxLines(1)
-
-        this.buildDivider()
-
-        this.buildZoomButton('browser.toolbar.zoomIn', $r('app.string.web_text_zoom_increase'), this.state.canIncrease, () => {
-          this.onAction('increase');
-        })
-      }
-      .width('100%')
-      .height(WEB_TEXT_ZOOM_CONTROL_HEIGHT)
-      .borderRadius(WEB_TEXT_ZOOM_CONTROL_RADIUS)
-
-      Row() {
-        BrowserSheetActionButton({
-          label: $r('app.string.web_text_zoom_done'),
-          buttonHeight: 44,
-          fontSize: 15,
-          onAction: () => {
-            this.controller?.close();
-          }
-        })
-      }
-      .width('100%')
-    }
-    .attributeModifier(CENTERED_DIALOG_SYSTEM_SURFACE_MODIFIER)
-  }
-
-  @Builder
-  private buildZoomButton(iconId: AiraRenderableIconId, label: ResourceStr, enabled: boolean, action: () => void) {
-    BrowserSheetIconButton({
-      airaIconId: iconId,
-      iconSize: 17,
-      buttonSize: WEB_TEXT_ZOOM_CONTROL_HEIGHT,
-      actionEnabled: enabled,
-      accessibilityLabel: label,
-      onAction: () => {
-        action();
+    BrowserZoomAdjustDialogBody({
+      title: $r('app.string.web_text_zoom_title'),
+      percentLabel: this.state.percentLabel,
+      canDecrease: this.state.canDecrease,
+      canIncrease: this.state.canIncrease,
+      canReset: this.state.ratio !== 100,
+      decreaseLabel: $r('app.string.web_text_zoom_decrease'),
+      increaseLabel: $r('app.string.web_text_zoom_increase'),
+      onDecrease: (): void => {
+        this.onAction('decrease');
+      },
+      onIncrease: (): void => {
+        this.onAction('increase');
+      },
+      onReset: (): void => {
+        this.onAction('reset');
+      },
+      onDone: (): void => {
+        this.controller?.close();
       }
     })
-  }
-
-  @Builder
-  private buildDivider() {
-    Blank()
-      .width(WEB_TEXT_ZOOM_DIVIDER_WIDTH)
-      .height(20)
-      .backgroundColor(this.storedDividerColor)
+      .attributeModifier(CENTERED_DIALOG_SYSTEM_SURFACE_MODIFIER)
   }
 }

@@ -2659,6 +2659,7 @@ struct BrowserShellPage {
         this.browserPrivateModeTogglePresentationHost
       ),
       openTextZoom: (): void => this.openWebTextZoomSheet(),
+      openWebZoom: (): void => this.openPhoneWebZoomDialog(),
       openSiteReport: (): void => this.openSiteReportDialog(),
       openTabsOverview: (): void => this.requestOpenTabsOverviewFromRootBottomPanel(),
       requestBrowserBack: (): void => {
@@ -3603,7 +3604,8 @@ struct BrowserShellPage {
         appearancePolicy: this.buildWebAppearancePolicyForTab(activeTab),
         forceEnableWebZoom: this.browserLargeScreenWebZoomCoordinator.resolveForceEnableWebZoom(
           this.webScrollExperimentSettings.forceEnableWebZoom,
-          this.browserShellPresentationOperations?.surface() === 'large_screen'
+          this.browserShellPresentationOperations?.surface() === 'large_screen',
+          this.phoneWebZoomForceEnabled
         ),
         textZoomRatio: this.resolveEffectiveWebTextZoomRatio(),
         pullRefreshNestedScrollEnabled: this.browserPullRefreshCoordinator.isEnabledForActiveSurface(activeTab),
@@ -3619,7 +3621,8 @@ struct BrowserShellPage {
         appearancePolicy: this.buildWebAppearancePolicyForTab(tab),
         forceEnableWebZoom: this.browserLargeScreenWebZoomCoordinator.resolveForceEnableWebZoom(
           this.webScrollExperimentSettings.forceEnableWebZoom,
-          this.browserShellPresentationOperations?.surface() === 'large_screen'
+          this.browserShellPresentationOperations?.surface() === 'large_screen',
+          this.phoneWebZoomForceEnabled
         ),
         textZoomRatio: this.resolveEffectiveWebTextZoomRatio(),
         userScriptNativeBridge: this.userScriptRuntimeCoordinator.createNativeBridge(
@@ -5758,6 +5761,9 @@ struct BrowserShellPage {
   @State browserFullscreenSessionPresentation: BrowserFullscreenSessionPresentation =
     this.browserFullscreenSessionCoordinator.snapshot();
   @State webTextZoomRatio: number = 100;
+  // Set when the touch zoom dialog opens, and kept for the session so a locked mobile
+  // viewport cannot clamp the same page zoom the desktop shell already forces on.
+  private phoneWebZoomForceEnabled: boolean = false;
   @State privateModeConfirmationState: BrowserPrivateModeConfirmationState =
     this.browserPrivateTabCoordinator.buildModeSwitchConfirmationState({
       target: 'confirm_enter_private'
@@ -5798,7 +5804,7 @@ struct BrowserShellPage {
     backgroundBlurStyle: BlurStyle.NONE,
     cornerRadius: CENTERED_DIALOG_CORNER_RADIUS_VP,
     width: resolveCenteredDialogControllerWidth('xs'),
-    autoCancel: true
+    autoCancel: false
   });
   private largeScreenWebZoomDialogController: CustomDialogController = new CustomDialogController({
     builder: BrowserLargeScreenWebZoomDialog({
@@ -5820,8 +5826,11 @@ struct BrowserShellPage {
     backgroundBlurStyle: BlurStyle.NONE,
     cornerRadius: CENTERED_DIALOG_CORNER_RADIUS_VP,
     width: resolveCenteredDialogControllerWidth('xs'),
-    autoCancel: true,
+    autoCancel: false,
     onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
+        return;
+      }
       this.browserLargeScreenShellIntentApplication.handleWebZoomDialogDismissed();
       dismissDialogAction.dismiss();
     }
@@ -6442,6 +6451,11 @@ struct BrowserShellPage {
       fullscreenPresentation: this.browserFullscreenSessionPresentation,
       textZoomRatio: this.webTextZoomRatio,
       textZoomActionVersion: this.webTextZoomActionVersion,
+      webZoomActionTrailingText: this.browserLargeScreenWebZoomCoordinator.snapshot(
+        this.activeTabId,
+        this.largeScreenWebZoomRevision
+      ).percentLabel,
+      webZoomActionVersion: this.largeScreenWebZoomRevision,
       themeModeActionVersion: this.themeModeActionVersion,
       toolbarLayoutVersion: this.toolbarLayoutVersion
     }),
@@ -12079,6 +12093,23 @@ struct BrowserShellPage {
   private openWebTextZoomSheet(): void {
     this.webTextZoomSheetState = this.webTextZoomViewModel.buildState(this.webTextZoomRatio);
     this.webTextZoomDialogController.open();
+  }
+
+  private openPhoneWebZoomDialog(): void {
+    const tabId = this.activeTabId.trim();
+    const snapshot = this.browserLargeScreenWebZoomCoordinator.snapshot(tabId, this.largeScreenWebZoomRevision);
+    if (!snapshot.available) {
+      this.showNativeToast($r('app.string.bottom_panel_zoom_unavailable'));
+      return;
+    }
+    if (!this.phoneWebZoomForceEnabled) {
+      this.phoneWebZoomForceEnabled = true;
+      this.browserHostedRuntimeSurfacePort.updateCurrentActiveConfigFromHost();
+    }
+    this.browserLargeScreenShellIntentApplication.dispatchNavigation({
+      kind: 'open_web_zoom_dialog',
+      text: ''
+    });
   }
 
   private applyWebTextZoomAction(action: BrowserWebTextZoomAction): void {

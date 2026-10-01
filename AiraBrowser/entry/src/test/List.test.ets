@@ -85,6 +85,7 @@ import crossDeviceLinkGuideCoordinatorTest from './CrossDeviceLinkGuideCoordinat
 import crossDeviceLinkViewModelTest from './CrossDeviceLinkViewModel.test';
 import communityUpdateCheckCoordinatorTest from './CommunityUpdateCheckCoordinator.test';
 import browserLargeScreenWebZoomPolicyTest from './BrowserLargeScreenWebZoomPolicy.test';
+import browserToolbarActionInsertPolicyTest from './BrowserToolbarActionInsertPolicy.test';
 import browserLargeScreenTabTitleSlotPolicyTest from './BrowserLargeScreenTabTitleSlotPolicy.test';
 import browserLargeScreenTabStripBlankAreaPolicyTest from './BrowserLargeScreenTabStripBlankAreaPolicy.test';
 import browserLargeScreenVerticalTabsPolicyTest from './BrowserLargeScreenVerticalTabsPolicy.test';
@@ -197,6 +198,7 @@ export default function tests(): void {
   crossDeviceLinkViewModelTest();
   communityUpdateCheckCoordinatorTest();
   browserLargeScreenWebZoomPolicyTest();
+  browserToolbarActionInsertPolicyTest();
   browserLargeScreenTabTitleSlotPolicyTest();
   browserLargeScreenTabStripBlankAreaPolicyTest();
   browserLargeScreenVerticalTabsPolicyTest();

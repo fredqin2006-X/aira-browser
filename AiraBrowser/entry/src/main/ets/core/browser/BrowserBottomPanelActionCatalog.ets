@@ -20,6 +20,7 @@ export type BrowserBottomPanelActionId =
   'addToDesktop' |
   'userAgent' |
   'textZoom' |
+  'webZoom' |
   'userAgentPreset' |
   'screenOrientation' |
   'themeMode' |
@@ -145,6 +146,8 @@ export class BrowserBottomPanelActionCatalog {
       case 'textZoom':
       case 'increaseFont':
         return 'reader.increaseFont';
+      case 'webZoom':
+        return 'browser.toolbar.zoomIn';
       case 'userAgentPreset':
         return 'browser.toolbar.userAgentPreset';
       case 'screenOrientation':
@@ -234,6 +237,7 @@ export class BrowserBottomPanelActionCatalog {
       { id: 'print', customizable: true, surfaces: ['web'] },
       { id: 'userAgent', customizable: true, surfaces: ['web'] },
       { id: 'textZoom', customizable: true, surfaces: ['web'] },
+      { id: 'webZoom', customizable: true, surfaces: ['web'] },
       { id: 'fullScreenMode', customizable: true, surfaces: ['web'] },
       { id: 'manualElementHide', customizable: true, surfaces: ['web'] },
       { id: 'elementInspection', customizable: true, surfaces: ['web'] },

@@ -73,8 +73,8 @@ export default function wallpaperColorChoicePolicyTest(): void {
       expect(HOME_WALLPAPER_AUTO_DARK_COLOR).assertEqual('#000000');
     });
 
-    it('starts_new_installs_on_auto', 0, () => {
-      expect(DEFAULT_WALLPAPER_SETTINGS.mode).assertEqual('auto');
+    it('starts_new_installs_on_the_theme_palette', 0, () => {
+      expect(DEFAULT_WALLPAPER_SETTINGS.mode).assertEqual('theme');
     });
 
     it('accepts_only_a_flat_color_as_a_solid_color_id', 0, () => {

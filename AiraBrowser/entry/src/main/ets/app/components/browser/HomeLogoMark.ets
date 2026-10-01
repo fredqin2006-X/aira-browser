@@ -19,6 +19,7 @@ import {
   HOME_LOGO_OPACITY_DEFAULT,
   HOME_LOGO_SCALE_DEFAULT_RATIO,
   normalizeHomeLogoOpacity,
+  resolveHomeLogoCornerRadiusVp,
   resolveHomeLogoDisplayWidthVp,
   resolveHomeLogoHeightVp
 } from '../../../core/settings/HomeLogoSettingsPolicy';
@@ -38,6 +39,7 @@ export struct HomeLogoAssetImage {
   @Prop heightVp: number = CENTERED_HOME_WORDMARK_HEIGHT;
   @Prop maxWidthVp: number = 0;
   @Prop colorMode: HomeLogoColorMode = 'authored';
+  @Prop cornerRadiusVp: number = 0;
   @Prop tintColor: ResourceColor = '#111111';
   @Prop label: string = '';
 
@@ -50,6 +52,8 @@ export struct HomeLogoAssetImage {
         .height(this.heightVp)
         .objectFit(ImageFit.Contain)
         .draggable(false)
+        .borderRadius(this.cornerRadiusVp)
+        .clip(this.cornerRadiusVp > 0)
         .interpolation(ImageInterpolation.Medium)
         .accessibilityText(this.label)
         .hitTestBehavior(HitTestMode.None)
@@ -59,6 +63,8 @@ export struct HomeLogoAssetImage {
         .height(this.heightVp)
         .objectFit(ImageFit.Contain)
         .fillColor(this.tintColor)
+        .borderRadius(this.cornerRadiusVp)
+        .clip(this.cornerRadiusVp > 0)
         .draggable(false)
         .interpolation(ImageInterpolation.Medium)
         .accessibilityText(this.label)
@@ -68,6 +74,8 @@ export struct HomeLogoAssetImage {
         .width(this.resolveWidth())
         .height(this.heightVp)
         .objectFit(ImageFit.Contain)
+        .borderRadius(this.cornerRadiusVp)
+        .clip(this.cornerRadiusVp > 0)
         .draggable(false)
         .interpolation(ImageInterpolation.Medium)
         .accessibilityText(this.label)
@@ -130,6 +138,10 @@ export struct HomeLogoMark {
       heightVp: resolveHomeLogoHeightVp(this.heightVp, this.storedScaleRatio),
       maxWidthVp: this.maxWidthVp,
       colorMode: this.resolveSource().colorMode,
+      cornerRadiusVp: resolveHomeLogoCornerRadiusVp(
+        resolveHomeLogoHeightVp(this.heightVp, this.storedScaleRatio),
+        this.resolveSource().shape
+      ),
       tintColor: this.tintColor,
       label: this.label
     })

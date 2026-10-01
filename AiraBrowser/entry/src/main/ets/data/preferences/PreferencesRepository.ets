@@ -79,6 +79,7 @@ export const DEFAULT_BROWSER_TOOLBAR_LAYOUT_SETTINGS: BrowserToolbarLayoutSettin
     'print',
     'userAgent',
     'textZoom',
+    'webZoom',
     'find',
     'fullScreenMode',
     'manualElementHide',
@@ -129,6 +130,7 @@ const BROWSER_TOOLBAR_CONFIGURABLE_ACTION_IDS: string[] = [
   'print',
   'userAgent',
   'textZoom',
+  'webZoom',
   'find',
   'fullScreenMode',
   'manualElementHide',
@@ -662,6 +664,40 @@ class MemoryPreferencesStorageAdapter implements PreferencesStorageAdapter {
     this.sitePermissionSettings = settings;
     return Promise.resolve();
   }
+}
+
+// New toolbar actions land next to the control they belong with, not at the end of a
+// saved layout. Page zoom follows text size; find follows page zoom when it is also new.
+export function insertMissingBrowserToolbarActions(
+  primaryActionIds: string[],
+  missingActionIds: string[]
+): string[] {
+  const remainingMissingActionIds = missingActionIds.filter((actionId: string): boolean => {
+    return actionId !== 'webZoom' && actionId !== 'find';
+  });
+  const normalizedActionIds = primaryActionIds.concat(remainingMissingActionIds);
+  insertBrowserToolbarActionAfter(normalizedActionIds, missingActionIds, 'webZoom', ['textZoom']);
+  insertBrowserToolbarActionAfter(normalizedActionIds, missingActionIds, 'find', ['webZoom', 'textZoom']);
+  return normalizedActionIds;
+}
+
+function insertBrowserToolbarActionAfter(
+  actionIds: string[],
+  missingActionIds: string[],
+  actionId: string,
+  anchors: string[]
+): void {
+  if (!missingActionIds.includes(actionId) || actionIds.includes(actionId)) {
+    return;
+  }
+  for (let index = 0; index < anchors.length; index++) {
+    const anchorIndex = actionIds.indexOf(anchors[index]);
+    if (anchorIndex >= 0) {
+      actionIds.splice(anchorIndex + 1, 0, actionId);
+      return;
+    }
+  }
+  actionIds.push(actionId);
 }
 
 export class PreferencesRepository {
@@ -1559,7 +1595,7 @@ export class PreferencesRepository {
     const missingActionIds = BROWSER_TOOLBAR_CONFIGURABLE_ACTION_IDS.filter((actionId: string) => {
       return !primaryActionIds.includes(actionId);
     });
-    const normalizedActionIds = this.insertNewToolbarFindAction(
+    const normalizedActionIds = insertMissingBrowserToolbarActions(
       primaryActionIds,
       missingActionIds
     );
@@ -1686,20 +1722,6 @@ export class PreferencesRepository {
       BROWSER_TOOLBAR_CONFIGURABLE_ACTION_IDS.includes(actionId);
   }
 
-  private insertNewToolbarFindAction(primaryActionIds: string[], missingActionIds: string[]): string[] {
-    const remainingMissingActionIds = missingActionIds.filter((actionId: string) => actionId !== 'find');
-    const normalizedActionIds = primaryActionIds.concat(remainingMissingActionIds);
-    if (!missingActionIds.includes('find')) {
-      return normalizedActionIds;
-    }
-    const textZoomIndex = normalizedActionIds.indexOf('textZoom');
-    if (textZoomIndex < 0) {
-      normalizedActionIds.push('find');
-      return normalizedActionIds;
-    }
-    normalizedActionIds.splice(textZoomIndex + 1, 0, 'find');
-    return normalizedActionIds;
-  }
 
   private normalizeToolbarActionIdList(
     actionIds: string[] | undefined,

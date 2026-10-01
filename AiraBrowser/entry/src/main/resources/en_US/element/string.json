@@ -397,6 +397,26 @@
       "value": "Choose a file (SVG / GIF)"
     },
     {
+      "name": "settings_home_logo_delete",
+      "value": "Delete"
+    },
+    {
+      "name": "settings_home_logo_delete_cancel",
+      "value": "Cancel"
+    },
+    {
+      "name": "settings_home_logo_delete_title",
+      "value": "Delete imported logo"
+    },
+    {
+      "name": "settings_home_logo_delete_message",
+      "value": "Delete \"%1$s\"? This cannot be undone."
+    },
+    {
+      "name": "settings_home_logo_delete_a11y",
+      "value": "Delete %1$s"
+    },
+    {
       "name": "settings_custom_home_title",
       "value": "Home"
     },
@@ -1670,7 +1690,7 @@
     },
     {
       "name": "settings_pro_donate_intro_title",
-      "value": "Donate Pro"
+      "value": "Donate to Support Pro"
     },
     {
       "name": "settings_pro_donate_intro_lead",
@@ -6730,7 +6750,11 @@
     },
     {
       "name": "settings_link_install_note",
-      "value": "This phone cannot install a desktop browser extension. Send the link to the computer and install it there."
+      "value": "After copying the link, send it to the computer and install it there."
+    },
+    {
+      "name": "settings_link_install_family",
+      "value": "Chrome-family browsers can install the Chrome extension. Firefox-family browsers can install the Firefox one."
     },
     {
       "name": "settings_link_ext_local",
@@ -9682,7 +9706,7 @@
     },
     {
       "name": "bottom_panel_home_web_zoom",
-      "value": "Open a page before zooming."
+      "value": "Open a page before changing zoom."
     },
     {
       "name": "bottom_panel_home_tool",

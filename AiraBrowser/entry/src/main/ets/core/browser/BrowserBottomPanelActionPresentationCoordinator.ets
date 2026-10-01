@@ -128,6 +128,8 @@ export interface BrowserBottomPanelActionSnapshotInput {
   userAgentActionVersion: number;
   textZoomRatio: number;
   textZoomActionVersion: number;
+  webZoomActionTrailingText: ResourceStr;
+  webZoomActionVersion: number;
   userAgentPresetSettings: BrowserUserAgentSettings;
   userAgentPresetActionVersion: number;
   screenOrientationMode: BrowserScreenOrientationMode;
@@ -322,6 +324,7 @@ export class BrowserBottomPanelActionPresentationCoordinator {
     result.addToDesktop = alwaysEnabled;
     result.userAgent = alwaysEnabled;
     result.textZoom = alwaysEnabled;
+    result.webZoom = alwaysEnabled;
     result.userAgentPreset = alwaysEnabled;
     result.screenOrientation = alwaysEnabled;
     result.themeMode = alwaysEnabled;
@@ -530,6 +533,10 @@ export class BrowserBottomPanelActionPresentationCoordinator {
       textZoomActionTrailingText: this.textZoomViewModel.buildState(input.textZoomRatio).percentLabel,
       textZoomActionIcon: $r('sys.symbol.doc_text_fill'),
       textZoomActionVersion: input.textZoomActionVersion,
+      webZoomActionLabel: bottomPanelActionTitle('webZoom'),
+      webZoomActionTrailingText: input.webZoomActionTrailingText,
+      webZoomActionIcon: $r('sys.symbol.plus'),
+      webZoomActionVersion: input.webZoomActionVersion,
       userAgentPresetActionLabel: bottomPanelActionTitle('userAgentPreset'),
       userAgentPresetActionTrailingText: this.userAgentSettingsViewModel.resolveSettingsSummary(input.userAgentPresetSettings),
       userAgentPresetActionIcon: this.resolveUserAgentPresetActionIcon(input.userAgentPresetSettings),
@@ -578,6 +585,7 @@ export class BrowserBottomPanelActionPresentationCoordinator {
       input.appProxyActive === true ? 'proxy=1' : 'proxy=0',
       `ua=${resourceStrKey(input.userAgentActionLabel)}:${resourceStrKey(input.userAgentActionTrailingText)}:${input.userAgentActionVersion ?? 0}`,
       `textZoom=${resourceStrKey(input.textZoomActionTrailingText)}:${input.textZoomActionVersion ?? 0}`,
+      `webZoom=${resourceStrKey(input.webZoomActionTrailingText)}:${input.webZoomActionVersion ?? 0}`,
       `uaPreset=${resourceStrKey(input.userAgentPresetActionTrailingText)}:${input.userAgentPresetActionVersion ?? 0}`,
       `orientation=${resourceStrKey(input.screenOrientationActionTrailingText)}:${input.screenOrientationActionVersion ?? 0}`,
       `theme=${resourceStrKey(input.themeModeActionTrailingText)}:${input.themeModeActionVersion ?? 0}`,
@@ -767,6 +775,7 @@ export class BrowserBottomPanelActionPresentationCoordinator {
       `bookmarkVersion=${input.bookmarkActionVersion}`,
       `desktop=${input.desktopSiteMode}:${input.userAgentActionVersion}`,
       `textZoom=${input.textZoomRatio}:${input.textZoomActionVersion}`,
+      `webZoom=${resourceStrKey(input.webZoomActionTrailingText)}:${input.webZoomActionVersion}`,
       `uaPreset=${input.userAgentPresetActionVersion}`,
       `orientation=${input.screenOrientationMode}:${input.screenOrientationActionVersion}`,
       `theme=${input.themeMode}:${input.resolvedThemeMode}:${input.themeModeActionVersion}`,

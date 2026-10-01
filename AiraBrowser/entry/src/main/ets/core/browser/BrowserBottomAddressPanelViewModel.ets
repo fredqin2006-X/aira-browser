@@ -109,6 +109,10 @@ export interface BrowserBottomAddressPanelBuildInput {
   textZoomActionTrailingText: ResourceStr;
   textZoomActionIcon: Resource;
   textZoomActionVersion?: number;
+  webZoomActionLabel: ResourceStr;
+  webZoomActionTrailingText: ResourceStr;
+  webZoomActionIcon: Resource;
+  webZoomActionVersion?: number;
   userAgentPresetActionLabel: ResourceStr;
   userAgentPresetActionTrailingText: ResourceStr;
   userAgentPresetActionIcon: Resource;
@@ -368,6 +372,16 @@ export class BrowserBottomAddressPanelViewModel {
         enabled: true,
         disabledMessage: '',
         renderVersion: input.textZoomActionVersion
+      },
+      {
+        id: 'webZoom',
+        title: resolveBrowserBottomAddressPanelActionTitle('webZoom'),
+        trailingText: input.webZoomActionTrailingText,
+        icon: input.webZoomActionIcon,
+        airaIconId: resolveBrowserBottomAddressPanelActionAiraIconId('webZoom'),
+        enabled: true,
+        disabledMessage: '',
+        renderVersion: input.webZoomActionVersion
       },
       {
         id: 'find',

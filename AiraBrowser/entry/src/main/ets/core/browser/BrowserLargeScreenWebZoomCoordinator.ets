@@ -129,8 +129,14 @@ export class BrowserLargeScreenWebZoomCoordinator {
     return this.buildSnapshot(normalizedTabId, state.percent, state.percentKnown, runtime.available);
   }
 
-  resolveForceEnableWebZoom(configuredForceEnableWebZoom: boolean, largeScreenShellActive: boolean): boolean {
-    return largeScreenShellActive || configuredForceEnableWebZoom;
+  resolveForceEnableWebZoom(
+    configuredForceEnableWebZoom: boolean,
+    largeScreenShellActive: boolean,
+    phoneWebZoomEngaged: boolean = false
+  ): boolean {
+    // Phone pages often lock viewport scale. Once the touch zoom dialog is used, keep the
+    // same force-enable the desktop shell already applies, or zoom() stays clamped.
+    return largeScreenShellActive || configuredForceEnableWebZoom || phoneWebZoomEngaged;
   }
 
   // 键盘 Ctrl +/-/0 与弹窗按钮走同一条目标缩放路径。档位写入 document zoom，

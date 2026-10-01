@@ -182,8 +182,8 @@ export const DEFAULT_WALLPAPER_BING_STATE: WallpaperBingState = {
 };
 
 export const DEFAULT_WALLPAPER_SETTINGS: WallpaperSettings = {
-  // New installs start on the neutral auto black/white rather than a palette-tinted background.
-  mode: 'auto',
+  // New installs follow the theme palette. Auto black/white stays a choice, not the start.
+  mode: 'theme',
   solidColorId: normalizeHomeWallpaperSolidColorId('mist'),
   bingWallpaperId: '',
   customWallpaperId: '',

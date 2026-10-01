@@ -56,6 +56,8 @@ export function bottomPanelActionTitle(actionId: BrowserBottomPanelActionId): Re
       return $r('app.string.bottom_panel_action_user_agent');
     case 'textZoom':
       return $r('app.string.bottom_panel_action_text_zoom');
+    case 'webZoom':
+      return $r('app.string.bottom_panel_action_web_zoom');
     case 'userAgentPreset':
       return $r('app.string.bottom_panel_action_user_agent_preset');
     case 'screenOrientation':
@@ -155,6 +157,8 @@ export function bottomPanelActionSubtitle(actionId: BrowserBottomPanelActionId):
       return $r('app.string.bottom_panel_action_user_agent_subtitle');
     case 'textZoom':
       return $r('app.string.bottom_panel_action_text_zoom_subtitle');
+    case 'webZoom':
+      return $r('app.string.bottom_panel_action_web_zoom_subtitle');
     case 'userAgentPreset':
       return $r('app.string.bottom_panel_action_user_agent_preset_subtitle');
     case 'screenOrientation':
@@ -264,6 +268,8 @@ export function bottomPanelReleasePrompt(actionId: string): Resource {
       return $r('app.string.bottom_panel_release_user_agent');
     case 'textZoom':
       return $r('app.string.bottom_panel_release_text_zoom');
+    case 'webZoom':
+      return $r('app.string.bottom_panel_release_web_zoom');
     case 'userAgentPreset':
       return $r('app.string.bottom_panel_release_user_agent_preset');
     case 'screenOrientation':
@@ -607,6 +613,8 @@ export function bottomPanelHomeUnavailable(actionId: string): Resource {
       return $r('app.string.bottom_panel_home_no_hide_ads');
     case 'textZoom':
       return $r('app.string.bottom_panel_home_text_zoom');
+    case 'webZoom':
+      return $r('app.string.bottom_panel_home_web_zoom');
     default:
       return $r('app.string.bottom_panel_home_tool');
   }

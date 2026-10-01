@@ -20,6 +20,8 @@ export const HOME_LOGO_CUSTOM_ASSET_ID_PREFIX: string = 'custom-';
  * A file the user added is always authored: the gallery image is not a mask we can safely retint.
  */
 export type HomeLogoColorMode = 'wallpaper' | 'authored';
+/** A wordmark stays a wide mark. An icon is a shipped app icon, drawn as a rounded square. */
+export type HomeLogoShape = 'wordmark' | 'icon';
 
 export function homeLogoFollowsWallpaper(colorMode: HomeLogoColorMode): boolean {
   return colorMode === 'wallpaper';
@@ -32,6 +34,7 @@ interface HomeLogoPresetAsset {
   width: number;
   height: number;
   colorMode: HomeLogoColorMode;
+  shape?: HomeLogoShape;
 }
 
 /**
@@ -47,6 +50,51 @@ const HOME_LOGO_PRESET_ASSETS: HomeLogoPresetAsset[] = [
     width: 546,
     height: 163,
     colorMode: 'wallpaper'
+  },
+  {
+    id: 'icon-classic',
+    title: '经典',
+    rawfileName: 'home_logo_icon_classic.png',
+    width: 216,
+    height: 216,
+    colorMode: 'authored',
+    shape: 'icon'
+  },
+  {
+    id: 'icon-night',
+    title: '夜色',
+    rawfileName: 'home_logo_icon_night.png',
+    width: 216,
+    height: 216,
+    colorMode: 'authored',
+    shape: 'icon'
+  },
+  {
+    id: 'icon-blue',
+    title: '海蓝',
+    rawfileName: 'home_logo_icon_blue.png',
+    width: 1080,
+    height: 1080,
+    colorMode: 'authored',
+    shape: 'icon'
+  },
+  {
+    id: 'icon-color',
+    title: '缤纷',
+    rawfileName: 'home_logo_icon_color.png',
+    width: 1080,
+    height: 1080,
+    colorMode: 'authored',
+    shape: 'icon'
+  },
+  {
+    id: 'icon-texture',
+    title: '磨砂',
+    rawfileName: 'home_logo_icon_texture.png',
+    width: 1080,
+    height: 1080,
+    colorMode: 'authored',
+    shape: 'icon'
   },
   {
     id: 'preset-pixel',
@@ -121,6 +169,7 @@ export interface HomeLogoPreset {
   intrinsicWidth: number;
   intrinsicHeight: number;
   colorMode: HomeLogoColorMode;
+  shape: HomeLogoShape;
 }
 
 /**
@@ -149,6 +198,7 @@ export interface HomeLogoDisplaySource {
   intrinsicWidth: number;
   intrinsicHeight: number;
   colorMode: HomeLogoColorMode;
+  shape: HomeLogoShape;
 }
 
 export function listHomeLogoPresets(): HomeLogoPreset[] {
@@ -161,7 +211,8 @@ export function listHomeLogoPresets(): HomeLogoPreset[] {
       rawfileName: asset.rawfileName,
       intrinsicWidth: asset.width,
       intrinsicHeight: asset.height,
-      colorMode: asset.colorMode
+      colorMode: asset.colorMode,
+      shape: asset.shape === 'icon' ? 'icon' : 'wordmark'
     });
   }
   return presets;
@@ -254,6 +305,30 @@ export function normalizeHomeLogoSelection(selection: HomeLogoSelection | undefi
   };
 }
 
+/**
+ * Drops one imported logo. Selecting that logo falls back to the shipped wordmark.
+ * A missing id returns undefined so the caller can refuse instead of rewriting the list.
+ */
+export function withoutHomeLogoCustomAsset(
+  selection: HomeLogoSelection | undefined,
+  id: string
+): HomeLogoSelection | undefined {
+  const normalized = normalizeHomeLogoSelection(selection);
+  if (findHomeLogoCustomAsset(normalized.customAssets, id) === undefined) {
+    return undefined;
+  }
+  const assets: HomeLogoCustomAsset[] = [];
+  for (let index = 0; index < normalized.customAssets.length; index += 1) {
+    if (normalized.customAssets[index].id !== id) {
+      assets.push(normalized.customAssets[index]);
+    }
+  }
+  return normalizeHomeLogoSelection({
+    id: normalized.id === id ? HOME_LOGO_BUILTIN_ID : normalized.id,
+    customAssets: assets
+  });
+}
+
 export function resolveHomeLogoDisplaySource(selection: HomeLogoSelection | undefined): HomeLogoDisplaySource {
   const normalized = normalizeHomeLogoSelection(selection);
   const preset = findHomeLogoPreset(normalized.id);
@@ -263,7 +338,8 @@ export function resolveHomeLogoDisplaySource(selection: HomeLogoSelection | unde
       fileUri: '',
       intrinsicWidth: preset.intrinsicWidth,
       intrinsicHeight: preset.intrinsicHeight,
-      colorMode: preset.colorMode
+      colorMode: preset.colorMode,
+      shape: preset.shape
     };
   }
   const asset = findHomeLogoCustomAsset(normalized.customAssets, normalized.id);
@@ -273,7 +349,8 @@ export function resolveHomeLogoDisplaySource(selection: HomeLogoSelection | unde
       fileUri: asset.uri,
       intrinsicWidth: asset.width,
       intrinsicHeight: asset.height,
-      colorMode: 'authored'
+      colorMode: 'authored',
+      shape: 'wordmark'
     };
   }
   const fallback = builtinHomeLogoPreset();
@@ -282,7 +359,8 @@ export function resolveHomeLogoDisplaySource(selection: HomeLogoSelection | unde
     fileUri: '',
     intrinsicWidth: fallback.intrinsicWidth,
     intrinsicHeight: fallback.intrinsicHeight,
-    colorMode: fallback.colorMode
+    colorMode: fallback.colorMode,
+    shape: fallback.shape
   };
 }
 

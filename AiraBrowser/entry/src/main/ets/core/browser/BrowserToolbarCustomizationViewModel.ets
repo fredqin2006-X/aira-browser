@@ -4,7 +4,8 @@ import {
   normalizeSplitToolbarSettings
 } from './BrowserSplitToolbarCustomizationPolicy';
 import {
-  DEFAULT_BROWSER_TOOLBAR_LAYOUT_SETTINGS
+  DEFAULT_BROWSER_TOOLBAR_LAYOUT_SETTINGS,
+  insertMissingBrowserToolbarActions
 } from '../../data/preferences/PreferencesRepository';
 import {
   BrowserBottomAddressPanelActionId
@@ -298,7 +299,9 @@ export class BrowserToolbarCustomizationViewModel {
       return !normalizedActionIds.includes(actionId);
     });
     const normalized = cloneBrowserToolbarLayoutSettings(settings);
-    normalized.primaryActionIds = normalizedActionIds.concat(missingActionIds);
+    normalized.primaryActionIds = this.toActionIds(
+      insertMissingBrowserToolbarActions(normalizedActionIds, missingActionIds)
+    );
     normalized.secondaryActionIds = [];
     normalized.leadingSlotActionId = this.normalizeTapActionId('leading', settings.leadingSlotActionId);
     normalized.menuSlotActionId = this.normalizeTapActionId('menu', settings.menuSlotActionId);

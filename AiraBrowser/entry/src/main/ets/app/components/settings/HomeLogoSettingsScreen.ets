@@ -1,4 +1,5 @@
 import { promptAction } from '@kit.ArkUI';
+import { showCenteredAlertDialog } from '../common/CenteredDialogSurface';
 import { HOME_LOGO_BUILTIN_ID, HomeLogoPickSource, HomeLogoSelection } from '../../../common/models/HomeLogoModels';
 import { HOME_LOGO_SUPPORTED_FORMATS_TEXT } from '../../../core/settings/HomeLogoImageFormatPolicy';
 import {
@@ -11,6 +12,7 @@ import {
   HOME_LOGO_OPACITY_MIN,
   HOME_LOGO_OPACITY_SLIDER_STEP,
   HOME_LOGO_PREVIEW_HEIGHT_VP,
+  resolveHomeLogoCornerRadiusVp,
   HOME_LOGO_SCALE_DEFAULT_RATIO,
   HOME_LOGO_SCALE_MAX_RATIO,
   HOME_LOGO_SCALE_MIN_RATIO,
@@ -48,6 +50,7 @@ const HOME_LOGO_SLIDER_HEIGHT: number = 40;
 const HOME_LOGO_SLIDER_TRACK_THICKNESS: number = 20;
 const HOME_LOGO_SLIDER_TRACK_RADIUS: number = 10;
 const HOME_LOGO_SLIDER_BLOCK_SIZE: number = 16;
+const HOME_LOGO_DELETE_BUTTON_SIZE: number = 22;
 
 @Component
 export struct HomeLogoSettingsContent {
@@ -70,6 +73,7 @@ export struct HomeLogoSettingsContent {
   private storedOpacity: number = HOME_LOGO_OPACITY_DEFAULT;
   onSelectLogo: (id: string) => void = (_id: string) => {};
   onAddCustom: (source: HomeLogoPickSource) => void = (_source: HomeLogoPickSource) => {};
+  onDeleteCustom: (id: string) => void = (_id: string) => {};
   onScaleCommit: (scaleRatio: number) => void = (_scaleRatio: number) => {};
   onOpacityCommit: (opacity: number) => void = (_opacity: number) => {};
 
@@ -250,8 +254,12 @@ export struct HomeLogoSettingsContent {
             heightVp: HOME_LOGO_PREVIEW_HEIGHT_VP,
             maxWidthVp: this.previewMaxWidth(),
             colorMode: item.colorMode,
+            cornerRadiusVp: resolveHomeLogoCornerRadiusVp(HOME_LOGO_PREVIEW_HEIGHT_VP, item.shape),
             tintColor: this.storedPrimaryTextColor
           })
+        }
+        if (item.kind === 'custom') {
+          this.buildDeleteButton(item)
         }
       }
       .width('100%')
@@ -284,6 +292,53 @@ export struct HomeLogoSettingsContent {
     .onClick(() => {
       this.activateTile(item);
     })
+  }
+
+  /** Only an imported tile can be removed. The badge sits in the well corner and does not select. */
+  @Builder
+  private buildDeleteButton(item: HomeLogoGridItem) {
+    Button({
+      type: ButtonType.Circle
+    }) {
+      SymbolGlyph($r('sys.symbol.xmark_circle_fill'))
+        .fontSize(18)
+        .fontColor([this.storedSecondaryTextColor])
+    }
+    .width(HOME_LOGO_DELETE_BUTTON_SIZE)
+    .height(HOME_LOGO_DELETE_BUTTON_SIZE)
+    .backgroundColor(Color.Transparent)
+    .align(Alignment.TopEnd)
+    .margin({ top: 4, right: 4 })
+    .accessibilityText($r('app.string.settings_home_logo_delete_a11y', item.title))
+    .onTouch((event: TouchEvent) => {
+      event.stopPropagation();
+    })
+    .onClick(() => {
+      this.confirmDeleteCustom(item);
+    })
+  }
+
+  private confirmDeleteCustom(item: HomeLogoGridItem): void {
+    if (this.busy || item.kind !== 'custom') {
+      return;
+    }
+    showCenteredAlertDialog({
+      title: $r('app.string.settings_home_logo_delete_title'),
+      message: $r('app.string.settings_home_logo_delete_message', item.title),
+      autoCancel: true,
+      primaryButton: {
+        value: $r('app.string.settings_home_logo_delete_cancel'),
+        action: () => {
+        }
+      },
+      secondaryButton: {
+        value: $r('app.string.settings_home_logo_delete'),
+        fontColor: $r('sys.color.ohos_id_color_warning'),
+        action: () => {
+          this.onDeleteCustom(item.id);
+        }
+      }
+    });
   }
 
   private activateTile(item: HomeLogoGridItem): void {
