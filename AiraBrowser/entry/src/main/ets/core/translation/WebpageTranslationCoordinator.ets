@@ -20,7 +20,8 @@ import { WebpageTranslationLanguageService } from '../../services/translation/We
 import {
   WebpageTranslationManualPolicyDecision,
   WebpageTranslationManualPolicyInput,
-  WebpageTranslationPolicyService
+  WebpageTranslationPolicyService,
+  WebpageTranslationToolbarOpenTranslationInput
 } from '../../services/translation/WebpageTranslationPolicyService';
 import {
   WebpageTranslationCacheContext
@@ -339,6 +340,14 @@ export class WebpageTranslationCoordinator {
     const origin = this.buildOrigin(context.activeTabId, context.activeUrl);
     const settings = this.settingsRepository.getSettings();
     const canResumeCurrentPage = this.originMatches(this.applicationSnapshot.origin, origin);
+    if (canResumeCurrentPage && this.applicationSnapshot.panel.canCancel) {
+      this.publishApplicationSnapshot(
+        this.applicationSnapshot.panel,
+        origin,
+        this.applicationSnapshot.targetLanguage
+      );
+      return;
+    }
     if (!canResumeCurrentPage) {
       this.cancelCurrentTask();
     }
@@ -355,17 +364,40 @@ export class WebpageTranslationCoordinator {
       origin,
       this.applicationSnapshot.targetLanguage
     );
-    if (!openResult.shouldResumeDynamicTranslation) {
+    if (openResult.shouldResumeDynamicTranslation) {
+      void this.resumeDynamicTranslationForCurrentPage(
+        this.runtimeLifecyclePort.resolveController(origin.tabId),
+        settings,
+        openResult.state,
+        (state: WebpageTranslationPanelState): void => {
+          this.publishPanelStateForOrigin(state, origin, surfaceVersion);
+        }
+      );
       return;
     }
-    void this.resumeDynamicTranslationForCurrentPage(
-      this.runtimeLifecyclePort.resolveController(origin.tabId),
-      settings,
-      openResult.state,
-      (state: WebpageTranslationPanelState): void => {
-        this.publishPanelStateForOrigin(state, origin, surfaceVersion);
-      }
-    );
+    if (this.shouldTranslateWhenOpeningFromToolbar(settings, openResult.state, context)) {
+      void this.translateCurrentWebpage();
+    }
+  }
+
+  private shouldTranslateWhenOpeningFromToolbar(
+    settings: TranslationSettings,
+    state: WebpageTranslationPanelState,
+    context: WebpageTranslationApplicationContext
+  ): boolean {
+    const input: WebpageTranslationToolbarOpenTranslationInput = {
+      manual: {
+        settings: settings,
+        appServiceModeFull: context.appServiceModeFull,
+        privateMode: context.privateMode,
+        currentUrl: context.activeUrl
+      },
+      panelStatus: state.status,
+      translatedCount: state.translatedCount,
+      canRestore: state.canRestore,
+      canCancel: state.canCancel
+    };
+    return this.policyService.shouldTranslateWhenOpeningFromToolbar(input);
   }
 
   private closeApplicationSurface(): void {

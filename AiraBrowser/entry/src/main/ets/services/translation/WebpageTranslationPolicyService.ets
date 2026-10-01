@@ -32,6 +32,14 @@ export interface WebpageTranslationManualPolicyDecision {
   blockReason: WebpageTranslationManualPolicyBlockReason;
 }
 
+export interface WebpageTranslationToolbarOpenTranslationInput {
+  manual: WebpageTranslationManualPolicyInput;
+  panelStatus: string;
+  translatedCount: number;
+  canRestore: boolean;
+  canCancel: boolean;
+}
+
 export interface WebpageTranslationSourceLanguagePolicyInput {
   settings: TranslationSettings;
   sourceLanguage: string;
@@ -145,6 +153,27 @@ export class WebpageTranslationPolicyService {
       settings.preferences.firstCloudDisclosureAcceptedAt <= 0;
   }
 
+  shouldTranslateWhenOpeningFromToolbar(input: WebpageTranslationToolbarOpenTranslationInput): boolean {
+    const preferences = input.manual.settings.preferences;
+    if (preferences.firstCloudDisclosureAcceptedAt <= 0) {
+      return false;
+    }
+    if (preferences.preferredTargetLanguage.trim().length === 0) {
+      return false;
+    }
+    if (!preferences.enabled) {
+      return false;
+    }
+    if (input.canCancel) {
+      return false;
+    }
+    if (this.hasAppliedTranslation(input.panelStatus, input.translatedCount, input.canRestore)) {
+      return false;
+    }
+    const decision = this.resolveManualTranslationDecision(input.manual);
+    return decision.allowed && !decision.requiresCloudDisclosure;
+  }
+
   buildCloudDisclosureProviderName(provider: TranslationProviderConfig | undefined): string {
     return provider?.displayName ?? resolveAppResourceText($r('app.string.webpage_translation_selected_service'));
   }
@@ -160,6 +189,11 @@ export class WebpageTranslationPolicyService {
       preferredTargetLanguage: current.preferredTargetLanguage,
       firstCloudDisclosureAcceptedAt: acceptedAt
     };
+  }
+
+  private hasAppliedTranslation(panelStatus: string, translatedCount: number, canRestore: boolean): boolean {
+    return (panelStatus === 'translated' || panelStatus === 'partially_translated') &&
+      (translatedCount > 0 || canRestore);
   }
 
   private buildManualDecision(

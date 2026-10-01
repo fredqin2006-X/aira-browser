@@ -64,16 +64,15 @@ flowchart TD
 
 ### 2. BrowserShellPage 做动作转发
 
-用户点击后，`BrowserShellPage.ets` 的核心路径是：
+用户点击后，底部工具栏动作进入 `WebpageTranslationCoordinator.handleUserAction('open_panel')`。它始终打开顶部翻译浮层。若用户还没同意云端翻译确认，或还没有目标语言，浮层停在原来的确认步骤，需要再点「操作」里的「翻译」。同意过且目标语言已保存后，同一次点击会在浮层出现的同时直接开始翻译；当前页已经译完时只重新打开浮层，方便改语言或显示方式，不会重新整页翻译。
+
+真正开始翻译的路径是：
 
 ```text
-openWebpageTranslationPanel()
-  -> WebpageTranslationCoordinator.openPanelFromToolbar()
-
-handleWebpageTranslationPrimaryAction()
+handleUserAction('translate')
   -> translateCurrentWebpage()
   -> WebpageTranslationPolicyService.resolveManualTranslationDecision()
-  -> runWebpageTranslationForCurrentPage()
+  -> runWebpageTranslationForOrigin()
   -> WebpageTranslationCoordinator.translateCurrentPage()
 ```
 

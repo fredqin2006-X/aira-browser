@@ -109,6 +109,7 @@ import historyOmniboxIndexTest from './HistoryOmniboxIndex.test';
 import localOmniboxSuggestionMatcherTest from './LocalOmniboxSuggestionMatcher.test';
 import browserTabCloseNeighborPolicyTest from './BrowserTabCloseNeighborPolicy.test';
 import webAppDesktopInstallSyncPolicyTest from './WebAppDesktopInstallSyncPolicy.test';
+import webpageTranslationToolbarOpenPolicyTest from './WebpageTranslationToolbarOpenPolicy.test';
 
 export default function tests(): void {
   userScriptValueStateStoreTest();
@@ -220,4 +221,5 @@ export default function tests(): void {
   localOmniboxSuggestionMatcherTest();
   browserTabCloseNeighborPolicyTest();
   webAppDesktopInstallSyncPolicyTest();
+  webpageTranslationToolbarOpenPolicyTest();
 }

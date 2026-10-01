@@ -3253,6 +3253,9 @@ check_file_contains_rule "${WEBPAGE_TRANSLATION_COORDINATOR}" "${WEBPAGE_TRANSLA
 check_file_contains_rule "${WEBPAGE_TRANSLATION_COORDINATOR}" "${WEBPAGE_TRANSLATION_COORDINATOR_REL}" \
   'private applicationSurfaceVersion: number' \
   "Webpage Translation must reject stale async publication across close, reopen, and lifecycle resets."
+check_file_contains_rule "${WEBPAGE_TRANSLATION_COORDINATOR}" "${WEBPAGE_TRANSLATION_COORDINATOR_REL}" \
+  'shouldTranslateWhenOpeningFromToolbar' \
+  "Webpage Translation toolbar open must ask policy before starting an already-configured translation."
 translation_snapshot_count="$(grep -Ec '@State webpageTranslationApplicationSnapshot: WebpageTranslationApplicationSnapshot' \
   "${SHELL_PAGE}" || true)"
 if [ "${translation_snapshot_count}" -ne 1 ]; then
