@@ -11883,6 +11883,18 @@ struct BrowserShellPage {
     }
   );
 
+  private resolvePurchaseAccountUid(): string {
+    const cloudUid = sharedAiraSyncConfigStore.getSettings().huaweiCloud.uid.trim();
+    if (cloudUid.length > 0) {
+      return cloudUid;
+    }
+    const stateUid = sharedMembershipFeature.getState().userId.trim();
+    if (stateUid.length > 0 && stateUid !== 'local') {
+      return stateUid;
+    }
+    return '';
+  }
+
   private purchaseNationalDayLifetime(): void {
     try {
       this.nationalDayOfferDialogController.close();
@@ -11892,7 +11904,7 @@ struct BrowserShellPage {
     void this.featureGatePurchaseCoordinator.startPurchaseFlow(
       getContext(this) as common.UIAbilityContext,
       'one_time',
-      sharedMembershipFeature.getState().userId,
+      this.resolvePurchaseAccountUid(),
       this.featureGatePurchaseHost,
       {
         profileId: boundary.profileId,
@@ -11913,7 +11925,7 @@ struct BrowserShellPage {
     void this.featureGatePurchaseCoordinator.startPurchaseFlow(
       getContext(this) as common.UIAbilityContext,
       planId,
-      sharedMembershipFeature.getState().userId,
+      this.resolvePurchaseAccountUid(),
       this.featureGatePurchaseHost,
       {
         profileId: boundary.profileId,

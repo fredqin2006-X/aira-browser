@@ -127,7 +127,7 @@ export class AiraProPurchaseCoordinator {
       if (!await this.canStartPlanPurchase(period, host)) {
         return;
       }
-      const result = await this.startProPurchase(context, period, uid);
+      const result = await this.startProPurchase(context, period, this.resolveAccountUid(uid));
       if (result.verificationCode === 'login_required') {
         host.onLoginRequired();
         return;
@@ -157,7 +157,7 @@ export class AiraProPurchaseCoordinator {
         host.showMessage($r('app.string.settings_pro_restore_private'));
         return;
       }
-      const result = await this.restorePurchase(context, uid, period);
+      const result = await this.restorePurchase(context, this.resolveAccountUid(uid), period);
       if (result.verificationCode === 'login_required') {
         host.onLoginRequired();
         return;
@@ -229,7 +229,7 @@ export class AiraProPurchaseCoordinator {
     if (!isAiraProSellablePlanId(period) && period.trim().toLowerCase() !== 'one_time') {
       return this.buildUnsupportedPlanResult(period, 'purchase_pro_monthly');
     }
-    if (uid.trim().length <= 0) {
+    if (!this.isBoundAccountUid(uid)) {
       return this.buildLoginRequiredResult(
         period.trim().toLowerCase() === 'one_time' ? 'purchase_pro_one_time' : 'purchase_pro_monthly'
       );
@@ -258,7 +258,7 @@ export class AiraProPurchaseCoordinator {
     if (!isAiraProIapPlanId(period)) {
       return this.buildUnsupportedPlanResult(period, 'restore_purchase');
     }
-    if (uid.trim().length <= 0) {
+    if (!this.isBoundAccountUid(uid)) {
       return this.buildLoginRequiredResult('restore_purchase');
     }
     const result = await this.iapService.restorePurchases(context);
@@ -576,6 +576,26 @@ export class AiraProPurchaseCoordinator {
       verificationCode: restoreResult.verificationCode,
       errorCode: purchaseResult.errorCode
     };
+  }
+
+  private resolveAccountUid(requestedUid: string): string {
+    const requested = requestedUid.trim();
+    if (this.isBoundAccountUid(requested)) {
+      return requested;
+    }
+    if (this.membershipFeature === undefined) {
+      return '';
+    }
+    const refreshed = this.membershipFeature.getState().userId.trim();
+    if (this.isBoundAccountUid(refreshed)) {
+      return refreshed;
+    }
+    return '';
+  }
+
+  private isBoundAccountUid(uid: string): boolean {
+    const normalized = uid.trim();
+    return normalized.length > 0 && normalized !== 'local';
   }
 
   private buildLoginRequiredResult(
