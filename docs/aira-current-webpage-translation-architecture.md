@@ -225,8 +225,8 @@ lifecycleCoordinator.startDynamicTranslationPolling()
 
 页面 runtime 会安装：
 
-- `MutationObserver`：监听新增节点和文本变化，写入 `state.pending`。
-- `IntersectionObserver`：对懒加载/即将进入视口的文本块做 pending 标记。
+- `MutationObserver`：只把新增节点和文本变化放进队列。滚动过程中不做整页扫描，也不在回调里读取布局；空闲后再标记 `state.pending`。
+- `IntersectionObserver`：对懒加载/即将进入视口的文本块做 pending 标记。滚动本身不再触发全页重扫。
 - History API hooks：包装 `history.pushState()` / `replaceState()`，监听 `popstate` / `hashchange`。
 
 `WebpageTranslationLifecycleCoordinator` 持有 Native 侧每 1400ms 轮询的 timer 和 page/route signal 版本：

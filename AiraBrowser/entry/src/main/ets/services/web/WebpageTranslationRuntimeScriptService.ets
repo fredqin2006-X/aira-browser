@@ -52,6 +52,11 @@ export class WebpageTranslationRuntimeScriptService {
     scrollListener: null,
     loadListener: null,
     debounceTimer: 0,
+    lastScrollAt: 0,
+    queuedMutationNodes: [],
+    mutationFlushTimer: 0,
+    viewportRefreshTimer: 0,
+    startupScanPasses: 0,
     chunkMeta: {},
     chunkTranslations: {},
     targetLanguage: '',
@@ -1125,10 +1130,19 @@ export class WebpageTranslationRuntimeScriptService {
     return score;
   }
   function isNearViewport(element) {
-    if (!element || element.nodeType !== Node.ELEMENT_NODE || isCurrentlyHidden(element)) {
+    if (!element || element.nodeType !== Node.ELEMENT_NODE || element.hidden === true) {
       return false;
     }
-    if (isDisplayContents(element)) {
+    var inlineStyle = element.style;
+    if (inlineStyle && (inlineStyle.display === 'none' || inlineStyle.visibility === 'hidden')) {
+      return false;
+    }
+    var rect = element.getBoundingClientRect();
+    var hasBox = rect.width > 0 && rect.height > 0;
+    if (!hasBox) {
+      if (!isDisplayContents(element)) {
+        return false;
+      }
       for (var childIndex = 0; childIndex < element.children.length; childIndex++) {
         if (isNearViewport(element.children[childIndex])) {
           return true;
@@ -1136,13 +1150,9 @@ export class WebpageTranslationRuntimeScriptService {
       }
       return false;
     }
-    var rect = element.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) {
-      return false;
-    }
     var viewHeight = window.innerHeight || document.documentElement.clientHeight || 0;
     var viewWidth = window.innerWidth || document.documentElement.clientWidth || 0;
-    return rect.bottom >= -160 && rect.right >= -80 && rect.top <= viewHeight + 360 && rect.left <= viewWidth + 80;
+    return rect.bottom >= -360 && rect.right >= -80 && rect.top <= viewHeight + 480 && rect.left <= viewWidth + 80;
   }
   function languageFamily(code) {
     var normalized = String(code || '').toLowerCase().split('-')[0];
@@ -1457,7 +1467,7 @@ export class WebpageTranslationRuntimeScriptService {
         return;
       }
       if (hasBlockChild(element) || hasBrBrSeparator(element)) {
-        if (onlyNearViewport && !isNearViewport(element) && !isDisplayContents(element)) {
+        if (onlyNearViewport && !isNearViewport(element)) {
           diagnostics.rejectedByViewport++;
           walkShadow(element);
           return;
@@ -1885,8 +1895,80 @@ export class WebpageTranslationRuntimeScriptService {
     return extractViewportBatch(limitNodes, limitChars, 'visible_blocks', 500);
   }
   function extractPendingBatch(limitNodes, limitChars) {
+    var ids = Object.keys(state.pending);
+    var nodeLimit = Math.max(1, Number(limitNodes) || 80);
+    var charLimit = Math.max(100, Number(limitChars) || 6000);
+    var diagnostics = {
+      mode: 'pending_batch',
+      totalTextNodes: ids.length,
+      acceptedTextNodes: 0,
+      rejectedByElement: 0,
+      rejectedByText: 0,
+      rejectedByViewport: 0,
+      rejectedByScore: 0,
+      skippedTranslated: 0,
+      cachedHitCount: 0,
+      candidateCount: 0,
+      strongCandidateCount: 0,
+      scoreFloor: 0,
+      selectedCount: 0,
+      selectedChars: 0,
+      limitNodes: nodeLimit,
+      limitChars: charLimit,
+      maxItemChars: 500,
+      pendingCount: ids.length
+    };
+    if (ids.length === 0) {
+      return publishChunkSelection([], 0, 0, 0, diagnostics);
+    }
     state.pending = {};
-    return extractViewportBatch(limitNodes, limitChars, 'pending_batch', 500);
+    if (Date.now() - state.lastScrollAt < 180) {
+      for (var deferredIndex = 0; deferredIndex < ids.length; deferredIndex++) {
+        state.pending[ids[deferredIndex]] = true;
+      }
+      scheduleSignal(520);
+      return publishChunkSelection([], 0, 0, 0, diagnostics);
+    }
+    var candidates = [];
+    for (var index = 0; index < ids.length; index++) {
+      var id = ids[index];
+      var element = state.nodeMap[id];
+      if (!element || element.nodeType !== Node.ELEMENT_NODE || !element.parentNode || isOwnTranslationNode(element)) {
+        diagnostics.rejectedByElement++;
+        continue;
+      }
+      if (state.translated[id] || state.noopTranslated[id] || hasVisibleTranslationResult(element)) {
+        diagnostics.skippedTranslated++;
+        continue;
+      }
+      if (!isNearViewport(element)) {
+        diagnostics.rejectedByViewport++;
+        if (state.visibilityObserver && !state.observedLazyBlocks[id]) {
+          state.observedLazyBlocks[id] = true;
+          try {
+            state.visibilityObserver.observe(element);
+          } catch (ignoreObserve) {
+          }
+        }
+        continue;
+      }
+      var text = normalizeText(visibleTextOfElement(element));
+      if (text.length < 2 || noLetterPattern.test(text) || isTargetLanguageText(text) || isLikelyChromeText(text, element)) {
+        diagnostics.rejectedByText++;
+        continue;
+      }
+      candidates.push({
+        element: element,
+        text: text,
+        order: index,
+        score: 100,
+        nearViewport: true,
+        top: 0
+      });
+      diagnostics.acceptedTextNodes++;
+    }
+    var taken = takeChunkItems(candidates, nodeLimit, charLimit, 500);
+    return publishChunkSelection(taken.items, taken.chars, taken.remaining, taken.cachedHitCount, diagnostics);
   }
   function parseRuntimeItemsPayload(json) {
     try {
@@ -2282,6 +2364,151 @@ export class WebpageTranslationRuntimeScriptService {
       state.pageSignalVersion++;
     }, Math.max(200, Number(debounceMs) || 800));
   }
+  function isOwnTranslationNode(node) {
+    var current = node && node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+    while (current && current.nodeType === Node.ELEMENT_NODE) {
+      if (current.getAttribute && (
+        current.getAttribute('data-aira-translation-result') === 'true' ||
+        current.getAttribute('data-aira-translation-wrap') === 'true' ||
+        current.getAttribute('data-aira-translation-loading') === 'true'
+      )) {
+        return true;
+      }
+      if (current.classList && current.classList.contains('aira-translation-result')) {
+        return true;
+      }
+      if (current === document.body || current === document.documentElement) {
+        return false;
+      }
+      current = current.parentElement;
+    }
+    return false;
+  }
+  function userIsScrolling() {
+    return Date.now() - state.lastScrollAt < 180;
+  }
+  function queueMutationNode(node) {
+    if (!node || isOwnTranslationNode(node) || state.queuedMutationNodes.length >= 160) {
+      return;
+    }
+    state.queuedMutationNodes.push(node);
+  }
+  function markPendingNodeCheap(node) {
+    if (!node || !node.parentElement || isOwnTranslationNode(node)) {
+      return false;
+    }
+    var parent = node.parentElement;
+    if (shouldSkipElement(parent) || hasSkippedAncestor(parent) || isCodePre(parent)) {
+      return false;
+    }
+    var text = normalizeText(node.textContent);
+    if (text.length < 2 || isLikelyChromeText(text, parent) || isTargetLanguageText(text)) {
+      return false;
+    }
+    var block = closestElement(parent, 'p, h1, h2, h3, h4, h5, h6, li, td, th, dd, dt, blockquote, figcaption, caption') || parent;
+    if (!block || shouldSkipElement(block) || isOwnTranslationNode(block)) {
+      return false;
+    }
+    state.pending[getBlockId(block)] = true;
+    return true;
+  }
+  function scheduleMutationFlush() {
+    if (state.mutationFlushTimer) {
+      return;
+    }
+    state.mutationFlushTimer = setTimeout(function () {
+      state.mutationFlushTimer = 0;
+      if (!state.observer) {
+        state.queuedMutationNodes = [];
+        return;
+      }
+      if (userIsScrolling()) {
+        scheduleMutationFlush();
+        return;
+      }
+      flushQueuedMutations();
+    }, 240);
+  }
+  function flushQueuedMutations() {
+    var nodes = state.queuedMutationNodes;
+    state.queuedMutationNodes = [];
+    var marked = 0;
+    var budget = 48;
+    for (var i = 0; i < nodes.length && budget > 0; i++) {
+      var node = nodes[i];
+      if (!node || isOwnTranslationNode(node)) {
+        continue;
+      }
+      if (node.nodeType === Node.TEXT_NODE) {
+        if (markPendingNodeCheap(node)) {
+          marked++;
+          budget--;
+        }
+        continue;
+      }
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        continue;
+      }
+      if (node.shadowRoot) {
+        observeDynamicRoot(node.shadowRoot);
+      }
+      var observed = scanLazyObservationCandidates(node, Math.min(24, budget));
+      budget -= Math.max(1, observed);
+      marked += observed;
+    }
+    if (nodes.length > 48) {
+      scheduleMutationFlush();
+    }
+    if (marked > 0) {
+      scheduleSignal(520);
+    }
+  }
+  function scheduleViewportRefresh() {
+    if (state.viewportRefreshTimer) {
+      return;
+    }
+    state.viewportRefreshTimer = setTimeout(function () {
+      state.viewportRefreshTimer = 0;
+      if (!state.observer) {
+        return;
+      }
+      if (userIsScrolling()) {
+        scheduleViewportRefresh();
+        return;
+      }
+      var observed = scanLazyObservationCandidates(document.body || document.documentElement, 80);
+      if (observed > 0) {
+        scheduleSignal(420);
+      }
+    }, 320);
+  }
+  function scheduleIdleWork(work, delayMs) {
+    if (typeof requestIdleCallback === 'function') {
+      requestIdleCallback(function () {
+        work();
+      }, { timeout: Math.max(240, Number(delayMs) || 700) });
+      return;
+    }
+    setTimeout(work, Math.max(80, Number(delayMs) || 180));
+  }
+  function scheduleStartupScan() {
+    scheduleIdleWork(function () {
+      if (!state.observer) {
+        return;
+      }
+      if (userIsScrolling()) {
+        setTimeout(scheduleStartupScan, 280);
+        return;
+      }
+      var observed = scanLazyObservationCandidates(document.body || document.documentElement, 400);
+      state.startupScanPasses++;
+      if (observed >= 400 && state.startupScanPasses < 8) {
+        scheduleStartupScan();
+        return;
+      }
+      attachNestedRoots(document.body || document.documentElement);
+    }, 700);
+  }
   function startObserver(debounceMs) {
     stopObserver();
     if (!document.body) {
@@ -2299,41 +2526,45 @@ export class WebpageTranslationRuntimeScriptService {
         if (marked > 0) {
           scheduleSignal(debounceMs);
         }
-      }, { threshold: 0.01, rootMargin: '360px 0px 360px 0px' })
+      }, { threshold: 0.01, rootMargin: '480px 0px 480px 0px' })
       : null;
     state.observer = new MutationObserver(function (mutations) {
+      var queued = 0;
       for (var i = 0; i < mutations.length; i++) {
         var mutation = mutations[i];
         if (mutation.type === 'characterData') {
-          markPendingNode(mutation.target);
-        } else if (mutation.type === 'childList') {
-          mutation.addedNodes.forEach(function (node) {
-            if (node.nodeType === Node.TEXT_NODE) {
-              markPendingNode(node);
-              return;
-            }
-            if (node.nodeType === Node.ELEMENT_NODE) {
-              scanLazyObservationCandidates(node, 400);
-              attachNestedRoots(node);
-              var nodes = collectTextNodes(node);
-              for (var j = 0; j < nodes.length; j++) {
-                markPendingNode(nodes[j]);
-              }
-            }
-          });
+          if (!isOwnTranslationNode(mutation.target)) {
+            queueMutationNode(mutation.target);
+            queued++;
+          }
+          continue;
+        }
+        if (mutation.type !== 'childList') {
+          continue;
+        }
+        var added = mutation.addedNodes;
+        for (var j = 0; j < added.length; j++) {
+          var node = added[j];
+          if (isOwnTranslationNode(node)) {
+            continue;
+          }
+          queueMutationNode(node);
+          queued++;
         }
       }
-      scheduleSignal(debounceMs);
+      if (queued > 0) {
+        scheduleMutationFlush();
+      }
     });
     state.observer.observe(document.body, { childList: true, subtree: true, characterData: true });
     state.clickListener = function () {
-      scheduleSignal(200);
+      scheduleViewportRefresh();
     };
     state.toggleListener = function () {
-      scheduleSignal(100);
+      scheduleViewportRefresh();
     };
     state.scrollListener = function () {
-      scheduleSignal(400);
+      state.lastScrollAt = Date.now();
     };
     state.loadListener = function (event) {
       var target = event && event.target;
@@ -2343,19 +2574,16 @@ export class WebpageTranslationRuntimeScriptService {
       try {
         if (target.contentDocument && target.contentDocument.body) {
           observeDynamicRoot(target.contentDocument.body);
-          attachNestedRoots(target.contentDocument.body);
         }
       } catch (ignoreFrame) {
       }
-      scheduleSignal(200);
+      scheduleViewportRefresh();
     };
     document.addEventListener('click', state.clickListener, true);
     document.addEventListener('toggle', state.toggleListener, true);
-    window.addEventListener('scroll', state.scrollListener, true);
+    window.addEventListener('scroll', state.scrollListener, { capture: true, passive: true });
     window.addEventListener('load', state.loadListener, true);
-    scanLazyObservationCandidates(document.body, 4000);
-    attachNestedRoots(document.body);
-    scheduleSignal(debounceMs);
+    scheduleStartupScan();
     return 'observer_started';
   }
   function stopObserver() {
@@ -2363,6 +2591,16 @@ export class WebpageTranslationRuntimeScriptService {
       clearTimeout(state.debounceTimer);
       state.debounceTimer = 0;
     }
+    if (state.mutationFlushTimer) {
+      clearTimeout(state.mutationFlushTimer);
+      state.mutationFlushTimer = 0;
+    }
+    if (state.viewportRefreshTimer) {
+      clearTimeout(state.viewportRefreshTimer);
+      state.viewportRefreshTimer = 0;
+    }
+    state.queuedMutationNodes = [];
+    state.startupScanPasses = 0;
     if (state.observer) {
       state.observer.disconnect();
       state.observer = null;
@@ -2410,7 +2648,7 @@ export class WebpageTranslationRuntimeScriptService {
     } catch (ignoreQuery) {
       return;
     }
-    var limit = Math.min(nodes.length, 5000);
+    var limit = Math.min(nodes.length, 1200);
     for (var i = 0; i < limit; i++) {
       var el = nodes[i];
       if (el.shadowRoot) {
