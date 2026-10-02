@@ -19797,6 +19797,14 @@
       "value": "已取消操作"
     },
     {
+      "name": "membership_iap_launching",
+      "value": "正在拉起华为支付"
+    },
+    {
+      "name": "membership_iap_launch_timeout",
+      "value": "华为支付未能拉起，请重试。"
+    },
+    {
       "name": "membership_iap_error_code",
       "value": "错误码 %1$d"
     },

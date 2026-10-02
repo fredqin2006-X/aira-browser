@@ -18,7 +18,12 @@ import { AiraProOverviewScreen } from './AiraProOverviewScreen';
 import { AiraDonateProIntroSheet } from './AiraDonateProIntroSheet';
 import { AIRA_COMMUNITY_REPOSITORY_URL } from '../../../common/constants/AiraCommunityProjectLinks';
 import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../../common/config/AiraDistributionCapabilityOwner';
-import { resolveCenteredDialogControllerWidth,  CENTERED_DIALOG_CORNER_RADIUS_VP } from '../common/CenteredDialogSurface';
+import {
+  resolveCenteredDialogControllerWidth,
+  resolveCenteredDialogSurfaceColor,
+  CENTERED_DIALOG_CORNER_RADIUS_VP
+} from '../common/CenteredDialogSurface';
+import { HuaweiPaymentLaunchDialog } from './HuaweiPaymentLaunchDialog';
 import {
   BrowserThemeViewState,
   BrowserThemeViewStateFactory
@@ -100,6 +105,9 @@ export struct AiraProScreen {
     },
     (message: ResourceStr) => {
       this.showToast(message);
+    },
+    (visible: boolean): void => {
+      this.setHuaweiPaymentLaunchVisible(visible);
     }
   );
   private huaweiLoginButtonController: loginComponentManager.LoginWithHuaweiIDButtonController =
@@ -169,6 +177,20 @@ export struct AiraProScreen {
     openAnimation: { duration: 0 },
     closeAnimation: { duration: 160 }
   });
+  private huaweiPaymentLaunchVisible: boolean = false;
+  private huaweiPaymentLaunchDialogController: CustomDialogController = new CustomDialogController({
+    builder: HuaweiPaymentLaunchDialog(),
+    autoCancel: false,
+    isModal: true,
+    alignment: DialogAlignment.Center,
+    customStyle: false,
+    backgroundColor: resolveCenteredDialogSurfaceColor(),
+    backgroundBlurStyle: BlurStyle.NONE,
+    cornerRadius: CENTERED_DIALOG_CORNER_RADIUS_VP,
+    width: 280,
+    onWillDismiss: (_dismissDialogAction: DismissDialogAction): void => {
+    }
+  });
   @State private activeSheetVisible: boolean = false;
   @State private activeSheetMounted: boolean = false;
   @State private activeSheetKind: AiraProSheetKind = 'none';
@@ -204,6 +226,7 @@ export struct AiraProScreen {
       this.membershipRedeemResultDialogController.close();
     } catch (_error) {
     }
+    this.setHuaweiPaymentLaunchVisible(false);
   }
 
   onPageShow(): void {
@@ -609,6 +632,21 @@ export struct AiraProScreen {
       }
     }
     return '';
+  }
+
+  private setHuaweiPaymentLaunchVisible(visible: boolean): void {
+    if (visible === this.huaweiPaymentLaunchVisible) {
+      return;
+    }
+    this.huaweiPaymentLaunchVisible = visible;
+    try {
+      if (visible) {
+        this.huaweiPaymentLaunchDialogController.open();
+      } else {
+        this.huaweiPaymentLaunchDialogController.close();
+      }
+    } catch (_error) {
+    }
   }
 
   private openProPurchase(planId: string = 'monthly'): void {

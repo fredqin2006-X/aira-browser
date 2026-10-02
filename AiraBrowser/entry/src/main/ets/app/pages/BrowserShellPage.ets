@@ -838,6 +838,7 @@ import { AIRA_DISTRIBUTION_CAPABILITY_OWNER } from '../../common/config/AiraDist
 import { sharedNationalDayOfferStore } from '../../data/membership/NationalDayOfferStore';
 import { NationalDayOfferCoordinator } from '../../core/membership/NationalDayOfferCoordinator';
 import { AiraProNationalDayOfferDialog } from '../components/membership/AiraProNationalDayOfferDialog';
+import { HuaweiPaymentLaunchDialog } from '../components/membership/HuaweiPaymentLaunchDialog';
 import {
   RenewalReminderCoordinator,
   RenewalReminderShellFacts
@@ -2747,6 +2748,9 @@ struct BrowserShellPage {
     },
     (message: ResourceStr): void => {
       this.showNativeToast(message);
+    },
+    (visible: boolean): void => {
+      this.setHuaweiPaymentLaunchVisible(visible);
     }
   );
   /**
@@ -5181,6 +5185,20 @@ struct BrowserShellPage {
   @State private bookmarkBarLinkIconPath: string = '';
   private bookmarkBarFolderRequest?: BrowserDesktopBookmarkBarFolderNameRequest = undefined;
   private bookmarkBarBookmarkRequest?: BrowserDesktopBookmarkBarBookmarkEditorRequest = undefined;
+  private huaweiPaymentLaunchVisible: boolean = false;
+  private huaweiPaymentLaunchDialogController: CustomDialogController = new CustomDialogController({
+    builder: HuaweiPaymentLaunchDialog(),
+    autoCancel: false,
+    isModal: true,
+    alignment: DialogAlignment.Center,
+    customStyle: false,
+    backgroundColor: resolveCenteredDialogSurfaceColor(),
+    backgroundBlurStyle: BlurStyle.NONE,
+    cornerRadius: CENTERED_DIALOG_CORNER_RADIUS_VP,
+    width: 280,
+    onWillDismiss: (_dismissDialogAction: DismissDialogAction): void => {
+    }
+  });
   private nationalDayOfferDialogController: CustomDialogController = new CustomDialogController({
     builder: AiraProNationalDayOfferDialog({
       onPurchase: (): void => {
@@ -6759,6 +6777,7 @@ struct BrowserShellPage {
   }
 
   aboutToDisappear(): void {
+    this.setHuaweiPaymentLaunchVisible(false);
     this.homeWallpaperPlaybackGate.dispose();
     this.browserAddressBarTabSwipeCoordinator.cancel();
     this.browserTabSwipeCoverCoordinator.dispose();
@@ -11893,6 +11912,21 @@ struct BrowserShellPage {
       return stateUid;
     }
     return '';
+  }
+
+  private setHuaweiPaymentLaunchVisible(visible: boolean): void {
+    if (visible === this.huaweiPaymentLaunchVisible) {
+      return;
+    }
+    this.huaweiPaymentLaunchVisible = visible;
+    try {
+      if (visible) {
+        this.huaweiPaymentLaunchDialogController.open();
+      } else {
+        this.huaweiPaymentLaunchDialogController.close();
+      }
+    } catch (_error) {
+    }
   }
 
   private purchaseNationalDayLifetime(): void {

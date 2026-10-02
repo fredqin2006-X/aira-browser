@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit';
+import { window } from '@kit.ArkUI';
 import { AIRA_ENABLE_DEVELOPMENT_DIAGNOSTICS } from '../../common/config/BuildVariantFlags';
 import {
   HuaweiIapProductView,
@@ -26,8 +27,28 @@ import {
   BrowserPrivacyEffectIntent,
   BrowserPrivacyEffectPolicyService
 } from '../../services/privacy/BrowserPrivacyEffectPolicyService';
+import {
+  HuaweiPaymentLaunchGate,
+  HuaweiPaymentLaunchHost
+} from './HuaweiPaymentLaunchGate';
 
 const HUAWEI_IAP_ALREADY_OWNS_PRODUCT_ERROR_CODE: number = 1001860051;
+
+class PurchaseFlowHuaweiPaymentLaunchHost implements HuaweiPaymentLaunchHost {
+  private host: AiraProPurchaseFlowHost;
+
+  constructor(host: AiraProPurchaseFlowHost) {
+    this.host = host;
+  }
+
+  onLaunchVisibilityChanged(visible: boolean): void {
+    this.host.onHuaweiPaymentLaunchChanged(visible);
+  }
+
+  onLaunchTimedOut(): void {
+    this.host.showMessage($r('app.string.membership_iap_launch_timeout'));
+  }
+}
 const AIRA_IAP_SUBSCRIPTION_EXPIRED_CODE: string = 'subscription_expired';
 const AIRA_PRO_ONE_TIME_PLAN_ID: string = 'one_time';
 const LIFETIME_UPGRADE_REFRESH_DELAYS_MS: number[] = [0, 800, 1600];
@@ -36,21 +57,25 @@ export interface AiraProPurchaseFlowHost {
   onMembershipStateChanged(): void;
   onLoginRequired(): void;
   showMessage(message: ResourceStr): void;
+  onHuaweiPaymentLaunchChanged(visible: boolean): void;
 }
 
 export class AiraProPurchaseFlowHostAdapter implements AiraProPurchaseFlowHost {
   private membershipStateChangedHandler: () => void;
   private loginRequiredHandler: () => void;
   private messageHandler: (message: ResourceStr) => void;
+  private huaweiPaymentLaunchChangedHandler?: (visible: boolean) => void;
 
   constructor(
     membershipStateChangedHandler: () => void,
     loginRequiredHandler: () => void,
-    messageHandler: (message: ResourceStr) => void
+    messageHandler: (message: ResourceStr) => void,
+    huaweiPaymentLaunchChangedHandler?: (visible: boolean) => void
   ) {
     this.membershipStateChangedHandler = membershipStateChangedHandler;
     this.loginRequiredHandler = loginRequiredHandler;
     this.messageHandler = messageHandler;
+    this.huaweiPaymentLaunchChangedHandler = huaweiPaymentLaunchChangedHandler;
   }
 
   onMembershipStateChanged(): void {
@@ -63,6 +88,12 @@ export class AiraProPurchaseFlowHostAdapter implements AiraProPurchaseFlowHost {
 
   showMessage(message: ResourceStr): void {
     this.messageHandler(message);
+  }
+
+  onHuaweiPaymentLaunchChanged(visible: boolean): void {
+    if (this.huaweiPaymentLaunchChangedHandler !== undefined) {
+      this.huaweiPaymentLaunchChangedHandler(visible);
+    }
   }
 }
 
@@ -93,6 +124,11 @@ export class AiraProPurchaseCoordinator {
   private profileBoundaryService: BrowserProfileBoundaryService;
   private awaitingSubscriptionManagementReturn: boolean = false;
   private subscriptionManagementRefreshPromise?: Promise<void>;
+  private purchaseLaunchInFlight: boolean = false;
+  private launchGate: HuaweiPaymentLaunchGate = new HuaweiPaymentLaunchGate();
+  private launchWindow?: window.Window;
+  private launchWindowEventHandler?: (event: window.WindowEventType) => void;
+  private launchWindowBindGeneration: number = 0;
 
   constructor(
     membershipFeature?: MembershipFeature,
@@ -119,20 +155,31 @@ export class AiraProPurchaseCoordinator {
     host: AiraProPurchaseFlowHost,
     boundaryInput: BrowserDataBoundaryInput
   ): Promise<void> {
+    if (!this.isEffectAllowed('membership_purchase', boundaryInput)) {
+      host.showMessage($r('app.string.settings_pro_purchase_private'));
+      return;
+    }
+    if (this.purchaseLaunchInFlight) {
+      return;
+    }
+    this.purchaseLaunchInFlight = true;
+    this.beginHuaweiPaymentLaunch(context, host);
     try {
-      if (!this.isEffectAllowed('membership_purchase', boundaryInput)) {
-        host.showMessage($r('app.string.settings_pro_purchase_private'));
-        return;
-      }
       if (!await this.canStartPlanPurchase(period, host)) {
         return;
       }
+      if (this.launchGate.hasTimedOut()) {
+        return;
+      }
       const result = await this.startProPurchase(context, period, this.resolveAccountUid(uid));
+      this.endHuaweiPaymentLaunch();
       if (result.verificationCode === 'login_required') {
         host.onLoginRequired();
         return;
       }
-      this.showOperationResult(host, result);
+      if (!(this.launchGate.hasTimedOut() && !result.ok)) {
+        this.showOperationResult(host, result);
+      }
       if (result.ok) {
         await this.refreshMembershipAfterPurchaseResult(
           result.verifiedProductId,
@@ -141,7 +188,12 @@ export class AiraProPurchaseCoordinator {
         );
       }
     } catch (_error) {
-      host.showMessage($r('app.string.settings_pro_purchase_unavailable'));
+      if (!this.launchGate.hasTimedOut()) {
+        host.showMessage($r('app.string.settings_pro_purchase_unavailable'));
+      }
+    } finally {
+      this.endHuaweiPaymentLaunch();
+      this.purchaseLaunchInFlight = false;
     }
   }
 
@@ -234,7 +286,11 @@ export class AiraProPurchaseCoordinator {
         period.trim().toLowerCase() === 'one_time' ? 'purchase_pro_one_time' : 'purchase_pro_monthly'
       );
     }
+    this.launchGate.armCashierDetection();
     const result = await this.iapService.startProPurchase(context, period, uid);
+    // The cashier has returned. Drop the launch sheet before receipt verification,
+    // which can take a moment and is no longer "opening Huawei payment".
+    this.launchGate.finish();
     if (!result.ok && result.errorCode === HUAWEI_IAP_ALREADY_OWNS_PRODUCT_ERROR_CODE) {
       const restoreResult = await this.iapService.restorePurchases(context);
       const restoredResult = await this.submitPurchaseDataIfNeeded(context, restoreResult, uid, 'restore');
@@ -244,6 +300,60 @@ export class AiraProPurchaseCoordinator {
       return restoredResult;
     }
     return this.submitPurchaseDataIfNeeded(context, result, uid, 'purchase');
+  }
+
+  private beginHuaweiPaymentLaunch(context: common.UIAbilityContext, host: AiraProPurchaseFlowHost): void {
+    this.launchGate.begin(new PurchaseFlowHuaweiPaymentLaunchHost(host));
+    this.bindLaunchWindow(context);
+  }
+
+  private endHuaweiPaymentLaunch(): void {
+    this.unbindLaunchWindow();
+    this.launchGate.finish();
+  }
+
+  private bindLaunchWindow(context: common.UIAbilityContext): void {
+    const generation = ++this.launchWindowBindGeneration;
+    try {
+      window.getLastWindow(context).then((mainWindow: window.Window) => {
+        if (generation !== this.launchWindowBindGeneration || !this.launchGate.isActive()) {
+          return;
+        }
+        const handler = (event: window.WindowEventType): void => {
+          this.handleLaunchWindowEvent(event);
+        };
+        this.launchWindow = mainWindow;
+        this.launchWindowEventHandler = handler;
+        mainWindow.on('windowEvent', handler);
+      }).catch((_error: Error) => {
+      });
+    } catch (_error) {
+    }
+  }
+
+  private unbindLaunchWindow(): void {
+    this.launchWindowBindGeneration++;
+    const mainWindow = this.launchWindow;
+    const handler = this.launchWindowEventHandler;
+    this.launchWindow = undefined;
+    this.launchWindowEventHandler = undefined;
+    if (mainWindow === undefined || handler === undefined) {
+      return;
+    }
+    try {
+      mainWindow.off('windowEvent', handler);
+    } catch (_error) {
+    }
+  }
+
+  private handleLaunchWindowEvent(event: window.WindowEventType): void {
+    if (event === window.WindowEventType.WINDOW_INACTIVE || event === window.WindowEventType.WINDOW_HIDDEN) {
+      this.launchGate.noteWindowInactive();
+      return;
+    }
+    if (event === window.WindowEventType.WINDOW_ACTIVE || event === window.WindowEventType.WINDOW_SHOWN) {
+      this.launchGate.noteWindowActive();
+    }
   }
 
   queryProProducts(context: common.UIAbilityContext): Promise<HuaweiIapProductView[]> {

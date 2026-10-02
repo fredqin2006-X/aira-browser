@@ -19777,6 +19777,14 @@
       "value": "Cancelled"
     },
     {
+      "name": "membership_iap_launching",
+      "value": "Opening Huawei payment…"
+    },
+    {
+      "name": "membership_iap_launch_timeout",
+      "value": "Huawei payment didn't open. Try again."
+    },
+    {
       "name": "membership_iap_error_code",
       "value": "Error %1$d"
     },

@@ -19797,6 +19797,14 @@
       "value": "已取消操作"
     },
     {
+      "name": "membership_iap_launching",
+      "value": "正在拉起華為支付"
+    },
+    {
+      "name": "membership_iap_launch_timeout",
+      "value": "華為支付未能拉起，請再試一次。"
+    },
+    {
       "name": "membership_iap_error_code",
       "value": "錯誤碼 %1$d"
     },

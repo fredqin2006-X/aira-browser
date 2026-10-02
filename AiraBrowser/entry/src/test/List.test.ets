@@ -70,6 +70,7 @@ import huaweiIapProductCatalogTest from './HuaweiIapProductCatalog.test';
 import airaProStorePricePolicyTest from './AiraProStorePricePolicy.test';
 import airaProComplimentaryClaimPolicyTest from './AiraProComplimentaryClaimPolicy.test';
 import airaProPurchasePolicyServiceTest from './AiraProPurchasePolicyService.test';
+import huaweiPaymentLaunchGateTest from './HuaweiPaymentLaunchGate.test';
 import membershipEntitlementRetentionPolicyTest from './MembershipEntitlementRetentionPolicy.test';
 import startupWelcomeIntroTest from './StartupWelcomeIntro.test';
 import featureIntroTest from './FeatureIntro.test';
@@ -185,6 +186,7 @@ export default function tests(): void {
   airaProStorePricePolicyTest();
   airaProComplimentaryClaimPolicyTest();
   airaProPurchasePolicyServiceTest();
+  huaweiPaymentLaunchGateTest();
   membershipEntitlementRetentionPolicyTest();
   startupWelcomeIntroTest();
   featureIntroTest();
