@@ -73,8 +73,21 @@ assertContract(addressPanel.includes('dragBar: true') && addressPanel.includes('
   'Toolbar system Sheet must use the plain system drag bar without a custom close header.');
 assertContract(normalizedAddressPanel.includes(
   "if (this.responsiveState.aspectBreakpoint === 'wide') { options.width = " +
-    'this.resolveFloatingQuickActionLayoutWidth(); }'
+    'this.resolveToolbarSystemSheetContentWidth(); }'
 ), 'Landscape toolbar Sheets must use the same responsive width as their action grid.');
+// The header row and the tool grid must measure against one width. When they diverge, the cards are
+// built wider than the lanes that hold them, an unshrinkable centered Row collapses to leading
+// alignment, and the header reads as shifted toward the leading edge on every wide window.
+assertContract(addressPanel.includes('private resolveToolbarSystemSheetContentWidth(): number') &&
+  addressPanel.includes('private resolveToolbarSystemSheetHostWidth(): number') &&
+  addressPanel.includes('this.toolbarSystemSheetResponsiveViewModel.buildState({') &&
+  addressPanel.includes('this.toolbarSheetContentWidth = this.resolveToolbarSystemSheetContentWidth();') &&
+  addressPanel.includes('return this.toolbarSheetContentWidth > 0 ? this.toolbarSheetContentWidth :') &&
+  /private resolveToolbarSystemSheetActionCellWidth\(\s*layoutState: BrowserBottomToolbarQuickActionLayoutState\s*\): number \{\s*const columnCount = Math\.max\(1, Math\.floor\(layoutState\.columnCount\)\);\s*const availableWidth = this\.resolveToolbarSystemSheetHeaderContentWidth\(\);/s
+    .test(addressPanel) &&
+  !addressPanel.includes('toolbarSheetHeaderTrackWidth'),
+  'The toolbar Sheet header row and action grid must share one resolved content width, and that '
+    + 'width must be the width BrowserBottomSheetSurface actually grants the content.');
 assertContract(!toolbarSheetBinding.includes('title:') && !toolbarSheetBinding.includes('detents:') &&
   !toolbarSheetBinding.includes('systemMaterial:') && !toolbarSheetBinding.includes('onWillDismiss:'),
   'Toolbar system Sheet must not add a title, custom material, or dismissal state machine.');

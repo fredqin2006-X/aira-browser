@@ -38,6 +38,13 @@ export interface BrowserBottomPanelResponsiveState {
   widthBreakpoint: BrowserBottomPanelWidthBreakpoint;
   heightBreakpoint: BrowserBottomPanelHeightBreakpoint;
   aspectBreakpoint: BrowserBottomPanelAspectBreakpoint;
+  /**
+   * Window width the bottom panel is laid out in.
+   *
+   * A native Sheet that sets no explicit width spans the window, not the floating panel, so this is
+   * the width such a Sheet starts from before the sheet surface clamps it.
+   */
+  viewportWidth: number;
   expandedTopInset: number;
   minViewportRatio: number;
   panelMaxHeight: number;
@@ -100,6 +107,7 @@ export class BrowserBottomPanelResponsiveViewModel {
       widthBreakpoint,
       heightBreakpoint,
       aspectBreakpoint,
+      viewportWidth: width,
       expandedTopInset: this.resolveExpandedTopInset(widthBreakpoint, heightBreakpoint, wideCompact),
       minViewportRatio: this.resolveMinViewportRatio(widthBreakpoint, heightBreakpoint, wideCompact),
       panelMaxHeight: this.resolvePanelMaxHeight(widthBreakpoint, heightBreakpoint, wideCompact),

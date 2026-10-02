@@ -76,6 +76,7 @@ import {
   BrowserBottomToolbarQuickActionLayoutState,
   BrowserBottomToolbarSurfaceTransitionState
 } from '../../../core/browser/BrowserBottomToolbarExpansionViewModel';
+import { BrowserSheetResponsiveLayoutViewModel } from '../../../core/browser/BrowserSheetResponsiveLayoutViewModel';
 import {
   BrowserBottomToolbarReorderGestureKind,
   reduceBrowserBottomToolbarReorderGesture
@@ -382,7 +383,17 @@ export struct BrowserBottomAddressPanel {
   @State private toolbarSheetVisibleActions: BrowserBottomAddressPanelAction[] = [];
   @State private toolbarParkedActions: BrowserBottomAddressPanelAction[] = [];
   @State private toolbarSystemSheetHeaderPressedIconId: string = '';
-  @State private toolbarSheetHeaderTrackWidth: number = 0;
+  /**
+   * Width the toolbar Sheet's content actually gets, resolved once at open time.
+   *
+   * A native Sheet is clamped to `BrowserBottomSheetSurface`'s breakpoint max width, which can be
+   * narrower than the floating panel. The header row and the tool grid used to be measured against
+   * different widths, so every circle sat half of the surplus outside the row and the whole row read
+   * as shifted to the leading edge. Both read this one value instead.
+   */
+  @State private toolbarSheetContentWidth: number = 0;
+  private toolbarSystemSheetResponsiveViewModel: BrowserSheetResponsiveLayoutViewModel =
+    new BrowserSheetResponsiveLayoutViewModel();
   private toolbarSystemSheetLockedLayout: BrowserBottomToolbarQuickActionLayoutState | undefined = undefined;
   private toolbarSystemSheetLockedLayoutKey: string = '';
   private toolbarSystemSheetLockedPreviewHeight: number = 0;
@@ -902,7 +913,7 @@ export struct BrowserBottomAddressPanel {
       }
     };
     if (this.responsiveState.aspectBreakpoint === 'wide') {
-      options.width = this.resolveFloatingQuickActionLayoutWidth();
+      options.width = this.resolveToolbarSystemSheetContentWidth();
     }
     return options;
   }
@@ -981,12 +992,6 @@ export struct BrowserBottomAddressPanel {
       right: this.resolveToolbarSystemSheetHeaderEdgeInset(layoutState)
     })
     .margin({ bottom: WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP })
-    .onAreaChange((_oldValue: Area, area: Area) => {
-      const width = Number(area.width);
-      if (width > 0 && Math.abs(width - this.toolbarSheetHeaderTrackWidth) > 0.5) {
-        this.toolbarSheetHeaderTrackWidth = width;
-      }
-    })
   }
 
   @Builder
@@ -1248,11 +1253,48 @@ export struct BrowserBottomAddressPanel {
     return WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ROW_HEIGHT + WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP;
   }
 
-  private resolveToolbarSystemSheetHeaderContentWidth(): number {
-    if (this.toolbarSheetHeaderTrackWidth > 0) {
-      return this.toolbarSheetHeaderTrackWidth;
+  /**
+   * The single width the toolbar Sheet lays its header row and its tool grid out against.
+   *
+   * `options.width` sizes the native Sheet, but `BrowserBottomSheetSurface` then clamps the content
+   * to its own breakpoint max width (560 / 680 / 720). Measuring against the pre-clamp width is what
+   * misaligned the header: the grid lanes were narrower than the cards built for them, the cards
+   * overflowed their lanes, and a centered Row of unshrinkable children collapses to leading
+   * alignment — so the header sat half of the surplus inboard of every circle. Replaying the surface's
+   * own clamp here keeps one answer for both.
+   */
+  private resolveToolbarSystemSheetContentWidth(): number {
+    const sheetWidth = this.responsiveState.aspectBreakpoint === 'wide' ?
+      this.resolveFloatingQuickActionLayoutWidth() : this.resolveToolbarSystemSheetHostWidth();
+    const surfaceMaxWidth = this.toolbarSystemSheetResponsiveViewModel.buildState({
+      containerWidth: sheetWidth,
+      explicitMaxWidth: 0
+    }).surfaceMaxWidth;
+    if (surfaceMaxWidth <= 0) {
+      return Math.max(1, sheetWidth);
     }
-    return this.resolveFloatingQuickActionLayoutWidth();
+    return Math.max(1, Math.min(sheetWidth, surfaceMaxWidth));
+  }
+
+  /**
+   * The width a bottom Sheet spans when `options.width` is unset.
+   *
+   * Only a `wide` aspect sets an explicit Sheet width, so every other window falls back to the
+   * window itself. The floating panel is narrower than that, so using it here would undersize the
+   * grid on exactly the phone layouts that currently look right.
+   */
+  private resolveToolbarSystemSheetHostWidth(): number {
+    const viewportWidth = Math.max(0, this.responsiveState.viewportWidth);
+    if (viewportWidth > 0) {
+      return viewportWidth;
+    }
+    const panelWidth = Math.max(0, this.responsiveState.panelWidth);
+    return panelWidth > 0 ? panelWidth : this.resolveFloatingQuickActionLayoutWidth();
+  }
+
+  private resolveToolbarSystemSheetHeaderContentWidth(): number {
+    return this.toolbarSheetContentWidth > 0 ? this.toolbarSheetContentWidth :
+      this.resolveToolbarSystemSheetContentWidth();
   }
 
   // Left and right buttons share the outer edges of the first and last tool circles.
@@ -1293,6 +1335,7 @@ export struct BrowserBottomAddressPanel {
 
   private lockToolbarSystemSheetPresentation(): void {
     const layoutState = this.resolveToolbarSystemSheetPresentedLayoutState();
+    this.toolbarSheetContentWidth = this.resolveToolbarSystemSheetContentWidth();
     this.toolbarSystemSheetLockedLayout = layoutState;
     this.toolbarSystemSheetLockedLayoutKey = this.resolveToolbarSystemSheetPresentedLayoutKey();
     this.toolbarSystemSheetLockedPreviewHeight = this.measureToolbarSystemSheetPreviewHeight(layoutState);
@@ -1300,6 +1343,7 @@ export struct BrowserBottomAddressPanel {
   }
 
   private clearToolbarSystemSheetPresentationLock(): void {
+    this.toolbarSheetContentWidth = 0;
     this.toolbarSystemSheetLockedLayout = undefined;
     this.toolbarSystemSheetLockedLayoutKey = '';
     this.toolbarSystemSheetLockedPreviewHeight = 0;
@@ -1867,7 +1911,7 @@ export struct BrowserBottomAddressPanel {
     layoutState: BrowserBottomToolbarQuickActionLayoutState
   ): number {
     const columnCount = Math.max(1, Math.floor(layoutState.columnCount));
-    const availableWidth = this.resolveFloatingQuickActionLayoutWidth();
+    const availableWidth = this.resolveToolbarSystemSheetHeaderContentWidth();
     const horizontalPadding = BROWSER_BOTTOM_QUICK_ACTION_GROUP_HORIZONTAL_PADDING * 2;
     const totalGapWidth = Math.max(0, columnCount - 1) * Math.max(0, layoutState.columnGap);
     return Math.max(1, (availableWidth - horizontalPadding - totalGapWidth) / columnCount);
