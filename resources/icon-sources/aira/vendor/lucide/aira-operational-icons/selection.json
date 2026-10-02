@@ -153,6 +153,12 @@
     },
     {
       "properties": {
+        "name": "chevron-right",
+        "code": 60963
+      }
+    },
+    {
+      "properties": {
         "name": "circles-three",
         "code": 57746
       }

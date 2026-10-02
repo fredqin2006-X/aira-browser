@@ -16,6 +16,7 @@ import {
   BROWSER_TRACKING_PROTECTION_SETTINGS_ROUTE,
   DOWNLOAD_MANAGEMENT_ROUTE,
   HISTORY_MANAGER_ROUTE,
+  HUAWEI_ACCOUNT_INFO_ROUTE,
   OFFLINE_PAGES_ROUTE,
   NOVEL_BOOKSHELF_ROUTE,
   SEARCH_SETTINGS_ROUTE,
@@ -326,6 +327,24 @@ export class BrowserShellRouteCoordinator {
       SETTINGS_CENTER_ROUTE,
       this.buildBoundaryRouteParams(),
       resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_013'))
+    );
+  }
+
+  /**
+   * Opens the Huawei account page from the toolbar sheet's account capsule.
+   *
+   * The capsule only offers this when an account is signed in; the signed-out path opens the login
+   * sheet instead, so there is no signed-out state to handle here.
+   */
+  openHuaweiAccountInfoPage(): void {
+    if (this.host.isLargeScreenShellActive()) {
+      this.host.openLargeScreenNativeRoute({ scene: 'settings' });
+      return;
+    }
+    this.pushRoute(
+      HUAWEI_ACCOUNT_INFO_ROUTE,
+      this.buildBoundaryRouteParams(),
+      resolveAppResourceText($r('app.string.settings_account_info'))
     );
   }
 

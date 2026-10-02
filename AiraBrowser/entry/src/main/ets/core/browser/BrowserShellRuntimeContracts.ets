@@ -30,6 +30,7 @@ export type BrowserSystemSheetType =
   'none' |
   'releaseNotice' |
   'desktopLoginConfirm' |
+  'accountLogin' |
   'homeSettings' |
   'homeShortcutSelection' |
   'userScriptInstall' |

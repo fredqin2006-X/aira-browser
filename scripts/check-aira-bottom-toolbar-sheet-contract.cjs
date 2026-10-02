@@ -156,14 +156,18 @@ assertContract(addressPanel.includes('backgroundColor: this.storedPageBackground
   addressPanel.includes('blurStyle: BlurStyle.NONE') &&
   !addressPanel.includes('systemMaterial: createFloatingGlassMaterialIfAvailable('),
   'Toolbar system Sheet must keep one opaque themed backplate and must not add a second glass blur.');
-assertContract(addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_ROW_GAP_EXTRA: number = 14;') &&
+assertContract(addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_ROW_GAP_EXTRA: number = 6;') &&
   addressPanel.includes('return layoutState.rowGap + WEB_BOTTOM_TOOLBAR_SHEET_ROW_GAP_EXTRA;') &&
   addressPanel.includes('space: this.resolveToolbarSystemSheetRowGap(layoutState)'),
-  'Toolbar system Sheet action rows must keep extra vertical space between the circular buttons.');
-assertContract(!addressPanel.includes('WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS') &&
-  addressPanel.includes('cardCornerRadius: 0,') &&
+  'Toolbar system Sheet action rows must keep extra vertical space between the action buttons.');
+assertContract(addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS: number = 18;') &&
+  addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_AVATAR_CORNER_RADIUS: number =') &&
+  addressPanel.includes('.borderRadius(WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_AVATAR_CORNER_RADIUS)') &&
+  addressPanel.includes('cardCornerRadius: WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS,') &&
+  addressPanel.includes('cardCornerRadius: toolbarSystemSheetAction ? WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS : 0,') &&
+  addressPanel.includes('.borderRadius(WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS)') &&
   quickActionCard.includes('return this.cardCornerRadius > 0 ? Math.min(this.cardCornerRadius, maximumRadius) : maximumRadius;'),
-  'Toolbar system Sheet action icons must be circles without changing other quick-action surfaces.');
+  'Toolbar system Sheet actions, the middle header bar, and its avatar must be matching rounded rectangles without changing other quick-action surfaces.');
 assertContract(toolbarSheetContent.includes('this.buildToolbarSystemSheetHeaderRow(layoutState)') &&
   addressPanel.includes('this.resolveToolbarSystemSheetHeaderEdgeInset(layoutState)') &&
   addressPanel.includes('private resolveToolbarSystemSheetHeaderEdgeInset(') &&
@@ -186,11 +190,79 @@ assertContract(toolbarSheetContent.includes('this.buildToolbarSystemSheetHeaderR
   addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BUTTON_SIZE: number = 48;') &&
   addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ICON_SIZE: number = 22;') &&
   addressPanel.includes('const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP: number = 20;') &&
-  addressPanel.includes('margin({ bottom: WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP })') &&
+  addressPanel.includes('private buildToolbarSystemSheetHeaderDivider(') &&
+  addressPanel.includes('this.buildToolbarSystemSheetHeaderDivider(layoutState)') &&
+  addressPanel.includes('.height(WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP)') &&
   addressPanel.includes('this.resolveToolbarSystemSheetHeaderHeight()') &&
   addressPanel.includes('this.buildToolbarSystemSheetReadingCapsule()') &&
   addressPanel.includes('WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT / 2'),
   'Toolbar system Sheet header edit expands to the full detent with remove badges, settings opens the app settings page, and continue-reading sits in a capsule between the header buttons.');
+// Home's middle capsule is the account card when there is nothing to continue reading. It reuses the
+// settings account view model and badge so the two surfaces cannot disagree about identity or tier.
+// The tier badge must hug the name, not float against the chevron.
+//
+// Ordering is asserted inside the capsule builder rather than by pattern-matching the whole file, so
+// an unrelated `.layoutWeight(1)` elsewhere cannot make the check pass or fail by accident.
+function accountCapsuleHugsName(source) {
+  const start = source.indexOf('private buildToolbarSystemSheetAccountCapsule()');
+  if (start < 0) {
+    return false;
+  }
+  const end = source.indexOf('\n  @Builder', start + 1);
+  const body = end > start ? source.slice(start, end) : source.slice(start);
+  const badgeAt = body.indexOf('SettingsMembershipBadge({ kind: this.liveAccountCapsule.membershipBadge })');
+  const spacerAt = body.indexOf('Blank().layoutWeight(1)');
+  const chevronAt = body.indexOf("airaIconId: 'browser.toolbar.chevronRight'");
+  if (badgeAt < 0 || spacerAt < 0 || chevronAt < 0) {
+    return false;
+  }
+  // Badge before the spacer, spacer before the chevron.
+  if (!(badgeAt < spacerAt && spacerAt < chevronAt)) {
+    return false;
+  }
+  // The name itself must not stretch, or it would push the badge away from it.
+  return !/Text\(this\.liveAccountCapsule\.label\)[\s\S]{0,400}?\.layoutWeight\(1\)/.test(body);
+}
+
+const accountCapsuleViewModelPath = path.join(repoRoot,
+  'AiraBrowser/entry/src/main/ets/core/browser/BrowserBottomPanelAccountCapsuleViewModel.ets');
+const accountCapsuleViewModel = fs.readFileSync(accountCapsuleViewModelPath, 'utf8');
+assertContract(addressPanel.includes('private buildToolbarSystemSheetAccountCapsule()') &&
+  addressPanel.includes('private buildToolbarSystemSheetAccountAvatar()') &&
+  addressPanel.includes('this.shouldShowAccountCapsule()') &&
+  addressPanel.includes('this.buildToolbarSystemSheetAccountCapsule()') &&
+  addressPanel.includes('onAccountCapsule: () => void') &&
+  addressPanel.includes('SettingsMembershipBadge({ kind: this.liveAccountCapsule.membershipBadge })') &&
+  addressPanel.includes("this.liveAccountCapsule.avatarUri.trim().length > 0") &&
+  addressPanel.includes("'browser.toolbar.account'") &&
+  addressPanel.includes('this.onAccountCapsule();') &&
+  addressPanel.includes("airaIconId: 'browser.toolbar.chevronRight'") &&
+  accountCapsuleHugsName(addressPanel),
+  'The toolbar Sheet header must show the account capsule on Home, with a placeholder avatar when '
+    + 'there is no photo, the membership badge when there is one, and a tap handler.');
+// Continue reading outranks the account card: it is concrete in-progress content, so the account
+// entry only fills the slot when there is nothing to continue.
+assertContract(addressPanel.includes('return this.liveAccountCapsule.visible && !this.shouldShowReadingContinuation();') &&
+  addressPanel.includes('this.shouldShowReadingContinuation()) {') &&
+  accountCapsuleViewModel.includes('AIRA_DISTRIBUTION_CAPABILITY_OWNER.isCommunity()') &&
+  accountCapsuleViewModel.includes("$r('app.string.bottom_panel_account_community')") &&
+  accountCapsuleViewModel.includes("$r('app.string.bottom_panel_account_signed_out')") &&
+  accountCapsuleViewModel.includes('resolveAiraHuaweiAccountIdentity') &&
+  accountCapsuleViewModel.includes('resolveBadgeKind'),
+  'Continue reading must outrank the account capsule, and the capsule must resolve Community, '
+    + 'signed-out, and signed-in labels through shared account and membership presentation.');
+const shellPagePath2 = path.join(repoRoot,
+  'AiraBrowser/entry/src/main/ets/app/pages/BrowserShellPage.ets');
+const shellPageSource = fs.readFileSync(shellPagePath2, 'utf8');
+assertContract(shellPageSource.includes('accountCapsule: this.buildRootBottomPanelAccountCapsule()') &&
+  shellPageSource.includes('private handleRootBottomPanelAccountCapsule(): void') &&
+  shellPageSource.includes('openHuaweiAccountInfoPage()') &&
+  shellPageSource.includes('this.browserTransientSurfaceCoordinator.openSystemSheet(\'accountLogin\');') &&
+  shellPageSource.includes("if (!AIRA_DISTRIBUTION_CAPABILITY_OWNER.isOfficial()) {") &&
+  shellPageSource.includes('handleAccountCapsuleLoginResult') &&
+  shellPageSource.includes('new SyncSettingsRefreshSignal().bump();'),
+  'The shell must publish the account capsule, open the account page when signed in, open the login '
+    + 'sheet when signed out, stay inert on Community, and refresh after a sign-in.');
 assertContract(quickActionCard.includes('@Prop removeBadgeVisible: boolean = false;') &&
   quickActionCard.includes("const HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_COLOR: string = '#FF3B30';") &&
   quickActionCard.includes('const HOME_SEARCH_QUICK_ACTION_REMOVE_BADGE_SIZE: number = 26;') &&

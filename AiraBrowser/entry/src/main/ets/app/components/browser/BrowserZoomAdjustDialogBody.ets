@@ -1,6 +1,7 @@
 import { resolveAppResourceText } from '../../../core/resources/AppResourceText';
 import { AiraRenderableIconId } from '../../../core/resources/GeneratedAiraIconCatalog';
 import {
+  BROWSER_THEME_STORAGE_ACCENT_KEY,
   BROWSER_THEME_STORAGE_CONTROL_BACKGROUND_KEY,
   BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY,
   BROWSER_THEME_STORAGE_TEXT_SECONDARY_KEY
@@ -16,6 +17,8 @@ const ZOOM_ADJUST_RELEASE_DURATION_MS: number = 220;
 
 @Component
 export struct BrowserZoomAdjustDialogBody {
+  @StorageProp(BROWSER_THEME_STORAGE_ACCENT_KEY)
+  private storedAccentColor: string = '#0A59F7';
   @StorageProp(BROWSER_THEME_STORAGE_CONTROL_BACKGROUND_KEY)
   private storedControlBackgroundColor: string = '#EEF2F6';
   @StorageProp(BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY)
@@ -32,6 +35,12 @@ export struct BrowserZoomAdjustDialogBody {
   onAdjust: (action: 'decrease' | 'increase' | 'reset') => void =
     (_action: 'decrease' | 'increase' | 'reset'): void => {};
   onDone: () => void = (): void => {};
+  @Prop doneFlat: boolean = false;
+  @Prop showRememberSite: boolean = false;
+  @Prop rememberSite: boolean = false;
+  @Prop rememberSiteEnabled: boolean = false;
+  rememberSiteLabel: ResourceStr = '';
+  onRememberSiteChange: (remember: boolean) => void = (_remember: boolean): void => {};
 
   build() {
     Column({ space: 16 }) {
@@ -99,9 +108,11 @@ export struct BrowserZoomAdjustDialogBody {
       .height(ZOOM_ADJUST_CIRCLE_SIZE)
       .alignItems(VerticalAlign.Center)
 
-      Row() {
+      Column({ space: 12 }) {
         BrowserSheetActionButton({
           label: $r('app.string.web_text_zoom_done'),
+          emphasis: 'secondary',
+          flat: this.doneFlat,
           stacked: true,
           buttonHeight: 44,
           fontSize: 15,
@@ -109,13 +120,45 @@ export struct BrowserZoomAdjustDialogBody {
             this.onDone();
           }
         })
+
+        if (this.showRememberSite) {
+          this.buildRememberSiteRow()
+        }
       }
       .width('100%')
-      .height(44)
     }
     .width('100%')
     .height('auto')
     .justifyContent(FlexAlign.Start)
+  }
+
+  @Builder
+  private buildRememberSiteRow() {
+    Row({ space: 8 }) {
+      Checkbox()
+        .select(this.rememberSite)
+        .selectedColor(this.storedAccentColor)
+        .enabled(this.rememberSiteEnabled)
+        .width(20)
+        .height(20)
+        .hitTestBehavior(HitTestMode.None)
+
+      Text(this.rememberSiteLabel)
+        .fontSize(14)
+        .fontColor(this.rememberSiteEnabled ? this.storedPrimaryTextColor : this.storedSecondaryTextColor)
+        .maxLines(2)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+    }
+    .width('100%')
+    .justifyContent(FlexAlign.Center)
+    .alignItems(VerticalAlign.Center)
+    .opacity(this.rememberSiteEnabled ? 1 : 0.45)
+    .onClick((): void => {
+      if (!this.rememberSiteEnabled) {
+        return;
+      }
+      this.onRememberSiteChange(!this.rememberSite);
+    })
   }
 
 }

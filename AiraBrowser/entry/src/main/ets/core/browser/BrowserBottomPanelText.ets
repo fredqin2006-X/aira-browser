@@ -433,6 +433,10 @@ export function bottomPanelContinueReadingA11y(title: string): Resource {
   return $r('app.string.bottom_panel_continue_reading_a11y', title);
 }
 
+export function bottomPanelAccountCapsuleA11y(label: string): Resource {
+  return $r('app.string.bottom_panel_account_capsule_a11y', label);
+}
+
 export function bottomPanelBack(): Resource {
   return $r('app.string.bottom_panel_back');
 }

@@ -10,7 +10,7 @@ export function resolveSystemSheetDialogTier(type: BrowserSystemSheetType): Desk
     type === 'readerText' || type === 'readerAppearance' || type === 'readerSettings') {
     return 'l';
   }
-  if (type === 'desktopLoginConfirm') {
+  if (type === 'desktopLoginConfirm' || type === 'accountLogin') {
     return 's';
   }
   if (type === 'novelCatalog') {

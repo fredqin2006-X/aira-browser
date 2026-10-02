@@ -42,7 +42,7 @@ export function isReadingExperienceSystemSheetType(type: BrowserSystemSheetType)
 export function resolveReadingExperienceSystemSheetHeight(type: BrowserSystemSheetType): SheetSize {
   if (type === 'readerText' || type === 'readerAppearance' || type === 'readerSettings' ||
     type === 'novelReaderText' || type === 'novelReaderAppearance' || type === 'novelReaderSettings' ||
-    type === 'homeSettings' || type === 'homeShortcutSelection') {
+    type === 'homeSettings' || type === 'homeShortcutSelection' || type === 'accountLogin') {
     return SheetSize.FIT_CONTENT;
   }
   return SheetSize.LARGE;

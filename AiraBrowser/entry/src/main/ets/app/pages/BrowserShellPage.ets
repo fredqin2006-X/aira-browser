@@ -1,5 +1,7 @@
 import { common } from '@kit.AbilityKit';
 import { webview } from '@kit.ArkWeb';
+import { loginComponentManager } from '@kit.AccountKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 import { AiraNavForensicsProbe } from '../../common/debug/AiraNavForensicsProbe';
 import { curves, FrameCallback, KeyboardAvoidMode, window } from '@kit.ArkUI';
 import { KeyCode } from '@kit.InputKit';
@@ -38,7 +40,8 @@ import {
   TabRecord,
   TabRestoreReason,
   TabRuntimeState,
-  HistoryVisit
+  HistoryVisit,
+  BrowserDataBoundaryInput
 } from '../../common/models/BrowserModels';
 import {
   QUICK_SEARCH_SWITCHING_PREFERENCES_REVISION_KEY,
@@ -147,6 +150,7 @@ import {
   createUserScriptBrowserRuntimeCoordinator,
   sharedMembershipFeature,
   sharedAiraSyncConfigStore,
+  sharedHuaweiAccountMutationCoordinator,
   sharedBookmarkFolderSelectionPreparationCoordinator,
   sharedArkWebAppProxyService,
   sharedBrowserProxyRuntimeRefreshCoordinator,
@@ -868,6 +872,15 @@ import {
 import { tabsOverviewSegmentGuideBackGate } from '../../core/onboarding/TabsOverviewSegmentGuidePolicy';
 import { CrossDeviceTabsEmptyAction } from '../../core/deviceTabs/CrossDeviceTabsEmptyPresentation';
 import { CROSS_DEVICE_LINK_SETUP_ROUTE, SYNC_DESKTOP_BOOKMARK_GUIDE_ROUTE } from '../router/AppRoutes';
+import {
+  SETTINGS_LEGAL_WEB_DOCUMENT_ROUTE,
+  SETTINGS_PRIVACY_STATEMENT_ROUTE
+} from '../router/AppRoutes';
+import { SyncSettingsRefreshSignal } from '../../core/sync/SyncSettingsRefreshSignal';
+import {
+  SYNC_SETTINGS_REFRESH_REVISION_KEY
+} from '../../core/sync/SyncSettingsRefreshSignal';
+import { HuaweiLoginSheetContent } from '../components/account/HuaweiLoginSheetContent';
 import { dismissOnboardingStackIfRequested } from '../router/OnboardingNavigation';
 import { FeatureGateOverlay } from '../components/browser/FeatureGateOverlay';
 import { NewUserGiftOverlay } from '../components/browser/NewUserGiftOverlay';
@@ -925,6 +938,11 @@ import {
   BrowserBottomPanelHost,
   BrowserBottomPanelRenderContext
 } from '../components/browser/BrowserBottomPanelHost';
+import { BrowserBottomPanelAccountCapsuleViewModel } from '../../core/browser/BrowserBottomPanelAccountCapsuleViewModel';
+import {
+  BrowserBottomPanelAccountCapsulePresentation
+} from '../../core/browser/BrowserBottomPanelPresentationChannel';
+import { LocalUserAvatarService } from '../../services/settings/LocalUserAvatarService';
 import { BrowserRootBottomPanelExpandedScrim } from '../components/browser/BrowserRootBottomPanelExpandedScrim';
 import { BrowserPageFindBar } from '../components/browser/BrowserPageFindBar';
 import {
@@ -1063,6 +1081,7 @@ import {
 import { BrowserSitePermissionPromptHost } from '../components/browser/BrowserSitePermissionPromptHost';
 import { BookmarkMoveFolderSelectionOverlay } from '../components/bookmarks/BookmarkMoveFolderSelectionSheet';
 import { BrowserWebTextZoomSheet } from '../components/browser/BrowserWebTextZoomSheet';
+import { sharedBrowserWebTextZoomSiteMemory } from '../../core/browser/BrowserWebTextZoomSiteMemory';
 import { BrowserLargeScreenWebZoomDialog } from '../components/browser/BrowserLargeScreenWebZoomDialog';
 import { BrowserTabOverviewCardSelectRect } from '../components/browser/BrowserTabOverviewCard';
 import { BrowserTabsFloatingOverlay } from '../components/browser/BrowserTabsFloatingOverlay';
@@ -5574,6 +5593,8 @@ struct BrowserShellPage {
       host: this.browserWebPageLifecycleApplicationHost
     });
   private webTextZoomViewModel: BrowserWebTextZoomViewModel = new BrowserWebTextZoomViewModel();
+  private webTextZoomSessionRatio: number = 100;
+  private webTextZoomRememberSite: boolean = false;
   private siteReportDialogViewModel: SiteReportDialogViewModel = new SiteReportDialogViewModel();
   private releaseNoticePresentationCoordinator: ReleaseNoticePresentationCoordinator =
     new ReleaseNoticePresentationCoordinator(
@@ -5815,6 +5836,9 @@ struct BrowserShellPage {
       state: $webTextZoomSheetState,
       onAction: (action: BrowserWebTextZoomAction): void => {
         this.applyWebTextZoomAction(action);
+      },
+      onRememberSite: (remember: boolean): void => {
+        this.setWebTextZoomRememberSite(remember);
       }
     }),
     alignment: DialogAlignment.Center,
@@ -5997,7 +6021,7 @@ struct BrowserShellPage {
   @State addressBarTabSwipePreview?: BrowserTabPreviewState = undefined;
   @State addressBarTabSwipeState: BrowserAddressBarTabSwipeState = createIdleAddressBarTabSwipeState();
   @State addressInput: string = '';
-  @State currentUrl: string = '';
+  @State @Watch('applyRememberedWebTextZoomForCurrentUrl') currentUrl: string = '';
   @State pendingWebUrl: string = '';
   @State currentTitle: string = 'Aira';
   @State @Watch('reconcileShellTabPresentation') showHomePage: boolean = true;
@@ -6046,6 +6070,22 @@ struct BrowserShellPage {
     this.browserUserScriptApplicationCoordinator.getSnapshot();
   @State featureGateSnapshot: FeatureGateSnapshot = this.featureGateCoordinator.getSnapshot();
   @State phoneSystemSheetVisible: boolean = false;
+  /**
+   * Bumped by sign-in, sign-out, and membership changes so the toolbar sheet's account capsule
+   * re-derives its name, avatar, and tier instead of keeping the value it read on first paint.
+   */
+  @StorageLink(SYNC_SETTINGS_REFRESH_REVISION_KEY) @Watch('handleRootBottomPanelAccountRefreshSignal')
+  private rootBottomPanelAccountRefreshRevision: number = 0;
+  @StorageProp(AIRA_NEW_USER_GIFT_REVISION_KEY) @Watch('handleRootBottomPanelAccountRefreshSignal')
+  private rootBottomPanelMembershipRefreshRevision: number = 0;
+  private accountCapsuleLoginButtonController: loginComponentManager.LoginWithHuaweiIDButtonController =
+    new loginComponentManager.LoginWithHuaweiIDButtonController()
+      .onClickLoginWithHuaweiIDButton((
+        error: BusinessError | undefined,
+        response: loginComponentManager.HuaweiIDCredential
+      ): void => {
+        this.handleAccountCapsuleLoginResult(error, response);
+      });
   @State homeShortcutSelectionState: HomeShortcutSelectionState =
     this.homeShortcutStateCoordinator.getSelectionSnapshot();
   @State browserQrScanSessionSnapshot: BrowserQrScanSessionSnapshot =
@@ -6141,6 +6181,16 @@ struct BrowserShellPage {
   @State rootBottomPanelImmediateLowDetentRequestVersion: number = 0;
   @State rootBottomPanelToolbarSystemSheetRequestVersion: number = 0;
   private rootBottomPanelToolbarSystemSheetRequested: boolean = false;
+  /** Local (non-Huawei) avatar, loaded once and reused by the toolbar sheet account capsule. */
+  private rootBottomPanelLocalAvatarUri: string = '';
+  private rootBottomPanelLocalAvatarLoaded: boolean = false;
+  private rootBottomPanelAccountCapsuleViewModel: BrowserBottomPanelAccountCapsuleViewModel =
+    new BrowserBottomPanelAccountCapsuleViewModel();
+  /**
+   * Read by the capsule builder so a sign-in, sign-out, or membership change re-derives it.
+   * ArkUI only tracks dependencies actually read during build, so the builder must touch this.
+   */
+  @State private rootBottomPanelAccountCapsuleRevision: number = 0;
   /**
    * Panel-driven search commits waiting for the next frame boundary. See
    * BrowserRootBottomPanelCommitFrameCallback for why they cannot run inline.
@@ -8015,6 +8065,7 @@ struct BrowserShellPage {
           actionId
         ),
       onContinueReading: (): void => this.novelReaderSession.handleAction({ type: 'continue_reading' }),
+      onAccountCapsule: (): void => this.handleRootBottomPanelAccountCapsule(),
       onKeyboardResizeSessionBegin: () => {
         this.requestRootBottomAddressInputKeyboardAvoidMode();
       },
@@ -8040,6 +8091,129 @@ struct BrowserShellPage {
       !this.readerModeSessionSnapshot.state.visible && !this.novelReaderSnapshot.visible &&
       !this.webBottomAddressFocused && !this.phoneSystemSheetVisible &&
       !this.rootBottomPanelToolbarSystemSheetRequested && !this.webContextMenuPresentation.state.visible;
+  }
+
+  /**
+   * The toolbar sheet's Home account capsule.
+   *
+   * The local avatar is read once, lazily: it is a file-system lookup, and the capsule only needs it
+   * when Huawei supplies no photo. A failed read just leaves the placeholder avatar in place.
+   */
+  private buildRootBottomPanelAccountCapsule(): BrowserBottomPanelAccountCapsulePresentation {
+    void this.rootBottomPanelAccountCapsuleRevision;
+    this.loadRootBottomPanelLocalAvatarIfNeeded();
+    return this.rootBottomPanelAccountCapsuleViewModel.buildState(
+      sharedAiraSyncConfigStore.getSettings(),
+      sharedMembershipFeature.getState(),
+      this.rootBottomPanelLocalAvatarUri
+    );
+  }
+
+  private loadRootBottomPanelLocalAvatarIfNeeded(): void {
+    if (this.rootBottomPanelLocalAvatarLoaded) {
+      return;
+    }
+    this.rootBottomPanelLocalAvatarLoaded = true;
+    void new LocalUserAvatarService().getAvatarImageUri()
+      .then((uri: string): void => {
+        this.rootBottomPanelLocalAvatarUri = uri;
+      })
+      .catch((_error: Error): void => {
+        this.rootBottomPanelLocalAvatarUri = '';
+      });
+  }
+
+  /**
+   * Account capsule tap: the account page when signed in, the login sheet otherwise.
+   *
+   * Community has no account system, so its capsule is inert instead of offering a login it cannot
+   * complete. Basic service mode also blocks accounts, matching the settings account card.
+   */
+  private handleRootBottomPanelAccountCapsule(): void {
+    if (!AIRA_DISTRIBUTION_CAPABILITY_OWNER.isOfficial()) {
+      return;
+    }
+    if (!this.isFullAppServiceMode()) {
+      this.showNativeToast($r('app.string.settings_center_01'));
+      return;
+    }
+    if (this.rootBottomPanelAccountCapsuleViewModel
+      .buildState(sharedAiraSyncConfigStore.getSettings(), sharedMembershipFeature.getState())
+      .signedIn) {
+      this.browserShellRouteCoordinator.openHuaweiAccountInfoPage();
+      return;
+    }
+    if (!sharedHuaweiAccountMutationCoordinator.canSignIn(this.buildRootBottomPanelBoundaryInput())) {
+      this.showNativeToast($r('app.string.settings_pro_sign_in_private'));
+      return;
+    }
+    this.browserTransientSurfaceCoordinator.openSystemSheet('accountLogin');
+  }
+
+  private handleAccountCapsuleLoginResult(
+    error: BusinessError | undefined,
+    response: loginComponentManager.HuaweiIDCredential
+  ): void {
+    if (error !== undefined) {
+      // Cancel is a normal outcome and must not raise a failure toast.
+      if (error.code !== 1001502012) {
+        this.showNativeToast(error.message.length > 0 ? error.message :
+          $r('app.string.settings_pro_sign_in_failed'));
+      }
+      return;
+    }
+    if (response.authorizationCode.trim().length <= 0 && response.openID.trim().length <= 0) {
+      this.showNativeToast($r('app.string.settings_pro_sign_in_incomplete'));
+      return;
+    }
+    this.browserTransientSurfaceCoordinator.closeSystemSheet();
+    sharedHuaweiAccountMutationCoordinator.signIn(this.buildRootBottomPanelBoundaryInput())
+      .then((result): void => {
+        if (result.type === 'failed') {
+          this.showNativeToast(result.message.length > 0 ? result.message : result.title);
+          return;
+        }
+        new SyncSettingsRefreshSignal().bump();
+      })
+      .catch((): void => {
+        this.showNativeToast($r('app.string.settings_pro_sign_in_failed'));
+      });
+  }
+
+  private buildRootBottomPanelBoundaryInput(): BrowserDataBoundaryInput {
+    return this.tabScopedEventContextCoordinator.resolveCurrentBoundary();
+  }
+
+  /**
+   * Republish the live presentation so the capsule picks up the new account state.
+   *
+   * The capsule is carried on the panel presentation channel, so a signal alone changes nothing until
+   * the presentation is rebuilt; the panel host keys its render on the layout key, and the live
+   * presentation is read on every build, so a revision bump is enough to re-derive it.
+   */
+  private handleRootBottomPanelAccountRefreshSignal(): void {
+    this.rootBottomPanelAccountCapsuleRevision += 1;
+  }
+
+  @Builder
+  private buildAccountCapsuleLoginSheet() {
+    HuaweiLoginSheetContent({
+      controller: this.accountCapsuleLoginButtonController,
+      onOpenUserAgreement: (): void => {
+        this.browserTransientSurfaceCoordinator.closeSystemSheet();
+        this.browserShellRouteCoordinator.openSimpleRoute(
+          SETTINGS_LEGAL_WEB_DOCUMENT_ROUTE,
+          resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_001'))
+        );
+      },
+      onOpenPrivacyPolicy: (): void => {
+        this.browserTransientSurfaceCoordinator.closeSystemSheet();
+        this.browserShellRouteCoordinator.openSimpleRoute(
+          SETTINGS_PRIVACY_STATEMENT_ROUTE,
+          resolveAppResourceText($r('app.string.browser_browser_shell_route_coordinator_001'))
+        );
+      }
+    })
   }
 
   private buildRootBottomPanelSemanticState(
@@ -9492,7 +9666,8 @@ struct BrowserShellPage {
         ),
         addressEditable: !this.buildCurrentDocumentViewerChromeContext().policy.active,
         webProtectionFeedback: this.siteControlsApplicationSnapshot.webProtectionFeedback,
-        readingSnapshot: this.novelReaderSnapshot
+        readingSnapshot: this.novelReaderSnapshot,
+        accountCapsule: this.buildRootBottomPanelAccountCapsule()
       }),
       layoutRenderKey: this.rootBottomPanelLayoutState.layoutRenderKey,
       layerZIndex: this.buildBottomPanelHostState().zIndex,
@@ -11486,6 +11661,8 @@ struct BrowserShellPage {
       })
     } else if (this.browserTransientSurfaceSnapshot.systemSheet.type === 'desktopLoginConfirm') {
       this.buildDesktopLoginConfirmSheet()
+    } else if (this.browserTransientSurfaceSnapshot.systemSheet.type === 'accountLogin') {
+      this.buildAccountCapsuleLoginSheet()
     } else if (this.browserTransientSurfaceSnapshot.systemSheet.type === 'crossDeviceTabs') {
       BrowserCrossDeviceTabsSheet({
         dataScope: this.tabScopedEventContextCoordinator.resolveCurrentBoundary().dataScope,
@@ -12128,7 +12305,7 @@ struct BrowserShellPage {
   }
 
   private openWebTextZoomSheet(): void {
-    this.webTextZoomSheetState = this.webTextZoomViewModel.buildState(this.webTextZoomRatio);
+    this.applyRememberedWebTextZoomForCurrentUrl();
     this.webTextZoomDialogController.open();
   }
 
@@ -12151,14 +12328,76 @@ struct BrowserShellPage {
 
   private applyWebTextZoomAction(action: BrowserWebTextZoomAction): void {
     const result = this.webTextZoomViewModel.buildActionResult(this.webTextZoomRatio, action);
+    const rememberSiteEnabled = this.canRememberCurrentWebTextZoomSite();
+    const state = this.webTextZoomViewModel.buildState(
+      result.state.ratio,
+      this.webTextZoomRememberSite,
+      rememberSiteEnabled
+    );
     if (!result.changed) {
-      this.webTextZoomSheetState = result.state;
+      this.webTextZoomSheetState = state;
       return;
     }
-    this.webTextZoomRatio = result.state.ratio;
-    this.webTextZoomSheetState = result.state;
+    this.webTextZoomRatio = state.ratio;
+    this.webTextZoomSheetState = state;
     this.webTextZoomActionVersion += 1;
+    if (this.webTextZoomRememberSite) {
+      sharedBrowserWebTextZoomSiteMemory.remember(this.resolveCurrentWebTextZoomOrigin(), state.ratio);
+    } else {
+      this.webTextZoomSessionRatio = state.ratio;
+    }
     this.browserHostedRuntimeSurfacePort.updateCurrentActiveConfigFromHost();
+  }
+
+  private setWebTextZoomRememberSite(remember: boolean): void {
+    const origin = this.resolveCurrentWebTextZoomOrigin();
+    if (origin.length === 0) {
+      return;
+    }
+    this.webTextZoomRememberSite = remember;
+    if (remember) {
+      sharedBrowserWebTextZoomSiteMemory.remember(origin, this.webTextZoomRatio);
+    } else {
+      sharedBrowserWebTextZoomSiteMemory.forget(origin);
+      this.webTextZoomSessionRatio = this.webTextZoomRatio;
+    }
+    const state = this.webTextZoomSheetState;
+    this.webTextZoomSheetState = {
+      ratio: state.ratio,
+      percentLabel: state.percentLabel,
+      canDecrease: state.canDecrease,
+      canIncrease: state.canIncrease,
+      rememberSite: remember,
+      rememberSiteEnabled: true
+    };
+  }
+
+  private applyRememberedWebTextZoomForCurrentUrl(): void {
+    sharedBrowserWebTextZoomSiteMemory.ensureLoaded();
+    const origin = sharedBrowserWebTextZoomSiteMemory.resolveOrigin(this.currentUrl);
+    const remembered = origin.length > 0 ? sharedBrowserWebTextZoomSiteMemory.read(origin) : undefined;
+    const nextRatio = remembered !== undefined ? remembered : this.webTextZoomSessionRatio;
+    const rememberSite = remembered !== undefined;
+    const rememberSiteEnabled = origin.length > 0;
+    this.webTextZoomRememberSite = rememberSite;
+    if (nextRatio !== this.webTextZoomRatio) {
+      this.webTextZoomRatio = nextRatio;
+      this.webTextZoomActionVersion += 1;
+      this.browserHostedRuntimeSurfacePort.updateCurrentActiveConfigFromHost();
+    }
+    this.webTextZoomSheetState = this.webTextZoomViewModel.buildState(
+      nextRatio,
+      rememberSite,
+      rememberSiteEnabled
+    );
+  }
+
+  private canRememberCurrentWebTextZoomSite(): boolean {
+    return this.resolveCurrentWebTextZoomOrigin().length > 0;
+  }
+
+  private resolveCurrentWebTextZoomOrigin(): string {
+    return sharedBrowserWebTextZoomSiteMemory.resolveOrigin(this.resolveCurrentWebPageActionUrl());
   }
 
   private handleSystemFontSizeScaleChange(): void {

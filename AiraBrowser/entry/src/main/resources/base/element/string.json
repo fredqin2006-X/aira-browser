@@ -5329,6 +5329,10 @@
       "value": "完成"
     },
     {
+      "name": "web_text_zoom_remember_site",
+      "value": "记住此网站的文字大小"
+    },
+    {
       "name": "web_text_zoom_notice_increased",
       "value": "网页已放大"
     },
@@ -23371,6 +23375,18 @@
     {
       "name": "settings_general_language_traditional",
       "value": "繁體中文"
+    },
+    {
+      "name": "bottom_panel_account_community",
+      "value": "社区版"
+    },
+    {
+      "name": "bottom_panel_account_signed_out",
+      "value": "未登录"
+    },
+    {
+      "name": "bottom_panel_account_capsule_a11y",
+      "value": "账号：%1$s"
     }
   ]
 }

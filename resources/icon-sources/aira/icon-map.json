@@ -18,12 +18,48 @@
     "note": "user-provided canonical start-window artwork; identical bytes for light and dark"
   },
   {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/active-download.svg",
+    "originalSource": "Lucide 1.38.0 / download-cloud",
+    "primaryResourceFamily": "app_toolbar_active_download",
+    "resourceFamilies": [
+      "app_toolbar_active_download"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/activity-heatmap.svg",
+    "originalSource": "Lucide 1.38.0 / activity",
+    "primaryResourceFamily": "app_sync_first_activation_activity_heatmap",
+    "resourceFamilies": [
+      "app_sync_first_activation_activity_heatmap"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/ad-blocker.svg",
+    "originalSource": "Lucide 1.38.0 / shield-off",
+    "primaryResourceFamily": "app_settings_ad_blocker",
+    "resourceFamilies": [
+      "app_settings_ad_blocker"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/adjustments-horizontal.svg",
+    "originalSource": "Lucide 1.38.0 / adjustments-horizontal",
+    "primaryResourceFamily": "app_omnibox_page_controls",
+    "resourceFamilies": [
+      "app_omnibox_page_controls"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/app-window.svg",
     "originalSource": "Lucide 1.38.0 / app-window",
-    "primaryResourceFamily": "app_settings_web_apps",
+    "primaryResourceFamily": "app_settings_app_service_mode",
     "resourceFamilies": [
-      "app_settings_web_apps",
-      "app_settings_app_service_mode"
+      "app_settings_app_service_mode",
+      "app_settings_web_apps"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
@@ -46,13 +82,22 @@
     "note": "Lucide Operational font source"
   },
   {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/arrow-right.svg",
+    "originalSource": "Lucide 1.38.0 / arrow-right",
+    "primaryResourceFamily": "app_toolbar_forward",
+    "resourceFamilies": [
+      "app_toolbar_forward"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/arrow-square-out.svg",
     "originalSource": "Lucide 1.38.0 / external-link",
-    "primaryResourceFamily": "app_site_setting_external_actions",
+    "primaryResourceFamily": "app_offline_open_original",
     "resourceFamilies": [
+      "app_offline_open_original",
       "app_site_setting_external_actions",
-      "app_site_setting_open_app",
-      "app_offline_open_original"
+      "app_site_setting_open_app"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
@@ -104,12 +149,39 @@
     "note": "Lucide Operational font source"
   },
   {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/bookmark-edit-drag-handle.svg",
+    "originalSource": "Lucide 1.38.0 / grip-vertical",
+    "primaryResourceFamily": "app_bookmark_edit_drag_handle",
+    "resourceFamilies": [
+      "app_bookmark_edit_drag_handle"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/bookmark-edit-move.svg",
+    "originalSource": "Lucide 1.38.0 / move",
+    "primaryResourceFamily": "app_bookmark_edit_move",
+    "resourceFamilies": [
+      "app_bookmark_edit_move"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/bookmark-edit-select-all.svg",
+    "originalSource": "Lucide 1.38.0 / box-select",
+    "primaryResourceFamily": "app_bookmark_edit_select_all",
+    "resourceFamilies": [
+      "app_bookmark_edit_select_all"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/bookmark-simple.svg",
     "originalSource": "Lucide 1.38.0 / bookmark",
-    "primaryResourceFamily": "app_reader_add_bookmark",
+    "primaryResourceFamily": "app_toolbar_add_bookmark",
     "resourceFamilies": [
-      "app_reader_add_bookmark",
-      "app_toolbar_add_bookmark"
+      "app_toolbar_add_bookmark",
+      "app_reader_add_bookmark"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
@@ -124,11 +196,47 @@
     "note": "one font glyph serves multiple app resource families"
   },
   {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/bookshelf.svg",
+    "originalSource": "Lucide 1.38.0 / library",
+    "primaryResourceFamily": "app_toolbar_bookshelf",
+    "resourceFamilies": [
+      "app_toolbar_bookshelf"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/browser.svg",
     "originalSource": "Lucide 1.38.0 / panel-top",
     "primaryResourceFamily": "app_toolbar_user_agent",
     "resourceFamilies": [
       "app_toolbar_user_agent"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/browser-address-expanded-copy.svg",
+    "originalSource": "Lucide 1.38.0 / copy",
+    "primaryResourceFamily": "app_browser_address_expanded_copy",
+    "resourceFamilies": [
+      "app_browser_address_expanded_copy"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/browser-address-expanded-edit.svg",
+    "originalSource": "Lucide 1.38.0 / pencil",
+    "primaryResourceFamily": "app_browser_address_expanded_edit",
+    "resourceFamilies": [
+      "app_browser_address_expanded_edit"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/browser-address-expanded-share.svg",
+    "originalSource": "Lucide 1.38.0 / share-2",
+    "primaryResourceFamily": "app_browser_address_expanded_share",
+    "resourceFamilies": [
+      "app_browser_address_expanded_share"
     ],
     "note": "Lucide Operational font source"
   },
@@ -142,13 +250,22 @@
     "note": "Lucide Operational font source"
   },
   {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/chevron-right.svg",
+    "originalSource": "Lucide 1.38.0 / chevron-right",
+    "primaryResourceFamily": "app_toolbar_chevron_right",
+    "resourceFamilies": [
+      "app_toolbar_chevron_right"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/circles-three.svg",
     "originalSource": "Lucide 1.38.0 / palette",
-    "primaryResourceFamily": "app_settings_appearance",
+    "primaryResourceFamily": "app_toolbar_theme_mode",
     "resourceFamilies": [
-      "app_settings_appearance",
       "app_toolbar_theme_mode",
-      "app_membership_benefit_appearance"
+      "app_membership_benefit_appearance",
+      "app_settings_appearance"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
@@ -182,24 +299,33 @@
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/cloud.svg",
     "originalSource": "Lucide 1.38.0 / cloud",
-    "primaryResourceFamily": "app_settings_webdav",
+    "primaryResourceFamily": "app_membership_benefit_webdav",
     "resourceFamilies": [
-      "app_settings_webdav",
-      "app_membership_benefit_webdav"
+      "app_membership_benefit_webdav",
+      "app_settings_webdav"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/code.svg",
     "originalSource": "Lucide 1.38.0 / code",
-    "primaryResourceFamily": "app_settings_user_scripts",
+    "primaryResourceFamily": "app_shortcut_scripts",
     "resourceFamilies": [
-      "app_settings_user_scripts",
       "app_shortcut_scripts",
+      "app_toolbar_element_inspection",
       "app_membership_benefit_user_scripts",
-      "app_toolbar_element_inspection"
+      "app_settings_user_scripts"
     ],
     "note": "one font glyph serves multiple app resource families"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/copy.svg",
+    "originalSource": "Lucide 1.38.0 / copy",
+    "primaryResourceFamily": "app_browser_address_copy",
+    "resourceFamilies": [
+      "app_browser_address_copy"
+    ],
+    "note": "Lucide Operational font source"
   },
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/corners-out.svg",
@@ -213,10 +339,10 @@
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/crown.svg",
     "originalSource": "Lucide 1.38.0 / crown",
-    "primaryResourceFamily": "app_settings_membership",
+    "primaryResourceFamily": "app_membership_benefit_membership",
     "resourceFamilies": [
-      "app_settings_membership",
-      "app_membership_benefit_membership"
+      "app_membership_benefit_membership",
+      "app_settings_membership"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
@@ -232,10 +358,10 @@
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/desktop.svg",
     "originalSource": "Lucide 1.38.0 / monitor",
-    "primaryResourceFamily": "app_theme_mode_system",
+    "primaryResourceFamily": "app_cross_device_link_peer_computer",
     "resourceFamilies": [
-      "app_theme_mode_system",
-      "app_cross_device_link_peer_computer"
+      "app_cross_device_link_peer_computer",
+      "app_theme_mode_system"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
@@ -270,13 +396,49 @@
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/download-simple.svg",
     "originalSource": "Lucide 1.38.0 / download",
-    "primaryResourceFamily": "app_settings_downloads",
+    "primaryResourceFamily": "app_shortcut_downloads",
     "resourceFamilies": [
-      "app_settings_downloads",
       "app_shortcut_downloads",
-      "app_membership_benefit_downloads"
+      "app_membership_benefit_downloads",
+      "app_settings_downloads"
     ],
     "note": "one font glyph serves multiple app resource families"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/element-inspection-exit-fullscreen.svg",
+    "originalSource": "Lucide 1.38.0 / minimize",
+    "primaryResourceFamily": "app_element_inspection_exit_fullscreen",
+    "resourceFamilies": [
+      "app_element_inspection_exit_fullscreen"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/element-inspection-fullscreen.svg",
+    "originalSource": "Lucide 1.38.0 / fullscreen",
+    "primaryResourceFamily": "app_element_inspection_fullscreen",
+    "resourceFamilies": [
+      "app_element_inspection_fullscreen"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/element-inspection-picker.svg",
+    "originalSource": "Lucide 1.38.0 / pointer-2",
+    "primaryResourceFamily": "app_element_inspection_picker",
+    "resourceFamilies": [
+      "app_element_inspection_picker"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/element-inspection-reselect.svg",
+    "originalSource": "Lucide 1.38.0 / mouse-pointer-square-dashed",
+    "primaryResourceFamily": "app_element_inspection_reselect",
+    "resourceFamilies": [
+      "app_element_inspection_reselect"
+    ],
+    "note": "Lucide Operational font source"
   },
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/eraser.svg",
@@ -299,10 +461,10 @@
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/flask.svg",
     "originalSource": "Lucide 1.38.0 / flask-conical",
-    "primaryResourceFamily": "app_settings_experiments",
+    "primaryResourceFamily": "app_membership_benefit_experiments",
     "resourceFamilies": [
-      "app_settings_experiments",
-      "app_membership_benefit_experiments"
+      "app_membership_benefit_experiments",
+      "app_settings_experiments"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
@@ -336,31 +498,31 @@
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/gear-six.svg",
     "originalSource": "Lucide 1.38.0 / settings",
-    "primaryResourceFamily": "app_settings_general",
+    "primaryResourceFamily": "app_shortcut_settings",
     "resourceFamilies": [
-      "app_settings_general",
-      "app_shortcut_settings"
+      "app_shortcut_settings",
+      "app_settings_general"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/gift.svg",
     "originalSource": "Lucide 1.38.0 / gift",
-    "primaryResourceFamily": "app_membership_gift",
+    "primaryResourceFamily": "app_membership_benefit_invite",
     "resourceFamilies": [
+      "app_membership_benefit_invite",
       "app_membership_gift",
-      "app_settings_membership_invite",
-      "app_membership_benefit_invite"
+      "app_settings_membership_invite"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/globe.svg",
     "originalSource": "Lucide 1.38.0 / globe",
-    "primaryResourceFamily": "app_settings_site_settings",
+    "primaryResourceFamily": "app_toolbar_site_info",
     "resourceFamilies": [
-      "app_settings_site_settings",
-      "app_toolbar_site_info"
+      "app_toolbar_site_info",
+      "app_settings_site_settings"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
@@ -374,32 +536,41 @@
     "note": "Lucide Operational font source"
   },
   {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/home-settings.svg",
+    "originalSource": "Lucide 1.38.0 / home-settings",
+    "primaryResourceFamily": "app_home_settings",
+    "resourceFamilies": [
+      "app_home_settings"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/house.svg",
     "originalSource": "Lucide 1.38.0 / house",
-    "primaryResourceFamily": "app_settings_custom_homepage",
+    "primaryResourceFamily": "app_shortcut_home",
     "resourceFamilies": [
-      "app_settings_custom_homepage",
-      "app_shortcut_home"
+      "app_shortcut_home",
+      "app_settings_custom_homepage"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/identification-card.svg",
     "originalSource": "Lucide 1.38.0 / contact",
-    "primaryResourceFamily": "app_settings_user_agent",
+    "primaryResourceFamily": "app_toolbar_user_agent_preset",
     "resourceFamilies": [
-      "app_settings_user_agent",
-      "app_toolbar_user_agent_preset"
+      "app_toolbar_user_agent_preset",
+      "app_settings_user_agent"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/info.svg",
     "originalSource": "Lucide 1.38.0 / info",
-    "primaryResourceFamily": "app_settings_about",
+    "primaryResourceFamily": "app_cross_device_link_help",
     "resourceFamilies": [
-      "app_settings_about",
-      "app_cross_device_link_help"
+      "app_cross_device_link_help",
+      "app_settings_about"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
@@ -442,11 +613,11 @@
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/magnifying-glass.svg",
     "originalSource": "Lucide 1.38.0 / search",
-    "primaryResourceFamily": "app_reader_find",
+    "primaryResourceFamily": "app_toolbar_search",
     "resourceFamilies": [
+      "app_toolbar_search",
       "app_reader_find",
-      "app_settings_search",
-      "app_toolbar_search"
+      "app_settings_search"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
@@ -469,6 +640,15 @@
     "note": "Lucide Operational font source"
   },
   {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/menu.svg",
+    "originalSource": "Lucide 1.38.0 / menu",
+    "primaryResourceFamily": "app_toolbar_menu",
+    "resourceFamilies": [
+      "app_toolbar_menu"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/microphone.svg",
     "originalSource": "Lucide 1.38.0 / mic",
     "primaryResourceFamily": "app_site_permission_microphone",
@@ -478,11 +658,92 @@
     "note": "Lucide Operational font source"
   },
   {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/minus.svg",
+    "originalSource": "Lucide 1.38.0 / minus",
+    "primaryResourceFamily": "app_toolbar_zoom_out",
+    "resourceFamilies": [
+      "app_toolbar_zoom_out"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/moon.svg",
     "originalSource": "Lucide 1.38.0 / moon",
     "primaryResourceFamily": "app_theme_mode_dark",
     "resourceFamilies": [
       "app_theme_mode_dark"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-auto-fast.svg",
+    "originalSource": "Lucide 1.38.0 / rabbit",
+    "primaryResourceFamily": "app_novel_reader_auto_fast",
+    "resourceFamilies": [
+      "app_novel_reader_auto_fast"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-auto-slow.svg",
+    "originalSource": "Lucide 1.38.0 / turtle",
+    "primaryResourceFamily": "app_novel_reader_auto_slow",
+    "resourceFamilies": [
+      "app_novel_reader_auto_slow"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-brightness-high.svg",
+    "originalSource": "Lucide 1.38.0 / sun",
+    "primaryResourceFamily": "app_novel_reader_brightness_high",
+    "resourceFamilies": [
+      "app_novel_reader_brightness_high"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-brightness-low.svg",
+    "originalSource": "Lucide 1.38.0 / sun-dim",
+    "primaryResourceFamily": "app_novel_reader_brightness_low",
+    "resourceFamilies": [
+      "app_novel_reader_brightness_low"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-catalog.svg",
+    "originalSource": "Lucide 1.38.0 / list",
+    "primaryResourceFamily": "app_novel_reader_catalog",
+    "resourceFamilies": [
+      "app_novel_reader_catalog"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-settings.svg",
+    "originalSource": "Lucide 1.38.0 / settings",
+    "primaryResourceFamily": "app_novel_reader_settings",
+    "resourceFamilies": [
+      "app_novel_reader_settings"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-text.svg",
+    "originalSource": "Lucide 1.38.0 / type",
+    "primaryResourceFamily": "app_novel_reader_text",
+    "resourceFamilies": [
+      "app_novel_reader_text"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-theme.svg",
+    "originalSource": "Lucide 1.38.0 / palette",
+    "primaryResourceFamily": "app_novel_reader_theme",
+    "resourceFamilies": [
+      "app_novel_reader_theme"
     ],
     "note": "Lucide Operational font source"
   },
@@ -580,10 +841,10 @@
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/receipt.svg",
     "originalSource": "Lucide 1.38.0 / receipt",
-    "primaryResourceFamily": "app_settings_restore_purchase",
+    "primaryResourceFamily": "app_membership_restore_purchase",
     "resourceFamilies": [
-      "app_settings_restore_purchase",
-      "app_membership_restore_purchase"
+      "app_membership_restore_purchase",
+      "app_settings_restore_purchase"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
@@ -615,23 +876,42 @@
     "note": "Lucide Operational font source"
   },
   {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/settings-sync.svg",
+    "originalSource": "Lucide 1.38.0 / cloud-sync",
+    "primaryResourceFamily": "app_membership_benefit_sync",
+    "resourceFamilies": [
+      "app_membership_benefit_sync",
+      "app_settings_sync"
+    ],
+    "note": "one font glyph serves multiple app resource families"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/settings-web-features.svg",
+    "originalSource": "Lucide 1.38.0 / blocks",
+    "primaryResourceFamily": "app_settings_web_features",
+    "resourceFamilies": [
+      "app_settings_web_features"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/share-network.svg",
     "originalSource": "Lucide 1.38.0 / share-2",
-    "primaryResourceFamily": "app_reader_share",
+    "primaryResourceFamily": "app_toolbar_share_document",
     "resourceFamilies": [
-      "app_reader_share",
       "app_toolbar_share_document",
-      "app_toolbar_share_page"
+      "app_toolbar_share_page",
+      "app_reader_share"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
   {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/shield.svg",
     "originalSource": "Lucide 1.38.0 / shield",
-    "primaryResourceFamily": "app_settings_privacy_security",
+    "primaryResourceFamily": "app_membership_benefit_privacy_security",
     "resourceFamilies": [
-      "app_settings_privacy_security",
-      "app_membership_benefit_privacy_security"
+      "app_membership_benefit_privacy_security",
+      "app_settings_privacy_security"
     ],
     "note": "one font glyph serves multiple app resource families"
   },
@@ -710,6 +990,24 @@
     "note": "Lucide Operational font source"
   },
   {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/tabs-overview-close-all.svg",
+    "originalSource": "Lucide 1.38.0 / trash",
+    "primaryResourceFamily": "app_tabs_overview_close",
+    "resourceFamilies": [
+      "app_tabs_overview_close"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/tabs-overview-new.svg",
+    "originalSource": "Lucide 1.38.0 / square-plus",
+    "primaryResourceFamily": "app_tabs_overview_add",
+    "resourceFamilies": [
+      "app_tabs_overview_add"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/text-align-justify.svg",
     "originalSource": "Lucide 1.38.0 / text-align-justify",
     "primaryResourceFamily": "app_reader_line_height",
@@ -737,177 +1035,20 @@
     "note": "Lucide Operational font source"
   },
   {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/translate.svg",
-    "originalSource": "Lucide 1.38.0 / languages",
-    "primaryResourceFamily": "app_settings_webpage_translation",
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-bookmark-add.svg",
+    "originalSource": "Lucide 1.38.0 / bookmark-plus",
+    "primaryResourceFamily": "app_omnibox_add_bookmark",
     "resourceFamilies": [
-      "app_settings_webpage_translation",
-      "app_toolbar_translate",
-      "app_membership_benefit_webpage_translation"
-    ],
-    "note": "one font glyph serves multiple app resource families"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/trash.svg",
-    "originalSource": "Lucide 1.38.0 / trash",
-    "primaryResourceFamily": "app_site_setting_clear_on_close",
-    "resourceFamilies": [
-      "app_site_setting_clear_on_close"
+      "app_omnibox_add_bookmark"
     ],
     "note": "Lucide Operational font source"
   },
   {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/warning-octagon.svg",
-    "originalSource": "Lucide 1.38.0 / octagon-alert",
-    "primaryResourceFamily": "app_toolbar_report_site",
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-bookmark-selected.svg",
+    "originalSource": "Lucide 1.38.0 / bookmark-check",
+    "primaryResourceFamily": "app_omnibox_bookmarked",
     "resourceFamilies": [
-      "app_toolbar_report_site"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/waveform.svg",
-    "originalSource": "Lucide 1.38.0 / activity",
-    "primaryResourceFamily": "app_site_permission_sensor",
-    "resourceFamilies": [
-      "app_site_permission_sensor"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/x.svg",
-    "originalSource": "Lucide 1.38.0 / x",
-    "primaryResourceFamily": "app_toolbar_clear_input",
-    "resourceFamilies": [
-      "app_toolbar_clear_input",
-      "app_tabs_delete"
-    ],
-    "note": "one font glyph serves multiple app resource families"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/activity-heatmap.svg",
-    "originalSource": "Lucide 1.38.0 / activity",
-    "primaryResourceFamily": "app_sync_first_activation_activity_heatmap",
-    "resourceFamilies": [
-      "app_sync_first_activation_activity_heatmap"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/settings-sync.svg",
-    "originalSource": "Lucide 1.38.0 / cloud-sync",
-    "primaryResourceFamily": "app_settings_sync",
-    "resourceFamilies": [
-      "app_settings_sync",
-      "app_membership_benefit_sync"
-    ],
-    "note": "one font glyph serves multiple app resource families"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/copy.svg",
-    "originalSource": "Lucide 1.38.0 / copy",
-    "primaryResourceFamily": "app_browser_address_copy",
-    "resourceFamilies": [
-      "app_browser_address_copy"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/ad-blocker.svg",
-    "originalSource": "Lucide 1.38.0 / shield-off",
-    "primaryResourceFamily": "app_settings_ad_blocker",
-    "resourceFamilies": [
-      "app_settings_ad_blocker"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/user-shield.svg",
-    "originalSource": "Lucide 1.38.0 / user-shield",
-    "primaryResourceFamily": "app_settings_notice_user_shield",
-    "resourceFamilies": [
-      "app_settings_notice_user_shield"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/menu.svg",
-    "originalSource": "Lucide 1.38.0 / menu",
-    "primaryResourceFamily": "app_toolbar_menu",
-    "resourceFamilies": [
-      "app_toolbar_menu"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/browser-address-expanded-share.svg",
-    "originalSource": "Lucide 1.38.0 / share-2",
-    "primaryResourceFamily": "app_browser_address_expanded_share",
-    "resourceFamilies": [
-      "app_browser_address_expanded_share"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/browser-address-expanded-edit.svg",
-    "originalSource": "Lucide 1.38.0 / pencil",
-    "primaryResourceFamily": "app_browser_address_expanded_edit",
-    "resourceFamilies": [
-      "app_browser_address_expanded_edit"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/browser-address-expanded-copy.svg",
-    "originalSource": "Lucide 1.38.0 / copy",
-    "primaryResourceFamily": "app_browser_address_expanded_copy",
-    "resourceFamilies": [
-      "app_browser_address_expanded_copy"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/tabs-overview-new.svg",
-    "originalSource": "Lucide 1.38.0 / square-plus",
-    "primaryResourceFamily": "app_tabs_overview_add",
-    "resourceFamilies": [
-      "app_tabs_overview_add"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/tabs-overview-close-all.svg",
-    "originalSource": "Lucide 1.38.0 / trash",
-    "primaryResourceFamily": "app_tabs_overview_close",
-    "resourceFamilies": [
-      "app_tabs_overview_close"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-home.svg",
-    "originalSource": "Lucide 1.38.0 / home",
-    "primaryResourceFamily": "app_toolbar_home",
-    "resourceFamilies": [
-      "app_toolbar_home"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-scan.svg",
-    "originalSource": "Lucide 1.38.0 / scan-qr-code",
-    "primaryResourceFamily": "app_toolbar_scan_qr",
-    "resourceFamilies": [
-      "app_toolbar_scan_qr"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-private-mode.svg",
-    "originalSource": "Lucide 1.38.0 / venetian-mask",
-    "primaryResourceFamily": "app_toolbar_privacy_mode",
-    "resourceFamilies": [
-      "app_toolbar_privacy_mode"
+      "app_omnibox_bookmarked"
     ],
     "note": "Lucide Operational font source"
   },
@@ -921,11 +1062,148 @@
     "note": "Lucide Operational font source"
   },
   {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-element-inspection.svg",
+    "originalSource": "Lucide 1.38.0 / scan-search",
+    "primaryResourceFamily": "app_toolbar_action_element_inspection",
+    "resourceFamilies": [
+      "app_toolbar_action_element_inspection"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-expand-hint.svg",
+    "originalSource": "Lucide 1.38.0 / chevron-up",
+    "primaryResourceFamily": "app_toolbar_expand_hint",
+    "resourceFamilies": [
+      "app_toolbar_expand_hint"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-home.svg",
+    "originalSource": "Lucide 1.38.0 / home",
+    "primaryResourceFamily": "app_toolbar_home",
+    "resourceFamilies": [
+      "app_toolbar_home"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-private-mode.svg",
+    "originalSource": "Lucide 1.38.0 / venetian-mask",
+    "primaryResourceFamily": "app_toolbar_privacy_mode",
+    "resourceFamilies": [
+      "app_toolbar_privacy_mode"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-scan.svg",
+    "originalSource": "Lucide 1.38.0 / scan-qr-code",
+    "primaryResourceFamily": "app_toolbar_scan_qr",
+    "resourceFamilies": [
+      "app_toolbar_scan_qr"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-slot-empty.svg",
+    "originalSource": "Lucide 1.38.0 / square-dashed",
+    "primaryResourceFamily": "app_toolbar_empty_slot",
+    "resourceFamilies": [
+      "app_toolbar_empty_slot"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
     "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-translate.svg",
     "originalSource": "Lucide 1.38.0 / languages",
     "primaryResourceFamily": "app_toolbar_action_translate",
     "resourceFamilies": [
       "app_toolbar_action_translate"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-user-script.svg",
+    "originalSource": "Lucide 1.38.0 / code-xml",
+    "primaryResourceFamily": "app_toolbar_user_scripts",
+    "resourceFamilies": [
+      "app_toolbar_user_scripts"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/tools.svg",
+    "originalSource": "Lucide 1.38.0 / tools",
+    "primaryResourceFamily": "app_settings_toolbar",
+    "resourceFamilies": [
+      "app_settings_toolbar"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/translate.svg",
+    "originalSource": "Lucide 1.38.0 / languages",
+    "primaryResourceFamily": "app_toolbar_translate",
+    "resourceFamilies": [
+      "app_toolbar_translate",
+      "app_membership_benefit_webpage_translation",
+      "app_settings_webpage_translation"
+    ],
+    "note": "one font glyph serves multiple app resource families"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/trash.svg",
+    "originalSource": "Lucide 1.38.0 / trash",
+    "primaryResourceFamily": "app_site_setting_clear_on_close",
+    "resourceFamilies": [
+      "app_site_setting_clear_on_close"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/user.svg",
+    "originalSource": "Lucide 1.38.0 / user",
+    "primaryResourceFamily": "app_toolbar_account",
+    "resourceFamilies": [
+      "app_toolbar_account"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/user-shield.svg",
+    "originalSource": "Lucide 1.38.0 / user-shield",
+    "primaryResourceFamily": "app_settings_notice_user_shield",
+    "resourceFamilies": [
+      "app_settings_notice_user_shield"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/vertical-tabs-collapsed.svg",
+    "originalSource": "Lucide 1.38.0 / vertical-tabs-collapsed",
+    "primaryResourceFamily": "app_tabs_vertical_collapsed",
+    "resourceFamilies": [
+      "app_tabs_vertical_collapsed"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/vertical-tabs-expanded.svg",
+    "originalSource": "Lucide 1.38.0 / vertical-tabs-expanded",
+    "primaryResourceFamily": "app_tabs_vertical_expanded",
+    "resourceFamilies": [
+      "app_tabs_vertical_expanded"
+    ],
+    "note": "Lucide Operational font source"
+  },
+  {
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/video-assistant-cast.svg",
+    "originalSource": "Lucide 1.38.0 / cast",
+    "primaryResourceFamily": "app_video_assistant_cast",
+    "resourceFamilies": [
+      "app_video_assistant_cast"
     ],
     "note": "Lucide Operational font source"
   },
@@ -957,301 +1235,32 @@
     "note": "Lucide Operational font source"
   },
   {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-element-inspection.svg",
-    "originalSource": "Lucide 1.38.0 / scan-search",
-    "primaryResourceFamily": "app_toolbar_action_element_inspection",
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/warning-octagon.svg",
+    "originalSource": "Lucide 1.38.0 / octagon-alert",
+    "primaryResourceFamily": "app_toolbar_report_site",
     "resourceFamilies": [
-      "app_toolbar_action_element_inspection"
+      "app_toolbar_report_site"
     ],
     "note": "Lucide Operational font source"
   },
   {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/settings-web-features.svg",
-    "originalSource": "Lucide 1.38.0 / blocks",
-    "primaryResourceFamily": "app_settings_web_features",
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/waveform.svg",
+    "originalSource": "Lucide 1.38.0 / activity",
+    "primaryResourceFamily": "app_site_permission_sensor",
     "resourceFamilies": [
-      "app_settings_web_features"
+      "app_site_permission_sensor"
     ],
     "note": "Lucide Operational font source"
   },
   {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/video-assistant-cast.svg",
-    "originalSource": "Lucide 1.38.0 / cast",
-    "primaryResourceFamily": "app_video_assistant_cast",
+    "exportedFile": "vendor/lucide/aira-operational-icons/svg/x.svg",
+    "originalSource": "Lucide 1.38.0 / x",
+    "primaryResourceFamily": "app_tabs_delete",
     "resourceFamilies": [
-      "app_video_assistant_cast"
+      "app_tabs_delete",
+      "app_toolbar_clear_input"
     ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/element-inspection-reselect.svg",
-    "originalSource": "Lucide 1.38.0 / mouse-pointer-square-dashed",
-    "primaryResourceFamily": "app_element_inspection_reselect",
-    "resourceFamilies": [
-      "app_element_inspection_reselect"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/element-inspection-fullscreen.svg",
-    "originalSource": "Lucide 1.38.0 / fullscreen",
-    "primaryResourceFamily": "app_element_inspection_fullscreen",
-    "resourceFamilies": [
-      "app_element_inspection_fullscreen"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/element-inspection-exit-fullscreen.svg",
-    "originalSource": "Lucide 1.38.0 / minimize",
-    "primaryResourceFamily": "app_element_inspection_exit_fullscreen",
-    "resourceFamilies": [
-      "app_element_inspection_exit_fullscreen"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/element-inspection-picker.svg",
-    "originalSource": "Lucide 1.38.0 / pointer-2",
-    "primaryResourceFamily": "app_element_inspection_picker",
-    "resourceFamilies": [
-      "app_element_inspection_picker"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-expand-hint.svg",
-    "originalSource": "Lucide 1.38.0 / chevron-up",
-    "primaryResourceFamily": "app_toolbar_expand_hint",
-    "resourceFamilies": [
-      "app_toolbar_expand_hint"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-bookmark-add.svg",
-    "originalSource": "Lucide 1.38.0 / bookmark-plus",
-    "primaryResourceFamily": "app_omnibox_add_bookmark",
-    "resourceFamilies": [
-      "app_omnibox_add_bookmark"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-bookmark-selected.svg",
-    "originalSource": "Lucide 1.38.0 / bookmark-check",
-    "primaryResourceFamily": "app_omnibox_bookmarked",
-    "resourceFamilies": [
-      "app_omnibox_bookmarked"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-user-script.svg",
-    "originalSource": "Lucide 1.38.0 / code-xml",
-    "primaryResourceFamily": "app_toolbar_user_scripts",
-    "resourceFamilies": [
-      "app_toolbar_user_scripts"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-catalog.svg",
-    "originalSource": "Lucide 1.38.0 / list",
-    "primaryResourceFamily": "app_novel_reader_catalog",
-    "resourceFamilies": [
-      "app_novel_reader_catalog"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-text.svg",
-    "originalSource": "Lucide 1.38.0 / type",
-    "primaryResourceFamily": "app_novel_reader_text",
-    "resourceFamilies": [
-      "app_novel_reader_text"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-theme.svg",
-    "originalSource": "Lucide 1.38.0 / palette",
-    "primaryResourceFamily": "app_novel_reader_theme",
-    "resourceFamilies": [
-      "app_novel_reader_theme"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-settings.svg",
-    "originalSource": "Lucide 1.38.0 / settings",
-    "primaryResourceFamily": "app_novel_reader_settings",
-    "resourceFamilies": [
-      "app_novel_reader_settings"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-brightness-low.svg",
-    "originalSource": "Lucide 1.38.0 / sun-dim",
-    "primaryResourceFamily": "app_novel_reader_brightness_low",
-    "resourceFamilies": [
-      "app_novel_reader_brightness_low"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-brightness-high.svg",
-    "originalSource": "Lucide 1.38.0 / sun",
-    "primaryResourceFamily": "app_novel_reader_brightness_high",
-    "resourceFamilies": [
-      "app_novel_reader_brightness_high"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-auto-slow.svg",
-    "originalSource": "Lucide 1.38.0 / turtle",
-    "primaryResourceFamily": "app_novel_reader_auto_slow",
-    "resourceFamilies": [
-      "app_novel_reader_auto_slow"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/novel-reader-auto-fast.svg",
-    "originalSource": "Lucide 1.38.0 / rabbit",
-    "primaryResourceFamily": "app_novel_reader_auto_fast",
-    "resourceFamilies": [
-      "app_novel_reader_auto_fast"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/bookshelf.svg",
-    "originalSource": "Lucide 1.38.0 / library",
-    "primaryResourceFamily": "app_toolbar_bookshelf",
-    "resourceFamilies": [
-      "app_toolbar_bookshelf"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/active-download.svg",
-    "originalSource": "Lucide 1.38.0 / download-cloud",
-    "primaryResourceFamily": "app_toolbar_active_download",
-    "resourceFamilies": [
-      "app_toolbar_active_download"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/toolbar-slot-empty.svg",
-    "originalSource": "Lucide 1.38.0 / square-dashed",
-    "primaryResourceFamily": "app_toolbar_empty_slot",
-    "resourceFamilies": [
-      "app_toolbar_empty_slot"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/bookmark-edit-drag-handle.svg",
-    "originalSource": "Lucide 1.38.0 / grip-vertical",
-    "primaryResourceFamily": "app_bookmark_edit_drag_handle",
-    "resourceFamilies": [
-      "app_bookmark_edit_drag_handle"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/bookmark-edit-move.svg",
-    "originalSource": "Lucide 1.38.0 / move",
-    "primaryResourceFamily": "app_bookmark_edit_move",
-    "resourceFamilies": [
-      "app_bookmark_edit_move"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/bookmark-edit-select-all.svg",
-    "originalSource": "Lucide 1.38.0 / box-select",
-    "primaryResourceFamily": "app_bookmark_edit_select_all",
-    "resourceFamilies": [
-      "app_bookmark_edit_select_all"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/arrow-right.svg",
-    "originalSource": "Lucide 1.38.0 / arrow-right",
-    "primaryResourceFamily": "app_toolbar_forward",
-    "resourceFamilies": [
-      "app_toolbar_forward"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/tools.svg",
-    "originalSource": "Lucide 1.38.0 / tools",
-    "primaryResourceFamily": "app_settings_toolbar",
-    "resourceFamilies": [
-      "app_settings_toolbar"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/minus.svg",
-    "originalSource": "Lucide 1.38.0 / minus",
-    "primaryResourceFamily": "app_toolbar_zoom_out",
-    "resourceFamilies": [
-      "app_toolbar_zoom_out"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/user.svg",
-    "originalSource": "Lucide 1.38.0 / user",
-    "primaryResourceFamily": "app_toolbar_account",
-    "resourceFamilies": [
-      "app_toolbar_account"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/adjustments-horizontal.svg",
-    "originalSource": "Lucide 1.38.0 / adjustments-horizontal",
-    "primaryResourceFamily": "app_omnibox_page_controls",
-    "resourceFamilies": [
-      "app_omnibox_page_controls"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/vertical-tabs-expanded.svg",
-    "originalSource": "Lucide 1.38.0 / vertical-tabs-expanded",
-    "primaryResourceFamily": "app_tabs_vertical_expanded",
-    "resourceFamilies": [
-      "app_tabs_vertical_expanded"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/vertical-tabs-collapsed.svg",
-    "originalSource": "Lucide 1.38.0 / vertical-tabs-collapsed",
-    "primaryResourceFamily": "app_tabs_vertical_collapsed",
-    "resourceFamilies": [
-      "app_tabs_vertical_collapsed"
-    ],
-    "note": "Lucide Operational font source"
-  },
-  {
-    "exportedFile": "vendor/lucide/aira-operational-icons/svg/home-settings.svg",
-    "originalSource": "Lucide 1.38.0 / home-settings",
-    "primaryResourceFamily": "app_home_settings",
-    "resourceFamilies": [
-      "app_home_settings"
-    ],
-    "note": "Lucide Operational font source"
+    "note": "one font glyph serves multiple app resource families"
   },
   {
     "exportedFile": "icons/app_widget_shortcut_history__user-provided.svg",

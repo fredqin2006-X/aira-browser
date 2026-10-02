@@ -7,6 +7,7 @@ import {
   DEFAULT_BROWSER_BOTTOM_CHROME_PRESENTATION
 } from './BrowserBottomChromePresentationViewModel';
 import { BrowserBottomPanelActionSnapshot } from './BrowserBottomPanelActionPresentationCoordinator';
+import { AiraMembershipBadgeKind } from '../../common/models/MembershipModels';
 
 export interface BrowserBottomPanelReadingContinuationPresentation {
   visible: boolean;
@@ -20,11 +21,35 @@ export const HIDDEN_BROWSER_BOTTOM_PANEL_READING_CONTINUATION: BrowserBottomPane
   loading: false
 };
 
+/**
+ * What the toolbar sheet's middle capsule shows about the account on Home.
+ *
+ * `label` is the nickname when signed in and the signed-out or Community wording otherwise, so the
+ * capsule renders one string without re-deriving identity. `membershipBadge` reuses the settings
+ * badge vocabulary; Community always resolves to `none` because it has no membership tier.
+ */
+export interface BrowserBottomPanelAccountCapsulePresentation {
+  visible: boolean;
+  label: string;
+  avatarUri: string;
+  signedIn: boolean;
+  membershipBadge: AiraMembershipBadgeKind;
+}
+
+export const HIDDEN_BROWSER_BOTTOM_PANEL_ACCOUNT_CAPSULE: BrowserBottomPanelAccountCapsulePresentation = {
+  visible: false,
+  label: '',
+  avatarUri: '',
+  signedIn: false,
+  membershipBadge: 'none'
+};
+
 export class BrowserBottomPanelLivePresentation {
   panelMotionState: BrowserBottomPanelMotionState;
   bottomChromePresentation: BrowserBottomChromePresentation;
   actionSnapshot?: BrowserBottomPanelActionSnapshot;
   readingContinuation: BrowserBottomPanelReadingContinuationPresentation;
+  accountCapsule: BrowserBottomPanelAccountCapsulePresentation;
   addressFocused: boolean;
   floatingHeaderVisible: boolean;
 
@@ -35,7 +60,9 @@ export class BrowserBottomPanelLivePresentation {
     readingContinuation: BrowserBottomPanelReadingContinuationPresentation =
       HIDDEN_BROWSER_BOTTOM_PANEL_READING_CONTINUATION,
     addressFocused: boolean = false,
-    floatingHeaderVisible: boolean = true
+    floatingHeaderVisible: boolean = true,
+    accountCapsule: BrowserBottomPanelAccountCapsulePresentation =
+      HIDDEN_BROWSER_BOTTOM_PANEL_ACCOUNT_CAPSULE
   ) {
     this.panelMotionState = panelMotionState;
     this.bottomChromePresentation = bottomChromePresentation;
@@ -43,6 +70,7 @@ export class BrowserBottomPanelLivePresentation {
     this.readingContinuation = readingContinuation;
     this.addressFocused = addressFocused;
     this.floatingHeaderVisible = floatingHeaderVisible;
+    this.accountCapsule = accountCapsule;
   }
 }
 

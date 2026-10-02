@@ -5329,6 +5329,10 @@
       "value": "Done"
     },
     {
+      "name": "web_text_zoom_remember_site",
+      "value": "Remember text size for this site"
+    },
+    {
       "name": "web_text_zoom_notice_increased",
       "value": "Page zoomed in"
     },
@@ -23371,6 +23375,18 @@
     {
       "name": "settings_general_language_traditional",
       "value": "繁體中文"
+    },
+    {
+      "name": "bottom_panel_account_community",
+      "value": "Community"
+    },
+    {
+      "name": "bottom_panel_account_signed_out",
+      "value": "Not signed in"
+    },
+    {
+      "name": "bottom_panel_account_capsule_a11y",
+      "value": "Account: %1$s"
     }
   ]
 }

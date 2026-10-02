@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "changelog-generator": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "skillPath": "changelog-generator/SKILL.md",
+      "computedHash": "0facdb5c491a654e3b0f6d300fb8fa14472d811cb715c632dc2862919b277dae"
+    },
+    "release-notes": {
+      "source": "phuryn/pm-skills",
+      "sourceType": "github",
+      "skillPath": "pm-execution/skills/release-notes/SKILL.md",
+      "computedHash": "375e01b5114d4ec892db0129cfb4cb3788fbfa9f2ff0262cdfd2166d77b3108a"
+    }
+  }
+}

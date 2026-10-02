@@ -82,6 +82,7 @@ import {
   BrowserSearchBackdropPresentationChannel
 } from './BrowserSearchBackdropPresentationChannel';
 import {
+  BrowserBottomPanelAccountCapsulePresentation,
   BrowserBottomPanelLivePresentation,
   BrowserBottomPanelReadingContinuationPresentation,
   HIDDEN_BROWSER_BOTTOM_PANEL_READING_CONTINUATION
@@ -410,6 +411,7 @@ export interface BrowserRootBottomPanelLivePresentationInput extends BrowserRoot
   panelMotionState: BrowserBottomPanelMotionState;
   responsiveLayoutKey: string;
   readingSnapshot: NovelReaderSnapshot;
+  accountCapsule: BrowserBottomPanelAccountCapsulePresentation;
 }
 
 export interface BrowserRootBottomPanelHostMountInput {
@@ -1366,7 +1368,8 @@ export class BrowserRootBottomPanelSessionCoordinator {
       ),
       this.buildReadingContinuationPresentation(input.readingSnapshot, input.semanticState),
       input.semanticState.addressFocused,
-      !this.programmaticHomeToolbarRestingChromeHidden && !this.searchPresentationHostPreparationActive
+      !this.programmaticHomeToolbarRestingChromeHidden && !this.searchPresentationHostPreparationActive,
+      input.accountCapsule
     );
   }
 

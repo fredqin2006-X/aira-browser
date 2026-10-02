@@ -478,6 +478,8 @@ export struct BrowserSheetActionButton {
   @Prop fillAvailableWidth: boolean = true;
   /** Set by callers that stack actions in a Column, where no width weight is wanted. */
   @Prop stacked: boolean = false;
+  /** Force the flat secondary/primary fill. Phone sheets otherwise leave secondary actions transparent. */
+  @Prop flat: boolean = false;
   @Prop buttonWidth: Length = 56;
   @Prop buttonHeight: number = BROWSER_MODAL_BOTTOM_SHEET_ACTION_HEIGHT;
   @Prop fontSize: number = 16;
@@ -584,7 +586,7 @@ export struct BrowserSheetActionButton {
   }
 
   private useFlatFill(): boolean {
-    return this.emphasis !== 'ghost' && this.useDesktopActionMetrics();
+    return this.emphasis !== 'ghost' && (this.flat || this.useDesktopActionMetrics());
   }
 
   private resolveRenderedHeight(): number {

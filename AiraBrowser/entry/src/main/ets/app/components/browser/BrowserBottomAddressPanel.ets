@@ -57,6 +57,7 @@ import {
   BROWSER_BOTTOM_PANEL_FLOATING_CONTENT_EXIT_BARRIER_MS
 } from '../../../core/browser/BrowserBottomPanelMotionTokens';
 import {
+  bottomPanelAccountCapsuleA11y,
   bottomPanelContinueReading,
   bottomPanelContinueReadingA11y,
   bottomPanelExit,
@@ -76,7 +77,11 @@ import {
   BrowserBottomToolbarQuickActionLayoutState,
   BrowserBottomToolbarSurfaceTransitionState
 } from '../../../core/browser/BrowserBottomToolbarExpansionViewModel';
-import { BrowserSheetResponsiveLayoutViewModel } from '../../../core/browser/BrowserSheetResponsiveLayoutViewModel';
+import {
+  BrowserBottomPanelAccountCapsulePresentation,
+  HIDDEN_BROWSER_BOTTOM_PANEL_ACCOUNT_CAPSULE
+} from '../../../core/browser/BrowserBottomPanelPresentationChannel';
+import { SettingsMembershipBadge } from '../settings/SettingsRows';import { BrowserSheetResponsiveLayoutViewModel } from '../../../core/browser/BrowserSheetResponsiveLayoutViewModel';
 import {
   BrowserBottomToolbarReorderGestureKind,
   reduceBrowserBottomToolbarReorderGesture
@@ -103,6 +108,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import {
   BROWSER_THEME_STORAGE_ACCENT_KEY,
   BROWSER_THEME_STORAGE_APP_PROXY_ACTIVE_BACKGROUND_KEY,
+  BROWSER_THEME_STORAGE_DIVIDER_KEY,
   BROWSER_THEME_STORAGE_PAGE_BACKGROUND_KEY,
   BROWSER_THEME_STORAGE_SETTINGS_ICON_FOREGROUND_KEY,
   BROWSER_THEME_STORAGE_RESOLVED_MODE_KEY
@@ -211,6 +217,8 @@ const WEB_BOTTOM_QUICK_ACTION_MAX_COLUMNS: number = 8;
 // A 64vp circle only fits four across that width. 54vp with an 8vp gap fits five,
 // and the same circle is reused in landscape; only the column count grows.
 const WEB_BOTTOM_TOOLBAR_SHEET_BUTTON_SIZE: number = 54;
+// Large enough to read as a rounded rectangle, still short of the 27vp that would make a 54vp button a circle.
+const WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS: number = 18;
 const WEB_BOTTOM_TOOLBAR_SHEET_COLUMN_GAP: number = 8;
 const WEB_BOTTOM_TOOLBAR_EXPANSION_HINT_ICON_ID: AiraRenderableIconId = 'browser.toolbar.expandHint';
 const WEB_BOTTOM_LIST_IMAGE_ICON_SIZE: number = 26;
@@ -252,6 +260,13 @@ const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_ROW_HEIGHT: number = 48;
 const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP: number = 20;
 const WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT: number = 48;
 const WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_ICON_SIZE: number = 22;
+const WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_AVATAR_SIZE: number = 32;
+const WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_AVATAR_ICON_SIZE: number = 20;
+// The 32vp avatar sits 8vp inside the 48vp bar, so 10vp keeps its corners concentric with the 18vp bar.
+const WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_AVATAR_CORNER_RADIUS: number = 10;
+const WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_CHEVRON_SIZE: number = 18;
+// Long nicknames must not push the badge or the chevron out of the capsule.
+const WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_NAME_MAX_WIDTH: number = 140;
 const WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_GAP: number = 10;
 const WEB_BOTTOM_TOOLBAR_EDIT_ADD_CAPSULE_WIDTH: number = 128;
 const WEB_BOTTOM_TOOLBAR_EDIT_ADD_CAPSULE_HEIGHT: number = 48;
@@ -262,7 +277,7 @@ const WEB_BOTTOM_TOOLBAR_ADD_SHEET_ENTER_OFFSET: number = 320;
 const WEB_BOTTOM_TOOLBAR_ADD_SHEET_TOP_SPACE: number = 28;
 const WEB_BOTTOM_TOOLBAR_ADD_SHEET_BOTTOM_SAFE: number = 56;
 const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_PRESSED_SCALE: number = 0.94;
-const WEB_BOTTOM_TOOLBAR_SHEET_ROW_GAP_EXTRA: number = 14;
+const WEB_BOTTOM_TOOLBAR_SHEET_ROW_GAP_EXTRA: number = 6;
 const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_PRESS_DURATION_MS: number = 90;
 const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_RELEASE_DURATION_MS: number = 260;
 const WEB_BOTTOM_TOOLBAR_SHEET_HEADER_RELEASE_CURVE: string = 'interpolatingSpring(0, 1, 360, 24)';
@@ -353,6 +368,7 @@ export struct BrowserBottomAddressPanel {
   @StorageProp(BROWSER_THEME_STORAGE_SETTINGS_ICON_FOREGROUND_KEY)
   private storedSelectedIconForegroundColor: string = '#FFFFFF';
   @StorageProp(BROWSER_THEME_STORAGE_RESOLVED_MODE_KEY) private storedResolvedThemeMode: string = 'light';
+  @StorageProp(BROWSER_THEME_STORAGE_DIVIDER_KEY) private storedDividerColor: string = '#E3E8EF';
   @State private panelVerticalMotionActive: boolean = false;
   @State private panelDetent: HomeSearchPanelDetent = 'low';
   @State private panelTargetDetent: HomeSearchPanelDetent = 'low';
@@ -474,6 +490,8 @@ export struct BrowserBottomAddressPanel {
   @State private liveReadingContinuationRevision: number = 0;
   @State private liveReadingContinuation: BrowserBottomPanelReadingContinuationPresentation =
     HIDDEN_BROWSER_BOTTOM_PANEL_READING_CONTINUATION;
+  @State private liveAccountCapsule: BrowserBottomPanelAccountCapsulePresentation =
+    HIDDEN_BROWSER_BOTTOM_PANEL_ACCOUNT_CAPSULE;
   @State private liveFloatingHeaderVisible: boolean = true;
   @State private livePanelMotionState: BrowserBottomPanelMotionState = DEFAULT_BROWSER_BOTTOM_PANEL_MOTION_STATE;
   @State private liveAddressInput: string = '';
@@ -592,6 +610,7 @@ export struct BrowserBottomAddressPanel {
   onShouldDispatchSheetActionImmediately: (actionId: BrowserBottomAddressPanelActionId) => boolean =
     (_actionId: BrowserBottomAddressPanelActionId) => false;
   onContinueReading: () => void = (): void => {};
+  onAccountCapsule: () => void = (): void => {};
   onKeyboardResizeSessionBegin: () => void = () => {};
   onKeyboardResizeSessionEnd: () => void = () => {};
 
@@ -610,6 +629,7 @@ export struct BrowserBottomAddressPanel {
       this.applyBottomChromePresentation(retainedPresentation.bottomChromePresentation);
       this.applyLiveActionSnapshot(retainedPresentation.actionSnapshot);
       this.applyReadingContinuation(retainedPresentation.readingContinuation);
+      this.applyAccountCapsule(retainedPresentation.accountCapsule);
       this.liveFloatingHeaderVisible = retainedPresentation.floatingHeaderVisible;
     } else {
       this.livePresentationConnected = false;
@@ -932,6 +952,7 @@ export struct BrowserBottomAddressPanel {
           Stack({ alignContent: Alignment.Bottom }) {
             Column({ space: 0 }) {
               this.buildToolbarSystemSheetHeaderRow(layoutState)
+              this.buildToolbarSystemSheetHeaderDivider(layoutState)
               this.buildToolbarSystemSheetActionGrid(
                 this.toolbarSheetVisibleActions,
                 layoutState
@@ -962,14 +983,17 @@ export struct BrowserBottomAddressPanel {
   private buildToolbarSystemSheetHeaderRow(layoutState: BrowserBottomToolbarQuickActionLayoutState) {
     Row() {
       this.buildToolbarSystemSheetHeaderLeadingButton()
-      if (this.toolbarSystemSheetEditing || this.isWebContentMode() || this.shouldShowReadingContinuation()) {
+      if (this.toolbarSystemSheetEditing || this.isWebContentMode() || this.shouldShowReadingContinuation() ||
+        this.shouldShowAccountCapsule()) {
         Row() {
           if (this.toolbarSystemSheetEditing) {
             this.buildToolbarSystemSheetEditingTitle()
           } else if (this.isWebContentMode()) {
             this.buildToolbarSystemSheetWebAddressCapsule()
-          } else {
+          } else if (this.shouldShowReadingContinuation()) {
             this.buildToolbarSystemSheetReadingCapsule()
+          } else {
+            this.buildToolbarSystemSheetAccountCapsule()
           }
         }
         .layoutWeight(1)
@@ -991,7 +1015,26 @@ export struct BrowserBottomAddressPanel {
       left: this.resolveToolbarSystemSheetHeaderEdgeInset(layoutState),
       right: this.resolveToolbarSystemSheetHeaderEdgeInset(layoutState)
     })
-    .margin({ bottom: WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP })
+  }
+
+  @Builder
+  private buildToolbarSystemSheetHeaderDivider(layoutState: BrowserBottomToolbarQuickActionLayoutState) {
+    // The button grid adds its own top padding below this slot, so the line has to sit
+    // at the midpoint of both gaps, not the center of this slot alone.
+    Column() {
+      Row()
+        .width('100%')
+        .height('1px')
+        .backgroundColor(this.storedDividerColor)
+    }
+    .width('100%')
+    .height(WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP)
+    .justifyContent(FlexAlign.Start)
+    .padding({
+      top: (WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BOTTOM_GAP + layoutState.groupVerticalPadding) / 2,
+      left: this.resolveToolbarSystemSheetHeaderEdgeInset(layoutState),
+      right: this.resolveToolbarSystemSheetHeaderEdgeInset(layoutState)
+    })
   }
 
   @Builder
@@ -1059,13 +1102,88 @@ export struct BrowserBottomAddressPanel {
     .height(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT)
     .padding(0)
     .backgroundColor(resolveBrowserBottomToolbarSheetActionColor(this.resolveNeutralThemeMode()))
-    .borderRadius(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT / 2)
+    .borderRadius(WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS)
     .stateEffect(false)
     .enabled(!this.liveReadingContinuation.loading)
     .accessibilityText(bottomPanelContinueReadingA11y(this.liveReadingContinuation.title))
     .onClick((): void => {
       this.onContinueReading();
     })
+  }
+
+  @Builder
+  private buildToolbarSystemSheetAccountCapsule() {
+    Button({ type: ButtonType.Normal }) {
+      Row({ space: 10 }) {
+        this.buildToolbarSystemSheetAccountAvatar()
+        // Name and badge form one leading group so the tier reads as part of the name. Only the
+        // chevron is pushed to the trailing edge, by a spacer rather than by weighting the name.
+        Row({ space: 6 }) {
+          Text(this.liveAccountCapsule.label)
+            .fontSize(15)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.resolveItemTextColor(true))
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .constraintSize({ maxWidth: WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_NAME_MAX_WIDTH })
+          if (this.liveAccountCapsule.membershipBadge !== 'none') {
+            SettingsMembershipBadge({ kind: this.liveAccountCapsule.membershipBadge })
+          }
+        }
+        .alignItems(VerticalAlign.Center)
+        Blank().layoutWeight(1)
+        AiraIcon({
+          airaIconId: 'browser.toolbar.chevronRight',
+          iconSize: WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_CHEVRON_SIZE,
+          iconColor: this.resolveItemTextColor(false)
+        })
+      }
+      .width('100%')
+      .height('100%')
+      .padding({ left: 6, right: 10 })
+      .alignItems(VerticalAlign.Center)
+    }
+    .width('100%')
+    .height(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT)
+    .padding(0)
+    .backgroundColor(resolveBrowserBottomToolbarSheetActionColor(this.resolveNeutralThemeMode()))
+    .borderRadius(WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS)
+    .stateEffect(false)
+    .accessibilityText(bottomPanelAccountCapsuleA11y(this.liveAccountCapsule.label))
+    .onClick((): void => {
+      this.onAccountCapsule();
+    })
+  }
+
+  /**
+   * A photo when there is one, otherwise the neutral person placeholder.
+   *
+   * Signed out and Community both land here with an empty uri, which is what makes them read as the
+   * same placeholder rather than as a missing image.
+   */
+  @Builder
+  private buildToolbarSystemSheetAccountAvatar() {
+    Stack({ alignContent: Alignment.Center }) {
+      if (this.liveAccountCapsule.avatarUri.trim().length > 0) {
+        Image(this.liveAccountCapsule.avatarUri)
+          .width(WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_AVATAR_SIZE)
+          .height(WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_AVATAR_SIZE)
+          .borderRadius(WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_AVATAR_CORNER_RADIUS)
+          .clip(true)
+          .objectFit(ImageFit.Cover)
+      } else {
+        AiraIcon({
+          airaIconId: 'browser.toolbar.account',
+          iconSize: WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_AVATAR_ICON_SIZE,
+          iconColor: this.resolveItemTextColor(true)
+        })
+      }
+    }
+    .width(WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_AVATAR_SIZE)
+    .height(WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_AVATAR_SIZE)
+    .borderRadius(WEB_BOTTOM_TOOLBAR_SHEET_ACCOUNT_AVATAR_CORNER_RADIUS)
+    .backgroundColor(resolveBrowserBottomToolbarSheetActionColor(this.resolveNeutralThemeMode()))
+    .clip(true)
   }
 
   @Builder
@@ -1127,7 +1245,7 @@ export struct BrowserBottomAddressPanel {
     .padding({ left: 4, right: 4 })
     .alignItems(VerticalAlign.Center)
     .backgroundColor(resolveBrowserBottomToolbarSheetActionColor(this.resolveNeutralThemeMode()))
-    .borderRadius(WEB_BOTTOM_TOOLBAR_SHEET_READING_CAPSULE_HEIGHT / 2)
+    .borderRadius(WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS)
   }
 
   private dispatchToolbarSystemSheetHeaderAction(actionId: BrowserBottomAddressPanelActionId): void {
@@ -1178,7 +1296,8 @@ export struct BrowserBottomAddressPanel {
     }
     .width(WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BUTTON_SIZE)
     .height(WEB_BOTTOM_TOOLBAR_SHEET_HEADER_BUTTON_SIZE)
-    .type(ButtonType.Circle)
+    .type(ButtonType.Normal)
+    .borderRadius(WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS)
     .padding(0)
     .backgroundColor(resolveBrowserBottomToolbarSheetActionColor(this.resolveNeutralThemeMode()))
     .stateEffect(false)
@@ -1528,7 +1647,7 @@ export struct BrowserBottomAddressPanel {
               cardBackgroundColor: this.resolveToolbarSystemSheetActionBackgroundColor(item),
               cardDisabledOpacity: 1,
               cardBorderWidth: 0,
-              cardCornerRadius: 0,
+              cardCornerRadius: WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS,
               addBadgeVisible: true,
               buttonSize: this.resolveToolbarSystemSheetButtonSize(layoutState),
               imageRenderVersion: this.resolveActionRenderVersion(item),
@@ -2682,7 +2801,7 @@ export struct BrowserBottomAddressPanel {
           this.resolveToolbarSystemSheetActionBackgroundColor(item) : this.resolveQuickActionCardBackgroundColor(item),
         cardDisabledOpacity: 1,
         cardBorderWidth: 0,
-        cardCornerRadius: 0,
+        cardCornerRadius: toolbarSystemSheetAction ? WEB_BOTTOM_TOOLBAR_SHEET_ACTION_CORNER_RADIUS : 0,
         removeBadgeVisible: toolbarSystemSheetAction && this.toolbarSystemSheetEditing,
         onBadge: (): void => {
           if (toolbarSystemSheetAction && this.toolbarSystemSheetEditing) {
@@ -3544,6 +3663,7 @@ export struct BrowserBottomAddressPanel {
     this.applyBottomChromePresentation(presentation.bottomChromePresentation);
     this.applyLiveActionSnapshot(presentation.actionSnapshot);
     this.applyReadingContinuation(presentation.readingContinuation);
+    this.applyAccountCapsule(presentation.accountCapsule);
     this.liveFloatingHeaderVisible = presentation.floatingHeaderVisible;
     this.syncPanelMotionState();
     this.syncBottomChromePresentation();
@@ -3569,6 +3689,32 @@ export struct BrowserBottomAddressPanel {
 
   private shouldShowReadingContinuation(): boolean {
     return this.liveReadingContinuation.visible && this.shouldRenderUnifiedQuickActionsContent();
+  }
+
+  private applyAccountCapsule(presentation: BrowserBottomPanelAccountCapsulePresentation): void {
+    const previous = this.liveAccountCapsule;
+    if (previous.visible === presentation.visible && previous.label === presentation.label &&
+      previous.avatarUri === presentation.avatarUri && previous.signedIn === presentation.signedIn &&
+      previous.membershipBadge === presentation.membershipBadge) {
+      return;
+    }
+    this.liveAccountCapsule = {
+      visible: presentation.visible,
+      label: presentation.label,
+      avatarUri: presentation.avatarUri,
+      signedIn: presentation.signedIn,
+      membershipBadge: presentation.membershipBadge
+    };
+  }
+
+  /**
+   * The capsule shows continue reading when there is one, and the account card otherwise.
+   *
+   * Continue reading is concrete, in-progress content, so it outranks the account entry; the account
+   * card fills the slot the rest of the time instead of leaving it blank.
+   */
+  private shouldShowAccountCapsule(): boolean {
+    return this.liveAccountCapsule.visible && !this.shouldShowReadingContinuation();
   }
 
   private resolveReadingContinuationHeight(): number {

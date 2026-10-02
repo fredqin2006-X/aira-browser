@@ -14,6 +14,8 @@ export interface BrowserWebTextZoomState {
   percentLabel: string;
   canDecrease: boolean;
   canIncrease: boolean;
+  rememberSite: boolean;
+  rememberSiteEnabled: boolean;
 }
 
 export interface BrowserWebTextZoomApplyResult {
@@ -22,13 +24,19 @@ export interface BrowserWebTextZoomApplyResult {
 }
 
 export class BrowserWebTextZoomViewModel {
-  buildState(ratio: number): BrowserWebTextZoomState {
+  buildState(
+    ratio: number,
+    rememberSite: boolean = false,
+    rememberSiteEnabled: boolean = false
+  ): BrowserWebTextZoomState {
     const normalizedRatio = this.normalizeRatio(ratio);
     return {
       ratio: normalizedRatio,
       percentLabel: `${normalizedRatio}%`,
       canDecrease: normalizedRatio > BROWSER_WEB_TEXT_ZOOM_MIN_RATIO,
-      canIncrease: normalizedRatio < BROWSER_WEB_TEXT_ZOOM_MAX_RATIO
+      canIncrease: normalizedRatio < BROWSER_WEB_TEXT_ZOOM_MAX_RATIO,
+      rememberSite: rememberSite,
+      rememberSiteEnabled: rememberSiteEnabled
     };
   }
 

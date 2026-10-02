@@ -5,6 +5,34 @@
   "sourceKind": "vendored-tabler-icons-outline-3.46.0",
   "glyphs": [
     {
+      "glyph": "active-download",
+      "sourceFile": "svg/active-download.svg",
+      "codePoint": 60948,
+      "sourceSha256": "1241f3544a2c80b61b52cdd3d895425f059d5168c7706393f4f6d471e2f24c39",
+      "lucideSlug": "download-cloud"
+    },
+    {
+      "glyph": "activity-heatmap",
+      "sourceFile": "svg/activity-heatmap.svg",
+      "codePoint": 57344,
+      "sourceSha256": "a5bdab53c64e93e62ab5480a2e95131f01a6057ed6392fc2904724d92f58bdbe",
+      "lucideSlug": "activity"
+    },
+    {
+      "glyph": "ad-blocker",
+      "sourceFile": "svg/ad-blocker.svg",
+      "codePoint": 57347,
+      "sourceSha256": "574dd5e728c29ae1b22aceae5ff58cec07f70a886ea2e89f30a4e696e08cb654",
+      "lucideSlug": "shield-off"
+    },
+    {
+      "glyph": "adjustments-horizontal",
+      "sourceFile": "svg/adjustments-horizontal.svg",
+      "codePoint": 60958,
+      "sourceSha256": "16d18b7782910ab381f142ce65b83314c99c9b689ba323b79e3ac15cd7cd5f5f",
+      "lucideSlug": "adjustments-horizontal"
+    },
+    {
       "glyph": "app-window",
       "sourceFile": "svg/app-window.svg",
       "sourceSha256": "d1862537e51d7a05d001e643c508512fb6acc4fb953b1cf9deae5cc93d1ae461",
@@ -24,6 +52,13 @@
       "sourceSha256": "06b5e3337916fc41d25003653ad95eb4a0d5a8f92f45075294ad85de0b7c8028",
       "codePoint": 57432,
       "lucideSlug": "arrow-left"
+    },
+    {
+      "glyph": "arrow-right",
+      "sourceFile": "svg/arrow-right.svg",
+      "codePoint": 60953,
+      "sourceSha256": "c19fe91bed5260057c6003c095184ed024d31c72e792863d1bc55d1c2e33be14",
+      "lucideSlug": "arrow-right"
     },
     {
       "glyph": "arrow-square-out",
@@ -68,6 +103,27 @@
       "lucideSlug": "book-open-text"
     },
     {
+      "glyph": "bookmark-edit-drag-handle",
+      "sourceFile": "svg/bookmark-edit-drag-handle.svg",
+      "codePoint": 60950,
+      "sourceSha256": "d0df0622d0dd774152b2d906719fe179393a998ff5db9df881d2fbc0ce9a7e34",
+      "lucideSlug": "grip-vertical"
+    },
+    {
+      "glyph": "bookmark-edit-move",
+      "sourceFile": "svg/bookmark-edit-move.svg",
+      "codePoint": 60951,
+      "sourceSha256": "ad714b859d95c7f968eb3778599dee7013812279263907012cff3b0bf32942b2",
+      "lucideSlug": "move"
+    },
+    {
+      "glyph": "bookmark-edit-select-all",
+      "sourceFile": "svg/bookmark-edit-select-all.svg",
+      "codePoint": 60952,
+      "sourceSha256": "4af55a24488bfa12e4157b137f01672ac0cd8a3fd1354e7c5fc6f732102c73f0",
+      "lucideSlug": "box-select"
+    },
+    {
       "glyph": "bookmark-simple",
       "sourceFile": "svg/bookmark-simple.svg",
       "sourceSha256": "eb4996b2246f56e3a7e53d0ec9e85b21bd241fa6d073750d3ec3204d15685e8c",
@@ -82,6 +138,13 @@
       "lucideSlug": "book-marked"
     },
     {
+      "glyph": "bookshelf",
+      "sourceFile": "svg/bookshelf.svg",
+      "codePoint": 60947,
+      "sourceSha256": "072450d361e62daf808d07c27a804185843960ce3188a5762bb31c3338a976ba",
+      "lucideSlug": "library"
+    },
+    {
       "glyph": "browser",
       "sourceFile": "svg/browser.svg",
       "sourceSha256": "19bae9b001fc3a96b49bb1bae8eb386614139bcf4f9a0182d3e2a5e7c6e8763f",
@@ -89,11 +152,39 @@
       "lucideSlug": "panel-top"
     },
     {
+      "glyph": "browser-address-expanded-copy",
+      "sourceFile": "svg/browser-address-expanded-copy.svg",
+      "codePoint": 60918,
+      "sourceSha256": "9cd07ad9f14f4fcc84f40728b1961593a0f74df91cca910aac42126dfcd2fd93",
+      "lucideSlug": "copy"
+    },
+    {
+      "glyph": "browser-address-expanded-edit",
+      "sourceFile": "svg/browser-address-expanded-edit.svg",
+      "codePoint": 60917,
+      "sourceSha256": "c2b9688adbea6a2b0b8001f9ad5dce8fa9cb154748ce3610936af7efc33a4092",
+      "lucideSlug": "pencil"
+    },
+    {
+      "glyph": "browser-address-expanded-share",
+      "sourceFile": "svg/browser-address-expanded-share.svg",
+      "codePoint": 60916,
+      "sourceSha256": "5e338868e3d28dac707c0f38f99c0ebcd8554804979c1036ba457f09bfb3e142",
+      "lucideSlug": "share-2"
+    },
+    {
       "glyph": "camera",
       "sourceFile": "svg/camera.svg",
       "sourceSha256": "3811ee82a304c3252b20d541de10e554f41d0b3d423030137e8f7682f4c4cc84",
       "codePoint": 57614,
       "lucideSlug": "camera"
+    },
+    {
+      "glyph": "chevron-right",
+      "sourceFile": "svg/chevron-right.svg",
+      "sourceSha256": "a046e885ca9660280d95278902b08f0bdf98420cb7909262989dbc14ca00e5e8",
+      "codePoint": 60963,
+      "lucideSlug": "chevron-right"
     },
     {
       "glyph": "circles-three",
@@ -136,6 +227,13 @@
       "codePoint": 57788,
       "sourceSha256": "ce51d3295b71d6c04b6ca1dfef6b7c8c6a5eb3729ddd889e41529f6c895e3a8c",
       "lucideSlug": "code"
+    },
+    {
+      "glyph": "copy",
+      "sourceFile": "svg/copy.svg",
+      "codePoint": 57346,
+      "sourceSha256": "9cd07ad9f14f4fcc84f40728b1961593a0f74df91cca910aac42126dfcd2fd93",
+      "lucideSlug": "copy"
     },
     {
       "glyph": "corners-out",
@@ -192,6 +290,34 @@
       "sourceSha256": "1241f3544a2c80b61b52cdd3d895425f059d5168c7706393f4f6d471e2f24c39",
       "codePoint": 57868,
       "lucideSlug": "download"
+    },
+    {
+      "glyph": "element-inspection-exit-fullscreen",
+      "sourceFile": "svg/element-inspection-exit-fullscreen.svg",
+      "codePoint": 60933,
+      "sourceSha256": "b71b948c3779f2bfb0378683844e908d046a0818d9798a4ad4ae3ca551d09c50",
+      "lucideSlug": "minimize"
+    },
+    {
+      "glyph": "element-inspection-fullscreen",
+      "sourceFile": "svg/element-inspection-fullscreen.svg",
+      "codePoint": 60932,
+      "sourceSha256": "9f0d0a273e81145ef4389f83adc519e0455b4db84a195c996bf9c6f0eb0e5625",
+      "lucideSlug": "fullscreen"
+    },
+    {
+      "glyph": "element-inspection-picker",
+      "sourceFile": "svg/element-inspection-picker.svg",
+      "codePoint": 60957,
+      "sourceSha256": "dc4356212af9d8857ee81a8fb7b339ed0be8d1ac99a62fee70d0b0fc04940d65",
+      "lucideSlug": "pointer-2"
+    },
+    {
+      "glyph": "element-inspection-reselect",
+      "sourceFile": "svg/element-inspection-reselect.svg",
+      "codePoint": 60931,
+      "sourceSha256": "ff21c5576916ef112ac7b167392936975b7bc70613f20a0ea49bb80c00b20432",
+      "lucideSlug": "mouse-pointer-square-dashed"
     },
     {
       "glyph": "eraser",
@@ -264,6 +390,13 @@
       "lucideSlug": "earth"
     },
     {
+      "glyph": "home-settings",
+      "sourceFile": "svg/home-settings.svg",
+      "codePoint": 60962,
+      "sourceSha256": "a49a419ddecee0d2c7e83855db2d3de73dd0173cdc2bcab3e825b431aa4c1162",
+      "lucideSlug": "home-settings"
+    },
+    {
       "glyph": "house",
       "sourceFile": "svg/house.svg",
       "sourceSha256": "cdfa8a3a1ba10df2522f96e98328be334709bae3051d03af465ace7bc1702fb6",
@@ -334,6 +467,13 @@
       "lucideSlug": "venetian-mask"
     },
     {
+      "glyph": "menu",
+      "sourceFile": "svg/menu.svg",
+      "codePoint": 60915,
+      "sourceSha256": "2632aa320288950a58a2678445a05e54425f8a004eedf5543b020ac5e0dac19d",
+      "lucideSlug": "menu"
+    },
+    {
       "glyph": "microphone",
       "sourceFile": "svg/microphone.svg",
       "sourceSha256": "d8fb3a26a97e43798472af795a143ba363896b02b35021a0bf8c7efd521e5f08",
@@ -341,11 +481,74 @@
       "lucideSlug": "mic"
     },
     {
+      "glyph": "minus",
+      "sourceFile": "svg/minus.svg",
+      "codePoint": 60955,
+      "sourceSha256": "1a43a0f30601432550fe1126cbce04acdeccc39a055e50ebe55ebe784df49d90",
+      "lucideSlug": "minus"
+    },
+    {
       "glyph": "moon",
       "sourceFile": "svg/moon.svg",
       "sourceSha256": "2ddc6d2f0637b0cead06b48ee585038aec60898522e7c124fd17b1cbdf4e977b",
       "codePoint": 58160,
       "lucideSlug": "moon"
+    },
+    {
+      "glyph": "novel-reader-auto-fast",
+      "sourceFile": "svg/novel-reader-auto-fast.svg",
+      "codePoint": 60946,
+      "sourceSha256": "1c477034a1498e48e3bb298167ef9c4e22f7150de75c5c2bd42b1771564514e4",
+      "lucideSlug": "rabbit"
+    },
+    {
+      "glyph": "novel-reader-auto-slow",
+      "sourceFile": "svg/novel-reader-auto-slow.svg",
+      "codePoint": 60945,
+      "sourceSha256": "d5c04c85e74e17d0fbcb78ad36ba24d4c1eb674f40208f8801be93b82d8e5d2e",
+      "lucideSlug": "turtle"
+    },
+    {
+      "glyph": "novel-reader-brightness-high",
+      "sourceFile": "svg/novel-reader-brightness-high.svg",
+      "codePoint": 60944,
+      "sourceSha256": "93f181c4e6a7cc78ca59aeb1dd1ddb52a5ea05ecda1dbc32005656edbc86eebb",
+      "lucideSlug": "sun"
+    },
+    {
+      "glyph": "novel-reader-brightness-low",
+      "sourceFile": "svg/novel-reader-brightness-low.svg",
+      "codePoint": 60943,
+      "sourceSha256": "92f33f56c282900da83d5c6f8d9581684755bb4eedfba5c7234b43330ac70c1f",
+      "lucideSlug": "sun-dim"
+    },
+    {
+      "glyph": "novel-reader-catalog",
+      "sourceFile": "svg/novel-reader-catalog.svg",
+      "codePoint": 60939,
+      "sourceSha256": "d1dee023b887aae9674447994acb90e7b384cfd023f378055563d6c22bbcc588",
+      "lucideSlug": "list"
+    },
+    {
+      "glyph": "novel-reader-settings",
+      "sourceFile": "svg/novel-reader-settings.svg",
+      "codePoint": 60942,
+      "sourceSha256": "bcc796b82b5bd72d0f80c8f707ca901cabfa548ea3acdb59349f9a0a52fda491",
+      "lucideSlug": "settings"
+    },
+    {
+      "glyph": "novel-reader-text",
+      "sourceFile": "svg/novel-reader-text.svg",
+      "codePoint": 60940,
+      "sourceSha256": "4c897c797944c8fb67c3da38f60a9825d7c763cb03e97f6ed72357e83aad5856",
+      "lucideSlug": "type"
+    },
+    {
+      "glyph": "novel-reader-theme",
+      "sourceFile": "svg/novel-reader-theme.svg",
+      "codePoint": 60941,
+      "sourceSha256": "4171b3ae0bfdb228378c9d3e660fd99d1dff7d919ca1f4652db86033b70b58f9",
+      "lucideSlug": "palette"
     },
     {
       "glyph": "palette",
@@ -446,6 +649,20 @@
       "lucideSlug": "box-select"
     },
     {
+      "glyph": "settings-sync",
+      "sourceFile": "svg/settings-sync.svg",
+      "codePoint": 57345,
+      "sourceSha256": "6156e030807651924612ab863e97c23311324b342dfe94e3c119e9824fd86453",
+      "lucideSlug": "cloud-sync"
+    },
+    {
+      "glyph": "settings-web-features",
+      "sourceFile": "svg/settings-web-features.svg",
+      "codePoint": 60929,
+      "sourceSha256": "16d18b7782910ab381f142ce65b83314c99c9b689ba323b79e3ac15cd7cd5f5f",
+      "lucideSlug": "blocks"
+    },
+    {
       "glyph": "share-network",
       "sourceFile": "svg/share-network.svg",
       "sourceSha256": "5e338868e3d28dac707c0f38f99c0ebcd8554804979c1036ba457f09bfb3e142",
@@ -516,6 +733,20 @@
       "lucideSlug": "panel-top"
     },
     {
+      "glyph": "tabs-overview-close-all",
+      "sourceFile": "svg/tabs-overview-close-all.svg",
+      "codePoint": 60920,
+      "sourceSha256": "01f414d952c83e38e987f047caa7671d12c2c637c7d96f206370f4fb09ea6a2a",
+      "lucideSlug": "trash"
+    },
+    {
+      "glyph": "tabs-overview-new",
+      "sourceFile": "svg/tabs-overview-new.svg",
+      "codePoint": 60919,
+      "sourceSha256": "b5efe99ab4ec34798d7f40597c850aac4cf76cea28fc818a7b59ce92433abb44",
+      "lucideSlug": "square-plus"
+    },
+    {
       "glyph": "text-align-justify",
       "sourceFile": "svg/text-align-justify.svg",
       "sourceSha256": "ebae4dad852887c253b0682d4b250dec0d1cbb453f54ad297c23b1fddc94cac9",
@@ -537,6 +768,90 @@
       "lucideSlug": "a-large-small"
     },
     {
+      "glyph": "toolbar-bookmark-add",
+      "sourceFile": "svg/toolbar-bookmark-add.svg",
+      "codePoint": 60935,
+      "sourceSha256": "9ec01ad70d6d516e8e247cc14447d4ea969406db0b395c2a17d157113d15eb71",
+      "lucideSlug": "bookmark-plus"
+    },
+    {
+      "glyph": "toolbar-bookmark-selected",
+      "sourceFile": "svg/toolbar-bookmark-selected.svg",
+      "codePoint": 60936,
+      "sourceSha256": "eb4996b2246f56e3a7e53d0ec9e85b21bd241fa6d073750d3ec3204d15685e8c",
+      "lucideSlug": "bookmark-check"
+    },
+    {
+      "glyph": "toolbar-copy-link",
+      "sourceFile": "svg/toolbar-copy-link.svg",
+      "codePoint": 60923,
+      "sourceSha256": "3b790f0ddc7b51081d95b0877af3f087a122524c3e172255b37652cb392fa990",
+      "lucideSlug": "link"
+    },
+    {
+      "glyph": "toolbar-element-inspection",
+      "sourceFile": "svg/toolbar-element-inspection.svg",
+      "codePoint": 60928,
+      "sourceSha256": "a223b6e274f4e674139b8fd2b2b50cc2e54ffe92aea8ab6f7bf2017497b525a3",
+      "lucideSlug": "scan-search"
+    },
+    {
+      "glyph": "toolbar-expand-hint",
+      "sourceFile": "svg/toolbar-expand-hint.svg",
+      "codePoint": 60934,
+      "sourceSha256": "e49476344a4760189021f66c15ea7172691a9e6c402aad0b2fdfb00266e14edc",
+      "lucideSlug": "chevron-up"
+    },
+    {
+      "glyph": "toolbar-home",
+      "sourceFile": "svg/toolbar-home.svg",
+      "codePoint": 60961,
+      "sourceSha256": "fd2dbd5e11f048665f47faf9dcbbefe42b031ffd14a134078df7b4208dbece68",
+      "lucideSlug": "home"
+    },
+    {
+      "glyph": "toolbar-private-mode",
+      "sourceFile": "svg/toolbar-private-mode.svg",
+      "codePoint": 60922,
+      "sourceSha256": "6f381223d2a4708d45549e98e5160cdd76e0f2a19dd82413694ef213e2d4be68",
+      "lucideSlug": "venetian-mask"
+    },
+    {
+      "glyph": "toolbar-scan",
+      "sourceFile": "svg/toolbar-scan.svg",
+      "codePoint": 60921,
+      "sourceSha256": "0508d58fed0e0c88cb57e57e97a8a00f968938dac33bb77f8660a3c15d410c58",
+      "lucideSlug": "scan-qr-code"
+    },
+    {
+      "glyph": "toolbar-slot-empty",
+      "sourceFile": "svg/toolbar-slot-empty.svg",
+      "codePoint": 60949,
+      "sourceSha256": "0cc874c67555cf68b4ed5cc089d898ac447c28f3e417a350dab89781a6b01100",
+      "lucideSlug": "square-dashed"
+    },
+    {
+      "glyph": "toolbar-translate",
+      "sourceFile": "svg/toolbar-translate.svg",
+      "codePoint": 60924,
+      "sourceSha256": "15e543674aeac8dd361099058956ca5c9a6304b8ba235a52c6c2cc4ea2aff912",
+      "lucideSlug": "languages"
+    },
+    {
+      "glyph": "toolbar-user-script",
+      "sourceFile": "svg/toolbar-user-script.svg",
+      "codePoint": 60938,
+      "sourceSha256": "46c0a5e0a70d95f76c6727d50838368a460a5309ff3161d9aacf284a11547656",
+      "lucideSlug": "code-xml"
+    },
+    {
+      "glyph": "tools",
+      "sourceFile": "svg/tools.svg",
+      "codePoint": 60954,
+      "sourceSha256": "9983dcb4377f7f9c3b774196e6750fd66ad697c471502fc9e20c8cbfe455e840",
+      "lucideSlug": "tools"
+    },
+    {
       "glyph": "translate",
       "sourceFile": "svg/translate.svg",
       "sourceSha256": "15e543674aeac8dd361099058956ca5c9a6304b8ba235a52c6c2cc4ea2aff912",
@@ -551,53 +866,11 @@
       "lucideSlug": "trash"
     },
     {
-      "glyph": "warning-octagon",
-      "sourceFile": "svg/warning-octagon.svg",
-      "sourceSha256": "2c061d9e537df64a9a1210cca57d0299d6eef9bbc7df57873925bb73248da641",
-      "codePoint": 58596,
-      "lucideSlug": "octagon-alert"
-    },
-    {
-      "glyph": "waveform",
-      "sourceFile": "svg/waveform.svg",
-      "sourceSha256": "5a436274498d761fb180a2837452c26767e4cc0bc9229bab3cad6b7b61669d8f",
-      "codePoint": 59394,
-      "lucideSlug": "activity"
-    },
-    {
-      "glyph": "x",
-      "sourceFile": "svg/x.svg",
-      "sourceSha256": "5b744954ff14bed6d872e67c84400c9259000b8aa781ead7488190d98ec93ac6",
-      "codePoint": 58614,
-      "lucideSlug": "x"
-    },
-    {
-      "glyph": "activity-heatmap",
-      "sourceFile": "svg/activity-heatmap.svg",
-      "codePoint": 57344,
-      "sourceSha256": "a5bdab53c64e93e62ab5480a2e95131f01a6057ed6392fc2904724d92f58bdbe",
-      "lucideSlug": "activity"
-    },
-    {
-      "glyph": "settings-sync",
-      "sourceFile": "svg/settings-sync.svg",
-      "codePoint": 57345,
-      "sourceSha256": "6156e030807651924612ab863e97c23311324b342dfe94e3c119e9824fd86453",
-      "lucideSlug": "cloud-sync"
-    },
-    {
-      "glyph": "copy",
-      "sourceFile": "svg/copy.svg",
-      "codePoint": 57346,
-      "sourceSha256": "9cd07ad9f14f4fcc84f40728b1961593a0f74df91cca910aac42126dfcd2fd93",
-      "lucideSlug": "copy"
-    },
-    {
-      "glyph": "ad-blocker",
-      "sourceFile": "svg/ad-blocker.svg",
-      "codePoint": 57347,
-      "sourceSha256": "574dd5e728c29ae1b22aceae5ff58cec07f70a886ea2e89f30a4e696e08cb654",
-      "lucideSlug": "shield-off"
+      "glyph": "user",
+      "sourceFile": "svg/user.svg",
+      "codePoint": 60956,
+      "sourceSha256": "b6f904c7da85e76a1eeffe7588a370d23f21a0bbc8eb91f66db719739db5c4d4",
+      "lucideSlug": "user"
     },
     {
       "glyph": "user-shield",
@@ -607,81 +880,25 @@
       "lucideSlug": "user-shield"
     },
     {
-      "glyph": "menu",
-      "sourceFile": "svg/menu.svg",
-      "codePoint": 60915,
-      "sourceSha256": "2632aa320288950a58a2678445a05e54425f8a004eedf5543b020ac5e0dac19d",
-      "lucideSlug": "menu"
+      "glyph": "vertical-tabs-collapsed",
+      "sourceFile": "svg/vertical-tabs-collapsed.svg",
+      "sourceSha256": "a7eb0ce288d8284ded4d1fde56ff9e1de5c0492ab3e6a69ecfa8f0ce2c9238bc",
+      "codePoint": 60960,
+      "lucideSlug": "vertical-tabs-collapsed"
     },
     {
-      "glyph": "browser-address-expanded-share",
-      "sourceFile": "svg/browser-address-expanded-share.svg",
-      "codePoint": 60916,
-      "sourceSha256": "5e338868e3d28dac707c0f38f99c0ebcd8554804979c1036ba457f09bfb3e142",
-      "lucideSlug": "share-2"
+      "glyph": "vertical-tabs-expanded",
+      "sourceFile": "svg/vertical-tabs-expanded.svg",
+      "sourceSha256": "e87167d90734bbed39c7f98443254618f125cb3302097f1c81a3126199fa4802",
+      "codePoint": 60959,
+      "lucideSlug": "vertical-tabs-expanded"
     },
     {
-      "glyph": "browser-address-expanded-edit",
-      "sourceFile": "svg/browser-address-expanded-edit.svg",
-      "codePoint": 60917,
-      "sourceSha256": "c2b9688adbea6a2b0b8001f9ad5dce8fa9cb154748ce3610936af7efc33a4092",
-      "lucideSlug": "pencil"
-    },
-    {
-      "glyph": "browser-address-expanded-copy",
-      "sourceFile": "svg/browser-address-expanded-copy.svg",
-      "codePoint": 60918,
-      "sourceSha256": "9cd07ad9f14f4fcc84f40728b1961593a0f74df91cca910aac42126dfcd2fd93",
-      "lucideSlug": "copy"
-    },
-    {
-      "glyph": "tabs-overview-new",
-      "sourceFile": "svg/tabs-overview-new.svg",
-      "codePoint": 60919,
-      "sourceSha256": "b5efe99ab4ec34798d7f40597c850aac4cf76cea28fc818a7b59ce92433abb44",
-      "lucideSlug": "square-plus"
-    },
-    {
-      "glyph": "tabs-overview-close-all",
-      "sourceFile": "svg/tabs-overview-close-all.svg",
-      "codePoint": 60920,
-      "sourceSha256": "01f414d952c83e38e987f047caa7671d12c2c637c7d96f206370f4fb09ea6a2a",
-      "lucideSlug": "trash"
-    },
-    {
-      "glyph": "toolbar-home",
-      "sourceFile": "svg/toolbar-home.svg",
-      "codePoint": 60961,
-      "sourceSha256": "fd2dbd5e11f048665f47faf9dcbbefe42b031ffd14a134078df7b4208dbece68",
-      "lucideSlug": "home"
-    },
-    {
-      "glyph": "toolbar-scan",
-      "sourceFile": "svg/toolbar-scan.svg",
-      "codePoint": 60921,
-      "sourceSha256": "0508d58fed0e0c88cb57e57e97a8a00f968938dac33bb77f8660a3c15d410c58",
-      "lucideSlug": "scan-qr-code"
-    },
-    {
-      "glyph": "toolbar-private-mode",
-      "sourceFile": "svg/toolbar-private-mode.svg",
-      "codePoint": 60922,
-      "sourceSha256": "6f381223d2a4708d45549e98e5160cdd76e0f2a19dd82413694ef213e2d4be68",
-      "lucideSlug": "venetian-mask"
-    },
-    {
-      "glyph": "toolbar-copy-link",
-      "sourceFile": "svg/toolbar-copy-link.svg",
-      "codePoint": 60923,
-      "sourceSha256": "3b790f0ddc7b51081d95b0877af3f087a122524c3e172255b37652cb392fa990",
-      "lucideSlug": "link"
-    },
-    {
-      "glyph": "toolbar-translate",
-      "sourceFile": "svg/toolbar-translate.svg",
-      "codePoint": 60924,
-      "sourceSha256": "15e543674aeac8dd361099058956ca5c9a6304b8ba235a52c6c2cc4ea2aff912",
-      "lucideSlug": "languages"
+      "glyph": "video-assistant-cast",
+      "sourceFile": "svg/video-assistant-cast.svg",
+      "codePoint": 60930,
+      "sourceSha256": "6606021323b90e0a5b82d1a3f8af76d8fc71278521629a4991d80ce5b13bfe60",
+      "lucideSlug": "cast"
     },
     {
       "glyph": "video-assistant-fill-screen",
@@ -705,235 +922,25 @@
       "lucideSlug": "rotate-cw"
     },
     {
-      "glyph": "toolbar-element-inspection",
-      "sourceFile": "svg/toolbar-element-inspection.svg",
-      "codePoint": 60928,
-      "sourceSha256": "a223b6e274f4e674139b8fd2b2b50cc2e54ffe92aea8ab6f7bf2017497b525a3",
-      "lucideSlug": "scan-search"
+      "glyph": "warning-octagon",
+      "sourceFile": "svg/warning-octagon.svg",
+      "sourceSha256": "2c061d9e537df64a9a1210cca57d0299d6eef9bbc7df57873925bb73248da641",
+      "codePoint": 58596,
+      "lucideSlug": "octagon-alert"
     },
     {
-      "glyph": "settings-web-features",
-      "sourceFile": "svg/settings-web-features.svg",
-      "codePoint": 60929,
-      "sourceSha256": "16d18b7782910ab381f142ce65b83314c99c9b689ba323b79e3ac15cd7cd5f5f",
-      "lucideSlug": "blocks"
+      "glyph": "waveform",
+      "sourceFile": "svg/waveform.svg",
+      "sourceSha256": "5a436274498d761fb180a2837452c26767e4cc0bc9229bab3cad6b7b61669d8f",
+      "codePoint": 59394,
+      "lucideSlug": "activity"
     },
     {
-      "glyph": "video-assistant-cast",
-      "sourceFile": "svg/video-assistant-cast.svg",
-      "codePoint": 60930,
-      "sourceSha256": "6606021323b90e0a5b82d1a3f8af76d8fc71278521629a4991d80ce5b13bfe60",
-      "lucideSlug": "cast"
-    },
-    {
-      "glyph": "element-inspection-reselect",
-      "sourceFile": "svg/element-inspection-reselect.svg",
-      "codePoint": 60931,
-      "sourceSha256": "ff21c5576916ef112ac7b167392936975b7bc70613f20a0ea49bb80c00b20432",
-      "lucideSlug": "mouse-pointer-square-dashed"
-    },
-    {
-      "glyph": "element-inspection-fullscreen",
-      "sourceFile": "svg/element-inspection-fullscreen.svg",
-      "codePoint": 60932,
-      "sourceSha256": "9f0d0a273e81145ef4389f83adc519e0455b4db84a195c996bf9c6f0eb0e5625",
-      "lucideSlug": "fullscreen"
-    },
-    {
-      "glyph": "element-inspection-exit-fullscreen",
-      "sourceFile": "svg/element-inspection-exit-fullscreen.svg",
-      "codePoint": 60933,
-      "sourceSha256": "b71b948c3779f2bfb0378683844e908d046a0818d9798a4ad4ae3ca551d09c50",
-      "lucideSlug": "minimize"
-    },
-    {
-      "glyph": "element-inspection-picker",
-      "sourceFile": "svg/element-inspection-picker.svg",
-      "codePoint": 60957,
-      "sourceSha256": "dc4356212af9d8857ee81a8fb7b339ed0be8d1ac99a62fee70d0b0fc04940d65",
-      "lucideSlug": "pointer-2"
-    },
-    {
-      "glyph": "toolbar-expand-hint",
-      "sourceFile": "svg/toolbar-expand-hint.svg",
-      "codePoint": 60934,
-      "sourceSha256": "e49476344a4760189021f66c15ea7172691a9e6c402aad0b2fdfb00266e14edc",
-      "lucideSlug": "chevron-up"
-    },
-    {
-      "glyph": "toolbar-bookmark-add",
-      "sourceFile": "svg/toolbar-bookmark-add.svg",
-      "codePoint": 60935,
-      "sourceSha256": "9ec01ad70d6d516e8e247cc14447d4ea969406db0b395c2a17d157113d15eb71",
-      "lucideSlug": "bookmark-plus"
-    },
-    {
-      "glyph": "toolbar-bookmark-selected",
-      "sourceFile": "svg/toolbar-bookmark-selected.svg",
-      "codePoint": 60936,
-      "sourceSha256": "eb4996b2246f56e3a7e53d0ec9e85b21bd241fa6d073750d3ec3204d15685e8c",
-      "lucideSlug": "bookmark-check"
-    },
-    {
-      "glyph": "toolbar-user-script",
-      "sourceFile": "svg/toolbar-user-script.svg",
-      "codePoint": 60938,
-      "sourceSha256": "46c0a5e0a70d95f76c6727d50838368a460a5309ff3161d9aacf284a11547656",
-      "lucideSlug": "code-xml"
-    },
-    {
-      "glyph": "novel-reader-catalog",
-      "sourceFile": "svg/novel-reader-catalog.svg",
-      "codePoint": 60939,
-      "sourceSha256": "d1dee023b887aae9674447994acb90e7b384cfd023f378055563d6c22bbcc588",
-      "lucideSlug": "list"
-    },
-    {
-      "glyph": "novel-reader-text",
-      "sourceFile": "svg/novel-reader-text.svg",
-      "codePoint": 60940,
-      "sourceSha256": "4c897c797944c8fb67c3da38f60a9825d7c763cb03e97f6ed72357e83aad5856",
-      "lucideSlug": "type"
-    },
-    {
-      "glyph": "novel-reader-theme",
-      "sourceFile": "svg/novel-reader-theme.svg",
-      "codePoint": 60941,
-      "sourceSha256": "4171b3ae0bfdb228378c9d3e660fd99d1dff7d919ca1f4652db86033b70b58f9",
-      "lucideSlug": "palette"
-    },
-    {
-      "glyph": "novel-reader-settings",
-      "sourceFile": "svg/novel-reader-settings.svg",
-      "codePoint": 60942,
-      "sourceSha256": "bcc796b82b5bd72d0f80c8f707ca901cabfa548ea3acdb59349f9a0a52fda491",
-      "lucideSlug": "settings"
-    },
-    {
-      "glyph": "novel-reader-brightness-low",
-      "sourceFile": "svg/novel-reader-brightness-low.svg",
-      "codePoint": 60943,
-      "sourceSha256": "92f33f56c282900da83d5c6f8d9581684755bb4eedfba5c7234b43330ac70c1f",
-      "lucideSlug": "sun-dim"
-    },
-    {
-      "glyph": "novel-reader-brightness-high",
-      "sourceFile": "svg/novel-reader-brightness-high.svg",
-      "codePoint": 60944,
-      "sourceSha256": "93f181c4e6a7cc78ca59aeb1dd1ddb52a5ea05ecda1dbc32005656edbc86eebb",
-      "lucideSlug": "sun"
-    },
-    {
-      "glyph": "novel-reader-auto-slow",
-      "sourceFile": "svg/novel-reader-auto-slow.svg",
-      "codePoint": 60945,
-      "sourceSha256": "d5c04c85e74e17d0fbcb78ad36ba24d4c1eb674f40208f8801be93b82d8e5d2e",
-      "lucideSlug": "turtle"
-    },
-    {
-      "glyph": "novel-reader-auto-fast",
-      "sourceFile": "svg/novel-reader-auto-fast.svg",
-      "codePoint": 60946,
-      "sourceSha256": "1c477034a1498e48e3bb298167ef9c4e22f7150de75c5c2bd42b1771564514e4",
-      "lucideSlug": "rabbit"
-    },
-    {
-      "glyph": "bookshelf",
-      "sourceFile": "svg/bookshelf.svg",
-      "codePoint": 60947,
-      "sourceSha256": "072450d361e62daf808d07c27a804185843960ce3188a5762bb31c3338a976ba",
-      "lucideSlug": "library"
-    },
-    {
-      "glyph": "active-download",
-      "sourceFile": "svg/active-download.svg",
-      "codePoint": 60948,
-      "sourceSha256": "1241f3544a2c80b61b52cdd3d895425f059d5168c7706393f4f6d471e2f24c39",
-      "lucideSlug": "download-cloud"
-    },
-    {
-      "glyph": "toolbar-slot-empty",
-      "sourceFile": "svg/toolbar-slot-empty.svg",
-      "codePoint": 60949,
-      "sourceSha256": "0cc874c67555cf68b4ed5cc089d898ac447c28f3e417a350dab89781a6b01100",
-      "lucideSlug": "square-dashed"
-    },
-    {
-      "glyph": "bookmark-edit-drag-handle",
-      "sourceFile": "svg/bookmark-edit-drag-handle.svg",
-      "codePoint": 60950,
-      "sourceSha256": "d0df0622d0dd774152b2d906719fe179393a998ff5db9df881d2fbc0ce9a7e34",
-      "lucideSlug": "grip-vertical"
-    },
-    {
-      "glyph": "bookmark-edit-move",
-      "sourceFile": "svg/bookmark-edit-move.svg",
-      "codePoint": 60951,
-      "sourceSha256": "ad714b859d95c7f968eb3778599dee7013812279263907012cff3b0bf32942b2",
-      "lucideSlug": "move"
-    },
-    {
-      "glyph": "bookmark-edit-select-all",
-      "sourceFile": "svg/bookmark-edit-select-all.svg",
-      "codePoint": 60952,
-      "sourceSha256": "4af55a24488bfa12e4157b137f01672ac0cd8a3fd1354e7c5fc6f732102c73f0",
-      "lucideSlug": "box-select"
-    },
-    {
-      "glyph": "arrow-right",
-      "sourceFile": "svg/arrow-right.svg",
-      "codePoint": 60953,
-      "sourceSha256": "c19fe91bed5260057c6003c095184ed024d31c72e792863d1bc55d1c2e33be14",
-      "lucideSlug": "arrow-right"
-    },
-    {
-      "glyph": "tools",
-      "sourceFile": "svg/tools.svg",
-      "codePoint": 60954,
-      "sourceSha256": "9983dcb4377f7f9c3b774196e6750fd66ad697c471502fc9e20c8cbfe455e840",
-      "lucideSlug": "tools"
-    },
-    {
-      "glyph": "minus",
-      "sourceFile": "svg/minus.svg",
-      "codePoint": 60955,
-      "sourceSha256": "1a43a0f30601432550fe1126cbce04acdeccc39a055e50ebe55ebe784df49d90",
-      "lucideSlug": "minus"
-    },
-    {
-      "glyph": "user",
-      "sourceFile": "svg/user.svg",
-      "codePoint": 60956,
-      "sourceSha256": "b6f904c7da85e76a1eeffe7588a370d23f21a0bbc8eb91f66db719739db5c4d4",
-      "lucideSlug": "user"
-    },
-    {
-      "glyph": "adjustments-horizontal",
-      "sourceFile": "svg/adjustments-horizontal.svg",
-      "codePoint": 60958,
-      "sourceSha256": "16d18b7782910ab381f142ce65b83314c99c9b689ba323b79e3ac15cd7cd5f5f",
-      "lucideSlug": "adjustments-horizontal"
-    },
-    {
-      "glyph": "vertical-tabs-expanded",
-      "sourceFile": "svg/vertical-tabs-expanded.svg",
-      "sourceSha256": "e87167d90734bbed39c7f98443254618f125cb3302097f1c81a3126199fa4802",
-      "codePoint": 60959,
-      "lucideSlug": "vertical-tabs-expanded"
-    },
-    {
-      "glyph": "vertical-tabs-collapsed",
-      "sourceFile": "svg/vertical-tabs-collapsed.svg",
-      "sourceSha256": "a7eb0ce288d8284ded4d1fde56ff9e1de5c0492ab3e6a69ecfa8f0ce2c9238bc",
-      "codePoint": 60960,
-      "lucideSlug": "vertical-tabs-collapsed"
-    },
-    {
-      "glyph": "home-settings",
-      "sourceFile": "svg/home-settings.svg",
-      "codePoint": 60962,
-      "sourceSha256": "a49a419ddecee0d2c7e83855db2d3de73dd0173cdc2bcab3e825b431aa4c1162",
-      "lucideSlug": "home-settings"
+      "glyph": "x",
+      "sourceFile": "svg/x.svg",
+      "sourceSha256": "5b744954ff14bed6d872e67c84400c9259000b8aa781ead7488190d98ec93ac6",
+      "codePoint": 58614,
+      "lucideSlug": "x"
     }
   ],
   "package": "@tabler/icons",
