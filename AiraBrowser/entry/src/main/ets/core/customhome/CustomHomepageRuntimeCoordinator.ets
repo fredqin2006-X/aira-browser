@@ -123,6 +123,7 @@ export interface CustomHomepageRuntimeShellFacts {
   runtimeAllowed: boolean;
   theme: CustomHomepageRuntimeThemeFacts;
   privacy: CustomHomepagePrivacyState;
+  tabCount: number;
   dataScope: BrowserDataScope;
   createOptions: BrowserCreateTabOptions;
   homeBackgroundColor: string;
@@ -412,6 +413,7 @@ export class CustomHomepageRuntimeCoordinator {
   };
   private bridgeCoordinator: CustomHomepageBridgeCoordinator;
   private holdingHandStatus: CustomHomepageHoldingHandStatus = UNKNOWN_CUSTOM_HOMEPAGE_HOLDING_HAND_STATUS;
+  private publishedTabCount: number = -1;
   private bridgeShellExecutor: CustomHomepageBridgeShellExecutor = {
     execute: (action: CustomHomepageBridgeShellAction): void => this.executeBridgeShellAction(action)
   };
@@ -514,7 +516,28 @@ export class CustomHomepageRuntimeCoordinator {
 
   syncBridge(kind: CustomHomepageBridgeSyncKind, documentGeneration?: number): void {
     const facts = this.shellHost.resolveFacts();
-    this.bridgeCoordinator.sync(kind, this.buildBridgeSyncSnapshot(facts, documentGeneration));
+    const snapshot = this.buildBridgeSyncSnapshot(facts, documentGeneration);
+    if ((kind === 'tabs' || kind === 'document_ready') &&
+      snapshot.shouldSync &&
+      snapshot.documentGeneration > 0) {
+      this.publishedTabCount = this.bridgeService.normalizeTabCount(snapshot.tabCount);
+    }
+    this.bridgeCoordinator.sync(kind, snapshot);
+  }
+
+  /**
+   * Pushes the ordinary-tab count already shown on the tab button. Home and privacy
+   * tabs stay out, so a homepage cannot learn that private tabs exist.
+   */
+  publishTabCount(): void {
+    if (!this.shouldRenderCustomHomepage() || this.committedGeneration <= 0) {
+      return;
+    }
+    const count = this.bridgeService.normalizeTabCount(this.shellHost.resolveFacts().tabCount);
+    if (count === this.publishedTabCount) {
+      return;
+    }
+    this.syncBridge('tabs');
   }
 
   syncPrivacyBoundaryBridge(documentGeneration?: number): void {
@@ -553,6 +576,7 @@ export class CustomHomepageRuntimeCoordinator {
       icons: facts.shortcutIcons,
       theme: this.buildBridgeThemeState(facts),
       privacy: facts.privacy,
+      tabCount: facts.tabCount,
       motionAllowed: this.isMotionBridgeAllowed(),
       holdingHandStatus: this.resolvePublishedHoldingHandStatus()
     };
@@ -741,7 +765,8 @@ export class CustomHomepageRuntimeCoordinator {
         this.bridgeService.buildDocumentStartScriptItemForUrl({
           theme: theme,
           privacy: facts.privacy,
-          motion: motion
+          motion: motion,
+          tabs: { count: facts.tabCount }
         }, this.desiredUrl)
       ],
       callbacks: {
@@ -1837,6 +1862,7 @@ export class CustomHomepageRuntimeCoordinator {
   private invalidateCommittedDocument(): void {
     this.documentCommitted = false;
     this.committedGeneration = 0;
+    this.publishedTabCount = -1;
     this.bridgeAuthorityActive = false;
     const hostedWebNode = this.hostedWebGeneration?.getNodeController();
     hostedWebNode?.setInteractionAllowed(false);

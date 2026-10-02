@@ -2,7 +2,7 @@
 
 > AiraHome API 契约版本：`v1`
 >
-> 文档最后更新：`2026-08-02`
+> 文档最后更新：`2026-10-02`
 
 > 适用对象：希望为 Aira 制作自定义主页的 HTML 作者。自定义主页会替换 Aira 首页内容，但它仍然以“主页”身份运行，不会作为普通网页进入标签页管理、历史记录或普通网页生命周期。
 
@@ -218,6 +218,7 @@ window.addEventListener('aira-home-ready', initializeAiraHome);
 | 管理快捷方式 | `openShortcut`、`copyShortcutUrl`、`editShortcut`、`removeShortcut` 等 | `void` 或 `Promise<void>` | `aira-home-shortcuts-changed` |
 | 拖动排序 | `reorderShortcuts(ids)` | `Promise<void>`；提交完整 ID 顺序 | `aira-home-shortcuts-changed` |
 | 读取设备与窗口环境 | `getEnvironment()` | `Promise<AiraEnvironment>` | `aira-home-environment-changed` |
+| 读取当前标签页数量 | `getTabCount()` | `Promise<number>` | `aira-home-tabs-changed` |
 | 订阅智感握姿 | `motion.on("holdingHandChanged", callback)` | 回调接收 `HoldingHandStatus` 数字枚举 | `motion.off(...)` 取消订阅 |
 | 读取主题/主题色/隐私 | `getTheme()` / `getThemePalette()` / `getPrivacyMode()` | `Promise` | 对应 `*-changed` 事件 |
 | 处理主页返回 | `setBackHandlerActive(active)` | `void`；注册或撤销一层返回处理 | `aira-home-back-requested` |
@@ -803,7 +804,42 @@ window.addEventListener("aira-home-privacy-mode-changed", function (event) {
 
 建议把隐私模式只用于视觉差异，例如更克制的背景、隐私标识、水印或独立配色。不要在主页里长期保存隐私模式下的搜索词、快捷方式点击或其他使用痕迹。
 
-## 13. 智感握姿
+## 13. 当前标签页数量
+
+自定义主页可以读取当前窗口里普通标签页的数量，用来在自己的界面上显示和 Aira 标签按钮一致的数字。
+
+```js
+function applyTabCount(count) {
+  var value = Number(count);
+  if (!isFinite(value) || value < 0) {
+    value = 0;
+  }
+  var label = document.querySelector("[data-aira-tab-count]");
+  if (label) {
+    label.textContent = String(Math.floor(value));
+  }
+}
+
+if (window.AiraHome && typeof AiraHome.getTabCount === "function") {
+  AiraHome.getTabCount().then(applyTabCount);
+}
+
+window.addEventListener("aira-home-tabs-changed", function (event) {
+  var detail = event.detail || {};
+  applyTabCount(detail.count);
+});
+```
+
+`getTabCount()` 返回 `Promise<number>`。这个数字与 Aira 标签按钮上的数字相同：
+
+- 只统计当前窗口中的普通标签页。
+- 主页本身不计入。只有主页、没有其他普通标签时，结果为 `0`。
+- 不包含隐私标签。主页不能借这个数字得知隐私标签是否存在。
+- 不提供标签标题、网址、图标或列表，也不能关闭、切换或创建标签。打开标签后台仍使用 `openTabs()`。
+
+数量会在标签打开或关闭后更新。主页应在初始化时读取一次，并监听 `aira-home-tabs-changed`。事件 `detail` 为 `{ count: number }`。旧版 Aira 没有此方法，调用前必须做特性检测；没有该能力时隐藏自己的计数即可。
+
+## 14. 智感握姿
 
 导入的 ZIP 主页包可以通过 `AiraHome.motion` 订阅智感握姿，用于把常用按钮、工具栏或信息区调整到更适合当前握持方式的位置。
 这套门面的调用形态、事件名、回调参数和枚举值与 HarmonyOS 原生 `motion` API 保持一致。
@@ -882,7 +918,7 @@ import { motion } from "@kit.MultimodalAwarenessKit";
 - Aira 不提供历史状态、时间戳、识别置信度或系统错误码。
 - 旧版 Aira 没有此门面。必须先判断 `window.AiraHome && window.AiraHome.motion`，并保留固定布局作为回退。
 
-## 14. 事件与错误处理
+## 15. 事件与错误处理
 
 ### 事件速查
 
@@ -893,6 +929,7 @@ import { motion } from "@kit.MultimodalAwarenessKit";
 | `aira-home-search-engines-changed` | `AiraSearchEngineState` | 搜索引擎列表或当前选择变化 |
 | `aira-home-theme-changed` | `AiraTheme` | Aira 主题变化 |
 | `aira-home-environment-changed` | `AiraEnvironment` | 当前主页 viewport 尺寸或方向变化 |
+| `aira-home-tabs-changed` | `{ count: number }` | 当前窗口普通标签页数量变化 |
 | `aira-home-privacy-mode-changed` | `AiraPrivacyModeState` | 当前主页边界变化 |
 | `aira-home-back-requested` | 无 | Aira 请求主页关闭当前瞬态界面 |
 
@@ -912,7 +949,7 @@ import { motion } from "@kit.MultimodalAwarenessKit";
 读取一次状态，并持续监听相关 `*-changed` 事件。智感握姿是例外：它遵循原生 `motion.on/off` 的回调模型，
 不提供快照 getter，也不承诺注册后立即回调。
 
-## 15. 完整初始化建议
+## 16. 完整初始化建议
 
 ```js
 (function () {
@@ -935,6 +972,9 @@ import { motion } from "@kit.MultimodalAwarenessKit";
     }
     if (typeof AiraHome.getEnvironment === "function") {
       AiraHome.getEnvironment().then(applyEnvironment).catch(function () {});
+    }
+    if (typeof AiraHome.getTabCount === "function") {
+      AiraHome.getTabCount().then(applyTabCount).catch(function () {});
     }
     if (AiraHome.motion) {
       holdingHandMotion = AiraHome.motion;
@@ -965,6 +1005,11 @@ import { motion } from "@kit.MultimodalAwarenessKit";
     applyEnvironment(event.detail || {});
   });
 
+  window.addEventListener("aira-home-tabs-changed", function (event) {
+    var detail = event.detail || {};
+    applyTabCount(detail.count);
+  });
+
   window.addEventListener("pagehide", function () {
     if (holdingHandMotion && holdingHandCallback) {
       holdingHandMotion.off("holdingHandChanged", holdingHandCallback);
@@ -980,7 +1025,7 @@ import { motion } from "@kit.MultimodalAwarenessKit";
 })();
 ```
 
-## 16. 能力与安全边界
+## 17. 能力与安全边界
 
 自定义主页可以通过 `AiraHome` 使用以下能力：
 
@@ -991,6 +1036,7 @@ import { motion } from "@kit.MultimodalAwarenessKit";
 - 主页可以请求打开 Aira 扫一扫。
 - 主页可以读取并展示 Aira 管理的快捷方式，也可以请求执行快捷方式操作或提交包含系统入口的拖动排序结果。
 - 主页可以读取主题状态和当前隐私模式状态，用 CSS 自己适配视觉。
+- 主页可以读取当前窗口的普通标签页数量，但不能读取标签列表、标题、网址，也不能读取隐私标签。
 - 导入的 ZIP 主页包可以在用户开启实验室开关时订阅智感握姿变化，但不能控制系统感知能力。
 - 主页可以为搜索、菜单等瞬态界面注册一层受限返回事件。
 - 主页可以在自己的独立空间中保存少量 JSON 配置；该配置不会与其他主页共享，也不会进入同步。
@@ -1001,7 +1047,7 @@ import { motion } from "@kit.MultimodalAwarenessKit";
 
 这些边界用于保护用户的账号、数据和浏览器设置。
 
-## 17. 设计和安全建议
+## 18. 设计和安全建议
 
 - 自定义主页应把自己当作 Aira 首页内容，而不是普通网页导航页。
 - 持久保存开关、滑块和布局配置时使用 `AiraHome.storage`。`localStorage` 可用于普通网页缓存，但不应作为主页包更新后仍需保留的配置来源。
@@ -1010,7 +1056,7 @@ import { motion } from "@kit.MultimodalAwarenessKit";
 - 为触控操作保留足够点击区域，建议主要按钮高度不低于 40 CSS 像素。
 - 智感握姿只适合优化可达性和布局，不应用于推断身份、建立用户画像或决定权限、支付、登录等重要流程。
 
-## 18. 导入校验
+## 19. 导入校验
 
 为了保护用户，Aira 会在导入时检查主页包。未通过校验的内容不会写入主页列表。
 
@@ -1026,7 +1072,7 @@ import { motion } from "@kit.MultimodalAwarenessKit";
 - HTML 中如果出现 `iframe`、`object`、`embed`、`base`、内联事件属性、`javascript:` 链接、Service Worker、`file://` 绝对路径、自动刷新跳转、远程脚本、直接网络请求或直接打开新窗口，会被拒绝。
 - 主页包内 `.js` 和 `.mjs` 资源同样不能注册 Service Worker、引用 `file://`、改写页面地址、直接打开新窗口或直接发起网络请求。
 
-## 19. 持久配置存储
+## 20. 持久配置存储
 
 每个已安装主页都有独立的本地配置空间。配置跟随这一次主页安装保存，不依赖 zip 解压目录、`file://` 地址或 Web Storage origin。
 
@@ -1060,7 +1106,7 @@ async function resetSettings() {
 主页更新时，只要新包使用相同的 manifest `id`，原安装的配置会继续保留。历史无 `id` 包与后来带 `id` 的包是两个
 独立主页，不会自动迁移配置；用户可以在确认新版可用后手动删除旧主页。
 
-## 20. 当前限制
+## 21. 当前限制
 
 - 不支持直接导入单文件 `.html` 或 `.htm`；所有本地自定义主页都需要使用 zip 主页包。
 - zip 主页包必须包含 `aira-homepage.json`、稳定 `id`、有效入口 HTML 和至少一张有效预览图；缺失 `id` 仅用于兼容历史主页包。
@@ -1068,13 +1114,14 @@ async function resetSettings() {
 - 设备类别是平台提供的宽泛分类，不表示当前窗口尺寸；分屏、自由窗口和横竖屏适配必须以 viewport/CSS 为准。
 - 主题 API 只读，不提供修改深色模式、浅色模式或跟随系统的能力。
 - 隐私模式 API 只读，只表示当前主页边界是否为隐私模式，不提供读取隐私标签、隐私历史或其他隐私数据的能力。
+- 标签数量 API 只读，只返回当前窗口的普通标签页数量，不提供标签列表、标题、网址或隐私标签信息。
 - 智感握姿 API 只向导入的 ZIP 主页包开放；网址主页、普通网页和旧版单文件主页不接收握姿数据。
 - 智感握姿依赖实验室总开关和设备能力，可能长期没有回调或只收到 `UNKNOWN_STATUS`。主页必须提供不依赖该能力的固定布局回退。
 - 官方 `aira-minimal-homepage` 示例包含智感握姿状态卡，可用于确认 `AiraHome.motion` 可用、订阅成功以及后续握姿变化回调；示例包版本以其 `aira-homepage.json` 为准。
 - 搜索引擎 API 不开放搜索 URL 模板、智能回退配置、会员判断或连通性探测结果。无 `engineId` 的搜索由 Aira 默认策略处理；显式 `engineId` 的搜索精确使用该引擎，不自动切换备用引擎。
 - 搜索引擎图标只能在主页自身展示层覆盖，不能通过主页 API 修改 Aira 的全局或持久化图标。
 
-## 21. 完整类型定义
+## 22. 完整类型定义
 
 ```ts
 interface AiraHomeApi {
@@ -1119,6 +1166,7 @@ interface AiraHomeApi {
   search(query: string, options?: AiraSearchOptions): void;
   openUrl(url: string): void;
   getEnvironment(): Promise<AiraEnvironment>;
+  getTabCount(): Promise<number>;
   getSearchEngineState(): Promise<AiraSearchEngineState>;
   setSearchEngine(engineId: string): Promise<AiraSearchEngineState>;
   setBackHandlerActive(active: boolean): void;

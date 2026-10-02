@@ -1585,6 +1585,24 @@ check_file_contains_rule "${CUSTOM_HOMEPAGE_BRIDGE_SERVICE}" "${CUSTOM_HOMEPAGE_
   'getThemePalette: function' \
   "custom-home pages must expose one focused read-only theme palette API."
 check_file_contains_rule "${CUSTOM_HOMEPAGE_BRIDGE_SERVICE}" "${CUSTOM_HOMEPAGE_BRIDGE_SERVICE_REL}" \
+  'getTabCount: function' \
+  "custom-home pages must expose one read-only ordinary tab count API."
+check_file_contains_rule "${CUSTOM_HOMEPAGE_BRIDGE_SERVICE}" "${CUSTOM_HOMEPAGE_BRIDGE_SERVICE_REL}" \
+  'aira-home-tabs-changed' \
+  "custom-home tab count updates must publish one changed event."
+check_file_contains_rule "${CUSTOM_HOMEPAGE_RUNTIME_COORDINATOR}" "${CUSTOM_HOMEPAGE_RUNTIME_COORDINATOR_REL}" \
+  "syncBridge\\('tabs'\\)" \
+  "custom-home runtime must publish ordinary tab count changes through the bridge."
+check_file_contains_rule "${CUSTOM_HOMEPAGE_BRIDGE_COORDINATOR}" "${CUSTOM_HOMEPAGE_BRIDGE_COORDINATOR_REL}" \
+  'syncTabsToWeb\(snapshot\)' \
+  "custom-home bridge must own tab-count synchronization."
+check_file_contains_rule "${SHELL_PAGE}" "${SHELL_PAGE_REL}" \
+  'tabCount: this.resolveOpenTabsButtonTabCount()' \
+  "custom-home tab count must stay the ordinary tab-button count, not the raw tab list."
+check_file_contains_rule "${SHELL_PAGE}" "${SHELL_PAGE_REL}" \
+  'publishCustomHomepageTabCount()' \
+  "BrowserShellPage must publish tab-count changes into the custom-home runtime instead of projecting tab lists."
+check_file_contains_rule "${CUSTOM_HOMEPAGE_BRIDGE_SERVICE}" "${CUSTOM_HOMEPAGE_BRIDGE_SERVICE_REL}" \
   'palette: normalizeThemePalette' \
   "custom-home theme snapshots and events must carry the normalized palette projection."
 check_file_contains_rule "${CUSTOM_HOMEPAGE_RUNTIME_COORDINATOR}" "${CUSTOM_HOMEPAGE_RUNTIME_COORDINATOR_REL}" \
@@ -3978,6 +3996,9 @@ check_file_contains_rule "${CUSTOM_HOMEPAGE_DEVELOPER_GUIDE}" "${CUSTOM_HOMEPAGE
 check_file_contains_rule "${CUSTOM_HOMEPAGE_DEVELOPER_GUIDE}" "${CUSTOM_HOMEPAGE_DEVELOPER_GUIDE_REL}" \
   'kind: .web. \| .system.' \
   "custom-home developer guide must document the concise shortcut kind field."
+check_file_contains_rule "${CUSTOM_HOMEPAGE_DEVELOPER_GUIDE}" "${CUSTOM_HOMEPAGE_DEVELOPER_GUIDE_REL}" \
+  'getTabCount\(\): Promise<number>' \
+  "custom-home developer guide must document the read-only tab count API."
 check_file_not_contains_rule "${ROOT_BOTTOM_PANEL_SESSION_COORDINATOR}" "${ROOT_BOTTOM_PANEL_SESSION_COORDINATOR_REL}" \
   'hostWidth|viewportWidth' \
   "bottom panel Session state must not carry horizontal responsive geometry."

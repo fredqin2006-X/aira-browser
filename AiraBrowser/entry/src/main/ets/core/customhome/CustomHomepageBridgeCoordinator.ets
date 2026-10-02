@@ -65,7 +65,8 @@ export type CustomHomepageBridgeSyncKind =
   'theme' |
   'privacy' |
   'holding_hand' |
-  'search_engines';
+  'search_engines' |
+  'tabs';
 
 export interface CustomHomepageBridgeSyncSnapshot {
   shouldSync: boolean;
@@ -75,6 +76,7 @@ export interface CustomHomepageBridgeSyncSnapshot {
   icons: CustomHomepageShortcutIconItem[];
   theme: CustomHomepageThemeState;
   privacy: CustomHomepagePrivacyState;
+  tabCount: number;
   motionAllowed: boolean;
   holdingHandStatus: CustomHomepageHoldingHandStatus;
 }
@@ -246,6 +248,7 @@ export class CustomHomepageBridgeCoordinator {
         this.syncThemeToWeb(snapshot);
         this.syncSearchEnginesToWeb(snapshot.dataScope, snapshot.documentGeneration);
         this.syncHoldingHandToWeb(snapshot);
+        this.syncTabsToWeb(snapshot);
         return;
       case 'shortcuts':
         this.syncShortcutsToWeb(
@@ -266,6 +269,9 @@ export class CustomHomepageBridgeCoordinator {
         return;
       case 'search_engines':
         this.syncSearchEnginesToWeb(snapshot.dataScope, snapshot.documentGeneration);
+        return;
+      case 'tabs':
+        this.syncTabsToWeb(snapshot);
         return;
     }
   }
@@ -440,6 +446,14 @@ export class CustomHomepageBridgeCoordinator {
     this.shellExecutor.execute({
       type: 'execute_script',
       script: this.bridgeService.buildPrivacyUpdateScript(snapshot.privacy),
+      documentGeneration: snapshot.documentGeneration
+    });
+  }
+
+  private syncTabsToWeb(snapshot: CustomHomepageBridgeSyncSnapshot): void {
+    this.shellExecutor.execute({
+      type: 'execute_script',
+      script: this.bridgeService.buildTabCountUpdateScript({ count: snapshot.tabCount }),
       documentGeneration: snapshot.documentGeneration
     });
   }

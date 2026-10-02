@@ -7332,6 +7332,7 @@ struct BrowserShellPage {
       this.activeTabId,
       this.isWebPageVisible()
     );
+    this.publishCustomHomepageTabCount();
   }
 
   private resolveBrowserShellPresentationSnapshot(
@@ -10138,6 +10139,10 @@ struct BrowserShellPage {
     return this.browserOpenTabsButtonViewModel.resolveTabCount(this.tabs);
   }
 
+  private publishCustomHomepageTabCount(): void {
+    this.customHomepageRuntimeCoordinator.publishTabCount();
+  }
+
   private syncWindowSafeInsetsForShell(forceWebTopInsetAlign: boolean = false): void {
     if (!this.browserPageForeground) {
       return;
@@ -10646,6 +10651,7 @@ struct BrowserShellPage {
         privacyMode: privacyMode,
         isPrivate: this.tabScopedEventContextCoordinator.isBoundaryPrivate(privacyMode, dataScope)
       },
+      tabCount: this.resolveOpenTabsButtonTabCount(),
       dataScope: dataScope,
       createOptions: this.tabScopedEventContextCoordinator.resolveCurrentBoundary(),
       homeBackgroundColor: this.themedHomeBackground,

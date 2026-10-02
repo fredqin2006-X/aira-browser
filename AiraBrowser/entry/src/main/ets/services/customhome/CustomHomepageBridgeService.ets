@@ -74,6 +74,10 @@ export interface CustomHomepagePrivacyState {
   isPrivate: boolean;
 }
 
+export interface CustomHomepageTabState {
+  count: number;
+}
+
 export type CustomHomepageHoldingHandStatus = 0 | 1 | 2 | 3 | 16;
 
 export interface CustomHomepageMotionState {
@@ -86,6 +90,7 @@ interface CustomHomepageDocumentStartState {
   privacy?: CustomHomepagePrivacyState;
   environment?: CustomHomepageNativeEnvironmentState;
   motion?: CustomHomepageMotionState;
+  tabs?: CustomHomepageTabState;
 }
 
 interface CustomHomepageSearchEngineItem {
@@ -389,6 +394,17 @@ window.__airaHomeSetPrivacy(${JSON.stringify(privacy)});
 `;
   }
 
+  buildTabCountUpdateScript(state: CustomHomepageTabState): string {
+    return `
+${this.buildDocumentStartScript()}
+window.__airaHomeSetTabState(${JSON.stringify(this.normalizeTabState(state))});
+`;
+  }
+
+  normalizeTabCount(count: number): number {
+    return this.normalizeTabState({ count: count }).count;
+  }
+
   buildHoldingHandUpdateScript(status: CustomHomepageHoldingHandStatus): string {
     return `
 // Preserve the previous status while rebuilding the bridge. The setter below
@@ -459,6 +475,9 @@ window.__airaHomeSetHoldingHandStatus(${status});
     const privacyBootstrapLine = state.privacy === undefined ?
       "window.__airaHomePrivacy = window.__airaHomePrivacy || { privacyMode: 'regular', isPrivate: false };" :
       `window.__airaHomePrivacy = ${JSON.stringify(this.normalizePrivacyState(state.privacy))};`;
+    const tabBootstrapLine = state.tabs === undefined ?
+      'window.__airaHomeTabState = window.__airaHomeTabState || { count: 0 };' :
+      `window.__airaHomeTabState = ${JSON.stringify(this.normalizeTabState(state.tabs))};`;
     const motionBootstrapLine = state.motion === undefined ?
       'window.__airaHomeMotionState = window.__airaHomeMotionState || { allowed: false, holdingHandStatus: 16 };' :
       `window.__airaHomeMotionState = ${JSON.stringify(state.motion)};`;
@@ -475,6 +494,7 @@ window.__airaHomeSetHoldingHandStatus(${status});
   window.__airaHomeSearchEngineRequests = window.__airaHomeSearchEngineRequests || {};
   window.__airaHomeStorageRequests = window.__airaHomeStorageRequests || {};
   ${privacyBootstrapLine}
+  ${tabBootstrapLine}
   ${motionBootstrapLine}
   window.__airaHomeHoldingHandCallbacks = Array.isArray(window.__airaHomeHoldingHandCallbacks) ?
     window.__airaHomeHoldingHandCallbacks : [];
@@ -526,6 +546,17 @@ window.__airaHomeSetHoldingHandStatus(${status});
     var privacy = window.__airaHomePrivacy || {};
     var privacyMode = privacy.privacyMode === 'private' ? 'private' : 'regular';
     return { privacyMode: privacyMode, isPrivate: privacyMode === 'private' };
+  }
+  function normalizeTabCount(count) {
+    var value = Number(count);
+    if (!isFinite(value) || value <= 0) {
+      return 0;
+    }
+    return Math.floor(value);
+  }
+  function getTabCount() {
+    var state = window.__airaHomeTabState || {};
+    return normalizeTabCount(state.count);
   }
   function normalizeHoldingHandStatus(status) {
     var value = Number(status);
@@ -869,6 +900,21 @@ window.__airaHomeSetHoldingHandStatus(${status});
     } catch (_error) {
     }
   };
+  window.__airaHomeSetTabState = function (state) {
+    var incoming = state || {};
+    var next = normalizeTabCount(incoming.count);
+    var previous = getTabCount();
+    window.__airaHomeTabState = { count: next };
+    if (previous === next) {
+      return;
+    }
+    try {
+      window.dispatchEvent(new CustomEvent('aira-home-tabs-changed', {
+        detail: { count: next }
+      }));
+    } catch (_error) {
+    }
+  };
   window.__airaHomeSetHoldingHandStatus = function (status) {
     var motionState = window.__airaHomeMotionState || {};
     if (motionState.allowed !== true) {
@@ -1141,6 +1187,9 @@ window.__airaHomeSetHoldingHandStatus(${status});
     getEnvironment: function () {
       return Promise.resolve(getEnvironment());
     },
+    getTabCount: function () {
+      return Promise.resolve(getTabCount());
+    },
     getThemePalette: function () {
       return Promise.resolve(getTheme().palette);
     },
@@ -1293,6 +1342,14 @@ window.__airaHomeSetHoldingHandStatus(${status});
   }
 })();
 `;
+  }
+
+  private normalizeTabState(state: CustomHomepageTabState | undefined): CustomHomepageTabState {
+    const count = state?.count;
+    if (count === undefined || !Number.isFinite(count) || count <= 0) {
+      return { count: 0 };
+    }
+    return { count: Math.floor(count) };
   }
 
   private normalizePrivacyState(privacy: CustomHomepagePrivacyState | undefined): CustomHomepagePrivacyState {
