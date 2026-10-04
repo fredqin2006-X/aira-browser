@@ -201,6 +201,7 @@ const SYNC_SETTINGS_VALUE_UNSET: string = '去开启同步';
 const ADD_DEVICE_ROW_TITLE: string = '添加设备';
 const ADD_DEVICE_ROW_DETAIL: string = '扫一扫电脑上的二维码';
 
+/** Computer bookmark and history sync is available on Aira Cloud and private deployment. */
 export function canSyncCrossDeviceContentProvider(providerKind: CrossDeviceLinkProviderKind): boolean {
   return providerKind === 'aira_cloud' || providerKind === 'self_hosted';
 }
@@ -426,8 +427,10 @@ export class CrossDeviceLinkViewModel {
       // A blocked switch is shown off. The saved preference stays where the presence owner left it.
       linkEnabled: facts.linkEnabled && this.resolveDisplayedLinkSwitchEnabled(facts),
       linkSwitchEnabled: this.resolveDisplayedLinkSwitchEnabled(facts),
-      bookmarkSyncEnabled: facts.bookmarkSyncEnabled,
-      historySyncEnabled: facts.historySyncEnabled,
+      // Huawei Cloud Space and WebDAV do not reach the computer. Aira Cloud and private
+      // deployment do, so only those two mirror the data-sync switches here.
+      bookmarkSyncEnabled: canSyncCrossDeviceContentProvider(facts.providerKind) && facts.bookmarkSyncEnabled,
+      historySyncEnabled: canSyncCrossDeviceContentProvider(facts.providerKind) && facts.historySyncEnabled,
       historySyncSupported: facts.historySyncSupported,
       deviceActionsEnabled: this.resolveDeviceActionsEnabled(facts),
       syncSettingsValue: this.resolveSyncSettingsValue(facts),

@@ -453,41 +453,41 @@ export struct CrossDeviceLinkScreen {
               this.onToggleLink(checked);
             }
           })
+
+          SettingsGroupDivider({ dividerColor: this.storedDividerColor })
+          SettingsSwitchRow({
+            title: $r('app.string.settings_sync_bookmarks'),
+            checked: this.state.bookmarkSyncEnabled,
+            airaIconId: BOOKMARK_SWITCH_GLYPH,
+            iconBackgroundColor: this.settingsIconBackgrounds.bookmarks,
+            iconColor: this.storedSettingsIconForegroundColor,
+            rowPosition: 'middle',
+            isEnabled: !this.isBusy,
+            primaryTextColor: this.storedPrimaryTextColor,
+            secondaryTextColor: this.storedSecondaryTextColor,
+            desktopPresentation: this.desktopPresentation,
+            onChange: (checked: boolean): void => {
+              this.onToggleBookmark(checked);
+            }
+          })
+
+          SettingsGroupDivider({ dividerColor: this.storedDividerColor })
+          SettingsSwitchRow({
+            title: $r('app.string.settings_sync_history'),
+            checked: this.state.historySyncSupported && this.state.historySyncEnabled,
+            airaIconId: HISTORY_SWITCH_GLYPH,
+            iconBackgroundColor: this.settingsIconBackgrounds.history,
+            iconColor: this.storedSettingsIconForegroundColor,
+            rowPosition: 'middle',
+            isEnabled: !this.isBusy,
+            primaryTextColor: this.storedPrimaryTextColor,
+            secondaryTextColor: this.storedSecondaryTextColor,
+            desktopPresentation: this.desktopPresentation,
+            onChange: (checked: boolean): void => {
+              this.onToggleHistory(checked);
+            }
+          })
         }, (key: string): string => key)
-
-        SettingsGroupDivider({ dividerColor: this.storedDividerColor })
-        SettingsSwitchRow({
-          title: $r('app.string.settings_sync_bookmarks'),
-          checked: this.state.bookmarkSyncEnabled,
-          airaIconId: BOOKMARK_SWITCH_GLYPH,
-          iconBackgroundColor: this.settingsIconBackgrounds.bookmarks,
-          iconColor: this.storedSettingsIconForegroundColor,
-          rowPosition: 'middle',
-          isEnabled: !this.isBusy,
-          primaryTextColor: this.storedPrimaryTextColor,
-          secondaryTextColor: this.storedSecondaryTextColor,
-          desktopPresentation: this.desktopPresentation,
-          onChange: (checked: boolean): void => {
-            this.onToggleBookmark(checked);
-          }
-        })
-
-        SettingsGroupDivider({ dividerColor: this.storedDividerColor })
-        SettingsSwitchRow({
-          title: $r('app.string.settings_sync_history'),
-          checked: this.state.historySyncSupported && this.state.historySyncEnabled,
-          airaIconId: HISTORY_SWITCH_GLYPH,
-          iconBackgroundColor: this.settingsIconBackgrounds.history,
-          iconColor: this.storedSettingsIconForegroundColor,
-          rowPosition: 'middle',
-          isEnabled: !this.isBusy,
-          primaryTextColor: this.storedPrimaryTextColor,
-          secondaryTextColor: this.storedSecondaryTextColor,
-          desktopPresentation: this.desktopPresentation,
-          onChange: (checked: boolean): void => {
-            this.onToggleHistory(checked);
-          }
-        })
 
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsNavigationRow({

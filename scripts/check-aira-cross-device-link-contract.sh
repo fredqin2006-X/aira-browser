@@ -83,12 +83,14 @@ require_pattern "${VIEW_MODEL_REL}" "class CrossDeviceLinkViewModel" \
 # reuse the sync owner's state; only tab presence remains owned by the presence coordinator.
 require_pattern "${VIEW_MODEL_REL}" "LINK_SWITCH_TITLE: string = '标签页互通'" \
   "the presence switch must be named 标签页互通."
-require_pattern "${VIEW_MODEL_REL}" "bookmarkSyncEnabled: facts.bookmarkSyncEnabled" \
-  "the bookmark switch must project the shared sync selection."
-require_pattern "${VIEW_MODEL_REL}" "historySyncEnabled: facts.historySyncEnabled" \
-  "the history switch must project the shared sync selection."
-require_pattern "${VIEW_MODEL_REL}" "providerKind === 'aira_cloud' \|\| providerKind === 'self_hosted'" \
-  "computer content sync must only support Aira Cloud or private deployment."
+require_pattern "${VIEW_MODEL_REL}" "canSyncCrossDeviceContentProvider\(facts.providerKind\) && facts.bookmarkSyncEnabled" \
+  "the bookmark switch must follow Aira Cloud, and stay off for every other provider."
+require_pattern "${VIEW_MODEL_REL}" "canSyncCrossDeviceContentProvider\(facts.providerKind\) && facts.historySyncEnabled" \
+  "the history switch must follow Aira Cloud, and stay off for every other provider."
+require_pattern "${VIEW_MODEL_REL}" "return providerKind === 'aira_cloud' \|\| providerKind === 'self_hosted'" \
+  "computer bookmark and history sync must be offered for Aira Cloud and private deployment."
+require_pattern "${HOST_REL}" "this.syncSwitchRevision \+= 1" \
+  "a refused content switch must rebuild from the provider-masked value."
 require_pattern "${HOST_REL}" "sharedCrossDeviceTabPresenceCoordinator.setCrossDeviceLinkEnabled\\(" \
   "flipping the tab switch must go through the presence owner."
 require_pattern "${HOST_REL}" "sharedSyncExperienceCoordinator.setBookmarkSelected" \

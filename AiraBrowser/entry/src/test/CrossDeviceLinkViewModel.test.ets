@@ -85,15 +85,32 @@ export default function crossDeviceLinkViewModelTest(): void {
       expect(buildState(off).linkEnabled).assertFalse();
     });
 
-    it('mirrors bookmark and history switch values from the sync owner', 0, () => {
-      const facts = buildFacts('aira_cloud');
-      facts.bookmarkSyncEnabled = false;
-      facts.historySyncEnabled = false;
-      const state = buildState(facts);
+    it('mirrors bookmark and history switches for Aira Cloud and private deployment only', 0, () => {
+      const cloud = buildFacts('aira_cloud');
+      cloud.bookmarkSyncEnabled = false;
+      cloud.historySyncEnabled = false;
+      const cloudState = buildState(cloud);
+      expect(cloudState.bookmarkSyncEnabled).assertFalse();
+      expect(cloudState.historySyncEnabled).assertFalse();
 
-      expect(state.bookmarkSyncEnabled).assertFalse();
-      expect(state.historySyncEnabled).assertFalse();
-      expect(state.historySyncSupported).assertTrue();
+      const selfHosted = buildFacts('self_hosted');
+      selfHosted.bookmarkSyncEnabled = true;
+      selfHosted.historySyncEnabled = true;
+      expect(buildState(selfHosted).bookmarkSyncEnabled).assertTrue();
+      expect(buildState(selfHosted).historySyncEnabled).assertTrue();
+
+      const huawei = buildFacts('huawei_space');
+      huawei.bookmarkSyncEnabled = true;
+      huawei.historySyncEnabled = true;
+      const huaweiState = buildState(huawei);
+      expect(huaweiState.bookmarkSyncEnabled).assertFalse();
+      expect(huaweiState.historySyncEnabled).assertFalse();
+
+      const webdav = buildFacts('webdav');
+      webdav.bookmarkSyncEnabled = true;
+      webdav.historySyncEnabled = true;
+      expect(buildState(webdav).bookmarkSyncEnabled).assertFalse();
+      expect(buildState(webdav).historySyncEnabled).assertFalse();
     });
 
     it('keeps pausing data sync independent from the cross-device link', 0, () => {

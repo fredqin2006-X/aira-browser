@@ -599,6 +599,7 @@ export struct CrossDeviceLinkHost {
     }
     if (enabled && !canSyncCrossDeviceContentProvider(this.providerKind)) {
       this.showCrossDeviceContentProviderPrompt(kind);
+      this.resetRejectedContentSwitch();
       return;
     }
     this.isTogglingLink = true;
@@ -624,6 +625,16 @@ export struct CrossDeviceLinkHost {
     });
   }
 
+  /**
+   * A refused open leaves the saved value unchanged, so ArkUI keeps the flipped Toggle until the
+   * row is rebuilt. Reset once after this gesture, and again when the prompt closes.
+   */
+  private resetRejectedContentSwitch(): void {
+    setTimeout((): void => {
+      this.syncSwitchRevision += 1;
+    }, 0);
+  }
+
   private showCrossDeviceContentProviderPrompt(kind: 'bookmark' | 'history'): void {
     const content = kind === 'bookmark'
       ? $r('app.string.settings_sync_bookmarks')
@@ -632,10 +643,16 @@ export struct CrossDeviceLinkHost {
       title: $r('app.string.settings_link_content_provider_required_title'),
       message: $r('app.string.settings_link_content_provider_required_message', content),
       autoCancel: true,
-      primaryButton: { value: $r('app.string.settings_account_cancel'), action: () => {} },
+      primaryButton: {
+        value: $r('app.string.settings_account_cancel'),
+        action: (): void => {
+          this.resetRejectedContentSwitch();
+        }
+      },
       secondaryButton: {
         value: $r('app.string.settings_link_open_sync_settings'),
         action: (): void => {
+          this.resetRejectedContentSwitch();
           if (this.onOpenSyncSettings !== undefined) {
             this.onOpenSyncSettings();
             return;
