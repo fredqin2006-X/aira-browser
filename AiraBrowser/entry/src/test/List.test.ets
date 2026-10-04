@@ -5,6 +5,7 @@ import userScriptExternalImportServiceTest from './UserScriptExternalImportServi
 import userScriptGforkProxyInstallUrlTest from './UserScriptGforkProxyInstallUrl.test';
 import userScriptGiteeRedirectInstallUrlTest from './UserScriptGiteeRedirectInstallUrl.test';
 import userScriptInstallLoadFailureTest from './UserScriptInstallLoadFailure.test';
+import userScriptDependencySourceTest from './UserScriptDependencySource.test';
 import userScriptInstallSourceResolverTest from './UserScriptInstallSourceResolver.test';
 import userScriptCookieBridgeTest from './UserScriptCookieBridge.test';
 import novelReadingSessionStateTest from './NovelReadingSessionState.test';
@@ -122,6 +123,7 @@ export default function tests(): void {
   userScriptExternalImportServiceTest();
   userScriptGforkProxyInstallUrlTest();
   userScriptInstallLoadFailureTest();
+  userScriptDependencySourceTest();
   userScriptInstallSourceResolverTest();
   userScriptGiteeRedirectInstallUrlTest();
   userScriptCookieBridgeTest();

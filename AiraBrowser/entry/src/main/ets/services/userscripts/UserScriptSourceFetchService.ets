@@ -86,6 +86,23 @@ const MAX_USER_SCRIPT_SOURCE_BYTES: number = 50 * 1024 * 1024;
 const USER_SCRIPT_SOURCE_TOO_LARGE_MESSAGE: string = resolveAppResourceText($r('app.string.user_script_source_too_large'));
 const USER_SCRIPT_METADATA_MARKER: string = '// ==UserScript==';
 
+/**
+ * @require libraries are ordinary scripts. They must not be rejected for lacking a userscript header.
+ * HTML error pages are still rejected so a failed download is not stored as executable source.
+ */
+export function isAcceptableUserScriptDependencySource(source: string): boolean {
+  const trimmed = source.trim();
+  if (trimmed.length === 0) {
+    return false;
+  }
+  return !isUserScriptHtmlDocument(trimmed);
+}
+
+function isUserScriptHtmlDocument(source: string): boolean {
+  const trimmed = source.trim().toLowerCase();
+  return trimmed.startsWith('<!doctype') || trimmed.startsWith('<html') || trimmed.startsWith('<');
+}
+
 export class UserScriptSourceFetchService {
   private installUrlService: UserScriptInstallUrlService = new UserScriptInstallUrlService();
   private installSourceResolver: UserScriptInstallSourceResolver = new UserScriptInstallSourceResolver();
@@ -128,6 +145,29 @@ export class UserScriptSourceFetchService {
       return this.fail(USER_SCRIPT_SOURCE_DOWNLOAD_FAILED_MESSAGE);
     }
     return failure;
+  }
+
+  /**
+   * Fetch one @require body from the declared URL.
+   * Install-source rewriting and the userscript metadata check do not apply here: a library such as a
+   * Greasy Fork code URL is plain JavaScript, and the HTTP stack follows its redirect.
+   */
+  async fetchDependencySource(url: string): Promise<UserScriptSourceFetchResult> {
+    const trimmedUrl = url.trim();
+    if (!this.isHttpUrl(trimmedUrl)) {
+      return this.fail(resolveAppResourceText($r('app.string.user_script_source_http_url')));
+    }
+    if (!this.hasDefaultNetwork()) {
+      return this.fail(USER_SCRIPT_SOURCE_OFFLINE_MESSAGE);
+    }
+    const result = await this.fetchExactSource(trimmedUrl);
+    if (!result.ok) {
+      return result;
+    }
+    if (!isAcceptableUserScriptDependencySource(result.source)) {
+      return this.fail(USER_SCRIPT_SOURCE_DOWNLOAD_FAILED_MESSAGE);
+    }
+    return result;
   }
 
   private async fetchExactSource(url: string): Promise<UserScriptSourceFetchResult> {
@@ -222,8 +262,7 @@ export class UserScriptSourceFetchService {
   }
 
   private looksLikeUserScript(source: string): boolean {
-    const trimmed = source.trim().toLowerCase();
-    if (trimmed.startsWith('<!doctype') || trimmed.startsWith('<html') || trimmed.startsWith('<')) {
+    if (isUserScriptHtmlDocument(source)) {
       return false;
     }
     return source.indexOf(USER_SCRIPT_METADATA_MARKER) >= 0;

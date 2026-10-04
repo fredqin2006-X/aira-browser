@@ -94,7 +94,8 @@ export class UserScriptDependencyFetchService {
         warnings.push(resolveAppResourceText($r('app.string.user_script_dep_require_unsupported'), url));
         continue;
       }
-      const result: UserScriptSourceFetchResult = await this.sourceFetchService.fetchSource(url, true);
+      // @require is a library, not an installable userscript. Do not require // ==UserScript==.
+      const result: UserScriptSourceFetchResult = await this.sourceFetchService.fetchDependencySource(url);
       if (!result.ok) {
         warnings.push(resolveAppResourceText($r('app.string.user_script_dep_require_failed'), url));
         continue;
