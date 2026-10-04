@@ -21,8 +21,8 @@ The v1 server supports:
 
 Follow the [Personal Server README](../services/personal-server/README.md) for deployment, reverse proxy/TLS, pairing,
 upgrade, backup, and recovery.
-In Aira Browser, open Sync, choose Personal Server, enter the HTTPS server URL, and complete the one-time pairing flow.
-Create another one-time pairing code for each Aira-sync installation and connect it to the same server. The paired phone
+In Aira Browser, open Sync, choose Personal Server, enter the HTTPS server URL, and pair with the server pairing code.
+Use that same code for each Aira-sync installation. The paired phone
 and desktops can then use the same server for sync, Page Push, and Cross-device Tabs without an Aira account.
 
 Disconnecting a Personal Server removes its device credential and instance configuration from the client. It does not

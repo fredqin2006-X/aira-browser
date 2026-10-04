@@ -2482,7 +2482,7 @@
     },
     {
       "name": "settings_sync_connect_self_host_message",
-      "value": "請先填寫伺服器地址並使用一次性配對碼連線。"
+      "value": "請先填寫伺服器地址並使用配對碼連線。"
     },
     {
       "name": "settings_sync_change_method_title",
@@ -11758,7 +11758,7 @@
     },
     {
       "name": "settings_sync_self_host_pairing_code",
-      "value": "一次性配對碼"
+      "value": "配對碼"
     },
     {
       "name": "settings_sync_self_host_pairing_code_placeholder",
@@ -11770,7 +11770,7 @@
     },
     {
       "name": "settings_sync_self_host_pairing_note",
-      "value": "配對碼只使用一次。裝置憑據會儲存在本機，不會傳送華為賬號令牌、會員資訊或付款資料。公開訪問伺服器時請使用 HTTPS。"
+      "value": "同一個配對碼可以在每台裝置上使用。裝置憑據會儲存在本機，不會傳送華為賬號令牌、會員資訊或付款資料。公開訪問伺服器時請使用 HTTPS。"
     },
     {
       "name": "settings_sync_self_host_instance",

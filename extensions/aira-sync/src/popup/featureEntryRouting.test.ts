@@ -1,5 +1,9 @@
 import { describe, expect, test } from 'vitest';
-import { resolveCloudFeatureEntryView, shouldAutoSelectAiraCloud } from './featureEntryRouting';
+import {
+  resolveCloudFeatureEntryView,
+  resolveOfficialPopupOpenView,
+  shouldAutoSelectAiraCloud,
+} from './featureEntryRouting';
 
 describe('cloud feature entry routing', () => {
   test('uses sync method setup when the desktop session exists without a selected provider', () => {
@@ -41,5 +45,33 @@ describe('cloud feature entry routing', () => {
       hasAiraDesktopSession: false,
       airaCloudAvailable: true,
     })).toBe('login');
+  });
+
+  test('opens the official popup on QR login until a desktop session or another provider exists', () => {
+    expect(resolveOfficialPopupOpenView({
+      airaCloudAvailable: true,
+      loggedIn: false,
+      selectedSource: null,
+    })).toBe('login');
+    expect(resolveOfficialPopupOpenView({
+      airaCloudAvailable: true,
+      loggedIn: false,
+      selectedSource: 'aira-cloud',
+    })).toBe('login');
+    expect(resolveOfficialPopupOpenView({
+      airaCloudAvailable: true,
+      loggedIn: true,
+      selectedSource: 'aira-cloud',
+    })).toBe('home');
+    expect(resolveOfficialPopupOpenView({
+      airaCloudAvailable: true,
+      loggedIn: false,
+      selectedSource: 'personal-server',
+    })).toBe('home');
+    expect(resolveOfficialPopupOpenView({
+      airaCloudAvailable: false,
+      loggedIn: false,
+      selectedSource: null,
+    })).toBe('home');
   });
 });

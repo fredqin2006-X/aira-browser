@@ -98,7 +98,7 @@ Unsigned Community HAPs are published on [GitHub Releases](https://github.com/ma
 
 The client stores local browsing state and selects one remote provider for each sync domain. WebDAV and Personal Server are publicly available. Official builds can also use Aira Cloud and Huawei Cloud Space.
 
-Personal Server provides discovery, one-time pairing, and APIs for bookmarks, history, personalization, the novel bookshelf, Page Push, and Cross-device Tabs. It uses per-device bearer credentials, stores only credential hashes, and has no user account system.
+Personal Server provides discovery, a reusable pairing code, and APIs for bookmarks, history, personalization, the novel bookshelf, Page Push, and Cross-device Tabs. It uses per-device bearer credentials, stores only credential hashes, and has no user account system.
 
 Read these before changing the protocol:
 
@@ -144,7 +144,7 @@ docker compose up -d --build
 docker compose exec aira-server cat /data/setup-code
 ```
 
-Connect a development client with the printed one-time pairing code. Compose binds `127.0.0.1:8787` by default. Put a TLS reverse proxy in front before exposing it. Backup, restore, upgrades, reverse proxy, and credential revocation are covered in the service README and the operations doc.
+Connect a development client with the printed pairing code. The same code can pair every device. Compose binds `127.0.0.1:8787` by default. Put a TLS reverse proxy in front before exposing it. Backup, restore, upgrades, reverse proxy, and credential revocation are covered in the service README and the operations doc.
 
 ## Build Aira-sync
 

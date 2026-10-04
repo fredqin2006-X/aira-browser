@@ -3,21 +3,26 @@ const { fail } = require('./errors');
 
 function readJson(request) {
   return new Promise((resolve, reject) => {
-    let body = '';
+    const chunks = [];
+    let received = 0;
     let stopped = false;
     request.on('data', (chunk) => {
       if (stopped) return;
-      body += chunk;
-      if (Buffer.byteLength(body, 'utf8') > bodyLimitBytes) {
+      const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      received += buffer.length;
+      if (received > bodyLimitBytes) {
         stopped = true;
         reject(Object.assign(new Error('Request body is too large.'), {
           status: 413,
           code: 'request_too_large',
         }));
+        return;
       }
+      chunks.push(buffer);
     });
     request.on('end', () => {
       if (stopped) return;
+      const body = Buffer.concat(chunks).toString('utf8');
       if (!body.trim()) {
         resolve({});
         return;

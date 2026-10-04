@@ -2,7 +2,7 @@
 
 Self-hosting means running your own sync server. Once your phone and computer are paired with the same server, you can sync bookmarks, history, personalization and the novel bookshelf, and you can use page push and cross-device tabs.
 
-It needs no Huawei account and no Aira Pro. One server serves one person: there is no sign-up, no password account and no membership. Each device pairs on its own, and a pairing code can be used only once. Disconnecting removes only that device's connection; it does not delete browsing data already on your phone or computer.
+It needs no Huawei account and no Aira Pro. One server serves one person: there is no sign-up, no password account and no membership. Each device pairs on its own with the same pairing code. Disconnecting removes only that device's connection; it does not delete browsing data already on your phone or computer.
 
 The server administrator can read the data that is synced to it. Do not expose this server to a network you do not trust.
 
@@ -23,7 +23,7 @@ docker compose up -d --build
 docker compose exec aira-server cat /data/setup-code
 ```
 
-The last command prints the one-time pairing code. It is meant for the first device only, and the server deletes it once a device has paired. If no device pairs within 24 hours, the code expires as well.
+The last command prints the pairing code. Enter this same code on your phone, computer, and any other device. The server does not delete it after pairing, and it does not expire. Treat it like a password.
 
 By default the server only listens on `127.0.0.1:8787` on the local machine. A browser on the computer running the server can reach it; your phone cannot.
 
@@ -78,11 +78,11 @@ Your phone browser should also be able to open `/health` at the address you are 
 
 1. Open Aira and go to "Settings" - "Sync", then choose "Self-hosting". You can also reach the same page from "Link with a computer".
 2. For the server address, enter an address your phone can open. Do not add a path at the end.
-3. For the one-time pairing code, enter the code printed in the previous step.
+3. For the pairing code, enter the code printed in the previous step.
 4. You can keep the default device name.
 5. Tap "Connect and pair".
 
-A pairing code is used only once. The device credentials are stored on this phone; your Huawei account token, membership and payment data are never sent to this server.
+The same pairing code can pair every device. Each device stores its own credentials; your Huawei account token, membership and payment data are never sent to this server.
 
 ## 4. Install and pair on your computer
 
@@ -101,11 +101,9 @@ After installing:
 1. Click the Aira-sync icon in the browser toolbar.
 2. Choose "Connect to self-hosting".
 3. Enter the same server address as on your phone. When the computer running the server connects to itself, `http://127.0.0.1:8787` works.
-4. Enter a one-time pairing code that has not been used yet and tap "Connect and use".
+4. Enter the same pairing code used on your phone and tap "Connect and use".
 
-Once your phone has used the pairing code printed at startup, it cannot be given to the computer as well. Every device needs its own pairing code. New pairing codes are issued by a device that has already paired; they are valid for 10 minutes and can be used only once.
-
-Right now the pairing pages on both the phone and the desktop extension only accept a pairing code; there is no "Generate pairing code" button yet. So connect the first device with the startup code, and do not enter an already used code for the next device.
+The phone and the computer use the same pairing code. Each device receives its own credential after pairing. Disconnecting one device does not affect the others.
 
 ## 5. Turn on cross-device linking
 
@@ -121,7 +119,7 @@ Only devices that are online, or were online just now, are shown. Settings pages
 ## Troubleshooting
 
 - Your phone cannot open the address: `127.0.0.1` means the phone itself, not the server. Use the computer's local network address, or its public HTTPS address.
-- The pairing code is rejected: it was already used, it has expired, or copying added spaces or line breaks. Get a new code.
+- The pairing code is rejected: it was copied incorrectly, or the server pairing code has been replaced. Read `/data/setup-code` again and remove any spaces or line breaks added while copying.
 - "Not a compatible self-hosted server": the address does not point at this server, or the reverse proxy does not pass `/.well-known/aira` through unchanged.
 - The computer connected but the phone did not: both must enter the same server, and each must be able to reach the address it was given. You cannot use a local address on one side and an unreachable address on the other.
 - Sync is not a backup. The database on the server is your data, so keep a separate backup.

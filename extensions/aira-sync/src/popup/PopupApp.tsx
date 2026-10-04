@@ -12,7 +12,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/sonner';
 import { SyncToggleField } from '@/components/sync/SyncSettingsFields';
+import { LEAFTAB_SELECTED_SYNC_SOURCE_KEY } from '@/features/sync/app/leafTabSyncStorageKeys';
 import { useBookmarkSyncRuntimeController } from '@/features/sync/bookmarks/useBookmarkSyncRuntimeController';
+import { parseLeafTabSyncRemoteKind } from '@/sync/leaftab/source';
 import type { LeafTabSyncFacade } from '@/features/sync/app/LeafTabSyncContracts';
 import QRCodeStyling from 'qr-code-styling';
 import {
@@ -72,7 +74,11 @@ import {
 } from '@/features/personal-server/PersonalServerConnection';
 import { AIRATAB_CAPABILITIES } from '@/config/AiratabDistribution';
 import { resolveCrossDeviceTransportKind } from '@/features/device-tabs/crossDeviceTransport';
-import { resolveCloudFeatureEntryView, shouldAutoSelectAiraCloud } from './featureEntryRouting';
+import {
+  resolveCloudFeatureEntryView,
+  resolveOfficialPopupOpenView,
+  shouldAutoSelectAiraCloud,
+} from './featureEntryRouting';
 import {
   detectHistoryBrowserKind,
   detectHistoryPlatform,
@@ -1492,14 +1498,28 @@ function AdvancedSettingsPage({
   );
 }
 
-function LoginQrPage({ onOpenWebdav, onLoggedIn }: { onOpenWebdav: () => void; onLoggedIn: () => void }) {
+function LoginQrPage({
+  onOpenPersonalServer,
+  onOpenWebdav,
+  onLoggedIn,
+}: {
+  onOpenPersonalServer: () => void;
+  onOpenWebdav: () => void;
+  onLoggedIn: () => void;
+}) {
   const { t } = useTranslation();
 
   return (
     <section className="flex min-h-[320px] flex-col">
       <LoginQrPanel onLoggedIn={onLoggedIn} />
 
-      <div className="mt-5 px-3 pb-3">
+      <div className="mt-5 space-y-2 px-3 pb-3">
+        <MenuItem
+          icon={<RiCloudFill className="size-4" />}
+          title={t('popup.home.personalServerOnlyTitle', { defaultValue: '使用私有化部署' })}
+          description={t('popup.home.personalServerOnlyDesc', { defaultValue: '连接自己的服务器，无需扫码登录' })}
+          onClick={onOpenPersonalServer}
+        />
         <MenuItem
           icon={<RiHardDrive3Fill className="size-4" />}
           title={t('popup.home.webdavOnlyTitle', { defaultValue: '仅使用 WebDAV 同步' })}
@@ -1680,7 +1700,7 @@ function PersonalServerConfigPage({
 
   const connect = async () => {
     if (!baseUrl.trim() || !pairingCode.trim()) {
-      toast.error('请输入服务器地址和一次性配对码');
+      toast.error('请输入服务器地址和配对码');
       return;
     }
     setBusy(true);
@@ -1730,11 +1750,11 @@ function PersonalServerConfigPage({
             disabled={busy}
           />
         </NativeField>
-        <NativeField label="一次性配对码">
+        <NativeField label="配对码">
           <Input
             value={pairingCode}
             onChange={(event) => setPairingCode(event.target.value)}
-            placeholder="从已配对设备或服务器获取"
+            placeholder="填写服务器上的配对码"
             disabled={busy}
           />
         </NativeField>
@@ -2022,7 +2042,11 @@ function WebdavConfigPage({
 }
 
 export function PopupApp() {
-  const [view, setView] = useState<PopupView>('home');
+  const [view, setView] = useState<PopupView>(() => resolveOfficialPopupOpenView({
+    airaCloudAvailable: AIRATAB_CAPABILITIES.airaCloud,
+    loggedIn: false,
+    selectedSource: parseLeafTabSyncRemoteKind(localStorage.getItem(LEAFTAB_SELECTED_SYNC_SOURCE_KEY)),
+  }));
   const [localVersion, setLocalVersion] = useState(0);
   const [pendingCloudSelectionAfterLogin, setPendingCloudSelectionAfterLogin] = useState(false);
   const autoCloudAttemptKey = useRef('');
@@ -2039,6 +2063,10 @@ export function PopupApp() {
     void localVersion;
     return readConfiguredHomeState(t, desktopConnectionProfile);
   }, [desktopConnectionProfile, localVersion, t]);
+  useEffect(() => {
+    if (!configuredHomeState?.isDesktopLoggedIn) return;
+    setView((current) => current === 'login' ? 'home' : current);
+  }, [configuredHomeState?.isDesktopLoggedIn]);
   const crossDeviceFeatureState = useMemo(() => {
     void localVersion;
     return readCrossDeviceFeatureState(
@@ -2281,6 +2309,10 @@ export function PopupApp() {
       )}
       {view === 'login' && AIRATAB_CAPABILITIES.airaCloud && (
         <LoginQrPage
+          onOpenPersonalServer={() => {
+            setPendingCloudSelectionAfterLogin(false);
+            setView('personal-server');
+          }}
           onOpenWebdav={() => {
             setPendingCloudSelectionAfterLogin(false);
             setView('webdav');

@@ -14,7 +14,7 @@ Include the affected commit, deployment shape, reproduction steps, and impact. R
 
 - one owner, with multiple explicitly paired devices;
 - no public registration, user directory, password authentication, roles, or organizations;
-- high-entropy one-use pairing codes and revocable per-device bearer credentials;
+- one high-entropy reusable pairing code and revocable per-device bearer credentials;
 - server-side token hashes only;
 - TLS required outside a trusted local network;
 - a private persistent data directory and encrypted off-host backups;

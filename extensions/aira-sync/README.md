@@ -95,8 +95,8 @@ back to a generic site icon there.
 ## Personal Server
 
 Deploy [Aira Personal Server](../../services/personal-server/README.md), then open Aira-sync and choose
-`使用自己的服务器`. Enter the public HTTPS base URL and a one-time pairing code. The first code comes from the server's
-`setup-code` file; later codes can be created by an already paired device.
+`使用自己的服务器`. Enter the public HTTPS base URL and the server pairing code from `setup-code`. The same code
+pairs every installation.
 
 The extension stores one device credential and isolates preferences, History data, Bookmark baselines, Page Push, and
 Cross-device Tabs by Personal Server instance identity. Disconnecting removes the connection and active Provider choice,

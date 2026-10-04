@@ -6,7 +6,7 @@
 
 ## Authentication
 
-The first server start creates a high-entropy, one-use bootstrap code at `<data-dir>/setup-code` with mode `0600`. `POST /v1/pairing/exchange` consumes that code and returns a random per-device bearer token. Later pairing codes are created by an authenticated device and expire after ten minutes by default.
+The first server start creates one high-entropy pairing code at `<data-dir>/setup-code` with mode `0600`. That code does not expire and can pair any number of devices. `POST /v1/pairing/exchange` checks it and returns a random per-device bearer token; it does not consume the server pairing code. Pairing the same device ID again replaces that device's credential. An authenticated device can still mint a ten-minute, one-use code through `POST /v1/pairing/codes` when sharing the server code is undesirable. Delete `<data-dir>/setup-code` and restart the server to replace a leaked code; the previous code then stops working.
 
 The server stores only SHA-256 token hashes. Every protected request uses:
 
@@ -20,7 +20,7 @@ Huawei access tokens, Aira membership state, IAP receipts, passwords, and cookie
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| `POST` | `/v1/pairing/exchange` | Consume a one-time code and pair one device |
+| `POST` | `/v1/pairing/exchange` | Pair one device with the server pairing code or a one-use code |
 | `POST` | `/v1/pairing/codes` | Mint a one-time code from a paired device |
 | `GET` | `/v1/devices` | List paired and revoked devices without tokens |
 | `POST` | `/v1/device/rotate` | Replace the caller's credential immediately |

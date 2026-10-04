@@ -98,7 +98,7 @@ Community 未签名 HAP 发在 [GitHub Releases](https://github.com/mason173/air
 
 客户端保存本地浏览状态，并在每个同步域上选择一个远程 Provider。公开可用的是 WebDAV 和 Personal Server；Official 构建还可以使用 Aira 云和华为云空间。
 
-Personal Server 提供发现、一次性配对、书签、历史、个性化、小说书架、页面推送和跨端标签接口。它使用按设备签发的 bearer 凭证，只存储凭证哈希，没有用户账号系统。
+Personal Server 提供发现、固定配对码、书签、历史、个性化、小说书架、页面推送和跨端标签接口。它使用按设备签发的 bearer 凭证，只存储凭证哈希，没有用户账号系统。
 
 改协议之前先读这些约定：
 
@@ -144,7 +144,7 @@ docker compose up -d --build
 docker compose exec aira-server cat /data/setup-code
 ```
 
-用打印出的一次性配对码连接开发客户端。默认 Compose 绑定 `127.0.0.1:8787`；要对外访问，先加 TLS 反代。备份、恢复、升级、反代和凭证吊销见服务 README 与运维文档。
+用打印出的配对码连接开发客户端。同一个码可以配多台设备。默认 Compose 绑定 `127.0.0.1:8787`；要对外访问，先加 TLS 反代。备份、恢复、升级、反代和凭证吊销见服务 README 与运维文档。
 
 ## 构建 Aira-sync
 

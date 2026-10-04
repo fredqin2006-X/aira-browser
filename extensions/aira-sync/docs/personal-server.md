@@ -11,12 +11,12 @@ hosted control plane.
 
 ## Pair This Browser
 
-1. Start the server and obtain its one-time setup code, or create a new pairing code from an already paired device.
+1. Start the server and read its pairing code from `setup-code`.
 2. Open Aira-sync and select `使用自己的服务器`.
-3. Enter the server base URL and pairing code.
+3. Enter the server base URL and the same pairing code used by the other devices.
 4. After discovery and pairing succeed, Aira-sync selects Personal Server as the active Bookmark Provider.
 
-The pairing code is consumed once. The returned device token belongs only to this extension installation and can be
+The server pairing code can be reused. The returned device token belongs only to this extension installation and can be
 rotated or revoked independently.
 
 ## Supported Services

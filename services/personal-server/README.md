@@ -36,7 +36,7 @@ docker compose up -d --build
 docker compose exec aira-server cat /data/setup-code
 ```
 
-The last command prints the one-time setup code. Enter the public server URL and this code in Aira under `Settings > Sync > Personal Server`. The setup-code file is deleted after the first device pairs.
+The last command prints the server pairing code. Enter the public server URL and this same code on every device under `Settings > Sync > Personal Server`. The code does not expire and is not deleted after pairing. Treat `/data/setup-code` like a password.
 
 The default Compose configuration binds port `8787` to `127.0.0.1`, so it is not directly exposed to the network. Put Caddy, Nginx, or another TLS reverse proxy in front of it.
 
@@ -71,7 +71,9 @@ The service writes its SQLite database and initial setup code under `AIRA_DATA_D
 
 ## Pairing More Devices
 
-An already paired device can mint a ten-minute, one-use pairing code through `POST /v1/pairing/codes`. The authenticated device-management endpoints can also list devices, rotate the current credential, and revoke a device. See [docs/protocol.md](docs/protocol.md).
+Use the same server pairing code for every device. Each exchange still issues a separate device credential. An already paired device can also mint a ten-minute, one-use code through `POST /v1/pairing/codes` instead of sharing the server code. The authenticated device-management endpoints can list devices, rotate the current credential, and revoke a device. See [docs/protocol.md](docs/protocol.md).
+
+To replace a leaked pairing code, delete `/data/setup-code` and restart the server. The previous code stops working.
 
 Never place a device token in a shell history, issue, log, or configuration committed to Git. Prefer the Aira client UI when it exposes the relevant device-management operation.
 

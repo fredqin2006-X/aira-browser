@@ -111,6 +111,8 @@ export const popupI18nReady = popupI18n
               cloudDesc: 'Requires a connected Aira desktop device and Pro access',
               webdavOnlyTitle: 'Use WebDAV sync only',
               webdavOnlyDesc: 'No Aira sign-in required and available to every user',
+              personalServerOnlyTitle: 'Use self-hosting',
+              personalServerOnlyDesc: 'Connect your own server without signing in',
             },
             login: {
               qrHint: 'Scan with Aira to connect this desktop device',
@@ -269,6 +271,8 @@ export const popupI18nReady = popupI18n
               cloudDesc: '需要连接 Aira 桌面设备和 Pro 权限',
               webdavOnlyTitle: '仅使用 WebDAV 同步',
               webdavOnlyDesc: '无需 Aira 登录，所有用户均可使用',
+              personalServerOnlyTitle: '使用私有化部署',
+              personalServerOnlyDesc: '连接自己的服务器，无需扫码登录',
             },
             login: {
               qrHint: '请使用 Aira 扫一扫连接这台桌面设备',

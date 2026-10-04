@@ -2482,7 +2482,7 @@
     },
     {
       "name": "settings_sync_connect_self_host_message",
-      "value": "Enter the server address and connect with a one-time pairing code first."
+      "value": "Enter the server address and connect with the pairing code first."
     },
     {
       "name": "settings_sync_change_method_title",
@@ -11758,7 +11758,7 @@
     },
     {
       "name": "settings_sync_self_host_pairing_code",
-      "value": "One-time pairing code"
+      "value": "Pairing code"
     },
     {
       "name": "settings_sync_self_host_pairing_code_placeholder",
@@ -11770,7 +11770,7 @@
     },
     {
       "name": "settings_sync_self_host_pairing_note",
-      "value": "A pairing code can be used only once. The device credentials are stored on this device; your Huawei account token, membership and payment data are never sent. Use HTTPS when the server is reachable from the internet."
+      "value": "The same pairing code can be used on every device. The device credentials are stored on this device; your Huawei account token, membership and payment data are never sent. Use HTTPS when the server is reachable from the internet."
     },
     {
       "name": "settings_sync_self_host_instance",

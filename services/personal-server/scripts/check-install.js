@@ -27,6 +27,15 @@ async function run() {
       code: setupCode, deviceId: 'check-device-1', deviceName: 'Check Phone', deviceKind: 'phone',
     });
     assert(first.token && first.instanceId === discovery.instanceId, 'first pairing');
+    assert(fs.readFileSync(path.join(dataDir, 'setup-code'), 'utf8').trim() === setupCode, 'setup code remains');
+    const reused = await json('POST', '/v1/pairing/exchange', {
+      code: setupCode, deviceId: 'check-device-3', deviceName: 'Check Extra Phone', deviceKind: 'phone',
+    });
+    assert(reused.token && reused.token !== first.token, 'reusable setup code');
+    const repaired = await json('POST', '/v1/pairing/exchange', {
+      code: setupCode, deviceId: 'check-device-3', deviceName: 'Check Extra Phone Again', deviceKind: 'phone',
+    });
+    assert(repaired.token && repaired.token !== reused.token, 'same device can pair again');
     let firstToken = first.token;
     const pairing = await json('POST', '/v1/pairing/codes', {}, firstToken);
     const second = await json('POST', '/v1/pairing/exchange', {
@@ -150,7 +159,7 @@ async function run() {
     assert(oldCredential.status === 401, 'rotated credential invalidation');
     firstToken = rotated.token;
     const devices = await json('GET', '/v1/devices', undefined, firstToken);
-    assert(devices.devices.length === 2 && devices.devices.some((device) => device.deviceKind === 'desktop'),
+    assert(devices.devices.length === 3 && devices.devices.some((device) => device.deviceKind === 'desktop'),
       'device list');
     await json('POST', '/v1/device-tabs/publish', {
       device: {
