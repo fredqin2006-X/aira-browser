@@ -2,6 +2,10 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BrowserHostedRuntimeSurfacePort } from '../../services/web/BrowserHostedRuntimeSurfacePort';
 import { BrowserRuntimeLifecyclePort } from '../../services/web/BrowserRuntimeLifecyclePort';
 import {
+  BrowserWebPageZoomSiteMemory,
+  sharedBrowserWebPageZoomSiteMemory
+} from './BrowserWebPageZoomSiteMemory';
+import {
   buildDocumentZoomScript,
   buildPageScaleReadScript,
   isDocumentZoomApplied,
@@ -112,14 +116,27 @@ export class BrowserLargeScreenWebZoomCoordinator {
   private scaleObservationGeneration: number = 0;
   private lastObservedScaleByTabId: Record<string, number | undefined> = {};
 
+  private readonly siteMemory: BrowserWebPageZoomSiteMemory;
+  private readonly resolvePageUrl: (tabId: string) => string;
+  private readonly allowSiteZoomPersistence: () => boolean;
+  private readonly ensureSiteZoomCanApply: () => void;
+
   constructor(
     runtimeLifecyclePort: BrowserRuntimeLifecyclePort,
     hostedRuntimeSurfacePort: BrowserHostedRuntimeSurfacePort,
-    publishRevision: () => void
+    publishRevision: () => void,
+    siteMemory: BrowserWebPageZoomSiteMemory = sharedBrowserWebPageZoomSiteMemory,
+    resolvePageUrl: (tabId: string) => string = (_tabId: string): string => '',
+    allowSiteZoomPersistence: () => boolean = (): boolean => true,
+    ensureSiteZoomCanApply: () => void = (): void => {}
   ) {
     this.runtimeLifecyclePort = runtimeLifecyclePort;
     this.hostedRuntimeSurfacePort = hostedRuntimeSurfacePort;
     this.publishRevision = publishRevision;
+    this.siteMemory = siteMemory;
+    this.resolvePageUrl = resolvePageUrl;
+    this.allowSiteZoomPersistence = allowSiteZoomPersistence;
+    this.ensureSiteZoomCanApply = ensureSiteZoomCanApply;
   }
 
   snapshot(tabId: string, _presentationRevision: number = 0): BrowserLargeScreenWebZoomSnapshot {
@@ -203,6 +220,7 @@ export class BrowserLargeScreenWebZoomCoordinator {
       return this.buildExecutionFailureResult(normalizedTabId, currentState.percent, execution);
     }
     const changed = execution.percent !== currentState.percent;
+    this.commitSiteZoom(normalizedTabId, execution.percent);
     this.revision += 1;
     this.publishRevision();
     return this.buildApplyResult(normalizedTabId, execution.percent, changed, true, '');
@@ -226,8 +244,13 @@ export class BrowserLargeScreenWebZoomCoordinator {
     };
   }
 
-  handleDocumentEnd(tabId: string): void {
+  handleDocumentEnd(tabId: string, pageUrl: string = ''): void {
     const normalizedTabId = tabId.trim();
+    const origin = this.siteMemory.resolveOrigin(pageUrl);
+    if (origin.length > 0) {
+      this.applyRememberedSiteZoom(normalizedTabId, origin);
+      return;
+    }
     const state = this.statesByTabId[normalizedTabId];
     if (state === undefined || !state.owned || state.percent === BROWSER_LARGE_SCREEN_WEB_ZOOM_DEFAULT_PERCENT) {
       return;
@@ -355,6 +378,32 @@ export class BrowserLargeScreenWebZoomCoordinator {
       shortcutNotificationLabel: this.shortcutNotificationLabel,
       revision: this.revision
     };
+  }
+
+  private commitSiteZoom(tabId: string, percent: number): void {
+    if (!this.allowSiteZoomPersistence()) {
+      return;
+    }
+    this.siteMemory.commit(this.siteMemory.resolveOrigin(this.resolvePageUrl(tabId)), percent);
+  }
+
+  /**
+   * A site with no saved zoom returns to 100%. A saved zoom replaces whatever the previous
+   * page in this tab was using, matching Chrome's per-origin page zoom.
+   */
+  private applyRememberedSiteZoom(tabId: string, origin: string): void {
+    const remembered = this.siteMemory.read(origin);
+    const target = remembered ?? BROWSER_LARGE_SCREEN_WEB_ZOOM_DEFAULT_PERCENT;
+    const state = this.statesByTabId[tabId];
+    if (target === BROWSER_LARGE_SCREEN_WEB_ZOOM_DEFAULT_PERCENT &&
+      (state === undefined || !state.owned || state.percent === BROWSER_LARGE_SCREEN_WEB_ZOOM_DEFAULT_PERCENT)) {
+      return;
+    }
+    if (target !== BROWSER_LARGE_SCREEN_WEB_ZOOM_DEFAULT_PERCENT) {
+      this.ensureSiteZoomCanApply();
+    }
+    this.debugSequence += 1;
+    this.applyTargetZoom(tabId, target, this.debugSequence);
   }
 
   private resolveShortcutNotificationLabel(action: BrowserLargeScreenWebZoomAction): ResourceStr {

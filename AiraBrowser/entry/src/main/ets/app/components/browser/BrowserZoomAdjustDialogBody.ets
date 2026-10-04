@@ -29,13 +29,11 @@ export struct BrowserZoomAdjustDialogBody {
   @Prop percentLabel: string = '100%';
   @Prop canDecrease: boolean = false;
   @Prop canIncrease: boolean = false;
-  @Prop canReset: boolean = false;
   decreaseLabel: ResourceStr = '';
   increaseLabel: ResourceStr = '';
   onAdjust: (action: 'decrease' | 'increase' | 'reset') => void =
     (_action: 'decrease' | 'increase' | 'reset'): void => {};
   onDone: () => void = (): void => {};
-  @Prop doneFlat: boolean = false;
   @Prop showRememberSite: boolean = false;
   @Prop rememberSite: boolean = false;
   @Prop rememberSiteEnabled: boolean = false;
@@ -44,34 +42,14 @@ export struct BrowserZoomAdjustDialogBody {
 
   build() {
     Column({ space: 16 }) {
-      Row() {
-        Blank()
-          .width(56)
-          .height(44)
-
-        Text(this.title)
-          .layoutWeight(1)
-          .fontSize(20)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(this.storedPrimaryTextColor)
-          .textAlign(TextAlign.Center)
-          .maxLines(1)
-
-        BrowserSheetActionButton({
-          label: $r('app.string.web_text_zoom_default'),
-          fillAvailableWidth: false,
-          buttonWidth: 56,
-          buttonHeight: 44,
-          fontSize: 15,
-          actionEnabled: this.canReset,
-          onAction: (): void => {
-            this.onAdjust('reset');
-          }
-        })
-      }
-      .width('100%')
-      .height(44)
-      .alignItems(VerticalAlign.Center)
+      Text(this.title)
+        .width('100%')
+        .height(44)
+        .fontSize(20)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.storedPrimaryTextColor)
+        .textAlign(TextAlign.Center)
+        .maxLines(1)
 
       Row() {
         BrowserZoomAdjustCircleButton({
@@ -112,7 +90,7 @@ export struct BrowserZoomAdjustDialogBody {
         BrowserSheetActionButton({
           label: $r('app.string.web_text_zoom_done'),
           emphasis: 'secondary',
-          flat: this.doneFlat,
+          flat: true,
           stacked: true,
           buttonHeight: 44,
           fontSize: 15,

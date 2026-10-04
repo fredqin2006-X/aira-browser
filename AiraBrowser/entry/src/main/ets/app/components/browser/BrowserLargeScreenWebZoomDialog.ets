@@ -19,7 +19,6 @@ export struct BrowserLargeScreenWebZoomDialog {
       percentLabel: this.snapshot.percentLabel,
       canDecrease: this.snapshot.canDecrease,
       canIncrease: this.snapshot.canIncrease,
-      canReset: this.snapshot.available && (!this.snapshot.percentKnown || this.snapshot.percent !== 100),
       decreaseLabel: $r('app.string.web_text_zoom_decrease_page'),
       increaseLabel: $r('app.string.web_text_zoom_increase_page'),
       onAdjust: (action: 'decrease' | 'increase' | 'reset'): void => {

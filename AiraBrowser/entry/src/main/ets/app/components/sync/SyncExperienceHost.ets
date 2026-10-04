@@ -41,7 +41,7 @@ import { SyncExperienceLinesDialog } from './SyncExperienceLinesDialog';
 import { SettingsNavigationCoordinator } from '../../router/SettingsNavigationCoordinator';
 import { SystemSettingsLaunchService } from '../../../services/system/SystemSettingsLaunchService';
 import { AppRuntimeContext } from '../../runtime/AppRuntimeContext';
-import { SYNC_SETTINGS_REFRESH_REVISION_KEY } from '../../../core/sync/SyncSettingsRefreshSignal';
+import { SYNC_SETTINGS_REFRESH_REVISION_KEY, SyncSettingsRefreshSignal } from '../../../core/sync/SyncSettingsRefreshSignal';
 import { SettingsContentKind } from '../../../core/settings/SettingsContentLayoutPolicy';
 import {
   BROWSER_THEME_STORAGE_ACCENT_KEY,

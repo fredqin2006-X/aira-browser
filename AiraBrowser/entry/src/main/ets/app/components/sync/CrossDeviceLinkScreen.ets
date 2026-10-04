@@ -137,8 +137,8 @@ export struct CrossDeviceLinkScreen {
           bottomPadding: 28,
           scroller: this.contentScroller
         }) {
-          this.buildSetupSection()
           this.buildMarquee()
+          this.buildSetupSection()
           this.buildScrollingCover()
         }
       }

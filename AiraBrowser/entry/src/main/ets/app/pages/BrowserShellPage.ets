@@ -976,6 +976,7 @@ import {
   BrowserLargeScreenWebZoomSnapshot,
   createBrowserLargeScreenWebZoomSnapshot
 } from '../../core/browser/BrowserLargeScreenWebZoomCoordinator';
+import { sharedBrowserWebPageZoomSiteMemory } from '../../core/browser/BrowserWebPageZoomSiteMemory';
 import { HomeSearchPanelDetent } from '../../core/browser/HomeSearchPanelDetentViewModel';
 import { BrowserKeyboardAvoidModeCoordinator } from '../../core/browser/BrowserKeyboardAvoidModeCoordinator';
 import {
@@ -5194,6 +5195,12 @@ struct BrowserShellPage {
       this.browserHostedRuntimeSurfacePort,
       (): void => {
         this.largeScreenWebZoomRevision += 1;
+      },
+      sharedBrowserWebPageZoomSiteMemory,
+      (tabId: string): string => this.tabScopedEventContextCoordinator.resolvePageUrl(tabId),
+      (): boolean => !this.tabScopedEventContextCoordinator.isCurrentBoundaryPrivate(),
+      (): void => {
+        this.engagePhoneWebZoomForRememberedSite();
       }
     );
   @State private bookmarkBarDialogTitle: ResourceStr = '';
@@ -12316,14 +12323,22 @@ struct BrowserShellPage {
       this.showNativeToast($r('app.string.bottom_panel_zoom_unavailable'));
       return;
     }
-    if (!this.phoneWebZoomForceEnabled) {
-      this.phoneWebZoomForceEnabled = true;
-      this.browserHostedRuntimeSurfacePort.updateCurrentActiveConfigFromHost();
-    }
+    this.engagePhoneWebZoomForRememberedSite();
     this.browserLargeScreenShellIntentApplication.dispatchNavigation({
       kind: 'open_web_zoom_dialog',
       text: ''
     });
+  }
+
+  private engagePhoneWebZoomForRememberedSite(): void {
+    if (this.browserShellPresentationOperations?.surface() === 'large_screen') {
+      return;
+    }
+    if (this.phoneWebZoomForceEnabled) {
+      return;
+    }
+    this.phoneWebZoomForceEnabled = true;
+    this.browserHostedRuntimeSurfacePort.updateCurrentActiveConfigFromHost();
   }
 
   private applyWebTextZoomAction(action: BrowserWebTextZoomAction): void {
@@ -12548,7 +12563,7 @@ struct BrowserShellPage {
         this.browserWebPageLifecycleApplicationCoordinator.handlePageBegin(tabId, event);
       },
       onPageEnd: (tabId: string, event: OnPageEndEvent) => {
-        this.browserLargeScreenWebZoomCoordinator.handleDocumentEnd(tabId);
+        this.browserLargeScreenWebZoomCoordinator.handleDocumentEnd(tabId, event.url);
         this.browserWebPageLifecycleApplicationCoordinator.handlePageEnd(tabId, event);
         this.browserWebBottomSafeAreaCoordinator.requestCheck(tabId);
         this.browserWebToolbarClearanceCoordinator.apply(tabId, true);

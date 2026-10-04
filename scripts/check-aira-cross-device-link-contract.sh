@@ -275,11 +275,11 @@ require_pattern "${SCREEN_REL}" "settingsIconBackgrounds: BrowserSettingsIconBac
   "the screen must take the settings icon color tokens."
 require_pattern "${SCREEN_REL}" "buildSyncSection\\(\\)" \
   "the sync section must have one builder."
-# The top card, switch then tutorial, sits under the title and above the browser marquee.
-tutorial_entry_line="$(grep -n 'this.buildSetupSection()' "${REPO_ROOT}/${SCREEN_REL}" | head -1 | cut -d: -f1)"
+# The scrolling browser rows are the page header: they sit under the title and above the switch card.
 marquee_line="$(grep -n 'this.buildMarquee()' "${REPO_ROOT}/${SCREEN_REL}" | head -1 | cut -d: -f1)"
-if [ -z "${tutorial_entry_line}" ] || [ -z "${marquee_line}" ] || [ "${tutorial_entry_line}" -ge "${marquee_line}" ]; then
-  fail "the top card must sit above the marquee."
+setup_section_line="$(grep -n 'this.buildSetupSection()' "${REPO_ROOT}/${SCREEN_REL}" | head -1 | cut -d: -f1)"
+if [ -z "${marquee_line}" ] || [ -z "${setup_section_line}" ] || [ "${marquee_line}" -ge "${setup_section_line}" ]; then
+  fail "the browser marquee must sit at the top, above the switch card."
 fi
 switch_line="$(grep -n 'this.onToggleLink' "${REPO_ROOT}/${SCREEN_REL}" | head -1 | cut -d: -f1)"
 tutorial_row_line="$(grep -n 'settings_link_tutorial' "${REPO_ROOT}/${SCREEN_REL}" | head -1 | cut -d: -f1)"
