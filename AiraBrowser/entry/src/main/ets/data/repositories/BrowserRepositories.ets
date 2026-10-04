@@ -2254,6 +2254,7 @@ export class RdbTabSessionRepository implements TabSessionRepository {
   private database: BrowserDatabase;
   private tabsCache: TabRecord[] = [];
   private initializationPromise?: Promise<void>;
+  private replaceTabsQueue: Promise<void> = Promise.resolve();
 
   constructor(database: BrowserDatabase) {
     this.database = database;
@@ -2307,14 +2308,24 @@ export class RdbTabSessionRepository implements TabSessionRepository {
     profileId?: string,
     options: TabSessionReplaceOptions = {}
   ): Promise<TabRecord[]> {
-    await this.initialize();
-    await this.database.replaceTabRecords(
-      windowId,
-      normalizeTabSessionOrder(filterPersistentTabSessionRecords(tabs, options)),
-      profileId
-    );
-    await this.refresh(windowId, profileId);
-    return this.listTabs(windowId, profileId);
+    let releaseQueue: () => void = (): void => {};
+    const previousOperation = this.replaceTabsQueue;
+    this.replaceTabsQueue = new Promise<void>((resolve: () => void): void => {
+      releaseQueue = resolve;
+    });
+    await previousOperation;
+    try {
+      await this.initialize();
+      await this.database.replaceTabRecords(
+        windowId,
+        normalizeTabSessionOrder(filterPersistentTabSessionRecords(tabs, options)),
+        profileId
+      );
+      await this.refresh(windowId, profileId);
+      return this.listTabs(windowId, profileId);
+    } finally {
+      releaseQueue();
+    }
   }
 }
 

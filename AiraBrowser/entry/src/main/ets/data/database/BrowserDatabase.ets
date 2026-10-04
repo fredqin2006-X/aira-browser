@@ -2764,10 +2764,14 @@ export class BrowserDatabase {
   }
 
   async replaceTabRecords(windowId: string, tabs: TabRecord[], profileId?: string): Promise<void> {
+    let transactionStarted = false;
+    let store: relationalStore.RdbStore | undefined = undefined;
     try {
-      const store = await this.getStore();
+      store = await this.getStore();
       const existingTabs = await this.listTabRecords(windowId, profileId);
       const nextTabIds = tabs.map((tab: TabRecord) => tab.id);
+      store.beginTransaction();
+      transactionStarted = true;
       for (const tab of tabs) {
         const values = this.toTabValues(tab);
         const updated = await store.update(values, this.createTabIdPredicates(tab.id, windowId));
@@ -2780,7 +2784,10 @@ export class BrowserDatabase {
           await store.delete(this.createTabIdPredicates(existingTab.id, windowId));
         }
       }
+      store.commit();
+      transactionStarted = false;
     } catch (error) {
+      this.rollbackTabSessionTransaction(store, transactionStarted);
       hilog.error(DOMAIN, TAG, 'Failed to replace tab session records: %{public}s', JSON.stringify(error));
       throw new Error('Failed to save tab sessions.');
     }
@@ -6409,6 +6416,20 @@ export class BrowserDatabase {
         return;
       }
       throw new Error(`Failed to upsert recently closed tab record: ${this.describeError(error as Error)}`);
+    }
+  }
+
+  private rollbackTabSessionTransaction(
+    store: relationalStore.RdbStore | undefined,
+    transactionStarted: boolean
+  ): void {
+    if (store === undefined || !transactionStarted) {
+      return;
+    }
+    try {
+      store.rollBack();
+    } catch (rollbackError) {
+      hilog.warn(DOMAIN, TAG, 'Failed to rollback tab session transaction: %{public}s', JSON.stringify(rollbackError));
     }
   }
 

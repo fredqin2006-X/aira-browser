@@ -49,6 +49,7 @@ export class BrowserTabSessionPersistenceCoordinator {
   private restoreService: BrowserTabSessionRestoreService = new BrowserTabSessionRestoreService();
   private recordFilterCoordinator: BrowserTabSessionRecordFilterCoordinator =
     new BrowserTabSessionRecordFilterCoordinator();
+  private persistQueue: Promise<void> = Promise.resolve();
 
   constructor(
     dependencies: BrowserTabSessionPersistenceDependencies,
@@ -64,6 +65,14 @@ export class BrowserTabSessionPersistenceCoordinator {
   }
 
   async persistAndWait(): Promise<void> {
+    const operation = this.persistQueue.then(() => this.persistLatestSnapshot());
+    // Keep the queue usable after an individual write fails. A later lifecycle
+    // callback must still be able to flush the current tab list.
+    this.persistQueue = operation.then(() => undefined, () => undefined);
+    return operation;
+  }
+
+  private async persistLatestSnapshot(): Promise<void> {
     const host = this.host;
     if (host.isRestoringTabs()) {
       return;
