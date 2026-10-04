@@ -28,6 +28,7 @@ import {
 // Temporary [DEBUG-load-scroll-jank-7c4d] probe: brackets our own synchronous work in the Web
 // callbacks so a blocked frame can name the handler responsible instead of inferring it.
 import { AiraLoadScrollJankProbe } from '../../common/debug/AiraLoadScrollJankProbe';
+import { AiraWebFreezeProbe } from '../../common/debug/AiraWebFreezeProbe';
 
 const HOSTED_WEB_NODE_LOG_DOMAIN: number = 0x0000;
 const HOSTED_WEB_NODE_LOG_TAG: string = 'HostedWebNode';
@@ -122,6 +123,8 @@ export interface HostedWebNodeConfig {
   forceEnableWebZoom?: boolean;
   textZoomRatio?: number;
   pullRefreshNestedScrollEnabled?: boolean;
+  /** When false, the Web component does not register onInterceptRequest. */
+  networkInterceptEnabled?: boolean;
   callbacks: HostedWebNodeCallbacks;
 }
 
@@ -625,6 +628,7 @@ const PAGE_CHROME_THEME_SIGNAL_SCRIPT: string = `
   }
 
   function notify(reason) {
+    var costStarted = Date.now();
     try {
       var snapshot = buildSnapshot();
       var signature = buildSignature(snapshot);
@@ -657,6 +661,8 @@ const PAGE_CHROME_THEME_SIGNAL_SCRIPT: string = `
         }, 160);
       }
     } catch (_error) {
+    } finally {
+      if (window.__airaFreezeCostAdd) window.__airaFreezeCostAdd('themeNotify', costStarted);
     }
   }
 
@@ -709,7 +715,12 @@ const PAGE_CHROME_THEME_SIGNAL_SCRIPT: string = `
         return;
       }
       var observer = new MutationObserver(function () {
-        schedule(reason);
+        var costStarted = Date.now();
+        try {
+          schedule(reason);
+        } finally {
+          if (window.__airaFreezeCostAdd) window.__airaFreezeCostAdd('themeObs', costStarted);
+        }
       });
       observer.observe(node, {
         attributes: true,
@@ -725,7 +736,12 @@ const PAGE_CHROME_THEME_SIGNAL_SCRIPT: string = `
         return;
       }
       var observer = new MutationObserver(function () {
-        schedule('meta');
+        var costStarted = Date.now();
+        try {
+          schedule('meta');
+        } finally {
+          if (window.__airaFreezeCostAdd) window.__airaFreezeCostAdd('themeHead', costStarted);
+        }
       });
       observer.observe(document.head, {
         childList: true,
@@ -1661,6 +1677,7 @@ const PAGE_BEHAVIOR_SIGNAL_SCRIPT: string = `
   }
 
   function processPendingMediaRoots() {
+    var costStarted = Date.now();
     pendingMediaRootTimer = -1;
     var found = false;
     try {
@@ -1699,6 +1716,7 @@ const PAGE_BEHAVIOR_SIGNAL_SCRIPT: string = `
         pendingMediaRootIndex = 0;
       }
       pendingMediaRootTimer = setTimeout(processPendingMediaRoots, 40);
+      if (window.__airaFreezeCostAdd) window.__airaFreezeCostAdd('mediaWalk', costStarted);
       return;
     }
     pendingMediaRoots = [];
@@ -1715,6 +1733,7 @@ const PAGE_BEHAVIOR_SIGNAL_SCRIPT: string = `
         enqueueMediaRoot(fallback.node, fallback.depth, fallback.node);
       }
     }
+    if (window.__airaFreezeCostAdd) window.__airaFreezeCostAdd('mediaWalk', costStarted);
   }
 
   // Every inserted node in the document reaches this callback on DOM-heavy pages, so reject roots
@@ -1771,7 +1790,12 @@ const PAGE_BEHAVIOR_SIGNAL_SCRIPT: string = `
       }
       doc.__airaPageBehaviorMediaDocumentObserved = true;
       var observer = new MutationObserver(function (mutations) {
-        enqueueAddedMediaElements(mutations, depth, doc);
+        var costStarted = Date.now();
+        try {
+          enqueueAddedMediaElements(mutations, depth, doc);
+        } finally {
+          if (window.__airaFreezeCostAdd) window.__airaFreezeCostAdd('mediaObs', costStarted);
+        }
       });
       observer.observe(doc.documentElement || doc, {
         childList: true,
@@ -2222,21 +2246,38 @@ function resolveHostedWebAppearancePolicy(config: HostedWebNodeConfig): WebAppea
   return resolveWebAppearancePolicy(config.appearancePolicy);
 }
 
+/**
+ * Names each injected script in traces and long-animation-frame attribution. ArkWeb injects these
+ * as anonymous sources, so without a label a long task inside them reports an empty sourceURL and
+ * cannot be told apart from a page-owned anonymous script.
+ */
+function withInjectedScriptLabel(item: ScriptItem, label: string): ScriptItem {
+  const source = String(item.script ?? '');
+  const tag = `\n//# sourceURL=aira-injected-${label}.js\n`;
+  return {
+    script: source.includes('//# sourceURL=') ? source : source + tag,
+    scriptRules: item.scriptRules
+  };
+}
+
 function buildHostedWebDocumentStartScripts(config: HostedWebNodeConfig): ScriptItem[] {
   const appearancePolicy = resolveHostedWebAppearancePolicy(config);
   const historyApiBridgeScript = new BrowserHistoryApiBridgeScriptService().buildDocumentStartScriptItem();
-  const scripts = HOSTED_WEB_NATIVE_BRIDGE_ALIAS_SCRIPTS
-    .concat(WEB_LINK_DRAG_SUPPRESSION_SCRIPTS)
-    .concat([buildWebAppearanceDocumentStartScriptItem(appearancePolicy)])
-    .concat([historyApiBridgeScript])
-    .concat([{
+  const scripts = [withInjectedScriptLabel(AiraWebFreezeProbe.buildCostLedgerScriptItem(), 'cost-ledger')]
+    .concat(HOSTED_WEB_NATIVE_BRIDGE_ALIAS_SCRIPTS.map(
+      (item: ScriptItem): ScriptItem => withInjectedScriptLabel(item, 'native-bridge-alias')))
+    .concat(WEB_LINK_DRAG_SUPPRESSION_SCRIPTS.map(
+      (item: ScriptItem): ScriptItem => withInjectedScriptLabel(item, 'link-drag-suppression')))
+    .concat([withInjectedScriptLabel(buildWebAppearanceDocumentStartScriptItem(appearancePolicy), 'appearance')])
+    .concat([withInjectedScriptLabel(historyApiBridgeScript, 'history-api-bridge')])
+    .concat([withInjectedScriptLabel({
       script: PAGE_BEHAVIOR_SIGNAL_SCRIPT,
       scriptRules: ['*']
-    }])
-    .concat([{
+    }, 'page-behavior')])
+    .concat([withInjectedScriptLabel({
       script: PAGE_CHROME_THEME_SIGNAL_SCRIPT,
       scriptRules: ['.*']
-    }]);
+    }, 'page-chrome-theme')]);
   return scripts.concat(config.documentStartScripts ?? []);
 }
 
@@ -2379,7 +2420,10 @@ function HostedWebNodeBuilder(config: HostedWebNodeConfig) {
       .zoomAccess(true)
       .textZoomRatio(config.textZoomRatio ?? 100)
       .attributeModifier(new BrowserWebAttributeModifier({
-        forceEnableWebZoom: config.forceEnableWebZoom
+        forceEnableWebZoom: config.forceEnableWebZoom,
+        onInterceptRequest: config.networkInterceptEnabled === false ? undefined : (event: OnInterceptRequestEvent) => {
+          return config.callbacks.onInterceptRequest(config.tabId, event);
+        }
       }))
       .overScrollMode(OverScrollMode.NEVER)
       .nestedScroll(resolveHostedWebNestedScrollOptions(config.pullRefreshNestedScrollEnabled === true))
@@ -2424,6 +2468,7 @@ function HostedWebNodeBuilder(config: HostedWebNodeConfig) {
       .onPageBegin((event: OnPageBeginEvent) => {
         const probeStartedAt = AiraLoadScrollJankProbe.beginUiTask('web_page_begin');
         registerHostedWebNativeMediaObservation(config);
+        AiraWebFreezeProbe.notePageBegin(config.tabId, event.url ?? '', config.controller);
         config.callbacks.onPageBegin(config.tabId, event);
         AiraLoadScrollJankProbe.endUiTask('web_page_begin', probeStartedAt);
       })
@@ -2437,6 +2482,7 @@ function HostedWebNodeBuilder(config: HostedWebNodeConfig) {
         );
         injectWebFileSavePickerCompat(config);
         injectPageBehaviorSignal(config);
+        AiraWebFreezeProbe.notePageEnd(config.tabId, event.url ?? '');
         config.callbacks.onPageEnd(config.tabId, event);
         AiraLoadScrollJankProbe.endUiTask('web_page_end', probeStartedAt);
       })
@@ -2457,9 +2503,11 @@ function HostedWebNodeBuilder(config: HostedWebNodeConfig) {
         config.callbacks.onScaleChange?.(config.tabId, event);
       })
       .onScroll((event: OnScrollEvent) => {
+        AiraWebFreezeProbe.noteScroll(config.tabId, event.yOffset);
         config.callbacks.onScroll(config.tabId, event);
       })
       .onTouch((event: TouchEvent) => {
+        AiraWebFreezeProbe.noteTouch(config.tabId, hostedWebTouchPhase(event.type), config.controller);
         config.callbacks.onTouch(config.tabId, event);
       })
       .onNavigationEntryCommitted((details: LoadCommittedDetails) => {
@@ -2512,9 +2560,6 @@ function HostedWebNodeBuilder(config: HostedWebNodeConfig) {
       })
       .onLoadIntercept((event: OnLoadInterceptEvent) => {
         return config.callbacks.onLoadIntercept(config.tabId, event);
-      })
-      .onInterceptRequest((event: OnInterceptRequestEvent) => {
-        return config.callbacks.onInterceptRequest(config.tabId, event);
       })
       .onOverrideUrlLoading((request: WebResourceRequest) => {
         return config.callbacks.onOverrideUrlLoading(config.tabId, request);
@@ -2772,6 +2817,7 @@ function buildTrackedHostedWebNodeConfig(
     forceEnableWebZoom: config.forceEnableWebZoom,
     textZoomRatio: config.textZoomRatio,
     pullRefreshNestedScrollEnabled: config.pullRefreshNestedScrollEnabled === true,
+    networkInterceptEnabled: config.networkInterceptEnabled !== false,
     callbacks: {
       onControllerAttached: (tabId: string): void => {
         hostedController.markWebControllerAttached();
@@ -2821,6 +2867,22 @@ function buildTrackedHostedWebNodeConfig(
   };
 }
 
+function hostedWebTouchPhase(type: TouchType): string {
+  if (type === TouchType.Down) {
+    return 'down';
+  }
+  if (type === TouchType.Move) {
+    return 'move';
+  }
+  if (type === TouchType.Up) {
+    return 'up';
+  }
+  if (type === TouchType.Cancel) {
+    return 'cancel';
+  }
+  return 'other';
+}
+
 function resolveHostedWebNestedScrollOptions(enabled: boolean): NestedScrollOptionsExt {
   if (!enabled) {
     return {
@@ -2831,8 +2893,10 @@ function resolveHostedWebNestedScrollOptions(enabled: boolean): NestedScrollOpti
     };
   }
   return {
-    scrollUp: NestedScrollMode.SELF_FIRST,
-    scrollDown: NestedScrollMode.SELF_FIRST,
+    // Finger-up must stay in the Web. Giving that edge to Refresh leaves the page stuck at the
+    // top after a site toggles its own scroll lock.
+    scrollUp: NestedScrollMode.SELF_ONLY,
+    scrollDown: NestedScrollMode.PARENT_FIRST,
     scrollLeft: NestedScrollMode.SELF_ONLY,
     scrollRight: NestedScrollMode.SELF_ONLY
   };

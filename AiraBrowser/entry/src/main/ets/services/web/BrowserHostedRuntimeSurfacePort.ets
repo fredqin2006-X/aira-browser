@@ -42,6 +42,7 @@ export interface BrowserHostedRuntimeActiveSurfaceConfig {
   forceEnableWebZoom?: boolean;
   textZoomRatio?: number;
   pullRefreshNestedScrollEnabled?: boolean;
+  networkInterceptEnabled?: boolean;
   webVideoControllerBridge?: HostedWebVideoControllerBridge;
   callbacks: HostedWebNodeCallbacks;
 }
@@ -350,6 +351,7 @@ export class BrowserHostedRuntimeSurfacePort {
       forceEnableWebZoom: config.forceEnableWebZoom,
       textZoomRatio: config.textZoomRatio,
       pullRefreshNestedScrollEnabled: config.pullRefreshNestedScrollEnabled,
+      networkInterceptEnabled: config.networkInterceptEnabled,
       webVideoControllerBridge: config.webVideoControllerBridge,
       callbacks: config.callbacks
     });
@@ -414,6 +416,7 @@ export class BrowserHostedRuntimeSurfacePort {
       forceEnableWebZoom: config.forceEnableWebZoom,
       textZoomRatio: config.textZoomRatio,
       pullRefreshNestedScrollEnabled: config.pullRefreshNestedScrollEnabled,
+      networkInterceptEnabled: config.networkInterceptEnabled,
       callbacks: config.callbacks
     });
   }

@@ -16,9 +16,22 @@ import {
   sharedAdBlockDocumentStartScriptProviderRegistry
 } from '../adblock/AdBlockDocumentStartScriptProviderRegistry';
 import { WebBackForwardCacheCoordinator } from './WebBackForwardCacheCoordinator';
+import { AiraWebFreezeProbe } from '../../common/debug/AiraWebFreezeProbe';
 
 const BROWSER_HOME_SUBMIT_DIAGNOSTIC_DOMAIN: number = 0x0000;
 const BROWSER_HOME_SUBMIT_DIAGNOSTIC_TAG: string = 'HomeSearchDiag';
+
+/**
+ * Temporary [DEBUG-web-freeze-9f2a]. Labels an injected script so trace and long-animation-frame
+ * attribution name it instead of reporting an anonymous source. Remove with the freeze probe.
+ */
+function labelInjectedScript(item: ScriptItem, label: string): ScriptItem {
+  const source = String(item.script ?? '');
+  return {
+    script: source.includes('//# sourceURL=') ? source : `${source}\n//# sourceURL=aira-injected-${label}.js\n`,
+    scriptRules: item.scriptRules
+  };
+}
 
 export interface BrowserHostedWebDocumentScripts {
   documentStartScripts: ScriptItem[];
@@ -73,6 +86,7 @@ export class BrowserHostedWebDocumentStartScriptCoordinator
       this.userScriptRuntimeCoordinator.buildDocumentStartScriptBundle(privateMode);
     const documentStartScriptKey = [
       'browser-document-start-v3',
+      'freeze-loaf-9f2a',
       privateMode ? 'private' : 'regular',
       tab.profileId,
       this.resolveTabUrl(tab),
@@ -103,13 +117,19 @@ export class BrowserHostedWebDocumentStartScriptCoordinator
     }
     const adBlockScripts = sharedAdBlockDocumentStartScriptProviderRegistry.buildForTab(tab);
     const browserScripts = [
-      this.backForwardCacheCoordinator.buildCompatibilityDocumentStartScriptItem(),
-      this.mixedContentImageUpgradeScriptService.buildDocumentStartScriptItem(),
-      this.mediaFrameRuntimeCoordinator.buildDocumentStartScriptItem(),
-      this.localScrollSignalService.buildDocumentStartScriptItem(),
-      this.clipboardPermissionScriptService.buildDocumentStartScriptItem(
+      labelInjectedScript(this.backForwardCacheCoordinator.buildCompatibilityDocumentStartScriptItem(),
+        'bfcache-compat'),
+      labelInjectedScript(this.mixedContentImageUpgradeScriptService.buildDocumentStartScriptItem(),
+        'mixed-content-upgrade'),
+      labelInjectedScript(this.mediaFrameRuntimeCoordinator.buildDocumentStartScriptItem(),
+        'media-frame-runtime'),
+      labelInjectedScript(this.localScrollSignalService.buildDocumentStartScriptItem(),
+        'local-scroll-signal'),
+      // Temporary [DEBUG-web-freeze-9f2a]. Remove with the probe.
+      labelInjectedScript(AiraWebFreezeProbe.buildDocumentStartScriptItem(), 'freeze-diag'),
+      labelInjectedScript(this.clipboardPermissionScriptService.buildDocumentStartScriptItem(
         clipboardPermissionRule
-      )
+      ), 'clipboard-permission')
     ].concat(userScriptBundle.items);
     const documentStartScripts = browserScripts.concat(adBlockScripts);
     const result: BrowserHostedWebDocumentScripts = {

@@ -103,6 +103,18 @@ const DEEP_PROBE_SCRIPT: string = `(function () {
     var allowBlockingFallback = __AIRA_ALLOW_BLOCKING_FALLBACK__;
     var probeConfiguration = __AIRA_DEEP_PROBE_CONFIGURATION__;
     var pendingAsyncWork = false;
+    var responseScanDeadline = 0;
+    var staticScanState = window.__airaVideoDeepProbeStaticScanState;
+    var currentPageKey = location && location.href ? String(location.href) : '';
+    if (!staticScanState || staticScanState.pageKey !== currentPageKey) {
+      staticScanState = {
+        pageKey: currentPageKey,
+        passCount: 0
+      };
+      window.__airaVideoDeepProbeStaticScanState = staticScanState;
+    }
+    var allowStaticScan = Number(staticScanState.passCount || 0) < 2;
+    staticScanState.passCount = Number(staticScanState.passCount || 0) + 1;
     var mediaUrlPattern = /(?:https?:\\/\\/|\\/\\/)[^"'<>\\s]+?\\.(?:m3u8|m3u|mpd|mp4|m4v|mov|webm)(?=$|[?#"'<>\\s])(?:[?#][^"'<>\\s]*)?/ig;
     window.__airaVideoDeepProbeResults = window.__airaVideoDeepProbeResults || [];
     window.__airaVideoDeepProbeSeen = window.__airaVideoDeepProbeSeen || Object.create(null);
@@ -479,16 +491,125 @@ const DEEP_PROBE_SCRIPT: string = `(function () {
       addManifestText(String(text), source || 'manifest_text', url || undefined);
     }
 
+    function shouldScanMediaResponse(url, text, mimeType) {
+      var responseUrl = String(url || '').toLowerCase();
+      var lowerMimeType = String(mimeType || '').split(';')[0].trim().toLowerCase();
+      if (isHlsManifestMimeType(lowerMimeType) || lowerMimeType === 'application/dash+xml' ||
+        lowerMimeType.indexOf('video/') === 0 ||
+        /\.(?:m3u8|m3u|mpd|mp4|m4v|mov|webm)(?:[?#]|$)/i.test(responseUrl)) {
+        return true;
+      }
+      var responseText = String(text || '');
+      if (responseText.length > 100000) return false;
+      var lowerText = responseText.toLowerCase();
+      return lowerText.indexOf('.m3u8') >= 0 || lowerText.indexOf('.m3u') >= 0 ||
+        lowerText.indexOf('.mpd') >= 0 || lowerText.indexOf('.mp4') >= 0 ||
+        lowerText.indexOf('.m4v') >= 0 || lowerText.indexOf('.mov') >= 0 ||
+        lowerText.indexOf('.webm') >= 0 || lowerText.indexOf('m3u8') >= 0 ||
+        lowerText.indexOf('videoplayback') >= 0;
+    }
+
+    function hasResponseScanBudget() {
+      return responseScanDeadline === 0 || Date.now() < responseScanDeadline;
+    }
+
     function maybeRecordMediaResponse(url, text, source, mimeType) {
       var responseText = String(text || '');
-      if (!responseText) return;
+      if (!responseText || !shouldScanMediaResponse(url, responseText, mimeType)) return;
       if (responseText.length > 300000) {
         responseText = responseText.substring(0, 300000);
       }
-      maybeRecordManifestResponse(url, responseText, source || 'manifest_text', mimeType);
-      scanTextForUrls(responseText, source || 'script_text', 'script_text');
-      if (url) {
-        scanTextForUrls(String(url), source || 'performance', 'performance_entry');
+      var previousDeadline = responseScanDeadline;
+      responseScanDeadline = Date.now() + 16;
+      try {
+        maybeRecordManifestResponse(url, responseText, source || 'manifest_text', mimeType);
+        if (!hasResponseScanBudget()) return;
+        scanTextForUrls(responseText, source || 'script_text', 'script_text');
+        if (url && hasResponseScanBudget()) {
+          scanTextForUrls(String(url), source || 'performance', 'performance_entry');
+        }
+      } finally {
+        responseScanDeadline = previousDeadline;
+      }
+    }
+
+    function isManifestUrl(url) {
+      return /\.(?:m3u8|m3u|mpd)(?:[?#]|$)/i.test(String(url || ''));
+    }
+
+    function hasMediaUrlHint(url) {
+      var value = String(url || '');
+      return isManifestUrl(value) || /\.(?:mp4|m4v|mov|webm)(?:[?#]|$)/i.test(value) ||
+        /(?:\/media\/|\/stream\/|\/video\/|videoplayback)/i.test(value);
+    }
+
+    function isTextResponseMimeType(mimeType) {
+      var lower = String(mimeType || '').split(';')[0].trim().toLowerCase();
+      return lower.indexOf('text/') === 0 || lower === 'application/json' ||
+        lower === 'application/manifest+json' || lower === 'application/javascript' ||
+        lower === 'text/javascript' || lower === 'application/xml' || lower === 'text/xml';
+    }
+
+    function parseContentLength(value) {
+      var parsed = Number.parseInt(String(value || ''), 10);
+      return Number.isFinite(parsed) && parsed >= 0 ? parsed : -1;
+    }
+
+    // Returns the maximum number of bytes worth reading, or 0 for a response that should not be read.
+    function responseBodyScanLimit(url, mimeType, contentLength) {
+      var manifestResponse = isHlsManifestMimeType(mimeType) || String(mimeType || '').toLowerCase()
+        .split(';')[0].trim() === 'application/dash+xml' || isManifestUrl(url);
+      if (manifestResponse) {
+        return contentLength < 0 || contentLength <= 300000 ? 300000 : 0;
+      }
+      if (!isTextResponseMimeType(mimeType)) return 0;
+      if (contentLength >= 0) return contentLength <= 100000 ? 100000 : 0;
+      return hasMediaUrlHint(url) ? 100000 : 0;
+    }
+
+    function readFetchResponsePrefix(response, maxBytes, callback) {
+      var finished = false;
+      function finish(value) {
+        if (finished) return;
+        finished = true;
+        callback(String(value || ''));
+      }
+      try {
+        if (response.body && typeof response.body.getReader === 'function' &&
+          typeof TextDecoder === 'function') {
+          var reader = response.body.getReader();
+          var decoder = new TextDecoder();
+          var text = '';
+          var bytesRead = 0;
+          var pump = function() {
+            reader.read().then(function(part) {
+              if (part.done) {
+                text += decoder.decode();
+                finish(text);
+                return;
+              }
+              var value = part.value;
+              bytesRead += value && value.byteLength ? value.byteLength : 0;
+              text += decoder.decode(value, { stream: bytesRead < maxBytes });
+              if (bytesRead >= maxBytes) {
+                try { reader.cancel(); } catch (_error) {}
+                finish(text);
+                return;
+              }
+              pump();
+            }).catch(function() { finish(text); });
+          };
+          pump();
+          return;
+        }
+        // Avoid an unbounded fallback when the stream reader is unavailable.
+        var contentLength = parseContentLength(response.headers && response.headers.get ?
+          response.headers.get('content-length') : '');
+        if (contentLength >= 0 && contentLength <= maxBytes && typeof response.text === 'function') {
+          response.text().then(function(value) { finish(value); }).catch(function() { finish(''); });
+        }
+      } catch (_error) {
+        finish('');
       }
     }
 
@@ -559,24 +680,39 @@ const DEEP_PROBE_SCRIPT: string = `(function () {
       try {
         var originalOpen = XMLHttpRequest.prototype.open;
         XMLHttpRequest.prototype.open = function(method, url) {
+          var requestMethod = typeof method === 'string' ? method.toUpperCase() : 'GET';
           this.__airaVideoDeepProbeUrl = typeof url === 'string' ? url : '';
-          this.__airaVideoDeepProbeMethod = typeof method === 'string' ? method.toUpperCase() : 'GET';
-          this.addEventListener('readystatechange', function() {
-            try {
-              if (this.readyState !== 4 || this.status < 200 || this.status >= 300) return;
-              var contentType = this.getResponseHeader ? (this.getResponseHeader('content-type') || '') : '';
-              if (this.responseType && this.responseType !== '' && this.responseType !== 'text') {
-                if (this.responseType === 'blob') {
-                  maybeRecordBlobManifest(this.responseURL || this.__airaVideoDeepProbeUrl || '',
-                    this.response, 'manifest_text', contentType);
+          this.__airaVideoDeepProbeMethod = requestMethod;
+          var previousListener = this.__airaVideoDeepProbeReadyStateListener;
+          if (previousListener && typeof this.removeEventListener === 'function') {
+            try { this.removeEventListener('readystatechange', previousListener); } catch (_error) {}
+          }
+          this.__airaVideoDeepProbeReadyStateListener = undefined;
+          var xhr = this;
+          if (requestMethod === 'GET' || requestMethod === 'HEAD') {
+            var readyStateListener = function() {
+              try {
+                if (xhr.readyState !== 4 || xhr.status < 200 || xhr.status >= 300) return;
+                var responseUrl = xhr.responseURL || xhr.__airaVideoDeepProbeUrl || '';
+                var contentType = xhr.getResponseHeader ? (xhr.getResponseHeader('content-type') || '') : '';
+                var contentLength = parseContentLength(xhr.getResponseHeader ?
+                  xhr.getResponseHeader('content-length') : '');
+                if (xhr.responseType && xhr.responseType !== '' && xhr.responseType !== 'text') {
+                  if (xhr.responseType === 'blob' &&
+                    responseBodyScanLimit(responseUrl, contentType, contentLength) > 0) {
+                    maybeRecordBlobManifest(responseUrl, xhr.response, 'manifest_text', contentType);
+                  }
+                  return;
                 }
-                return;
+                if (responseBodyScanLimit(responseUrl, contentType, contentLength) <= 0) return;
+                var text = typeof xhr.responseText === 'string' ? xhr.responseText : '';
+                maybeRecordMediaResponse(responseUrl, text, 'manifest_text', contentType);
+              } catch (e) {
               }
-              var text = typeof this.responseText === 'string' ? this.responseText : '';
-              maybeRecordMediaResponse(this.responseURL || this.__airaVideoDeepProbeUrl || '', text, 'manifest_text', contentType);
-            } catch (e) {
-            }
-          });
+            };
+            this.__airaVideoDeepProbeReadyStateListener = readyStateListener;
+            this.addEventListener('readystatechange', readyStateListener);
+          }
           return originalOpen.apply(this, arguments);
         };
         XMLHttpRequest.prototype.open.toString = function() { return originalOpen.toString(); };
@@ -592,11 +728,18 @@ const DEEP_PROBE_SCRIPT: string = `(function () {
           }
           return originalFetch.apply(this, arguments).then(function(response) {
             try {
-              var clone = response.clone();
-              var contentType = clone.headers && clone.headers.get ? (clone.headers.get('content-type') || '') : '';
-              clone.text().then(function(text) {
-                maybeRecordMediaResponse(response.url || requestUrl, text, 'manifest_text', contentType);
-              }).catch(function() {});
+              var responseUrl = response.url || requestUrl;
+              var contentType = response.headers && response.headers.get ?
+                (response.headers.get('content-type') || '') : '';
+              var contentLength = parseContentLength(response.headers && response.headers.get ?
+                response.headers.get('content-length') : '');
+              var maxBytes = responseBodyScanLimit(responseUrl, contentType, contentLength);
+              if (maxBytes > 0) {
+                var clone = response.clone();
+                readFetchResponsePrefix(clone, maxBytes, function(text) {
+                  maybeRecordMediaResponse(responseUrl, text, 'manifest_text', contentType);
+                });
+              }
             } catch (e) {
             }
             return response;
@@ -639,19 +782,6 @@ const DEEP_PROBE_SCRIPT: string = `(function () {
       } catch (e) {
       }
       try {
-        var originalDecode = TextDecoder.prototype.decode;
-        TextDecoder.prototype.decode = function() {
-          var text = originalDecode.apply(this, arguments);
-          try {
-            maybeRecordMediaResponse('', text, 'manifest_text', 'application/vnd.apple.mpegurl');
-          } catch (e) {
-          }
-          return text;
-        };
-        TextDecoder.prototype.decode.toString = function() { return originalDecode.toString(); };
-      } catch (e) {
-      }
-      try {
         window.__airaMediaDiagnosticEvents = window.__airaMediaDiagnosticEvents || [];
         var eventNames = ['loadstart', 'loadedmetadata', 'canplay', 'playing', 'waiting', 'stalled', 'suspend', 'abort', 'emptied', 'error'];
         eventNames.forEach(function(name) {
@@ -682,9 +812,11 @@ const DEEP_PROBE_SCRIPT: string = `(function () {
       var normalizedText = normalizeText(text);
       mediaUrlPattern.lastIndex = 0;
       var match;
-      while ((match = mediaUrlPattern.exec(normalizedText)) !== null && results.length < 80) {
+      while ((match = mediaUrlPattern.exec(normalizedText)) !== null && results.length < 80 &&
+        hasResponseScanBudget()) {
         addResult(match[0], source || 'script_text', { signal: signal || 'script_text' });
       }
+      if (!hasResponseScanBudget()) return;
       addManifestText(normalizedText, source || 'manifest_text');
       scanStructuredMediaFields(normalizedText, source || 'script_text', signal || 'script_text');
       scanPlayerMethodMediaUrls(normalizedText, source || 'script_text', signal || 'script_text');
@@ -695,7 +827,8 @@ const DEEP_PROBE_SCRIPT: string = `(function () {
     function scanEncodedPlayerFields(text, source, signal) {
       var fieldPattern = /["']([A-Za-z_$][A-Za-z0-9_$-]{0,63})["']\\s*:\\s*["']([A-Za-z0-9+/=_-]{24,})["']/ig;
       var match;
-      while ((match = fieldPattern.exec(String(text || ''))) !== null && results.length < 80) {
+      while ((match = fieldPattern.exec(String(text || ''))) !== null && results.length < 80 &&
+        hasResponseScanBudget()) {
         if (!isMediaFieldName(match[1])) continue;
         var decoded = decodeBase64UrlText(match[2] || '');
         if (decoded) {
@@ -708,9 +841,11 @@ const DEEP_PROBE_SCRIPT: string = `(function () {
       var normalizedText = normalizeText(text);
       mediaUrlPattern.lastIndex = 0;
       var match;
-      while ((match = mediaUrlPattern.exec(normalizedText)) !== null && results.length < 80) {
+      while ((match = mediaUrlPattern.exec(normalizedText)) !== null && results.length < 80 &&
+        hasResponseScanBudget()) {
         addResult(match[0], source || 'script_text', { signal: signal || 'script_text' });
       }
+      if (!hasResponseScanBudget()) return;
       addManifestText(normalizedText, source || 'manifest_text');
       scanStructuredMediaFields(normalizedText, source || 'script_text', signal || 'script_text');
       scanPlayerMethodMediaUrls(normalizedText, source || 'script_text', signal || 'script_text');
@@ -1659,22 +1794,22 @@ __AIRA_XLPLAYER_LINES_RUNTIME_FRAGMENT__
         pairedAudioIndexRange: runtimeItem.pairedAudioIndexRange || undefined
       });
     }
-    if (strategyEnabled('player_adapters')) {
+    if (allowStaticScan && strategyEnabled('player_adapters')) {
       scanVideoJsPlayers();
       scanArtPlayerInstances();
       scanJwPlayerInstances();
       scanDPlayerInstances();
     }
-    if (strategyEnabled('metadata')) {
+    if (allowStaticScan && strategyEnabled('metadata')) {
       scanMetaMediaTags();
       scanEmbeddedPlayerEntries();
       scanJsonLdScripts();
     }
-    if (strategyEnabled('player_configs')) {
+    if (allowStaticScan && strategyEnabled('player_configs')) {
       scanLikelyPlayerConfigNodes();
       scanKnownGlobalConfigs();
     }
-    if (strategyEnabled('vendor_adapters')) scanXlPlayerLinesEndpoint();
+    if (allowStaticScan && strategyEnabled('vendor_adapters')) scanXlPlayerLinesEndpoint();
     scanMediaElements();
     if (strategyEnabled('performance_entries')) scanPerformanceEntries();
     if (strategyEnabled('location')) scanTextForUrls(location.href || '', 'dom', 'location');

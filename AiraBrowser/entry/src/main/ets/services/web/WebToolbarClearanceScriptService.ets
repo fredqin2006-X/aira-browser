@@ -72,10 +72,15 @@ export class WebToolbarClearanceScriptService {
             if (runtime.observer) runtime.observer.disconnect();
             runtime.observedBody = document.body;
             runtime.observer = new MutationObserver(function() {
+              var costStarted = Date.now();
+              try {
               if (!(runtime.px > 0) || runtime.locked()) return;
               if (!document.body) return;
               if (runtime.observedBody !== document.body) runtime.bind();
               if (document.getElementById(id) === null) runtime.insert(runtime.px);
+              } finally {
+                if (window.__airaFreezeCostAdd) window.__airaFreezeCostAdd('toolbarObs', costStarted);
+              }
             });
             runtime.observer.observe(document.body, { childList: true });
             if (document.documentElement) {

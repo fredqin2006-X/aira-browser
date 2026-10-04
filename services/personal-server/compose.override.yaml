@@ -1,0 +1,6 @@
+# Local test only. Publishes the server on this machine's LAN interfaces.
+# Not for internet exposure. The committed compose.yaml keeps the loopback bind.
+services:
+  aira-server:
+    ports: !override
+      - "8787:8787"

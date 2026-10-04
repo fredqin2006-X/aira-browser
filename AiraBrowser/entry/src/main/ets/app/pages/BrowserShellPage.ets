@@ -395,6 +395,7 @@ import {
   BrowserSearchSuggestionSnapshot
 } from '../../core/browser/BrowserSearchSuggestionCoordinator';
 import { BrowserAdBlockCoordinator } from '../../core/browser/BrowserAdBlockCoordinator';
+import { BrowserWebStreamingRequestBypass } from '../../core/web/BrowserWebStreamingRequestBypass';
 import {
   BrowserSiteControlsApplicationShell,
   BrowserSiteControlsApplicationSnapshot,
@@ -3634,6 +3635,7 @@ struct BrowserShellPage {
         ),
         textZoomRatio: this.resolveEffectiveWebTextZoomRatio(),
         pullRefreshNestedScrollEnabled: this.browserPullRefreshCoordinator.isEnabledForActiveSurface(activeTab),
+        networkInterceptEnabled: this.browserSiteControlsRuntimeCoordinator.isNetworkInterceptEnabled(),
         callbacks: this.buildHostedWebNodeCallbacks()
       };
     },
@@ -7653,12 +7655,28 @@ struct BrowserShellPage {
       .pullToRefresh(this.browserPullRefreshCoordinator.isEnabledForActiveSurface())
       .refreshOffset(48)
       .pullUpToCancelRefresh(true)
+      .onGestureRecognizerJudgeBegin((event: BaseGestureEvent, current: GestureRecognizer,
+        _recognizers: Array<GestureRecognizer>): GestureJudgeResult => {
+        return this.judgeWebPullRefreshPan(event, current);
+      })
       .onStateChange((status: RefreshStatus) => {
         this.browserPullRefreshCoordinator.handleStatus(status);
       })
       .onRefreshing(() => {
         this.browserPullRefreshCoordinator.requestRefresh();
       })
+  }
+
+  private judgeWebPullRefreshPan(event: BaseGestureEvent, current: GestureRecognizer): GestureJudgeResult {
+    if (!current.isBuiltIn() || current.getType() !== GestureControl.GestureType.PAN_GESTURE) {
+      return GestureJudgeResult.CONTINUE;
+    }
+    const pan = event as PanGestureEvent;
+    return this.browserPullRefreshCoordinator.shouldClaimVerticalPan(
+      this.browserWebScrollInteractionCoordinator.getLastScrollY(),
+      pan.offsetX,
+      pan.offsetY
+    ) ? GestureJudgeResult.CONTINUE : GestureJudgeResult.REJECT;
   }
 
   @Builder
@@ -11956,6 +11974,9 @@ struct BrowserShellPage {
   }
 
   private handleInterceptRequest(tabId: string, event: OnInterceptRequestEvent): WebResourceResponse | null {
+    if (this.shouldLeaveStreamingRequestToKernel(event.request)) {
+      return null;
+    }
     const htmlFileResponse = this.documentViewerService.tryBuildHtmlFileResponse(event.request);
     if (htmlFileResponse !== null) {
       return htmlFileResponse;
@@ -11975,6 +11996,37 @@ struct BrowserShellPage {
       }, this.browserMediaDiscoveryHost);
     }
     return response;
+  }
+
+  private shouldLeaveStreamingRequestToKernel(request: WebResourceRequest): boolean {
+    let url = '';
+    try {
+      url = request.getRequestUrl();
+    } catch (_error) {
+      url = '';
+    }
+    if (BrowserWebStreamingRequestBypass.isEventStreamUrl(url)) {
+      return true;
+    }
+    return BrowserWebStreamingRequestBypass.acceptsEventStream(this.readRequestAcceptHeader(request));
+  }
+
+  private readRequestAcceptHeader(request: WebResourceRequest): string {
+    try {
+      const headers = request.getRequestHeader();
+      if (headers === undefined || headers === null) {
+        return '';
+      }
+      for (let index = 0; index < headers.length; index += 1) {
+        const key = headers[index].headerKey?.trim().toLowerCase() ?? '';
+        if (key === 'accept') {
+          return headers[index].headerValue?.trim() ?? '';
+        }
+      }
+    } catch (_error) {
+      return '';
+    }
+    return '';
   }
 
   private buildMediaDiscoveryRuntimeContext(): BrowserMediaDiscoveryRuntimeContext {

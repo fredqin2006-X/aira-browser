@@ -493,6 +493,10 @@ export class BrowserSiteControlsRuntimeCoordinator {
     this.protectionFeedbackSessionCoordinator.clearPrivateSessions();
   }
 
+  isNetworkInterceptEnabled(): boolean {
+    return this.adBlockCoordinator.isProtectionEnabled();
+  }
+
   handleInterceptRequest(tabId: string, request: WebResourceRequest): WebResourceResponse | null {
     const context = this.resolveApplicationContext(tabId);
     const response = this.adBlockCoordinator.handleInterceptRequest({

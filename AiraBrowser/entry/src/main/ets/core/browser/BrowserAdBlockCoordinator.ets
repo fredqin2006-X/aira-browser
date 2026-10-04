@@ -773,6 +773,10 @@ export class BrowserAdBlockCoordinator {
     };
   }
 
+  isProtectionEnabled(): boolean {
+    return this.repository.getSettings().preferences.enabled === true;
+  }
+
   resolvePrivacyCoverage(context: BrowserAdBlockPageRuntimeContext): BrowserAdBlockPrivacyCoverageResult {
     const snapshot = this.resolveSnapshot();
     const policy = this.resolveEffectivePagePolicy(snapshot, context);

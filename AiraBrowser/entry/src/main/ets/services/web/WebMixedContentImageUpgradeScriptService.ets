@@ -186,6 +186,8 @@ const MIXED_CONTENT_IMAGE_UPGRADE_SCRIPT: string = `
     originalSetAttribute = Element.prototype.setAttribute;
     try {
       Element.prototype.setAttribute = function (name, value) {
+        var costStarted = Date.now();
+        try {
         var normalizedName = String(name || '').toLowerCase();
         if (normalizedName === 'style' ||
           (isImageResourceElement(this) && (normalizedName === 'src' || normalizedName === 'srcset')) ||
@@ -194,6 +196,9 @@ const MIXED_CONTENT_IMAGE_UPGRADE_SCRIPT: string = `
           return originalSetAttribute.call(this, name, upgradeValue(normalizedName, value));
         }
         return originalSetAttribute.call(this, name, value);
+        } finally {
+          if (window.__airaFreezeCostAdd) window.__airaFreezeCostAdd('mixedSet', costStarted);
+        }
       };
     } catch (_error) {
     }
@@ -219,7 +224,12 @@ const MIXED_CONTENT_IMAGE_UPGRADE_SCRIPT: string = `
       var originalSetProperty = stylePrototype.setProperty;
       try {
         stylePrototype.setProperty = function (name, value, priority) {
-          return originalSetProperty.call(this, name, upgradeCssUrls(value), priority);
+          var costStarted = Date.now();
+          try {
+            return originalSetProperty.call(this, name, upgradeCssUrls(value), priority);
+          } finally {
+            if (window.__airaFreezeCostAdd) window.__airaFreezeCostAdd('mixedCss', costStarted);
+          }
         };
       } catch (_error) {
       }
@@ -228,6 +238,8 @@ const MIXED_CONTENT_IMAGE_UPGRADE_SCRIPT: string = `
 
   try {
     var observer = new MutationObserver(function (records) {
+      var costStarted = Date.now();
+      try {
       for (var recordIndex = 0; recordIndex < records.length; recordIndex += 1) {
         var record = records[recordIndex];
         if (record.type === 'attributes') {
@@ -237,6 +249,9 @@ const MIXED_CONTENT_IMAGE_UPGRADE_SCRIPT: string = `
         for (var nodeIndex = 0; nodeIndex < record.addedNodes.length; nodeIndex += 1) {
           scan(record.addedNodes[nodeIndex]);
         }
+      }
+      } finally {
+        if (window.__airaFreezeCostAdd) window.__airaFreezeCostAdd('mixedObs', costStarted);
       }
     });
     observer.observe(document, {

@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.6.1 (1000491)
+
+2026-10-04
+
+This release remembers zoom for each site, lets you arrange the toolbar, and separates the computer-link switches.
+
+- Each site remembers its text size and page zoom.
+- Bottom-bar tools can be arranged from the add sheet, and the current address appears in the toolbar.
+- The page pauses while Huawei payment is opening, so it is harder to tap the wrong thing.
+- Membership cannot be purchased while signed out.
+- Tabs remain after the system closes the app.
+- Tabs, bookmarks, and history can be switched separately when linking with a computer. The scrolling computer-icon hint moves to the top.
+- Private deployment can connect every device with the same pairing code.
+
 ## 3.5.4 (1000485)
 
 2026-10-01

@@ -252,11 +252,11 @@ CHANGELOG_SECTION_EN="$(read_current_changelog_section "${COMMUNITY_CHANGELOG_EN
   fail "Could not read the current section of $(basename "${COMMUNITY_CHANGELOG_EN}") (see the error above)."
 [ -n "${CHANGELOG_SECTION_EN}" ] ||
   fail "$(basename "${COMMUNITY_CHANGELOG_EN}") has no readable current section."
+EXPECTED_HEADING="${APP_VERSION_NAME} (${APP_VERSION_CODE})"
 CHANGELOG_HEADING_EN="$(printf '%s\n' "${CHANGELOG_SECTION_EN}" | sed -n '1p' | sed 's/^##[[:space:]]*//')"
 [ "${CHANGELOG_HEADING_EN}" = "${EXPECTED_HEADING}" ] ||
   fail "the newest section of $(basename "${COMMUNITY_CHANGELOG_EN}") is '${CHANGELOG_HEADING_EN}' while the app is ${EXPECTED_HEADING}. Keep the English changelog in step with the Chinese one."
 CHANGELOG_HEADING="$(printf '%s\n' "${CHANGELOG_SECTION}" | sed -n '1p' | sed 's/^##[[:space:]]*//')"
-EXPECTED_HEADING="${APP_VERSION_NAME} (${APP_VERSION_CODE})"
 [ "${CHANGELOG_HEADING}" = "${EXPECTED_HEADING}" ] ||
   fail "the newest section of $(basename "${COMMUNITY_CHANGELOG}") is '${CHANGELOG_HEADING}' while the app is ${EXPECTED_HEADING}. Add the current version's section first."
 

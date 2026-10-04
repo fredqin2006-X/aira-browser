@@ -43,6 +43,7 @@ export interface BrowserWebHostSyncInput {
   forceEnableWebZoom?: boolean;
   textZoomRatio?: number;
   pullRefreshNestedScrollEnabled?: boolean;
+  networkInterceptEnabled?: boolean;
   callbacks: HostedWebNodeCallbacks;
 }
 
@@ -58,6 +59,7 @@ export interface BrowserWebHostConfigUpdateInput {
   forceEnableWebZoom?: boolean;
   textZoomRatio?: number;
   pullRefreshNestedScrollEnabled?: boolean;
+  networkInterceptEnabled?: boolean;
   callbacks: HostedWebNodeCallbacks;
 }
 
@@ -198,6 +200,7 @@ export class BrowserWebHostCoordinator {
       input.forceEnableWebZoom,
       input.textZoomRatio,
       input.pullRefreshNestedScrollEnabled,
+      input.networkInterceptEnabled,
       input.callbacks
     );
     const attachResult = this.attachController(
@@ -214,6 +217,7 @@ export class BrowserWebHostCoordinator {
       input.forceEnableWebZoom,
       input.textZoomRatio,
       input.pullRefreshNestedScrollEnabled,
+      input.networkInterceptEnabled,
       input.callbacks,
       ensureResult
     );
@@ -268,6 +272,7 @@ export class BrowserWebHostCoordinator {
       input.forceEnableWebZoom,
       input.textZoomRatio,
       false,
+      input.networkInterceptEnabled,
       input.callbacks
     );
     const attachResult = this.attachController(
@@ -284,6 +289,7 @@ export class BrowserWebHostCoordinator {
       input.forceEnableWebZoom,
       input.textZoomRatio,
       false,
+      input.networkInterceptEnabled,
       input.callbacks,
       ensureResult
     );
@@ -342,6 +348,7 @@ export class BrowserWebHostCoordinator {
       forceEnableWebZoom: input.forceEnableWebZoom,
       textZoomRatio: input.textZoomRatio,
       pullRefreshNestedScrollEnabled: input.pullRefreshNestedScrollEnabled === true,
+      networkInterceptEnabled: input.networkInterceptEnabled !== false,
       callbacks: this.bindCallbacksToCurrentNodeGeneration(activeTab.id, input.callbacks)
     });
     return true;
@@ -443,6 +450,7 @@ export class BrowserWebHostCoordinator {
     forceEnableWebZoom: boolean | undefined,
     textZoomRatio: number | undefined,
     pullRefreshNestedScrollEnabled: boolean | undefined,
+    networkInterceptEnabled: boolean | undefined,
     callbacks: HostedWebNodeCallbacks
   ): BrowserWebHostEnsureResult {
     const runtimeSecurityPolicy = this.resolveRuntimeSecurityPolicy(tab);
@@ -471,6 +479,7 @@ export class BrowserWebHostCoordinator {
       forceEnableWebZoom: forceEnableWebZoom,
       textZoomRatio: textZoomRatio,
       pullRefreshNestedScrollEnabled: pullRefreshNestedScrollEnabled === true,
+      networkInterceptEnabled: networkInterceptEnabled !== false,
       callbacks: callbacks
     };
     const existingController = this.hostedWebNodeControllers[tab.id];
@@ -517,6 +526,7 @@ export class BrowserWebHostCoordinator {
     forceEnableWebZoom: boolean | undefined,
     textZoomRatio: number | undefined,
     pullRefreshNestedScrollEnabled: boolean | undefined,
+    networkInterceptEnabled: boolean | undefined,
     callbacks: HostedWebNodeCallbacks,
     ensureResult: BrowserWebHostEnsureResult
   ): BrowserWebHostAttachResult {
@@ -574,6 +584,7 @@ export class BrowserWebHostCoordinator {
       forceEnableWebZoom: forceEnableWebZoom,
       textZoomRatio: textZoomRatio,
       pullRefreshNestedScrollEnabled: pullRefreshNestedScrollEnabled === true,
+      networkInterceptEnabled: networkInterceptEnabled !== false,
       callbacks: generationBoundCallbacks
     });
     this.hostedWebNodeControllers[tab.id] = rebuiltController;
