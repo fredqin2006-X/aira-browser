@@ -3,8 +3,8 @@ import { CrossDeviceTabPresencePanelStatus } from '../deviceTabs/CrossDeviceTabP
 import { CrossDeviceBrowserIconKind, resolveCrossDeviceBrowserIconKind } from './CrossDeviceBrowserIcon';
 
 /**
- * What a row on the 与电脑互联 page does when tapped. The page is a read-only
- * projection plus these jumps; it never owns sync state itself.
+ * What a row on the 与电脑互联 page does when tapped. The page projects presence and sync-owner
+ * state, and delegates writes to those owners rather than keeping duplicate state.
  */
 export type CrossDeviceLinkActionId =
   'open_sync_settings' |
@@ -60,6 +60,9 @@ export interface CrossDeviceLinkViewState {
   linkSwitchDescription: string;
   linkEnabled: boolean;
   linkSwitchEnabled: boolean;
+  bookmarkSyncEnabled: boolean;
+  historySyncEnabled: boolean;
+  historySyncSupported: boolean;
   /**
    * False when official cloud is blocked because this account is not an active member.
    * The empty-computer row and 添加设备 stay visible but inert, and 同步设置 is omitted.
@@ -191,12 +194,16 @@ const DEVICES_SIGNED_OUT_DETAIL: string = '电脑端登录后，这里会显示�
 
 const SELF_HOSTED_TITLE: string = '私有化部署';
 
-const LINK_SWITCH_TITLE: string = '与电脑互联';
-const LINK_SWITCH_DETAIL: string = '跨设备标签页和网页推送，和数据同步互不影响。';
+const LINK_SWITCH_TITLE: string = '标签页互通';
+const LINK_SWITCH_DETAIL: string = '在手机和电脑之间查看并推送标签页；书签和历史记录也可分别同步。';
 const SYNC_SETTINGS_TITLE: string = '同步设置';
 const SYNC_SETTINGS_VALUE_UNSET: string = '去开启同步';
 const ADD_DEVICE_ROW_TITLE: string = '添加设备';
 const ADD_DEVICE_ROW_DETAIL: string = '扫一扫电脑上的二维码';
+
+export function canSyncCrossDeviceContentProvider(providerKind: CrossDeviceLinkProviderKind): boolean {
+  return providerKind === 'aira_cloud' || providerKind === 'self_hosted';
+}
 
 export function localizeCrossDeviceLinkCopy(value: ResourceStr): ResourceStr {
   if (typeof value !== 'string') {
@@ -205,7 +212,10 @@ export function localizeCrossDeviceLinkCopy(value: ResourceStr): ResourceStr {
   if (value === '与电脑互联') {
     return $r('app.string.settings_sync_cross_device');
   }
-  if (value === '跨设备标签页和网页推送，和数据同步互不影响。') {
+  if (value === '标签页互通') {
+    return $r('app.string.settings_link_tabs_switch');
+  }
+  if (value === '在手机和电脑之间查看并推送标签页；书签和历史记录也可分别同步。') {
     return $r('app.string.settings_link_switch_detail');
   }
   if (value === '去开启同步') {
@@ -343,6 +353,12 @@ export function localizeCrossDeviceLinkCopy(value: ResourceStr): ResourceStr {
   if (value === '两边打开的网页都会出现在对方的跨设备标签页里。') {
     return $r('app.string.settings_link_guide_tabs_message');
   }
+  if (value === '电脑和手机同步更多内容') {
+    return $r('app.string.settings_link_guide_tabs_title');
+  }
+  if (value === '除了推送和查看标签页，还能在电脑与手机之间同步书签和历史记录。') {
+    return $r('app.string.settings_link_guide_tabs_message');
+  }
   if (value === '下一个') {
     return $r('app.string.settings_link_guide_next');
   }
@@ -410,6 +426,9 @@ export class CrossDeviceLinkViewModel {
       // A blocked switch is shown off. The saved preference stays where the presence owner left it.
       linkEnabled: facts.linkEnabled && this.resolveDisplayedLinkSwitchEnabled(facts),
       linkSwitchEnabled: this.resolveDisplayedLinkSwitchEnabled(facts),
+      bookmarkSyncEnabled: facts.bookmarkSyncEnabled,
+      historySyncEnabled: facts.historySyncEnabled,
+      historySyncSupported: facts.historySyncSupported,
       deviceActionsEnabled: this.resolveDeviceActionsEnabled(facts),
       syncSettingsValue: this.resolveSyncSettingsValue(facts),
       localDeviceRow: this.buildLocalDeviceRow(facts.localDevice),

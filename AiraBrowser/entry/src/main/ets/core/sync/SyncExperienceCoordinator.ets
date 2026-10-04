@@ -85,6 +85,7 @@ import {
 import { SyncWebdavProviderRole } from './SyncWebdavConfigViewModel';
 import { SyncFailurePresentationService } from './SyncFailurePresentationService';
 import { WebNetworkAvailabilityService } from '../../services/web/WebNetworkAvailabilityService';
+import { canSyncCrossDeviceContentProvider } from './CrossDeviceLinkViewModel';
 
 export type SyncExperienceActionOutcomeType =
   | 'completed'
@@ -433,7 +434,10 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
         return {
           type: 'confirmation-required',
           title: $r('app.string.settings_sync_change_method_title'),
-          message: this.resolveGoalChangeConfirmMessage(remoteKind),
+          message: this.resolveGoalChangeConfirmMessage(
+            remoteKind,
+            this.willDisableCrossDeviceContent(context, remoteKind)
+          ),
           remoteKind: remoteKind
         };
       }
@@ -463,6 +467,7 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
           return switchResult;
         }
         providerSwitchMessage = switchOutcome.message;
+        await this.reconcileCrossDeviceContentProvider(remoteKind);
       }
       const switchLines = providerSwitchMessage.length > 0
         ? this.syncFailurePresentationService.localizeProviderMessageLines(providerSwitchMessage)
@@ -691,7 +696,11 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
   async selectAdvancedProvider(
     remoteKind: AiraSyncRemoteKind
   ): Promise<SyncExperienceProviderSelectionPresentation> {
-    return this.advancedOperations.selectProvider(remoteKind);
+    const presentation = await this.advancedOperations.selectProvider(remoteKind);
+    if (presentation.type === 'selected') {
+      await this.reconcileCrossDeviceContentProvider(remoteKind);
+    }
+    return presentation;
   }
 
   async setMasterEnabled(enabled: boolean): Promise<SyncExperienceActionOutcome> {
@@ -861,7 +870,48 @@ export class SyncExperienceCoordinator implements AiraCloudBookmarkV4BootstrapTr
     return $r('app.string.settings_sync_history_kept_remote');
   }
 
-  private resolveGoalChangeConfirmMessage(remoteKind: AiraSyncProviderKind): ResourceStr {
+  private async reconcileCrossDeviceContentProvider(remoteKind: AiraSyncRemoteKind): Promise<void> {
+    if (remoteKind === 'none' || canSyncCrossDeviceContentProvider(remoteKind)) {
+      return;
+    }
+    const settings = this.syncService.getAiraSyncSettings();
+    const state = this.experienceStateStore.getState();
+    if (settings.bookmarkSyncEnabled === true) {
+      const outcome = await this.providerOperations.setBookmarkDomainEnabled(false);
+      if (outcome.type !== 'bookmark-domain-disabled') {
+        throw new Error(outcome.message);
+      }
+    }
+    if (state.bookmarkSelected || settings.bookmarkSyncEnabled === true) {
+      await this.experienceStateStore.setBookmarkSelected(false);
+    }
+    if (state.historySelected) {
+      await this.experienceStateStore.setHistorySelected(false);
+      this.automaticRuntime.cancelHistoryAutomaticSync();
+    }
+  }
+
+  private willDisableCrossDeviceContent(
+    context: SyncExperienceContext,
+    remoteKind: AiraSyncProviderKind
+  ): boolean {
+    if (canSyncCrossDeviceContentProvider(remoteKind)) {
+      return false;
+    }
+    return context.settings.bookmarkSyncEnabled === true || context.experienceState.bookmarkSelected ||
+      context.experienceState.historySelected;
+  }
+
+  private resolveGoalChangeConfirmMessage(
+    remoteKind: AiraSyncProviderKind,
+    disablesCrossDeviceContent: boolean = false
+  ): ResourceStr {
+    if (disablesCrossDeviceContent) {
+      if (remoteKind === 'huawei_space') {
+        return $r('app.string.settings_sync_change_to_huawei_cross_device');
+      }
+      return $r('app.string.settings_sync_change_to_webdav_cross_device');
+    }
     return this.resolveNamedGoalMessage(
       remoteKind,
       $r('app.string.settings_sync_change_to_cloud'),

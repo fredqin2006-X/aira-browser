@@ -410,6 +410,7 @@ export struct SyncExperienceHost {
       .finally(() => {
         this.isBusy = false;
         this.refreshState();
+        new SyncSettingsRefreshSignal().bump();
       });
   }
 
@@ -471,6 +472,7 @@ export struct SyncExperienceHost {
       .finally(() => {
         this.isBusy = false;
         this.refreshState();
+        new SyncSettingsRefreshSignal().bump();
       });
   }
 
@@ -488,6 +490,7 @@ export struct SyncExperienceHost {
       .finally(() => {
         this.isBusy = false;
         this.refreshState();
+        new SyncSettingsRefreshSignal().bump();
       });
   }
 

@@ -54,6 +54,8 @@ const DEVICE_GLYPH: AiraRenderableIconId = 'browser.toolbar.tabs';
 const ADD_DEVICE_GLYPH: AiraRenderableIconId = 'browser.toolbar.scanQr';
 const EXTENSION_GLYPH: AiraRenderableIconId = 'site.setting.externalActions';
 const LINK_SWITCH_GLYPH: AiraRenderableIconId = 'browser.toolbar.sendToDesktop';
+const BOOKMARK_SWITCH_GLYPH: AiraRenderableIconId = 'browser.shortcut.bookmarks';
+const HISTORY_SWITCH_GLYPH: AiraRenderableIconId = 'browser.shortcut.history';
 const SELF_HOSTED_GLYPH: AiraRenderableIconId = 'settings.webdav';
 const LOCAL_DEVICE_GLYPH: AiraRenderableIconId = 'crossDeviceLink.localDevice';
 
@@ -97,8 +99,10 @@ export struct CrossDeviceLinkScreen {
   onBack: () => void = (): void => {};
   onOpenSetup: () => void = (): void => {};
   onOpenDeviceTabs: (deviceId: string) => void = (_deviceId: string): void => {};
-  /** This page's own cross-device switch; it never writes data-sync state. */
+  /** The tab interconnect switch; it never writes bookmark or history state. */
   onToggleLink: (enabled: boolean) => void = (_enabled: boolean): void => {};
+  onToggleBookmark: (enabled: boolean) => void = (_enabled: boolean): void => {};
+  onToggleHistory: (enabled: boolean) => void = (_enabled: boolean): void => {};
   onAction: (action: CrossDeviceLinkActionId) => void = (_action: CrossDeviceLinkActionId) => {};
   private contentScroller: Scroller = new Scroller();
   @State private marqueeOffset0: number = 0;
@@ -419,8 +423,9 @@ export struct CrossDeviceLinkScreen {
   }
 
   /**
-   * The switch and the tutorial share the top card. The switch is first; the recipe still
-   * lives one level down, so the overview stays a status page.
+   * The three switches share their authoritative content state with 数据同步. The tab switch
+   * stays owned by the presence coordinator; bookmark and history changes go through the sync
+   * coordinator so both pages update together.
    */
   @Builder
   private buildSetupSection() {
@@ -432,9 +437,7 @@ export struct CrossDeviceLinkScreen {
         surfaceColor: this.storedSurfaceBackgroundColor,
         desktopPresentation: this.desktopPresentation
       }) {
-        // Rebuilt from the authoritative value whenever an attempt settles, because a refused
-        // change cannot move the boolean and ArkUI would not re-apply `isOn` on its own.
-        ForEach([`${this.state.linkEnabled}:${this.switchSettledRevision}`], (_key: string) => {
+        ForEach([`${this.state.linkEnabled}:${this.state.bookmarkSyncEnabled}:${this.state.historySyncEnabled}:${this.switchSettledRevision}`], (_key: string) => {
           SettingsSwitchRow({
             title: localizeCrossDeviceLinkCopy(this.state.linkSwitchTitle),
             checked: this.state.linkEnabled,
@@ -453,7 +456,40 @@ export struct CrossDeviceLinkScreen {
         }, (key: string): string => key)
 
         SettingsGroupDivider({ dividerColor: this.storedDividerColor })
+        SettingsSwitchRow({
+          title: $r('app.string.settings_sync_bookmarks'),
+          checked: this.state.bookmarkSyncEnabled,
+          airaIconId: BOOKMARK_SWITCH_GLYPH,
+          iconBackgroundColor: this.settingsIconBackgrounds.bookmarks,
+          iconColor: this.storedSettingsIconForegroundColor,
+          rowPosition: 'middle',
+          isEnabled: !this.isBusy,
+          primaryTextColor: this.storedPrimaryTextColor,
+          secondaryTextColor: this.storedSecondaryTextColor,
+          desktopPresentation: this.desktopPresentation,
+          onChange: (checked: boolean): void => {
+            this.onToggleBookmark(checked);
+          }
+        })
 
+        SettingsGroupDivider({ dividerColor: this.storedDividerColor })
+        SettingsSwitchRow({
+          title: $r('app.string.settings_sync_history'),
+          checked: this.state.historySyncSupported && this.state.historySyncEnabled,
+          airaIconId: HISTORY_SWITCH_GLYPH,
+          iconBackgroundColor: this.settingsIconBackgrounds.history,
+          iconColor: this.storedSettingsIconForegroundColor,
+          rowPosition: 'middle',
+          isEnabled: !this.isBusy,
+          primaryTextColor: this.storedPrimaryTextColor,
+          secondaryTextColor: this.storedSecondaryTextColor,
+          desktopPresentation: this.desktopPresentation,
+          onChange: (checked: boolean): void => {
+            this.onToggleHistory(checked);
+          }
+        })
+
+        SettingsGroupDivider({ dividerColor: this.storedDividerColor })
         SettingsNavigationRow({
           title: $r('app.string.settings_link_tutorial'),
           value: $r('app.string.settings_link_view_steps'),

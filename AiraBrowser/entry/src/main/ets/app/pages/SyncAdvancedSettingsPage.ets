@@ -76,7 +76,7 @@ import {
   BROWSER_THEME_STORAGE_TEXT_PRIMARY_KEY
 } from '../../core/theme/BrowserThemeStorageKeys';
 import { AppServiceModeGateService } from '../../services/settings/AppServiceModeGateService';
-import { SYNC_SETTINGS_REFRESH_REVISION_KEY } from '../../core/sync/SyncSettingsRefreshSignal';
+import { SYNC_SETTINGS_REFRESH_REVISION_KEY, SyncSettingsRefreshSignal } from '../../core/sync/SyncSettingsRefreshSignal';
 
 @Entry
 @Component
@@ -624,9 +624,19 @@ struct SyncAdvancedSettingsPage {
     if (remoteKind === 'none') {
       return;
     }
+    const providerWarning = remoteKind === 'huawei_space'
+      ? resolveAppResourceText($r('app.string.settings_sync_change_to_huawei_cross_device'))
+      : remoteKind === 'webdav'
+        ? resolveAppResourceText($r('app.string.settings_sync_change_to_webdav_cross_device'))
+        : '';
+    const confirmationMessage = resolveAppResourceText(
+      this.syncAdvancedSettingsViewModel.resolveSwitchConfirmMessage(remoteKind)
+    );
     showCenteredAlertDialog({
       title: this.syncAdvancedSettingsViewModel.resolveSwitchConfirmTitle(remoteKind),
-      message: this.syncAdvancedSettingsViewModel.resolveSwitchConfirmMessage(remoteKind),
+      message: providerWarning.length > 0
+        ? `${confirmationMessage}\n\n${providerWarning}`
+        : confirmationMessage,
       autoCancel: true,
       primaryButton: {
         value: $r('app.string.settings_account_cancel'),
@@ -682,6 +692,7 @@ struct SyncAdvancedSettingsPage {
       })
       .finally(() => {
         this.isBusy = false;
+        new SyncSettingsRefreshSignal().bump();
       });
   }
 

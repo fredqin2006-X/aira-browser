@@ -117,6 +117,8 @@ export default function crossDeviceLinkGuideCoordinatorTest(): void {
 
       expect(fixture.coordinator.getSnapshot().visible).assertTrue();
       expect(fixture.coordinator.getSnapshot().clipId).assertEqual('device_tabs');
+      expect(fixture.coordinator.getSnapshot().title).assertEqual('电脑和手机同步更多内容');
+      expect(fixture.coordinator.getSnapshot().message.indexOf('书签和历史记录') >= 0).assertTrue();
       expect(fixture.coordinator.getSnapshot().primaryAction).assertEqual('open_guide');
       expect(fixture.coordinator.getSnapshot().primaryActionTitle).assertEqual('查看互联教程');
       expect(fixture.shell.openGuideCount).assertEqual(0);

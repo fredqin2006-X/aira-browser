@@ -47,8 +47,8 @@ const CROSS_DEVICE_LINK_GUIDE_STEPS: CrossDeviceLinkGuideStep[] = [
   },
   {
     clipId: 'device_tabs',
-    title: '两台设备互相看标签页',
-    message: '两边打开的网页都会出现在对方的跨设备标签页里。'
+    title: '电脑和手机同步更多内容',
+    message: '除了推送和查看标签页，还能在电脑与手机之间同步书签和历史记录。'
   }
 ];
 
@@ -58,8 +58,8 @@ const CROSS_DEVICE_LINK_GUIDE_SKIP_TITLE: string = '不再提示';
 
 /**
  * Teaches 与电脑互联 once per device, the first time that settings page is entered.
- * The first step only advances the clip. The second step's primary button opens the
- * existing 互联教程 page. Skipping or leaving does not open it.
+ * The first step covers page push. The second step covers tabs plus bookmark and history sync.
+ * The second step's primary button opens the existing 互联教程 page. Skipping or leaving does not open it.
  */
 export class CrossDeviceLinkGuideCoordinator {
   private readonly repository: CrossDeviceLinkGuideRepository;

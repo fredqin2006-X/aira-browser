@@ -2501,6 +2501,14 @@
       "value": "将改为“WebDAV 同步”。现有数据会安全合并；当前同步方式不会自动变成备份。需要备份时请单独开启。"
     },
     {
+      "name": "settings_sync_change_to_huawei_cross_device",
+      "value": "将改为“华为云空间”。切换后，与电脑互联中的书签和历史记录同步会关闭，无法继续在电脑端同步；现有数据不会删除。确定要切换吗？"
+    },
+    {
+      "name": "settings_sync_change_to_webdav_cross_device",
+      "value": "将改为“WebDAV 同步”。切换后，与电脑互联中的书签和历史记录同步会关闭，无法继续在电脑端同步；现有数据不会删除。确定要切换吗？"
+    },
+    {
       "name": "settings_sync_change_to_self_host",
       "value": "将改为“私有化部署”。现有数据会安全合并；当前同步方式不会自动变成备份。需要备份时请单独开启。"
     },
@@ -6614,7 +6622,23 @@
     },
     {
       "name": "settings_link_switch_detail",
-      "value": "跨设备标签页和网页推送，和数据同步互不影响。"
+      "value": "在手机和电脑之间查看并推送标签页；书签和历史记录也可分别同步。"
+    },
+    {
+      "name": "settings_link_tabs_switch",
+      "value": "标签页互通"
+    },
+    {
+      "name": "settings_link_content_provider_required_title",
+      "value": "需要切换同步方式"
+    },
+    {
+      "name": "settings_link_content_provider_required_message",
+      "value": "“%1$s”只有在使用 Aira 云同步或私有化部署时，才能与电脑互通。请先切换同步方式。"
+    },
+    {
+      "name": "settings_link_open_sync_settings",
+      "value": "去切换同步方式"
     },
     {
       "name": "settings_link_turn_on_sync",
@@ -7190,11 +7214,11 @@
     },
     {
       "name": "settings_link_guide_tabs_title",
-      "value": "两台设备互相看标签页"
+      "value": "电脑和手机同步更多内容"
     },
     {
       "name": "settings_link_guide_tabs_message",
-      "value": "两边打开的网页都会出现在对方的跨设备标签页里。"
+      "value": "除了推送和查看标签页，还能在电脑与手机之间同步书签和历史记录。"
     },
     {
       "name": "settings_link_guide_next",

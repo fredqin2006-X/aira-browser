@@ -19,7 +19,8 @@ import {
   CrossDeviceLinkProviderKind,
   CrossDeviceLinkViewState,
   CrossDeviceLinkViewModel,
-  canEnableCrossDeviceLinkSwitch
+  canEnableCrossDeviceLinkSwitch,
+  canSyncCrossDeviceContentProvider
 } from '../../../core/sync/CrossDeviceLinkViewModel';
 import {
   SyncExperienceGoalOption,
@@ -289,6 +290,12 @@ export struct CrossDeviceLinkHost {
           },
           onToggleLink: (enabled: boolean): void => {
             this.toggleLink(enabled);
+          },
+          onToggleBookmark: (enabled: boolean): void => {
+            this.toggleSyncContent('bookmark', enabled);
+          },
+          onToggleHistory: (enabled: boolean): void => {
+            this.toggleSyncContent('history', enabled);
           },
           onAction: (action: CrossDeviceLinkActionId): void => {
             this.handleAction(action);
@@ -586,9 +593,62 @@ export struct CrossDeviceLinkHost {
     this.navigationCoordinator.openSyncSettings(this.boundary);
   }
 
+  private toggleSyncContent(kind: 'bookmark' | 'history', enabled: boolean): void {
+    if (this.isTogglingLink || this.isAddingDevice) {
+      return;
+    }
+    if (enabled && !canSyncCrossDeviceContentProvider(this.providerKind)) {
+      this.showCrossDeviceContentProviderPrompt(kind);
+      return;
+    }
+    this.isTogglingLink = true;
+    const operation = kind === 'bookmark'
+      ? sharedSyncExperienceCoordinator.setBookmarkSelected(enabled)
+      : sharedSyncExperienceCoordinator.setHistorySelected(enabled);
+    operation.then((outcome): void => {
+      if (outcome.type !== 'completed') {
+        showCenteredAlertDialog({
+          title: outcome.title,
+          message: outcome.message,
+          autoCancel: true,
+          primaryButton: { value: $r('app.string.settings_account_cancel'), action: () => {} }
+        });
+      }
+    }).catch((): void => {
+      this.showToast($r('app.string.settings_sync_change_failed'));
+    }).finally((): void => {
+      this.isTogglingLink = false;
+      void this.refresh().then((): void => {
+        this.syncSwitchRevision += 1;
+      });
+    });
+  }
+
+  private showCrossDeviceContentProviderPrompt(kind: 'bookmark' | 'history'): void {
+    const content = kind === 'bookmark'
+      ? $r('app.string.settings_sync_bookmarks')
+      : $r('app.string.settings_sync_history');
+    showCenteredAlertDialog({
+      title: $r('app.string.settings_link_content_provider_required_title'),
+      message: $r('app.string.settings_link_content_provider_required_message', content),
+      autoCancel: true,
+      primaryButton: { value: $r('app.string.settings_account_cancel'), action: () => {} },
+      secondaryButton: {
+        value: $r('app.string.settings_link_open_sync_settings'),
+        action: (): void => {
+          if (this.onOpenSyncSettings !== undefined) {
+            this.onOpenSyncSettings();
+            return;
+          }
+          this.navigationCoordinator.openSyncSettings(this.boundary);
+        }
+      }
+    });
+  }
+
   /**
-   * This page's own switch: tab handoff and page push belong to the presence owner, not to the
-   * data sync owner, so flipping it never touches bookmarks, history, or personalization.
+   * This page's tab switch belongs to the presence owner. Content switches use the shared sync
+   * coordinator so their state is immediately reflected on 数据同步 as well.
    */
   private toggleLink(enabled: boolean): void {
     if (this.isTogglingLink || !this.viewState.linkSwitchEnabled) {

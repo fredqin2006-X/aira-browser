@@ -5,7 +5,8 @@ import {
   CrossDeviceLinkProviderKind,
   CrossDeviceLinkViewState,
   CrossDeviceLinkViewModel,
-  canEnableCrossDeviceLinkSwitch
+  canEnableCrossDeviceLinkSwitch,
+  canSyncCrossDeviceContentProvider
 } from '../main/ets/core/sync/CrossDeviceLinkViewModel';
 import { resolveCrossDeviceBrowserIconKind } from '../main/ets/core/sync/CrossDeviceBrowserIcon';
 import {
@@ -60,13 +61,21 @@ export default function crossDeviceLinkViewModelTest(): void {
     it('carries the cross-device switch and the sync row as two separate things', 0, () => {
       const state = buildState(buildFacts('aira_cloud'));
 
-      // The page owns the link switch; data sync is only a jump to its owner.
+      // The page projects the presence owner's tab switch and shared sync selections.
       expect(state.linkEnabled).assertTrue();
       expect(state.linkSwitchEnabled).assertTrue();
-      expect(state.linkSwitchTitle).assertEqual('与电脑互联');
+      expect(state.linkSwitchTitle).assertEqual('标签页互通');
       expect(state.syncSettingsValue).assertEqual('Aira 云');
       expect(state.addDeviceTitle).assertEqual('添加设备');
       expect(state.addDeviceDetail.length > 0).assertTrue();
+    });
+
+    it('limits computer content sync to Aira cloud and self-hosted providers', 0, () => {
+      expect(canSyncCrossDeviceContentProvider('aira_cloud')).assertTrue();
+      expect(canSyncCrossDeviceContentProvider('self_hosted')).assertTrue();
+      expect(canSyncCrossDeviceContentProvider('huawei_space')).assertFalse();
+      expect(canSyncCrossDeviceContentProvider('webdav')).assertFalse();
+      expect(canSyncCrossDeviceContentProvider('none')).assertFalse();
     });
 
     it('mirrors the presence owner link switch instead of keeping its own', 0, () => {
@@ -74,6 +83,17 @@ export default function crossDeviceLinkViewModelTest(): void {
       off.linkEnabled = false;
 
       expect(buildState(off).linkEnabled).assertFalse();
+    });
+
+    it('mirrors bookmark and history switch values from the sync owner', 0, () => {
+      const facts = buildFacts('aira_cloud');
+      facts.bookmarkSyncEnabled = false;
+      facts.historySyncEnabled = false;
+      const state = buildState(facts);
+
+      expect(state.bookmarkSyncEnabled).assertFalse();
+      expect(state.historySyncEnabled).assertFalse();
+      expect(state.historySyncSupported).assertTrue();
     });
 
     it('keeps pausing data sync independent from the cross-device link', 0, () => {

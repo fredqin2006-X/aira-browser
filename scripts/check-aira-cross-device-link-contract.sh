@@ -79,28 +79,28 @@ done
 # dependent capability is reached by jumping to the owner that already implements it.
 require_pattern "${VIEW_MODEL_REL}" "class CrossDeviceLinkViewModel" \
   "the page state must have one builder."
-# 数据同步 and 与电脑互联 are two separate channels: this page owns the cross-device switch
-# (tab handoff and page push) and only links to the sync owner for data sync. It must never
-# carry a second data-sync master switch, or pausing bookmarks would look like it also
-# stopped devices from talking.
-require_pattern "${VIEW_MODEL_REL}" "LINK_SWITCH_TITLE: string = '与电脑互联'" \
-  "the page's own switch must be the cross-device link, not data sync."
-require_pattern "${VIEW_MODEL_REL}" "linkEnabled: facts.linkEnabled" \
-  "the link switch must come from the presence owner, not the sync owner."
+# 与电脑互联 now exposes separate tab, bookmark and history switches. The content switches
+# reuse the sync owner's state; only tab presence remains owned by the presence coordinator.
+require_pattern "${VIEW_MODEL_REL}" "LINK_SWITCH_TITLE: string = '标签页互通'" \
+  "the presence switch must be named 标签页互通."
+require_pattern "${VIEW_MODEL_REL}" "bookmarkSyncEnabled: facts.bookmarkSyncEnabled" \
+  "the bookmark switch must project the shared sync selection."
+require_pattern "${VIEW_MODEL_REL}" "historySyncEnabled: facts.historySyncEnabled" \
+  "the history switch must project the shared sync selection."
+require_pattern "${VIEW_MODEL_REL}" "providerKind === 'aira_cloud' \|\| providerKind === 'self_hosted'" \
+  "computer content sync must only support Aira Cloud or private deployment."
 require_pattern "${HOST_REL}" "sharedCrossDeviceTabPresenceCoordinator.setCrossDeviceLinkEnabled\\(" \
-  "flipping the link switch must go through the presence owner."
-require_pattern "${HOST_REL}" "isCrossDeviceLinkEnabled\\(\\)" \
-  "the link switch state must be read from the presence owner."
-reject_pattern "${SCREEN_REL}" "同步所有内容" \
-  "the data-sync master switch must not be duplicated on this page."
-reject_pattern "${HOST_REL}" "setMasterEnabled" \
-  "this page must not write data-sync state at all."
-require_pattern "${SCREEN_REL}" "onChange: \\(checked: boolean\\): void =>" \
-  "the switch must forward the intent instead of writing state."
-require_pattern "${SCREEN_REL}" "switchSettledRevision: number = 0" \
-  "the screen must accept a settle signal for the switch."
-require_pattern "${SCREEN_REL}" "linkEnabled.*switchSettledRevision" \
-  "the switch row must be rebuilt from the authoritative value, not left on its flipped look."
+  "flipping the tab switch must go through the presence owner."
+require_pattern "${HOST_REL}" "sharedSyncExperienceCoordinator.setBookmarkSelected" \
+  "the bookmark switch must use the shared sync owner."
+require_pattern "${HOST_REL}" "sharedSyncExperienceCoordinator.setHistorySelected" \
+  "the history switch must use the shared sync owner."
+require_pattern "${HOST_REL}" "settings_link_content_provider_required_message" \
+  "enabling computer content sync on another provider must explain the provider requirement."
+require_pattern "${SCREEN_REL}" "this.onToggleBookmark\\(checked\\)" \
+  "the bookmark row must forward changes to its owner."
+require_pattern "${SCREEN_REL}" "this.onToggleHistory\\(checked\\)" \
+  "the history row must forward changes to its owner."
 require_pattern "${SCREEN_REL}" "this.onAction\\('open_sync_settings'\\)" \
   "the 同步设置 row must be the way out to the sync owner."
 require_pattern "${SCREEN_REL}" "if \\(this.state.deviceActionsEnabled\\)" \
@@ -142,7 +142,7 @@ require_pattern "${HOST_REL}" "sharedCrossDeviceTabPresenceCoordinator.loadPanel
 require_pattern "${HOST_REL}" "isAvailable\\('aira_cloud'\\)" \
   "the desktop link availability must be the Aira Cloud capability, not a local literal."
 reject_pattern "${HOST_REL}" "bookmarkSyncEnabled =|historySelected =|remoteKind =" \
-  "the page must never write sync state."
+  "the page must not write sync settings directly; it must use the sync coordinator."
 reject_pattern "${HOST_REL}" "https://" \
   "install links belong to the extension catalog service, not the host."
 
@@ -284,7 +284,7 @@ fi
 switch_line="$(grep -n 'this.onToggleLink' "${REPO_ROOT}/${SCREEN_REL}" | head -1 | cut -d: -f1)"
 tutorial_row_line="$(grep -n 'settings_link_tutorial' "${REPO_ROOT}/${SCREEN_REL}" | head -1 | cut -d: -f1)"
 if [ -z "${switch_line}" ] || [ -z "${tutorial_row_line}" ] || [ "${switch_line}" -ge "${tutorial_row_line}" ]; then
-  fail "the 与电脑互联 switch must sit above the 互联教程 row in the same card."
+  fail "the 标签页互通 switch must sit above the 互联教程 row in the same card."
 fi
 require_pattern "${SCREEN_REL}" "LINK_SWITCH_GLYPH: AiraRenderableIconId = 'browser.toolbar.sendToDesktop'" \
   "the cross-device switch must carry the same send-to-desktop icon as the settings entry."
