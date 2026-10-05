@@ -1,17 +1,13 @@
 {
   "enabled": true,
-  "noticeId": "aira-3.6.1-1000491",
-  "title": "Aira 3.6.1 update",
-  "updatedAt": "2026-10-04",
-  "summary": "This release remembers zoom for each site, lets you arrange the toolbar, and separates the computer-link switches.",
+  "noticeId": "aira-3.6.2-1000493",
+  "title": "Aira 3.6.2 update",
+  "updatedAt": "2026-10-05",
+  "summary": "This release fixes the freeze while a page is checked for video, and lets userscript dependencies install.",
   "items": [
-    "Each site remembers its text size and page zoom.",
-    "Bottom-bar tools can be arranged from the add sheet, and the current address appears in the toolbar.",
-    "The page pauses while Huawei payment is opening, so it is harder to tap the wrong thing.",
-    "Membership cannot be purchased while signed out.",
-    "Tabs remain after the system closes the app.",
-    "Tabs, bookmarks, and history can be switched separately when linking with a computer. The scrolling computer-icon hint moves to the top.",
-    "Private deployment can connect every device with the same pairing code."
+    "Search pages and similar pages no longer freeze for a few seconds while video is detected.",
+    "Installing a userscript now also stores its plain JavaScript dependency libraries instead of rejecting them for a missing userscript header.",
+    "Video detection uses less power and reports its result sooner."
   ],
   "actionLabel": "View changelog"
 }

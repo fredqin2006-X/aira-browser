@@ -1,14 +1,23 @@
 {
   "latestAppGalleryRelease": {
-    "versionName": "3.5.3",
-    "versionCode": 1000480,
-    "releasedAt": "2026-09-30",
+    "versionName": "3.6.2",
+    "versionCode": 1000493,
+    "releasedAt": "2026-10-05",
     "source": "formal-package-generated",
-    "notes": "Formal AppGallery package that offers long-term membership at the National Day price of ¥48 with a 7折 badge from October 1 through October 7, then restores the regular price. The membership page no longer lists the phone client, the launch screen no longer keeps the classic icon after an icon change, opening the tab list no longer squashes the page, and auto and solid wallpaper modes sync. Built from committed HEAD 637882b7 plus the 3.5.3 (1000480) version and release-note changes in the same working tree, signed with the Aira release certificate and the AppGallery release Profile for com.aira.browser, with crash symbols archived. The release-signed APP build passed, and the outer APP signature plus the packed release Profile were verified independently. This records a locally generated formal package and does not claim AppGallery review approval or on-shelf publication.",
-    "artifact": "AiraBrowser/build/outputs/default/Aira-official-v3.5.3-1000480-release-signed.app",
-    "sha256": "bc947e9c031125b3318b687f23fe2dffdd56a327c39343c96a96e9bc1efef470"
+    "notes": "Formal AppGallery package that fixes a multi-second freeze while a page is scanned for video, by leaving text/event-stream requests to the kernel, and installs a userscript's plain JavaScript @require dependencies instead of rejecting them for a missing userscript header. Video detection does less probe work and indexes its evidence. Built from committed HEAD 7a27077 plus the 3.6.2 (1000493) version and release-note changes in the same working tree, signed with the Aira release certificate and the AppGallery release Profile for com.aira.browser, with crash symbols archived. The release-signed APP build passed. This records a locally generated formal package and does not claim AppGallery review approval or on-shelf publication.",
+    "artifact": "AiraBrowser/build/outputs/default/Aira-official-v3.6.2-1000493-release-signed.app",
+    "sha256": "bd953dddca82301f472b41dba282bb678186e1967903c07ef2bdf348a13d17f1"
   },
   "history": [
+    {
+      "versionName": "3.6.2",
+      "versionCode": 1000493,
+      "releasedAt": "2026-10-05",
+      "source": "formal-package-generated",
+      "notes": "Formal AppGallery package that fixes a multi-second freeze while a page is scanned for video, by leaving text/event-stream requests to the kernel, and installs a userscript's plain JavaScript @require dependencies instead of rejecting them for a missing userscript header. Video detection does less probe work and indexes its evidence. Built from committed HEAD 7a27077 plus the 3.6.2 (1000493) version and release-note changes in the same working tree, signed with the Aira release certificate and the AppGallery release Profile for com.aira.browser, with crash symbols archived. The release-signed APP build passed. This records a locally generated formal package and does not claim AppGallery review approval or on-shelf publication.",
+      "artifact": "AiraBrowser/build/outputs/default/Aira-official-v3.6.2-1000493-release-signed.app",
+      "sha256": "bd953dddca82301f472b41dba282bb678186e1967903c07ef2bdf348a13d17f1"
+    },
     {
       "versionName": "3.5.3",
       "versionCode": 1000480,

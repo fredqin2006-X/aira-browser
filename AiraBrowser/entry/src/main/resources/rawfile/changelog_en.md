@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.6.2 (1000493)
+
+2026-10-05
+
+This release fixes the freeze while a page is checked for video, and lets userscript dependencies install.
+
+- Search pages and similar pages no longer freeze for a few seconds while video is detected.
+- Installing a userscript now also stores its plain JavaScript dependency libraries instead of rejecting them for a missing userscript header.
+- Video detection uses less power and reports its result sooner.
+
 ## 3.6.1 (1000491)
 
 2026-10-04
