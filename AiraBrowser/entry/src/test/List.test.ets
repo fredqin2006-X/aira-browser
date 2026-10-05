@@ -15,6 +15,8 @@ import browserArkWebMediaTakeoverRecoveryCharacterizationTest from
   './BrowserArkWebMediaTakeoverRecoveryCharacterization.test';
 import mediaSessionResolutionRuntimeServiceTest from './MediaSessionResolutionRuntimeService.test';
 import mediaPageBehaviorEvidenceAdapterTest from './MediaPageBehaviorEvidenceAdapter.test';
+import mediaTypeRulesTest from './MediaTypeRules.test';
+import mediaProbePolicyServiceTest from './MediaProbePolicyService.test';
 import browserTabletInterfaceModePolicyTest from './BrowserTabletInterfaceModePolicy.test';
 import browserCockpitWindowSpanPolicyTest from './BrowserCockpitWindowSpanPolicy.test';
 import browserCockpitAdaptationPolicyTest from './BrowserCockpitAdaptationPolicy.test';
@@ -133,6 +135,8 @@ export default function tests(): void {
   browserArkWebMediaTakeoverRecoveryCharacterizationTest();
   mediaSessionResolutionRuntimeServiceTest();
   mediaPageBehaviorEvidenceAdapterTest();
+  mediaTypeRulesTest();
+  mediaProbePolicyServiceTest();
   browserTabletInterfaceModePolicyTest();
   browserCockpitWindowSpanPolicyTest();
   browserCockpitAdaptationPolicyTest();

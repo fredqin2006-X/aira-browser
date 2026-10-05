@@ -12033,7 +12033,8 @@ struct BrowserShellPage {
     return this.browserMediaDiscoveryRuntimeContextFactory.build({
       fullAppServiceMode: this.isFullAppServiceMode(),
       cachedExperimentSettings: this.webScrollExperimentSettings,
-      mediaResourcesPanelOpen: this.browserTransientSurfaceCoordinator.isMounted('resource_candidates')
+      mediaResourcesPanelOpen: this.browserTransientSurfaceCoordinator.isMounted('resource_candidates'),
+      webPageVisible: this.isWebPageVisible()
     });
   }
 

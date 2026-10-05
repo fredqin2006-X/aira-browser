@@ -895,9 +895,25 @@ class MediaEvidenceCompatibilityReaderImpl implements MediaEvidenceCompatibility
   }
 
   projectSessionEvidence(now: number): MediaSessionEvidenceProjection {
+    const occurrencesByTarget: Map<string, MediaPlaybackOccurrenceEvidence[]> = new Map();
+    const unattachedOccurrences: MediaPlaybackOccurrenceEvidence[] = [];
+    for (let i = 0; i < this.state.playbackOccurrences.length; i++) {
+      const occurrence = this.state.playbackOccurrences[i];
+      const evidence = this.buildOccurrenceEvidence(occurrence);
+      if (occurrence.playbackTargetId === undefined) {
+        unattachedOccurrences.push(evidence);
+        continue;
+      }
+      const targetOccurrences = occurrencesByTarget.get(occurrence.playbackTargetId);
+      if (targetOccurrences === undefined) {
+        occurrencesByTarget.set(occurrence.playbackTargetId, [evidence]);
+      } else {
+        targetOccurrences.push(evidence);
+      }
+    }
     const targets: MediaSessionPlaybackTargetEvidence[] = [];
     this.state.playbackTargetsByKey.forEach((target: MediaPlaybackTargetState): void => {
-      const occurrences = this.buildTargetOccurrences(target.playbackTargetId);
+      const occurrences = occurrencesByTarget.get(target.playbackTargetId) ?? [];
       const frameDocuments = this.buildFrameDocuments(target.frameDocumentKeys);
       const currentRoute = this.hasCurrentRouteOccurrence(occurrences);
       const fresh = now - target.lastObservedAt <= PLAYBACK_EVIDENCE_FRESHNESS_MS;
@@ -931,7 +947,7 @@ class MediaEvidenceCompatibilityReaderImpl implements MediaEvidenceCompatibility
       scope: this.state.scope,
       revision: this.state.revision,
       targets: targets,
-      unattachedOccurrences: this.buildUnattachedOccurrences()
+      unattachedOccurrences: unattachedOccurrences
     };
     return projection;
   }
@@ -973,30 +989,6 @@ class MediaEvidenceCompatibilityReaderImpl implements MediaEvidenceCompatibility
       return 'expired';
     }
     return 'reachable';
-  }
-
-  private buildTargetOccurrences(playbackTargetId: string): MediaPlaybackOccurrenceEvidence[] {
-    const occurrences: MediaPlaybackOccurrenceEvidence[] = [];
-    for (let i = 0; i < this.state.playbackOccurrences.length; i++) {
-      const occurrence = this.state.playbackOccurrences[i];
-      if (occurrence.playbackTargetId !== playbackTargetId) {
-        continue;
-      }
-      occurrences.push(this.buildOccurrenceEvidence(occurrence));
-    }
-    return occurrences;
-  }
-
-  private buildUnattachedOccurrences(): MediaPlaybackOccurrenceEvidence[] {
-    const occurrences: MediaPlaybackOccurrenceEvidence[] = [];
-    for (let i = 0; i < this.state.playbackOccurrences.length; i++) {
-      const occurrence = this.state.playbackOccurrences[i];
-      if (occurrence.playbackTargetId !== undefined) {
-        continue;
-      }
-      occurrences.push(this.buildOccurrenceEvidence(occurrence));
-    }
-    return occurrences;
   }
 
   private buildOccurrenceEvidence(

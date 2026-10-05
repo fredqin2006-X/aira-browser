@@ -67,12 +67,12 @@ export class MediaDiscoveryStore {
 
   ingestSignals(input: MediaSignalBatch): MediaDiscoveryStoreSummary {
     const records = this.recordsByTab.get(input.tabId)?.slice() ?? [];
-    const identities = this.collectIdentityKeys(records);
+    const identityIndexes = this.collectIdentityIndexes(records);
     let presentationRelevantChange = false;
     let validationRelevantChange = false;
     for (let i = 0; i < input.signals.length; i++) {
       const build = this.buildFromSignal(input.signals[i]);
-      const mutation = this.upsertRecord(records, identities, build.identity.idKey, build.candidate);
+      const mutation = this.upsertRecord(records, identityIndexes, build.identity.idKey, build.candidate);
       presentationRelevantChange = presentationRelevantChange || mutation.presentationRelevantChange;
       validationRelevantChange = validationRelevantChange || mutation.validationRelevantChange;
     }
@@ -139,26 +139,25 @@ export class MediaDiscoveryStore {
 
   private upsertRecord(
     records: MediaDiscoveryCandidateRecord[],
-    identities: string[],
+    identityIndexes: Map<string, number>,
     identityKey: string,
     candidate: MediaCandidate
   ): MediaDiscoveryRecordMutation {
-    for (let i = 0; i < identities.length; i++) {
-      if (identities[i] === identityKey) {
-        const current = records[i].candidate;
-        const presentationFingerprint = this.buildPresentationFingerprint(current);
-        const validationFingerprint = this.buildValidationFingerprint(current);
-        const validationRetryDue = this.shouldValidateCandidate(current, Date.now());
-        this.mergeRecord(records[i], candidate);
-        return {
-          presentationRelevantChange:
-            presentationFingerprint !== this.buildPresentationFingerprint(current),
-          validationRelevantChange:
-            validationRetryDue || validationFingerprint !== this.buildValidationFingerprint(current)
-        };
-      }
+    const existingIndex = identityIndexes.get(identityKey);
+    if (existingIndex !== undefined) {
+      const current = records[existingIndex].candidate;
+      const presentationFingerprint = this.buildPresentationFingerprint(current);
+      const validationFingerprint = this.buildValidationFingerprint(current);
+      const validationRetryDue = this.shouldValidateCandidate(current, Date.now());
+      this.mergeRecord(records[existingIndex], candidate);
+      return {
+        presentationRelevantChange:
+          presentationFingerprint !== this.buildPresentationFingerprint(current),
+        validationRelevantChange:
+          validationRetryDue || validationFingerprint !== this.buildValidationFingerprint(current)
+      };
     }
-    identities.push(identityKey);
+    identityIndexes.set(identityKey, records.length);
     records.push({
       identityKey: identityKey,
       candidate: candidate
@@ -550,12 +549,12 @@ export class MediaDiscoveryStore {
     return current !== undefined ? current : next;
   }
 
-  private collectIdentityKeys(records: MediaDiscoveryCandidateRecord[]): string[] {
-    const identities: string[] = [];
+  private collectIdentityIndexes(records: MediaDiscoveryCandidateRecord[]): Map<string, number> {
+    const indexes: Map<string, number> = new Map();
     for (let i = 0; i < records.length; i++) {
-      identities.push(records[i].identityKey);
+      indexes.set(records[i].identityKey, i);
     }
-    return identities;
+    return indexes;
   }
 
   private findCandidate(tabId: string, candidateId: string): MediaCandidate | undefined {

@@ -2132,6 +2132,7 @@ export class BrowserMediaDiscoveryCoordinator {
       pageUrl: input.pageUrl,
       pageTitle: input.pageTitle,
       privateMode: privateModeOverride ?? (input.privacyMode === 'private'),
+      webPageVisible: input.runtime.webPageVisible,
       userIntent: userIntent,
       visibleVideoMediaCount: counts.visibleVideoMediaCount,
       videoMediaCount: counts.videoMediaCount
@@ -2198,6 +2199,7 @@ export class BrowserMediaDiscoveryCoordinator {
       fullAppServiceMode: runtime.fullAppServiceMode,
       webVideoTakeoverEnabled: runtime.webVideoTakeoverEnabled,
       mediaResourcesPanelOpen: runtime.mediaResourcesPanelOpen,
+      webPageVisible: runtime.webPageVisible,
       userIntent: userIntent
     };
   }

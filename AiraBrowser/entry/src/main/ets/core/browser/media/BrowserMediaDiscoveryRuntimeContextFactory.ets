@@ -6,6 +6,7 @@ export interface BrowserMediaDiscoveryRuntimeContextBuildInput {
   fullAppServiceMode: boolean;
   cachedExperimentSettings: BrowserExperimentSettings;
   mediaResourcesPanelOpen: boolean;
+  webPageVisible: boolean;
 }
 
 export class BrowserMediaDiscoveryRuntimeContextFactory {
@@ -27,7 +28,8 @@ export class BrowserMediaDiscoveryRuntimeContextFactory {
     const buildSignature =
       (input.fullAppServiceMode ? '1' : '0') + ':' +
         (cachedTakeoverEnabled ? '1' : '0') + ':' +
-        (input.mediaResourcesPanelOpen ? '1' : '0');
+        (input.mediaResourcesPanelOpen ? '1' : '0') + ':' +
+        (input.webPageVisible ? '1' : '0');
     if (this.cachedRuntimeContext !== undefined && buildSignature === this.cachedBuildSignature) {
       return this.cachedRuntimeContext;
     }
@@ -37,7 +39,8 @@ export class BrowserMediaDiscoveryRuntimeContextFactory {
     this.cachedRuntimeContext = {
       fullAppServiceMode: input.fullAppServiceMode,
       webVideoTakeoverEnabled: repositoryTakeoverEnabled,
-      mediaResourcesPanelOpen: input.mediaResourcesPanelOpen
+      mediaResourcesPanelOpen: input.mediaResourcesPanelOpen,
+      webPageVisible: input.webPageVisible
     };
     return this.cachedRuntimeContext;
   }

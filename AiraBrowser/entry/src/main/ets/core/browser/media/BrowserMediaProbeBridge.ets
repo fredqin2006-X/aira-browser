@@ -17,6 +17,8 @@ import {
 import {
   MediaCompatibilitySelectorEvidenceObservation
 } from '../../../features/mediaDiscovery/MediaEvidenceGraphModels';
+import { MediaResourceTypeRules } from '../../../features/mediaDiscovery/MediaResourceTypeRules';
+import { MediaVideoTypeRules } from '../../../features/mediaDiscovery/MediaVideoTypeRules';
 import {
   MediaSignalClassificationOptions,
   MediaSignalClassificationService
@@ -75,6 +77,8 @@ export class BrowserMediaProbeBridge {
   private selectorProbeService: VideoCompatibilityProfileSelectorProbeService =
     new VideoCompatibilityProfileSelectorProbeService();
   private signalClassifier: MediaSignalClassificationService;
+  private resourceTypeRules: MediaResourceTypeRules = new MediaResourceTypeRules();
+  private videoTypeRules: MediaVideoTypeRules = new MediaVideoTypeRules();
 
   constructor(
     resourceDomScanService: MediaResourceDomProbeService,
@@ -92,6 +96,10 @@ export class BrowserMediaProbeBridge {
     try {
       const url = input.request.getRequestUrl();
       if (url.length === 0) {
+        return undefined;
+      }
+      const classification = this.resourceTypeRules.classifyByUrl(url);
+      if (classification.family === 'unknown' && classification.noise) {
         return undefined;
       }
       const isMainFrame = this.safeIsMainFrame(input.request);
@@ -118,6 +126,9 @@ export class BrowserMediaProbeBridge {
     try {
       const url = input.request.getRequestUrl();
       if (url.length === 0) {
+        return undefined;
+      }
+      if (this.videoTypeRules.classifyByUrl(url).kind === 'unknown') {
         return undefined;
       }
       const referer = this.safeHeader(input.request, 'Referer');
